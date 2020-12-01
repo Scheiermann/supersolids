@@ -3,23 +3,59 @@
 
 \subsection{Questions}
 \begin{itemize}
-        \item $\int \frac{1}{r^{n}} \mathrm{d^{3}r}$ divergent just for $n \leq 3 $ ?
-        {\color{red} Apart from the angular part, $\int \frac{1}{r^{n}} \mathrm{d^{3}r}$ goes as $\int \frac{1}{r^{n-2}} dr$. Let's integrate up to a radius $R$, which we will tend to infinity. If $n=3$ it diverges as $\ln(R)$. If $n>3$ it does not diverge, e.g. $n=4$  vanishes as $1/R$. If $n<3$ if diverges, e.g. $n=2$ diverges as $R$.}
-        \item What is an s-wave?
-        \item if $l < \frac{n-3}{2}$,
-        \item and like $k^{n-2}$ otherwise (Landau and Lishitz, 1977). For a van der
+         \item $\int \frac{1}{r^{n}} \mathrm{d^{3}r}$ divergent just for $n \leq 3 $ ?
+        {\color{red} Yes. Apart from an angular part, the integral goes as $\int dr \frac{1}{r^{n-2}}$. If you integrate  till $R$ (which you will tend to infinity), then you can easily see that for $n=3$ it diverges as  
+        $\ln(R)$. For any other $n$ is goes as $R^{3-n}$, and hence it converges for $n>3$, and diverges for $n<3$. }
+        
+        \item What is an s-wave? {\color{red} $s$-wave means angular momentum $l=0$}.
+        \item if $l < \frac{n-3}{2}$, and like $k^{n-2}$ otherwise (Landau and Lishitz, 1977). For a van der
         Waals-like potential $(n = 6)$, only $l = 0$ (s-wave) matters at low energies. Whats with $l=0$? Lifschitz is a typo?
+        {\color{red}  $l=0$ is special. For $l=0$ the centrifugal barrier $\frac{\hbar^2l(l+1)}{2mr^2}$ vanishes. Intuitively you can see that for short-range potentials, like $1/r^6$ you need to 
+        be close to $r=0$, such that the particles see each other. If the kinetic energy is too low, then the kinetic energy is not enough to overcome the centrifugal barrier. As a result, only $l=0$, i.e. the $s$-wave, 
+        contributes.}        
         \item In the notes: eq. 1.8 to 1.9 the commutator $[\psi, \psi^{\dagger}]$ was used, but from 1.9 to 1.10 Bogoliubov aproximation was used, why not directly on 1.8 ?
-        \item What is the derivation of 1.11? Its a FFT, but what are the xact steps?
-        \item What are the python packages to use operators like $\hat{\psi}$? There is some sympy implementation, but probably there is a better one?
+        {\color{red}  It could have been done directly in 1.8.}
+        \item What is the derivation of 1.11? Its a FFT, but what are the xact steps? 
+        {\color{red}  First $\hat\psi(\vec r)=\sum_{\vec p} \hat a_{\vec p}\frac{e^{i\vec p\cdot\vec r/\hbar}}{\sqrt{V}}$, where $V$ is just a quantization volume, just to have the proper units.
+        We will also Fourier-Transform the potential $V(\vec r-\vec r')=\sum \tilde V(\vec q)e^{i\vec q\cdot (\vec r-\vec r')}$. Then, you see that 
+        $$
+        \int d^3r \int d^3r' V(\vec r-\vec r') \hat\psi^\dag(\vec r) \hat\psi^\dag(\vec r')\hat\psi(\vec r')\hat\psi(\vec r)
+        $$
+        becomes of the form of Eq. (1.11), after using that $\frac{1}{V} \int d^3 r e^{i\vec k\cdot \vec r}=\delta(\vec k)$.}
+        
+        \item What are the python packages to use operators like $\hat{\psi}$? There is some sympy implementation, but probably there is a better one? 
+        {\color{red} I'm unsure what do you mean here.}
+               
         \item how to get from 1.11 to 1.12? Is it a commutator expansion? Why $q$ is disappearing?
-        \item In 1.17 $\omega_{\rho}$ part has a factor 2, but $\omega_{z}$ not, despite beeing symmetric in $\psi$. Why?
+        {\color{red} This is based on the so-called Bogoliubov approximation. Since the system condenses in $\vec p=0$, you approximate $\hat a_0$ and $\hat a^\dag_0$ by $\sqrt{N_0}$, 
+        with $N_0$ the number of condensed atoms.  This is because $N_0\gg 1$. Actually $N_0\simeq N$, and hence the number of non-condensed atoms is much smaller than $N_0$. 
+        Then you will do the following. You will consider up to second order, i.e. up to terms with at most two operators $a_{\vec p}$ with $\vec p\neq 0$~(you will see that there 
+        are no terms with just one operator with $p\neq 0$). 
+        Let's have a look to the interaction term in Eq. (1.11) (I forget here hats and vectors in order to ease the notation) $a^\dag_{p_1+q}a^\dag_{p_2-q}a_{p_2}a_{p_1}$. 
+        Let's see which combinations you have that have at most 2 operators with a non zero momentum: 
+        $(p_1+q,p_2-q,p_2,p_1)=(0,0,0,0), (0,0,x,x), (x,x,0,0), (0,x,x,0), (x,0,0,x), (0,x,0,x), (x,0,x,0)$, where $x$ means that it is not zero. The first term gives you the energy at order zero: $E_0=\frac{U(0)}{2V}N_0^2$. 
+        Note that $N=N_0+\sum_{p\neq 0} a^\dag_pa_p$, and hence up to second order   $N^2=N_0^2+2N_0\sum_{p\neq 0} a^\dag_pa_p$. As a result:
+        $E_0=\frac{U(0)}{2V}N^2 - U(0) n_0 \sum_{p\neq 0} a^\dag_pa_p$. 
+        The 3rd and 4th terms give $U(0) n_0 \sum_{p\neq 0} a^\dag_pa_p$ which cancels exactly with the term in $E_0$. 
+        The other terms will give you what you find in Eq. (1.12).}
+        
+        
+        \item In 1.17 $\omega_{\rho}$ part has a factor 2, but $\omega_{z}$ not, despite beeing symmetric in $\psi$. Why?{\color{red} This is because of the two directions on the plane.}
         \item What is variable $a$? Why should $a > 0$ as repulsive short-range interactions stabilize the BEC (p.10)?
-        \item ``When the atomic density grows due to the attractive interaction, three-body losses predominantly occur in the high-density region. '' What does three-body losses mean?
-        \item ``As the collapse occurs mainly in the x-y direction due to anisotropy of the DDI (in the absence of inelastic losses, the condensate would indeed become an infinitely thin cigar-shaped cloud along z),
+        {\color{red} $a$ is the $s$-wave scattering length. It characterizes the short-range part of the interaction. As mentioned above the contact interaction is just described by what happens at $s$-wave. 
+        At low energies, this means that the short-range interactions are given by a single parameter, which is the scattering length. A positive scattering length means repulsive interactions, i.e. the interaction energy increases when the density increases, i.e. when the distances decreases (i.e. the particles repel each other). The opposite is true for $a<0$, for which the particle attract each other. The dipole-dipole interaction is partially atrtractive and partially repulsive. Attraction is dangerous, because the system tends to collapse. Adding repulsive contact interaction may compensate the dipolar attraction, hence preventing collapse.} 
+                \item ``When the atomic density grows due to the attractive interaction, three-body losses predominantly occur in the high-density region. '' What does three-body losses mean? 
+                {\color{red} Three-body losses means that three particles meet at close distances (which becomes more and more probable for larger and larger densities). When this occurs, two of the particles may 
+                fall into a bound state, giving the excess energy to the third one. As a result all three particle are loss from the system, and hence the term three-body loss.}
+                 \item ``As the collapse occurs mainly in the x-y direction due to anisotropy of the DDI (in the absence of inelastic losses, the condensate would indeed become an infinitely thin cigar-shaped cloud along z),
         and therefore the condensate explodes essentially radially, producing the anisotropic
         shape of the cloud.'' Why is the collaps not along z axis?
-        \item How are the regions stable, metastable, unstable derived in Figure 1.5, here Figure \ref{fig:acrit}?
+        {\color{red} Note that the dipoles attract each other when placed head with tail, i.e. in this case when they are placed aligned on top of each other along the $z$-direction. Hence collapse produces a thin "cigar" along $z$. However, before this "cigar" becomes infinitely thin, three-body losses kick out. When this occurs, the kinetic energy on the $xy$ plane, which is huge (due to the strong compression, recall Heisenberg uncertainty), is released and the BEC explodes. A note here: the key point of all the droplet business in recent works (starting in 2016) is that the collapse in a dipolar condensate may be actually stopped due to 
+        the stabilizing effect of quantum fluctuations, but this wasn't known when I wrote the notes!}
+        
+        \item How are the regions stable, metastable, unstable derived in Figure 1.5, here Figure \ref{fig:acrit}? 
+        {\color{red}  It comes from the two solutions of Eq. (1.25).}
+
 \end{itemize}
 
 \begin{figure}[H]
