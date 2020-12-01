@@ -1,10 +1,12 @@
 %!TeX encoding=utf8
+\usepackage{xcolor}
 
 \section{Bose Einstein Condensate}
 
 \subsection{Questions}
 \begin{itemize}
         \item $\int \frac{1}{r^{n}} \mathrm{d^{3}r}$ divergent just for $n \leq 3 $ ?
+        {\color{red} Apart from the angular part, $\int \frac{1}{r^{n}} \mathrm{d^{3}r}$ goes as $\int \frac{1}{r^{n-2}} dr$. Let's integrate up to a radius $R$, which we will tend to infinity. If $n=3$ it diverges as $\ln(R)$. If $n>3$ it does not diverge, e.g. $n=4$  vanishes as $1/R$. If $n<3$ if diverges, e.g. $n=2$ diverges as $R$.}
         \item What is an s-wave?
         \item if $l < \frac{n-3}{2}$,
         \item and like $k^{n-2}$ otherwise (Landau and Lishitz, 1977). For a van der
