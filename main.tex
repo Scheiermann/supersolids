@@ -1,0 +1,26 @@
+%!TeX encoding=utf8
+\input{preamble.tex}
+\begin{document}
+\input{titlepage.tex}
+
+
+\thispagestyle{empty}
+\tableofcontents
+\pagestyle{scrheadings}
+
+\setcounter{page}{1}
+\newpage
+
+
+%\tikzexternalize{main}
+
+%%%nopagebreak (needs to be run together)
+% \nopagebreak
+% \hrule height 0pt
+% \pagebreak[2]
+%%%
+\input{text.tex}
+
+\printbibliography
+
+\end{document}

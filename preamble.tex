@@ -1,0 +1,167 @@
+\documentclass[english]{scrartcl}
+
+\newcommand{\authA}{Daniel Scheiermann}
+\newcommand{\matA}{}
+\newcommand{\grpnr}{}
+\newcommand{\Versuchsnummer}{}
+\newcommand{\Versuchsname}{}
+
+\usepackage{physics}
+
+%%%%%%%%%%%%%%%%%%Capitalized Color - start%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{xparse}
+\usepackage{xcolor}
+\definecolor{luh_blue}{RGB}{0,80,155} %the blue of the luh logo
+
+
+\ExplSyntaxOn
+\NewDocumentCommand{\colorcap}{ O{blue} m }
+ {
+  \sheljohn_colorcap:nn { #1 } { #2 }
+ }
+
+\tl_new:N \l__sheljohn_colorcap_input_tl
+\cs_new_protected:Npn \sheljohn_colorcap:nn #1 #2
+ {
+  % store the string in a variable for usage with \regex_replace_all:nnN
+  \tl_set:Nn \l__sheljohn_colorcap_input_tl { #2 }
+  \regex_replace_all:nnN
+   { ([A-Z]+) } % search a capital letter (or more)
+   { \c{textcolor}\cB\{#1\cE\}\cB\{\1\cE\} } % replace the match with \textcolor{#1}{<match>}
+   \l__sheljohn_colorcap_input_tl
+  \tl_use:N \l__sheljohn_colorcap_input_tl
+ }
+\ExplSyntaxOff
+%%%%%%%%%%%%%%%%%%Capitalized Color - end%%%%%%%%%%%%%%%%%%%%%%%%
+%---configure pagelayout
+\KOMAoptions{ % read documentation for KOMAScript providing the documentclass scrartcl
+DIV=11,
+BCOR=0mm,
+paper=a4,
+fontsize=12pt,
+parskip=half,
+twoside=false,
+titlepage=true
+}
+
+%\usepackage[ %Set linespacing
+%singlespacing %onehalfspacing,doublespacing
+%]{setspace}
+
+\usepackage[headsepline,footsepline,automark,pagestyleset=KOMA-Script,markcase=ignoreuppercase]{scrlayer-scrpage} %Configure headline and footer
+
+\clearscrheadings
+\setlength{\headheight}{3.5\baselineskip}
+
+% \ihead[]{\authA~(\matA)}
+\ihead[]{\authA~\matA}
+\ohead{\includegraphics[height=13pt]{IMAGE/luh_logo.png}
+%\\ $ $ \grpnr
+}
+%\Versuchsnummer
+
+
+%\clearpairofpagestyles
+\cfoot{\vspace{-0.75cm}\pagemark}
+\pagestyle{scrheadings}
+
+%better positioning of floatings
+\renewcommand{\floatpagefraction}{.75} % standard: .5
+\renewcommand{\textfraction}{.1} % standard: .2
+\renewcommand{\topfraction}{.8} % standard: .7
+\renewcommand{\bottomfraction}{.5} % standard: .3
+\setcounter{topnumber}{3} % standard: 2
+\setcounter{bottomnumber}{2} % standard: 1
+\setcounter{totalnumber}{5} % standard: 3
+
+%---Language and umlauts
+\usepackage[utf8]{inputenc} %Set UTF-8 encoding, enables ä,ö,ü etc.
+% \DeclareUnicodeCharacter{2212}{-}
+\usepackage[english]{babel} %Set document language to ngerman (new german)
+%\usepackage[% improved hyphenation
+%expansion=true,
+%protrusion=true
+%]{microtype}
+\usepackage{subcaption}
+%\usepackage{subfig} %subcaption includes subfig
+%\captionsetup[subfigure]{list=true, font=large, labelfont=bf,
+%labelformat=brace, position=top}
+
+%---Mathmatics (AMS packages )
+\usepackage{amsmath} %generell math enviorments e.g. align
+\usepackage{amsfonts}
+\usepackage{amssymb}
+%\usepackage{amsthm} %math theorems
+%\usepackage{upgreek}%provide special form of greek letters e.g. \upmu
+\usepackage{float}
+%---Units
+\usepackage[decimalsymbol=comma]{siunitx}
+%\usepackage{units}
+%\usepackage[numbers]{natbib}
+%\usepackage{pdfpages}
+\usepackage{textcomp}
+\usepackage{longtable}
+%\usepackage{braket}
+%\usepackage{color}
+\usepackage[backend=biber]{biblatex}
+\addbibresource{literature.bib}
+
+%\renewcommand{\arraystretch}{1.2} % Standard-Zeilenhöhe einstellen
+
+%%%%%%%%%%%%%%%%%%For tikz%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{lmodern}
+\usepackage{textcomp}
+\usepackage{lastpage}
+\usepackage{amsmath}
+\usepackage{physics}
+\usepackage{lipsum}
+\usepackage{pxfonts}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{width=\textwidth, compat=1.17}
+\usepgfplotslibrary{external} % LaTeX and plain TeX
+\usetikzlibrary{pgfplots.external}
+\usepgfplotslibrary[external] % LaTeX and plain TeX
+\usetikzlibrary[pgfplots.external]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%---tables and imgaes
+\usepackage{graphicx} %provide \includegraphics[options]{name}
+%\usepackage{epstopdf} %enable the use of eps-graphics
+\usepackage[hypcap]{caption} %captions out of floating-enviorments(figure,table)
+\usepackage{booktabs} %extra lines in tabulars
+%\usepackage{flafter} %Place floating-enviorments after references.
+%\usepackage[ %
+%section %latest ancor for floating-enviorments
+%]{placeins}
+\usepackage{verbatim} %long comments \begin{comment} ...\end{comment}
+
+%---Hyperlinks
+\usepackage{hyperref} %create table of content and references as links
+\hypersetup{
+%
+%Colors
+colorlinks=true,
+breaklinks=true,
+citecolor=blue,
+linkcolor=black,
+menucolor=red,
+urlcolor=cyan,
+%
+%pdf-bookmarks
+bookmarksopen=false,
+bookmarksopenlevel=0,
+%
+%pdf-data
+% pdftitle={\titel},
+% pdfauthor={\writer},
+% pdfcreator={\writer},
+% pdfsubject={\titel},
+% pdfkeywords={\titel}
+%
+%misc
+plainpages=false,% zur korrekten Erstellung der Bookmarks
+hypertexnames=false,% zur korrekten Erstellung der Bookmarks
+% hyperindex=true,
+}
+
