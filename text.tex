@@ -152,16 +152,24 @@ In this state, every constituent atom is part of the solid and the superfluid si
     \item beyond mean-field approximation leads to corrections to the ground
 state energy stemming from quantum fluctuations of the collective modes in a BEC (LHY-correction)
     \item In 2018 quantum droplets in a Bose-Bose mixture were observed
-    \item mean- field energy depends on the difference of the two coupling constants $\delta(g) = |g_{rep}| - |g_{att}|$ \item LHY-correction depends on the individual coupling constants
-    \item For weakly attractive combination of interactions, a repulsive beyond mean-field correction can stabilize the BEC
-    \item after a peak density increasing the number of particles only leads to an increase in the
-size of the droplet
-    \item eGPE: kinetic energy, external trapping, and two-body interactions, LHY
-    \item beyond mean-field correction has only been calculated for a homogeneous system and can therefore only be included within a local-density approximation
-    \item QMC calculations in full many-body system verified the formation
-    \item intra-species scattering lengths $a_{11}$ and $a_{22}$ lead to different equilibrium densities $n^{(i)}_{0}$ for the two components of the mixture.
-    \item droplet forms an intrinsic imbalance in the atom numbers of the two components ($\frac{N1}{N2} = \sqrt{\frac{a_{22}}{a_{11}}}$ )
-    \item larger density than in original BEC increases the rate of three-body loss $\Rightarrow$ extra term in eGPE
+
+    \item Quantum droplets in Bose-Bose mixtures
+    \begin{itemize}
+        \item mean- field energy depends on the difference of the two coupling constants $\delta(g) = |g_{rep}| - |g_{att}|$ \item LHY-correction depends on the individual coupling constants
+        \item For weakly attractive combination of interactions, a repulsive beyond mean-field correction can stabilize the BEC
+        \item after a peak density increasing the number of particles only leads to an increase in the
+    size of the droplet
+        \item eGPE: kinetic energy, external trapping, and two-body interactions, LHY
+        \item beyond mean-field correction has only been calculated for a homogeneous system and can therefore only be included within a local-density approximation
+        \item QMC calculations in full many-body system verified the formation
+        \item intra-species scattering lengths $a_{11}$ and $a_{22}$ lead to different equilibrium densities $n^{(i)}_{0}$ for the two components of the mixture.
+        \item droplet forms an intrinsic imbalance in the atom numbers of the two components ($\frac{N1}{N2} = \sqrt{\frac{a_{22}}{a_{11}}}$ )
+        \item larger density than in original BEC increases the rate of three-body loss $\Rightarrow$ extra term in eGPE
+        \item[]
+            \begin{equation}
+              i \hbar \partial_{t} \psi = \left[ - \frac{\hbar^{2} \nabla^{2}}{2 m} + V_{ext}(r) + \alpha n_{0} |\psi|^{2} + \gamma n_{0}^{\frac{3}{2}} |\psi|^{3} \right] \psi
+            \end{equation}
+    \end{itemize}
 \end{itemize}
 
 \begin{figure}[H]
@@ -171,3 +179,16 @@ size of the droplet
     \textsc{Santos}, \emph{title} (year)
     \label{fig:droplet}
 \end{figure}
+
+\begin{itemize}
+    \item Dipolar Quantum droplets
+    \begin{itemize}
+        \item[]
+            \begin{equation}
+              i \hbar \partial_{t} \psi = \left[ - \frac{\hbar^{2} \nabla^{2}}{2 m} + V_{ext}(r) + g |\psi|^{2} + \phi_{dd} + g_{qf} |\psi|^{3} \right] \psi
+            \end{equation}
+    \end{itemize}
+    \item Liquid-like density saturation appears indicating very low compressibility
+    \item a droplet has $2.2 \cdot 10^{4}$ atoms
+    \item the dynamical state after 5ms of evolution is a Gaussian density distribution
+\end{itemize}
