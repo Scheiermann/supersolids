@@ -6,23 +6,30 @@
          \item $\int \frac{1}{r^{n}} \mathrm{d^{3}r}$ divergent just for $n \leq 3 $ ?
         {\color{red} Yes. Apart from an angular part, the integral goes as $\int dr \frac{1}{r^{n-2}}$. If you integrate  till $R$ (which you will tend to infinity), then you can easily see that for $n=3$ it diverges as  
         $\ln(R)$. For any other $n$ is goes as $R^{3-n}$, and hence it converges for $n>3$, and diverges for $n<3$. }
+        {\color{green} Thanks.}
         
         \item What is an s-wave? {\color{red} $s$-wave means angular momentum $l=0$}.
+        {\color{green} Thanks.}
+
         \item if $l < \frac{n-3}{2}$, and like $k^{n-2}$ otherwise (Landau and Lishitz, 1977). For a van der
         Waals-like potential $(n = 6)$, only $l = 0$ (s-wave) matters at low energies. Whats with $l=0$? Lifschitz is a typo?
-        {\color{red}  $l=0$ is special. For $l=0$ the centrifugal barrier $\frac{\hbar^2l(l+1)}{2mr^2}$ vanishes. Intuitively you can see that for short-range potentials, like $1/r^6$ you need to 
+        {\color{red}  $l=0$ is special. For $l=0$ the centrifugal barrier $\frac{\hbar^2l(l+1)}{2mr^2}$ vanishes. Intuitively you can see that for short-range potentials, like $1/r^6$ you need to
         be close to $r=0$, such that the particles see each other. If the kinetic energy is too low, then the kinetic energy is not enough to overcome the centrifugal barrier. As a result, only $l=0$, i.e. the $s$-wave, 
         contributes.}        
+        {\color{green} Thanks.}
+
         \item In the notes: eq. 1.8 to 1.9 the commutator $[\psi, \psi^{\dagger}]$ was used, but from 1.9 to 1.10 Bogoliubov aproximation was used, why not directly on 1.8 ?
         {\color{red}  It could have been done directly in 1.8.}
-        \item What is the derivation of 1.11? Its a FFT, but what are the xact steps? 
+        {\color{green} Thanks.}
+
+        \item What is the derivation of 1.11? Its a FFT, but what are the exact steps?
         {\color{red}  First $\hat\psi(\vec r)=\sum_{\vec p} \hat a_{\vec p}\frac{e^{i\vec p\cdot\vec r/\hbar}}{\sqrt{V}}$, where $V$ is just a quantization volume, just to have the proper units.
         We will also Fourier-Transform the potential $V(\vec r-\vec r')=\sum \tilde V(\vec q)e^{i\vec q\cdot (\vec r-\vec r')}$. Then, you see that 
         $$
         \int d^3r \int d^3r' V(\vec r-\vec r') \hat\psi^\dag(\vec r) \hat\psi^\dag(\vec r')\hat\psi(\vec r')\hat\psi(\vec r)
         $$
         becomes of the form of Eq. (1.11), after using that $\frac{1}{V} \int d^3 r e^{i\vec k\cdot \vec r}=\delta(\vec k)$.}
-        
+
         \item What are the python packages to use operators like $\hat{\psi}$? There is some sympy implementation, but probably there is a better one? 
         {\color{red} I'm unsure what do you mean here.}
                
@@ -58,14 +65,6 @@
 
 \end{itemize}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{IMAGE/acrit.png}\\
-    \caption{Logo}
-    \textsc{Santos}, \emph{title} (year)
-    \label{fig:acrit}
-\end{figure}
-
 \begin{itemize}
         \item Typo in ``we obtain a 1D equation similar to the a GP equation'', just the or a
         \item ``ground-state wave-function is independent of the in-plane coordinates '' Why?
@@ -76,14 +75,6 @@
         \item What are the spin-F matrizes?
         \item Is the occurance of these spin textures in Figure \ref{fig:helical} special?
 \end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{IMAGE/helical.png}\\
-    \caption{Is the occurance of these textures special?}
-    \textsc{Santos}, \emph{title} (year)
-    \label{fig:helical}
-\end{figure}
 
 \subsection{Summary}
 \begin{itemize}
@@ -108,6 +99,14 @@
         \item ``pancake traps'' can stabilize the phonon-instability
         \item qualitative features for $a_{crit}(\lambda)$ by gaussian ansatz, for exact numerical solution non-local Gross-Pitaevskii Equation needed
 \end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{IMAGE/acrit.png}\\
+    \caption{Logo}
+    \textsc{Santos}, \emph{title} (year)
+    \label{fig:acrit}
+\end{figure}
 
 \begin{figure}[H]
     \centering
@@ -162,22 +161,11 @@ to the difference between scattering lengths at different channels
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{IMAGE/acrit.png}\\
-    \caption{Logo}
+    \includegraphics[width=0.7\textwidth]{IMAGE/helical.png}\\
+    \caption{Is the occurance of these textures special?}
     \textsc{Santos}, \emph{title} (year)
-    \label{fig:acrit}
+    \label{fig:helical}
 \end{figure}
-
-\begin{itemize}
-        \item Typo in ``we obtain a 1D equation similar to the a GP equation'', just the or a
-        \item ``ground-state wave-function is independent of the in-plane coordinates '' Why?
-        \item 1.26 to 1.27, where does the $U_{dd}$ go?
-        \item Typo If: ``roton momentum. if this were so''
-        \item Why should a modulation with a finite wavelength allow superfluids?
-        \item Typo repeatance: ``the width of the width''
-        \item What are the spin-F matrizes?
-        \item Is the occurance of these spin textures in Figure \ref{fig:helical} special?
-\end{itemize}
 
 \section{Supersolids}
 
