@@ -74,6 +74,14 @@
         \item Typo repeatance: ``the width of the width''
         \item What are the spin-F matrizes?
         \item Is the occurance of these spin textures in Figure \ref{fig:helical} special?
+        \item ``In 3D system there exists a regime where no collective modes are below the chemical potential, which corresponds to the particle emission threshold $\Rightarrow$ excitation leads to self-evaporation of the droplet to zero temperature'' Is this a good/useful or is it just counter-productive for experiments? Meaning switching between this regime and a normal one to get probably higher densities?
+        \item In Figure \ref{fig:collective} b, if the theoretical values would fit, then the dashed line would be where the darkest color is? If yes, why is it not?
+        \item What are bright and dark solitons?
+        \item What is meant by crossover between bright solitons and droplets?
+        \item ``anisotropy of droplets leads to a frustration of the dipolar quantum droplet when
+compressed along the magnetic field direction'' What does frustration mean in that context?
+        \item ``multi-droplet states appear upon crossing into the bistable region, due to the fragmentation of the system following a modulational instability $\Rightarrow$ multi-droplet states are not the ground state'' Why is this following (what is the argument here)?
+
 \end{itemize}
 
 \subsection{Summary}
@@ -102,7 +110,7 @@
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{IMAGE/acrit.png}\\
+    \includegraphics[width=1.0\textwidth]{IMAGE/acrit.png}\\
     \caption{Logo}
     \textsc{Santos}, \emph{title} (year)
     \label{fig:acrit}
@@ -110,7 +118,7 @@
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{IMAGE/stability.png}\\
+    \includegraphics[width=1.0\textwidth]{IMAGE/stability.png}\\
     \caption{Logo}
     \textsc{Santos}, \emph{title} (year)
     \label{fig:stability}
@@ -161,7 +169,7 @@ to the difference between scattering lengths at different channels
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{IMAGE/helical.png}\\
+    \includegraphics[width=1.0\textwidth]{IMAGE/helical.png}\\
     \caption{Is the occurance of these textures special?}
     \textsc{Santos}, \emph{title} (year)
     \label{fig:helical}
@@ -198,7 +206,7 @@ state energy stemming from quantum fluctuations of the collective modes in a BEC
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{IMAGE/droplet.png}\\
+    \includegraphics[width=1.0\textwidth]{IMAGE/droplet.png}\\
     \caption{Peak density of the droplet saturates in z-driection}
     \textsc{Santos}, \emph{title} (year)
     \label{fig:droplet}
@@ -215,4 +223,149 @@ state energy stemming from quantum fluctuations of the collective modes in a BEC
     \item Liquid-like density saturation appears indicating very low compressibility
     \item a droplet has $2.2 \cdot 10^{4}$ atoms
     \item the dynamical state after 5ms of evolution is a Gaussian density distribution
+    \item most liquid-like aspect arises from the balance between attractive
+        mean-field interaction and repulsive quantum fluctuations (self-bound nature)
+    \item BECs and degenerate Fermi gases gaseous (expand release from trap)
+    \item quantum droplets are self-bound ($N > N_{crit})$ caused by interplay between the binding mechanism and the kinetic energy cost of an inhomogeneous density distribution
+    \item kinetic energy leads to an increase $E/N$, which for small atom numbers can be strong enough to drive a liquid-to-gas transition
+    \item $N_{crit}$ experimental sequence:
+        \begin{enumerate}
+            \item prepare a quantum droplet with a high atom number
+            \item external trapping potential switched off and the unavoidable process of three-body decay leads to a rapid loss of atoms.
+            \item crossing the phase boundary to the gaseous state, the droplet turns into a gas and
+                rapidly expands
+            \item[$\Rightarrow$] significant reduction in the density suppressing further losses
+            \item[$\Rightarrow$] settled at critical atom number $N_{crit}$ of a self-bound droplet (actual value  depends on the precise strengths of the two interactions involved)
+            \item by varying the effective scattering length using Feshbach resonances, the phase diagrams can
+                be mapped out
+            \item residual confinement along the direction of gravity leads to a significant reduction of $N_{crit}$
+        \end{enumerate}
 \end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{IMAGE/self_bound.png}\\
+    \caption{
+            BEC and a self-bound quantum droplet in free space for a) the dipolar and (b) the Bose-Bose mixture. \\
+            In the droplet regime, imaging aberations appear due to the high density and a spatial size of the droplets that is smaller than the experimental imaging resolution. Theoretical phase boundary between self-bound droplet and expanding BEC, together with the measured critical atom numbers for (c) the dipolar and (d) Bose-Bose droplets.
+      }
+    \textsc{Tilman Pfau et al.}, \emph{New states of matter with fine-tuned interactions: quantum droplets and dipolar supersolids} (2020)
+    \label{fig:self_bound}
+\end{figure}
+
+\begin{itemize}
+    \item For Bose-Bose mixtures excitations, where the components are in- or out-of- phase (to each other)
+    \item collective modes would lead to exotic finite temperature behaviour of the binary droplets
+    \item In 3D system there exists a regime where no collective modes are below the chemical potential, which corresponds to the particle emission threshold $\Rightarrow$ excitation leads to self-evaporation of the droplet to zero temperature (just for Bose-Bose)
+    \begin{itemize}
+        \item out-of-phase modes are expected to be overdamped (too energetic to be bound)
+        \item No collective modes have been observed in Bose-Bose droplets (development of novel temperature probes needed)
+        \item quantum droplets are self-bound objects (time-of-flight expansion temperature measurements for cold atoms cannot be applied)
+    \end{itemize}
+    \item In 1D quantum droplets the breathing mode always stays trapped (theoretically shown)
+    \item dipolar case at least one collective mode is always expected to remain below the particle emission threshold
+    \item In dipolar systems, measurements of collective excitations were obeserved
+    \item an oscillation in the axial length of the droplet. Increase in the excitation energy upon approaching the transition (fits numerical simulations that include quantum fluctuations as the stabilization
+mechanism for the droplets)
+    \item Scissors mode: breaking of the rotational symmetry causes an angular oscillation of the droplet
+around the polarizing magnetic field direction
+    \item Scissor mode is an important marker of superfluidity (but moment of inertia of droplets does not differ significantly from the classical rigid due to the large anisotropy in their density distribution)
+    \item scattering length comes from partial wave analysis, where one expands in the angular momentum components of the outgoing wave (similar to multipole expansion in Electrodynamic), it is related to the physically observable cross-section
+\end{itemize}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{IMAGE/collective_excitation.png}\\
+    \caption{
+      Measurements of the collective excitations of a dipolar quantum droplet.
+      a) With stabilizing contribution of quantum fluctuations (blue) and without (red). \\
+      b) Measurement of the scissors mode arising from the breaking of the
+rotational symmetry in dipolar quantum droplets. Experimentally, the orientation of
+the magnetic field is modulated at different frequencies and the response of the system
+is observed by looking at the droplet sizes $\sigma_{x,y}$. Theoretical scissors mode frequency expected from linear response theory (dashed).
+}
+    \textsc{Tilman Pfau et al.}, \emph{New states of matter with fine-tuned interactions: quantum droplets and dipolar supersolids} (2020)
+    \label{fig:collective}
+\end{figure}
+
+
+\begin{itemize}
+    \item solitons emerge as a single particle effect (dispersion in the waveguide stabilizes the system against collapse
+    \item quantum droplets are stabilized by many-body phenomenon (repulsive quantum fluctuations)
+    \item solitons are only stable for effectively 1D gas (atom number $N < N_{crit\_soliton}$)
+    \item quantum droplets can exist as a purely self-bound state in 3D (atom number $N > N_{crit\_droplet}$)
+    \item Quantum droplets and solitons are distinct solutions of the eGPE
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{IMAGE/droplet_soliton.png}\\
+    \caption{
+            Simulated phase diagram of the ground-state peak density as a function
+            of the atom number and the (effective) scattering length for \\
+            a) Bose-Bose mixture in a cigar-shaped confinement \\
+            b) dipolar quantum gas in a pancake-shaped confinement. \\
+            Solitons and droplets can coexist in a bistable region (gray) or can be smoothly connected by a crossover (dashed guide-line).
+          }
+    \textsc{Tilman Pfau et al.}, \emph{New states of matter with fine-tuned interactions: quantum droplets and dipolar supersolids} (2020)
+    \label{fig:doplet_collision}
+\end{figure}
+
+
+\begin{itemize}
+    \item anisotropy of droplets leads to a frustration of the dipolar quantum droplet when
+compressed along the magnetic field direction and the emergence of arrays of dipolar
+quantum droplets
+    \item multi-droplet states appear upon crossing into the bistable region, due to the fragmentation of the system following a modulational instability $\Rightarrow$ multi-droplet states are not the ground state
+    \item by confining a multi-droplet in a cigar-shaped trap it can be made the ground-state (confirmed experimentally)
+    \item For large enough atom numbers, two-dimensional arrays of multiple quantum droplets eventually emerge as the ground state in cylindrically symmetric traps
+\end{itemize}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{IMAGE/external_trap.png}\\
+    \caption{
+        a) Example images of two-dimensional droplet arrays with increasing
+atom numbers in a cylindrically symmetric trap [19, 112]. (b) Phase diagram of an
+ensemble of 2.5 × 104 dysprosium atoms in a cylindrically symmetric trap with $\lambda = \frac{\omega_{z}}{\omega_{r}}$
+        d) In cigar-shaped traps, it is energetically favourable for the droplet number to increase with increasing confinement along the polarization direction. \\
+        c) Examples for this behaviour upon changing the in-plane trap geometry
+        d) Total energy per particle $E/N$ for a single droplet (red), two droplets (green) and four droplets (blue) in an external trap with $\omega_{trap} = 2\pi (70, 1000, f_{z}$) Hz using a variational approach (lines) or numerical simulations of the eGPE (points).
+      }
+    \textsc{Tilman Pfau et al.}, \emph{New states of matter with fine-tuned interactions: quantum droplets and dipolar supersolids} (2020)
+    \label{fig:external_trap}
+\end{figure}
+
+\begin{itemize}
+    \item collisions after loading a two-dimensional array into a one-dimensional waveguide with only weak confinement along one direction (Figure \ref{fig:droplet_collision} a. The droplets initially repel
+each other due to the repulsive dipole-dipole interaction. However, the weak confinement
+along the waveguide axis forces the droplets to reverse their motion and collide with each
+other. Figure \ref{fig:droplet_collision} b showing that the droplets bounce off each other twice. The oscillation of the droplets in the waveguide is strongly damped because of the relative motion between
+droplets and the residual background atoms, and inelastic collisions.
+
+    \item separated BECs are typically realized with a double-well potential
+    \item for collision the barrier needs to be removed
+    \item Controlling the time at which the radial and vertical confinement is turned off, the velocity can be precisely controlled
+    \item critical velocity $v_{c}$ dividing the two outcomes of the collision (merging droplets and droplets bouncing off each other) depends on the mean atom number $\tilde{N}_{coll}$ of the two droplets
+    \begin{itemize}
+        \item $v_{c}\left(\tilde{N}_{coll}\right)$ dependence is very different for small and large droplets
+        \item in a liquid-drop model the surface tension is the important energy scale for large droplets
+        \item small droplets there is no distinction between bulk and surface and as such the relevant energy scale is the binding energy
+        \item this can be seen as evidence of a crossover from a compressible quantum droplet at small atom numbers to a nearly incompressible droplet at large atom numbers
+    \end{itemize}
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{IMAGE/droplet_collision.png}\\
+    \caption{
+            \textbf{Dipolar droplets:} \\
+            a) Single-shot images of colliding dipolar quantum droplets for different evolution times. b) Mean droplet distance d as a function of the evolution time together with a guide to the eye representing a damped bouncing motion at the trap frequency (dashed gray line). \\
+            \textbf{Bose-Bose droplets:} \\
+            (c), (d) Example images of collision measurements of independently created binary quantum droplets resulting in (c) a separation and (d) a merger of the droplets. (e) Outcomes of different droplet collision measurements as a function of the relative velocity $\tilde{v}$ and the atom number $\tilde{N}_{coll}$ at the time of the collision, with the blue (red) diamonds indicating a merger (separation) of the droplets.
+      }
+    \textsc{Tilman Pfau et al.}, \emph{New states of matter with fine-tuned interactions: quantum droplets and dipolar supersolids} (2020)
+    \label{fig:droplet_collision}
+\end{figure}
