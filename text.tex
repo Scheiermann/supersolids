@@ -4,64 +4,115 @@
 \subsection{Questions}
 \begin{itemize}
          \item $\int \frac{1}{r^{n}} \mathrm{d^{3}r}$ divergent just for $n \leq 3 $ ?
-        {\color{red} Yes. Apart from an angular part, the integral goes as $\int dr \frac{1}{r^{n-2}}$. If you integrate  till $R$ (which you will tend to infinity), then you can easily see that for $n=3$ it diverges as  
-        $\ln(R)$. For any other $n$ is goes as $R^{3-n}$, and hence it converges for $n>3$, and diverges for $n<3$. }
+        {\color{red}
+            Yes. Apart from an angular part, the integral goes as $\int dr \frac{1}{r^{n-2}}$. If you integrate  till $R$ (which you will tend to infinity), then you can easily see that for $n=3$ it diverges as
+            $\ln(R)$. For any other $n$ is goes as $R^{3-n}$, and hence it converges for $n>3$, and diverges for $n<3$.
+        }
         {\color{green} Thanks.}
         
-        \item What is an s-wave? {\color{red} $s$-wave means angular momentum $l=0$}.
+        \item What is an s-wave?
+        {\color{red} $s$-wave means angular momentum $l=0$}.
         {\color{green} Thanks.}
 
         \item if $l < \frac{n-3}{2}$, and like $k^{n-2}$ otherwise (Landau and Lishitz, 1977). For a van der
         Waals-like potential $(n = 6)$, only $l = 0$ (s-wave) matters at low energies. Whats with $l=0$? Lifschitz is a typo?
-        {\color{red}  $l=0$ is special. For $l=0$ the centrifugal barrier $\frac{\hbar^2l(l+1)}{2mr^2}$ vanishes. Intuitively you can see that for short-range potentials, like $1/r^6$ you need to
-        be close to $r=0$, such that the particles see each other. If the kinetic energy is too low, then the kinetic energy is not enough to overcome the centrifugal barrier. As a result, only $l=0$, i.e. the $s$-wave, 
-        contributes.}        
+        {\color{red}
+            $l=0$ is special. For $l=0$ the centrifugal barrier $\frac{\hbar^2l(l+1)}{2mr^2}$ vanishes. Intuitively you can see that for short-range potentials, like $1/r^6$ you need to
+            be close to $r=0$, such that the particles see each other. If the kinetic energy is too low, then the kinetic energy is not enough to overcome the centrifugal barrier. As a result, only $l=0$, i.e. the $s$-wave,
+            contributes.
+        }
         {\color{green} Thanks.}
 
         \item In the notes: eq. 1.8 to 1.9 the commutator $[\psi, \psi^{\dagger}]$ was used, but from 1.9 to 1.10 Bogoliubov aproximation was used, why not directly on 1.8 ?
-        {\color{red}  It could have been done directly in 1.8.}
+        {\color{red} It could have been done directly in 1.8.}
         {\color{green} Thanks.}
 
         \item What is the derivation of 1.11? Its a FFT, but what are the exact steps?
-        {\color{red}  First $\hat\psi(\vec r)=\sum_{\vec p} \hat a_{\vec p}\frac{e^{i\vec p\cdot\vec r/\hbar}}{\sqrt{V}}$, where $V$ is just a quantization volume, just to have the proper units.
-        We will also Fourier-Transform the potential $V(\vec r-\vec r')=\sum \tilde V(\vec q)e^{i\vec q\cdot (\vec r-\vec r')}$. Then, you see that 
-        $$
-        \int d^3r \int d^3r' V(\vec r-\vec r') \hat\psi^\dag(\vec r) \hat\psi^\dag(\vec r')\hat\psi(\vec r')\hat\psi(\vec r)
-        $$
-        becomes of the form of Eq. (1.11), after using that $\frac{1}{V} \int d^3 r e^{i\vec k\cdot \vec r}=\delta(\vec k)$.}
+            {\color{red}
+                First $\hat\psi(\vec r)=\sum_{\vec p} \hat a_{\vec p}\frac{e^{i\vec p\cdot\vec r/\hbar}}{\sqrt{V}}$, where $V$ is just a quantization volume, just to have the proper units.
+                We will also Fourier-Transform the potential $V(\vec r-\vec r')=\sum \tilde V(\vec q)e^{i\vec q\cdot (\vec r-\vec r')}$. Then, you see that
+                $$
+                \int d^3r \int d^3r' V(\vec r-\vec r') \hat\psi^\dag(\vec r) \hat\psi^\dag(\vec r')\hat\psi(\vec r')\hat\psi(\vec r)
+                $$
+                becomes of the form of Eq. (1.11), after using that $\frac{1}{V} \int d^3 r e^{i\vec k\cdot \vec r}=\delta(\vec k)$.
+            }
+            {\color{green}
+                Thanks.
+                \begin{equation*}
+                  = \int d^3r \int d^3r' a_{p_{3}}^{\dagger} a_{p_{4}}^{\dagger} \delta\left(p_{2} - p_{4} - q\right) \delta\left(p_{1} - p_{3} + q\right) a_{p_{2}} a_{p_{1}} \\
+                  = a_{p_{1} + q}^{\dagger} a_{p_{2} - q}^{\dagger} a_{p_{2}} a_{p_{1}} \\
+                \end{equation*}
+            }
 
-        \item What are the python packages to use operators like $\hat{\psi}$? There is some sympy implementation, but probably there is a better one? 
-        {\color{red} I'm unsure what do you mean here.}
+        \item What are the python packages to use operators like $\hat{\psi}$? There is some sympy implementation, but probably there is a better one?
+        {\color{red}
+            I'm unsure what do you mean here. \\
+        }
+        {\color{green}
+            We surely will use calculation with more complicated operators than diagonal matrices (complicated Hamilton operator). Which python packages you know for that? I know that sympy has implementations for operators for symbolic calculations.
+        }
                
         \item how to get from 1.11 to 1.12? Is it a commutator expansion? Why $q$ is disappearing?
-        {\color{red} This is based on the so-called Bogoliubov approximation. Since the system condenses in $\vec p=0$, you approximate $\hat a_0$ and $\hat a^\dag_0$ by $\sqrt{N_0}$, 
-        with $N_0$ the number of condensed atoms.  This is because $N_0\gg 1$. Actually $N_0\simeq N$, and hence the number of non-condensed atoms is much smaller than $N_0$. 
-        Then you will do the following. You will consider up to second order, i.e. up to terms with at most two operators $a_{\vec p}$ with $\vec p\neq 0$~(you will see that there 
-        are no terms with just one operator with $p\neq 0$). 
-        Let's have a look to the interaction term in Eq. (1.11) (I forget here hats and vectors in order to ease the notation) $a^\dag_{p_1+q}a^\dag_{p_2-q}a_{p_2}a_{p_1}$. 
-        Let's see which combinations you have that have at most 2 operators with a non zero momentum: 
-        $(p_1+q,p_2-q,p_2,p_1)=(0,0,0,0), (0,0,x,x), (x,x,0,0), (0,x,x,0), (x,0,0,x), (0,x,0,x), (x,0,x,0)$, where $x$ means that it is not zero. The first term gives you the energy at order zero: $E_0=\frac{U(0)}{2V}N_0^2$. 
-        Note that $N=N_0+\sum_{p\neq 0} a^\dag_pa_p$, and hence up to second order   $N^2=N_0^2+2N_0\sum_{p\neq 0} a^\dag_pa_p$. As a result:
-        $E_0=\frac{U(0)}{2V}N^2 - U(0) n_0 \sum_{p\neq 0} a^\dag_pa_p$. 
-        The 3rd and 4th terms give $U(0) n_0 \sum_{p\neq 0} a^\dag_pa_p$ which cancels exactly with the term in $E_0$. 
-        The other terms will give you what you find in Eq. (1.12).}
-        
-        
-        \item In 1.17 $\omega_{\rho}$ part has a factor 2, but $\omega_{z}$ not, despite beeing symmetric in $\psi$. Why?{\color{red} This is because of the two directions on the plane.}
+        {\color{red}
+            This is based on the so-called Bogoliubov approximation. Since the system condenses in $\vec p=0$, you approximate $\hat a_0$ and $\hat a^\dag_0$ by $\sqrt{N_0}$,
+            with $N_0$ the number of condensed atoms.  This is because $N_0\gg 1$. Actually $N_0\simeq N$, and hence the number of non-condensed atoms is much smaller than $N_0$.
+            Then you will do the following. You will consider up to second order, i.e. up to terms with at most two operators $a_{\vec p}$ with $\vec p\neq 0$~(you will see that there
+            are no terms with just one operator with $p\neq 0$).
+            Let's have a look to the interaction term in Eq. (1.11) (I forget here hats and vectors in order to ease the notation) $a^\dag_{p_1+q}a^\dag_{p_2-q}a_{p_2}a_{p_1}$.
+            Let's see which combinations you have that have at most 2 operators with a non zero momentum:
+            $(p_1+q,p_2-q,p_2,p_1)=(0,0,0,0), (0,0,x,x), (x,x,0,0), (0,x,x,0), (x,0,0,x), (0,x,0,x), (x,0,x,0)$, where $x$ means that it is not zero. The first term gives you the energy at order zero: $E_0=\frac{U(0)}{2V}N_0^2$.
+            Note that $N=N_0+\sum_{p\neq 0} a^\dag_pa_p$, and hence up to second order   $N^2=N_0^2+2N_0\sum_{p\neq 0} a^\dag_pa_p$. As a result:
+            $E_0=\frac{U(0)}{2V}N^2 - U(0) n_0 \sum_{p\neq 0} a^\dag_pa_p$.
+            The 3rd and 4th terms give $U(0) n_0 \sum_{p\neq 0} a^\dag_pa_p$ which cancels exactly with the term in $E_0$.
+            The other terms will give you what you find in Eq. (1.12).
+        }
+        {\color{green}
+            Alright, but why are there just $p$ and $-p$ in Eq. (1.12), but $p_{1}, p_{2}, q$ Eq. (1.11)?
+        }
+
+        \item In 1.17 $\omega_{\rho}$ part has a factor 2, but $\omega_{z}$ not, despite beeing symmetric in $\psi$. Why?
+        {\color{red}
+            This is because of the two directions on the plane.
+        }
+        {\color{green}
+            Of course. Thanks.
+        }
+
         \item What is variable $a$? Why should $a > 0$ as repulsive short-range interactions stabilize the BEC (p.10)?
-        {\color{red} $a$ is the $s$-wave scattering length. It characterizes the short-range part of the interaction. As mentioned above the contact interaction is just described by what happens at $s$-wave. 
-        At low energies, this means that the short-range interactions are given by a single parameter, which is the scattering length. A positive scattering length means repulsive interactions, i.e. the interaction energy increases when the density increases, i.e. when the distances decreases (i.e. the particles repel each other). The opposite is true for $a<0$, for which the particle attract each other. The dipole-dipole interaction is partially atrtractive and partially repulsive. Attraction is dangerous, because the system tends to collapse. Adding repulsive contact interaction may compensate the dipolar attraction, hence preventing collapse.} 
-                \item ``When the atomic density grows due to the attractive interaction, three-body losses predominantly occur in the high-density region. '' What does three-body losses mean? 
-                {\color{red} Three-body losses means that three particles meet at close distances (which becomes more and more probable for larger and larger densities). When this occurs, two of the particles may 
-                fall into a bound state, giving the excess energy to the third one. As a result all three particle are loss from the system, and hence the term three-body loss.}
-                 \item ``As the collapse occurs mainly in the x-y direction due to anisotropy of the DDI (in the absence of inelastic losses, the condensate would indeed become an infinitely thin cigar-shaped cloud along z),
+        {\color{red}
+            $a$ is the $s$-wave scattering length. It characterizes the short-range part of the interaction. As mentioned above the contact interaction is just described by what happens at $s$-wave.
+            At low energies, this means that the short-range interactions are given by a single parameter, which is the scattering length. A positive scattering length means repulsive interactions, i.e. the interaction energy increases when the density increases, i.e. when the distances decreases (i.e. the particles repel each other). The opposite is true for $a<0$, for which the particle attract each other. The dipole-dipole interaction is partially atrtractive and partially repulsive. Attraction is dangerous, because the system tends to collapse. Adding repulsive contact interaction may compensate the dipolar attraction, hence preventing collapse.
+        }
+        {\color{green}
+            Thanks. \textbf{May} compensate, means this is still under investigation?
+        }
+
+        \item ``When the atomic density grows due to the attractive interaction, three-body losses predominantly occur in the high-density region.'' What does three-body losses mean?
+        {\color{red}
+            Three-body losses means that three particles meet at close distances (which becomes more and more probable for larger and larger densities). When this occurs, two of the particles may
+            fall into a bound state, giving the excess energy to the third one. As a result all three particle are loss from the system, and hence the term three-body loss.
+        }
+        {\color{green}
+            Thanks.
+        }
+
+        \item ``As the collapse occurs mainly in the x-y direction due to anisotropy of the DDI (in the absence of inelastic losses, the condensate would indeed become an infinitely thin cigar-shaped cloud along z),
         and therefore the condensate explodes essentially radially, producing the anisotropic
         shape of the cloud.'' Why is the collaps not along z axis?
-        {\color{red} Note that the dipoles attract each other when placed head with tail, i.e. in this case when they are placed aligned on top of each other along the $z$-direction. Hence collapse produces a thin "cigar" along $z$. However, before this "cigar" becomes infinitely thin, three-body losses kick out. When this occurs, the kinetic energy on the $xy$ plane, which is huge (due to the strong compression, recall Heisenberg uncertainty), is released and the BEC explodes. A note here: the key point of all the droplet business in recent works (starting in 2016) is that the collapse in a dipolar condensate may be actually stopped due to 
-        the stabilizing effect of quantum fluctuations, but this wasn't known when I wrote the notes!}
+        {\color{red}
+            Note that the dipoles attract each other when placed head with tail, i.e. in this case when they are placed aligned on top of each other along the $z$-direction. Hence collapse produces a thin "cigar" along $z$. However, before this "cigar" becomes infinitely thin, three-body losses kick out. When this occurs, the kinetic energy on the $xy$ plane, which is huge (due to the strong compression, recall Heisenberg uncertainty), is released and the BEC explodes. A note here: the key point of all the droplet business in recent works (starting in 2016) is that the collapse in a dipolar condensate may be actually stopped due to the stabilizing effect of quantum fluctuations, but this wasn't known when I wrote the notes!
+        }
+        {\color{green}
+            Thanks.
+        }
         
         \item How are the regions stable, metastable, unstable derived in Figure 1.5, here Figure \ref{fig:acrit}? 
-        {\color{red}  It comes from the two solutions of Eq. (1.25).}
+        {\color{red}
+            It comes from the two solutions of Eq. (1.25).
+        }
+        {\color{green}
+            Thanks.
+        }
 
 \end{itemize}
 
@@ -81,6 +132,8 @@
         \item ``anisotropy of droplets leads to a frustration of the dipolar quantum droplet when
 compressed along the magnetic field direction'' What does frustration mean in that context?
         \item ``multi-droplet states appear upon crossing into the bistable region, due to the fragmentation of the system following a modulational instability $\Rightarrow$ multi-droplet states are not the ground state'' Why is this following (what is the argument here)?
+        \item What is in-situ density profiles?
+        \item ``interference of multiple quantum droplets, allowing the characterization of the nearest- and next-nearest neighbour coherence'' Can this be seen in Figure \ref{fig:supersolids_exist}, if yes how?
 
 \end{itemize}
 
@@ -369,3 +422,168 @@ droplets and the residual background atoms, and inelastic collisions.
     \textsc{Tilman Pfau et al.}, \emph{New states of matter with fine-tuned interactions: quantum droplets and dipolar supersolids} (2020)
     \label{fig:droplet_collision}
 \end{figure}
+
+\begin{itemize}
+    \item self-organized droplet arrays break the continuous translational symmetry
+    \item[$\Rightarrow$] supersolid state combines frictionless flow of a superfluid with the crystal-like periodic density modulation of a solid
+    \item first experimental evidence for BECs coupled to external light fields, either exploiting cavity-mediated long-range interactions between the atoms or spin-orbit coupling
+    \item there two continuous symmetries are broken, the periodicity of the density modulation is set by the external light field, and therefore allowing no propagating phonon modes.
+    \item dipolar quantum gases can build droplet arrays in a self-organizing fashion and is based purely on the intrinsic interactions $\Rightarrow$ propagating phonon modes allowed
+    \item to prove the coexistence of spatial order and superfluidity needs to be established
+    \item initial experimets states rapidly lost their global phase coherence
+    \item While each droplet itself is superfluid, the whole system is not
+    \item theoretically an infinitely extended system showed the coexistence of superfluidity and spatial order for a narrow range of the scattering length close to the phase transition
+    \item measurements showed indications of phase coherence in droplet arrays in a cigar-shaped trap geometry
+    \item experimental results undoubtedly proved the coexistence of spatial order and global phase coherence
+    \item in-situ density profiles in 3 regimes: isolated (incoherent arrays), phase-coherent droplet arrays, and a regular BEC
+    \item transition characterized by the strength of the density modulation Figure \ref{fig:supersolids_exist} c
+    \item interference of multiple quantum droplets, allowing the characterization of the nearest- and next-nearest neighbour coherence
+\end{itemize}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{IMAGE/supersolids_exist.png}\\
+    \caption{
+        a) Comparison of the theoretically (top) and experimentally (bottom)
+        observed density profiles of an array of isolated droplets (left side), an array of quantum
+        droplets immersed in a condensate background (center) and a regular BEC (right side)
+        [67]. (b) Example image of the multi-wave interference in [34], showing the principal
+        and minor interference fringes at a different spacing. (c), (d) Experimental signatures
+        of the phase diagram for (c) the in-situ density modulation and (d) the nearest-
+        neighbour coherence. The strength of the density modulation in (c) is characterized
+        by the spectral weight SW, which compares the contribution of Fourier amplitudes at
+        finite momentum to the zero momentum contribution. (d) The Fourier transforms of
+        the interference patterns reveal clear side peaks at the length scale corresponding to
+        nearest- and next-nearest neighbours. Phase coherence leads to a well-reproducible
+        interference pattern and thus a vanishing variance of the amplitude of these side
+        peaks.
+        The variance of the nearest-neighbour peak var(P1) allows to differentiate
+        between three regimes – isolated droplets (ID), phase-coherent droplets (supersolid
+        phase, SSP) and a BEC. The black dashed line in (c) and (d) indicates the theoretical
+        phase boundary obtained from numerical simulations of the eGPE. Adapted from
+        [34, 67].
+        of a time-of-flight interference measurement is shown in Figure 7b.
+      }
+    \textsc{Tilman Pfau et al.}, \emph{New states of matter with fine-tuned interactions: quantum droplets and dipolar supersolids} (2020)
+    \label{fig:supersolids_exist}
+\end{figure}
+
+ 
+\begin{itemize}
+    \item to prove supersolidity (superfluid nature) elementary excitations needed
+    \item The breaking of a continuous symmetry at the superfluid-supersolid phase transition fundamentally
+affects the spectrum of collective excitations
+    \item[$\Rightarrow$] low-lying collective modes allow insights into the symmetry breaking and the supersolid nature
+    \item energetically lowest mode is the dipole mode which is completely decoupled from interactions and always features an excitation energy corresponding to the trap frequency $\omega_{x}$
+    \item Upon decreasing the scattering length, a softening of the roton
+mode is observed
+    \item roton mode is characterized by a minimum in the dispersion relation at a finite momentum and corresponds to a perturbative density modulation on top of the condensate density distribution
+    \item In the considered trap geometry, the roton is comprised of two degenerate
+modes – a symmetric and an anti-symmetric roton mode. As these roton modes soften,
+avoided crossings are observed between pairs of modes with equal parity.
+    \item softening of the roton triggers the phase transition to an array of quantum
+droplets (occurs in this finite system as a finite excitation energy of the roton modes)
+    \item degeneracy of the even and odd roton modes is lifted with the emergence of a density modulation in the ground state
+    \item At smaller scattering lengths the excitation energy of the symmetric mode rapidly increases, whereas the excitation energy of the anti-symmetric mode further decreases.
+    \item symmetric mode features an oscillation between the array and condensate background (understood as Higgs amplitude excitation of the supersolid array)
+    \item Close to the phase transition, the amplitude mode exists in an isolated state because of the
+energetic separation of the modes in the finite system
+    \item The amplitude mode hybridizes with the other symmetric modes as its excitation energy increases.
+    \item Close to the phase transition, collective modes with a larger excitation energy are affected by the rapidly increasing amplitude mode
+    \item coupling of the higher symmetric modes with the amplitude mode leads to a bifurcation of the first quadrupole mode (after crossing the phase transition)
+    \item higher-lying collective mode is scissors mode, decrease in the excitation energy upon crossing the phase transition (understood as a stiffening due to the emerging density modulation)
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{IMAGE/collective_modes.png}\\
+    \caption{
+      a) Calculated excitation frequencies $\omega_{x}$ of the lowest collective modes across the phase transition from a BEC to an array of quantum droplets in
+a cigar-shaped trap geometry with $\omega_{trap} = 2\pi [30, 90, 110]$ Hz.
+The blue (red) lines
+indicate an even (odd) parity of the density variation with respect to the weak
+trapping direction x.
+(b), (c) Signature of the phase transition in the excitation
+energy of the axial quadrupole mode measured with (b)
+162Dy and (c) 166Er.
+The measurements were done using trap frequencies of $2 \pi [19(2), 53(2), 81(2)]$ Hz
+and $2 \pi [259(2), 30(1), 170(1)]$ Hz for the case of dysprosium and erbium, respectively.
+      }
+    \textsc{Tilman Pfau et al.}, \emph{New states of matter with fine-tuned interactions: quantum droplets and dipolar supersolids} (2020)
+    \label{fig:collective_modes}
+\end{figure}
+
+\begin{itemize}
+    \item most closely related to superfluidity is the low-energy Goldstone mode that emerges out of the anti-symmetric roton mode
+    \item it features an out-of-phase oscillation between array and superfluid background, involving Josephson-like dynamics between droplets
+    \item Goldstone theorem: connects existance of Goldstone mode to double symmetry breaking at the phase transition
+    \item interplay between crystal motion and superfluid counterflow preserves the center of mass and leads to a linear correlation between the array displacement $\delta x$ and the imbalance $\eta$ between the side droplets
+    \item finite lifetime of array prevents time-resolved measurement of the mode (excitation leaves a trace
+        on the spatial density distributions)
+    \item This trace can be statistically mapped out by repeating the experiment many times, leading to the observed correlation between the imbalance and the displacement
+\end{itemize}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{IMAGE/goldstone_mode.png}\\
+    \caption{
+      a) Schematic of the low-energy Goldstone mode, featuring an out-of-phase
+and center of mass preserving oscillation between the droplet array and the superfluid
+background. A displacement of the droplet array by $\delta x$ leads to an imbalance $\eta$ in the
+atom number of the side droplets. (b), (c) Measured imbalances $\eta$ as a function of the
+measured displacements $\delta x$ in (b) the supersolid region and (c) isolated droplet region.
+The black line shows the theoretically predicted correlation of the low-energy Goldstone
+mode. (d) The low residual of the experimental data with respect to the theoretical
+prediction close to the phase transition clearly proves the existence of the low-energy
+Goldstone mode. The gray area indicates the phase-coherent region.
+      }
+    \textsc{Tilman Pfau et al.}, \emph{New states of matter with fine-tuned interactions: quantum droplets and dipolar supersolids} (2020)
+    \label{fig:goldstone_mode}
+\end{figure}
+
+\section{Outlook}
+\begin{itemize}
+    \item $N_{crit}$, roton softening in dipolar gases show discrepancies between theory and experiments
+    \item mean-field of eGPE is limited to the perturbative regime at small gas parameters
+    \item quantum depletion and quantum correlations start to play a role at the
+        large quantum droplet densities
+    \item beyond mean-field correction originating from quantum fluctuations is typically included in the description through a local density approximation
+    \item validity may not always be given for:
+    \begin{itemize}
+        \item long-range interaction
+        \item close to a phase transition
+        \item dense systems
+        \item large dipolar strengths ($\epsilon_{dd} > 1$)
+    \end{itemize}
+
+    \item mean-field collapse leads to imaginary Bogoliubov modes, which are neglected (soft phonon mode for the Bose-Bose and roton mode for the dipolar system)
+    \item Further improvement of theoretical description through:
+    \begin{itemize}
+        \item diagrammatic Beliaev technique
+        \item behaviour in one-dimensional optical lattices
+        \item hypernetted-chain Euler-Lagrange method
+        \item Gaussian-state theory (includes squeezing effects)
+        \item bosonic pairing
+        \item inclusion of higher order corrections to the Bogoliubov speed of sound
+        \item quantum Monte-Carlo (intrinsically include particle correlations, quantum fluctuations, a finite
+system size, and a finite interaction range)
+    \end{itemize}
+
+    \item these methods are limited to the usage of a simplified interaction potential because they cannot handle the bound molecular states in the complete interaction potential
+    \item low-dimensional systems to circumvent these fundamental problems
+    \item in 1D the energy functional of Bose-Bose mixtures does not suffer from the aforementioned imaginary Bogoliubov mode (quantum Monte-Carlo studies found small deviations from the predictions of the eGPE)
+    \item measurements of $N_{crit}$ and droplet density profile can be used as a sensitive benchmark for different theories in the near future
+    \item in Bose-Bose self-evaporation to zero temperature has so far not been experimentally verified
+  \item measurements of collective excitations are still lacking due to the finite lifetime in the experiments \item In dipolar droplets, the unavoidable presence of thermal fluctuations at finite temperatures has been proposed to increase $N_{crit}$ of a self-bound droplet (large scattering lengths, large atom numbers)
+    \item validity of the Born approximation for the dipolar scattering problem has been called into question, which would result in a temperature dependent systematic shift of $N_{crit}$ to lower values
+  \item Open questions:
+    \begin{itemize}
+        \item How general is the emergence of a supersolid state with respect to variations in the experimental parameters?
+        \item How does finite temperature affect the supersolid phase transition?
+        \item Upon evaporating into the supersolid state, are both symmetries broken simultaneously or sequentially?
+        \item Do supersolid states exist in other systems, such as polar molecules ?
+      \item eGPE as a mean-field theory should also not be the correct description for arrays of isolated droplets with no wave function overlap $\Rightarrow$ research needed for exact nature of supersolid-to-isolated-droplet-array transition
+    \end{itemize}
+\end{itemize}
