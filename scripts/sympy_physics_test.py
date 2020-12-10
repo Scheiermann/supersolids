@@ -20,7 +20,7 @@ from sympy.physics.quantum import TimeDepBra
 from sympy.stats import Normal, density
 
 if __name__ == '__main__':
-    # Script runs, if script is run as main script (called by python split_operator.py)
+    # Script runs, if script is run as main script (called by python *.py)
 
     L = 1
     n = 1
