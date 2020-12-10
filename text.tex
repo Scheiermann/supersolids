@@ -587,3 +587,46 @@ system size, and a finite interaction range)
       \item eGPE as a mean-field theory should also not be the correct description for arrays of isolated droplets with no wave function overlap $\Rightarrow$ research needed for exact nature of supersolid-to-isolated-droplet-array transition
     \end{itemize}
 \end{itemize}
+
+
+\section{Simulations written in Python}
+
+\subsection{First draft}
+\begin{itemize}
+    \item look into FFT artefacts
+    \item GPE without Dipolar-Dipolar-Interactions
+    \begin{equation}
+        i \frac{\partial}{\partial t} \psi(x,t) = \left(\frac{-1}{2} \frac{\partial^{2}}{\partial x^{2}} + \frac{1}{2} x^{2} + \tilde{g} |\psi(x,t)|^{2} \right) \psi(x,t)
+    \end{equation}
+    \item dimensionless
+    \begin{equation}
+        \mu \phi_{0}(x) = \left(\frac{-1}{2} \frac{\partial^{2}}{\partial x^{2}} + \frac{1}{2} x^{2} + \tilde{g} |\phi_{0}(x)|^{2} \right) \phi_{0}(x)
+    \end{equation}
+    \item first use 1D later on 3D
+\end{itemize}
+
+\subsection{Further ideas}
+\begin{itemize}
+    \item for split-operator more precise Trotter-Suzuki decomposition of time evolution operator $U(t) = \exp^{\frac{-i H t}{\hbar} }$
+    \item other method: Lanczos method (Krylov space)
+    \item error $\propto E_{max}$ $\Rightarrow$ spectrum centering to lower errors
+    \item accuracy is not uniform for all eigenstates $\Rightarrow$ Chebyshov method
+    \item fft is implemented in scipy, sympy and numpy (research which one to use)
+\end{itemize}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{IMAGE/strang_splitting.png}\\
+    \caption{Logo}
+    \textsc{James Schloss},
+    \emph{            \url{https://www.algorithm-archive.org/contents/split-operator_method/split-operator_method.html}
+    } (year)
+    \label{fig:stability}
+\end{figure}
+
+\section{Goal}
+Solve:
+    \begin{equation}
+        i \hbar \frac{\partial}{\partial t} \psi(r,t) = \left(\frac{-\hbar^{2}}{2 m} \nabla^{2} + V(r) + g |\psi(x,t)|^{2} \right) \psi(x,t)
+    \end{equation}
