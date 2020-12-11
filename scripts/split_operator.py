@@ -90,8 +90,10 @@ class Schroedinger(object):
 
         self.psi = norm.pdf(self.x, loc=0.5 * L, scale=0.1)
 
-        self.H_kin = np.exp(self.U * 0.5 * self.k ** 2 * self.dt)
-        self.H_pot = np.exp(self.U * (self.V(self.x) + self.g * np.abs(self.psi)) * self.dt)
+        self.H_kin = np.exp(-self.U * (-0.5 * self.k ** 2) * self.dt)
+
+        # Here we use half steps in real space, but will use it before and after H_kin with normal steps
+        self.H_pot = np.exp(-self.U * (self.V(self.x) + self.g * np.abs(self.psi) ** 2) * (0.5 * self.dt))
 
         self.t = 0.0
         self.psi_x_line = None
@@ -99,7 +101,6 @@ class Schroedinger(object):
         self.V_x_line = None
 
     def time_step(self):
-        # for i in np.arange(0, self.timesteps):
         self.psi = self.H_pot * self.psi
         self.psi = sp.fft.fft(self.psi)
         self.psi = self.H_kin * self.psi
@@ -107,7 +108,6 @@ class Schroedinger(object):
         self.psi = self.H_pot * self.psi
 
         self.t += self.dt
-        # print(f"Round {i}:\n {self.psi}")
 
         if self.imag_time:
             norm = np.sum(np.abs(self.psi)) * self.x
@@ -128,8 +128,8 @@ if __name__ == '__main__':
 
     V = 1/2 * (x - L/2) ** 2
     # psi_0 = syp.exp(- 0.5 * (x - L/2) ** 2)
-    Harmonic = Schroedinger(resolution, L, timesteps=1000, dx=(2*L/resolution), dk=(np.pi/L), dt=0.01,
-                            V=V, imag_time=False)
+    Harmonic = Schroedinger(resolution, L, timesteps=600, dx=(2*L/resolution), dk=(np.pi/L), dt=0.01,
+                            V=V, g=1, imag_time=False)
 
     ######################################################################
     fig = plt.figure()

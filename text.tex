@@ -137,6 +137,21 @@ compressed along the magnetic field direction'' What does frustration mean in th
 
 \end{itemize}
 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{IMAGE/find_the_error.png}\\
+    \caption{
+      The method from the first draft was implemented, but the resulting split.mp4 looks wrong.
+      probably the error lies in the equations, that were used. Note that Strang-Splitting was used as in       \ref{fig:strang_splitting}: Per timestep $H_{pot}$ was used before and after $H_{kin}$, but with just $0.5dt$.
+      Also in that reference they used $\exp^{-iH}$, which seems right, instead of $\exp^{iH}$ in the draft.
+    }
+    \textsc{Daniel Scheiermann},
+    \emph{\url{split_operator.py}} (2020)
+    \label{fig:find_the_error}
+\end{figure}
+
+
 \subsection{Summary}
 \begin{itemize}
         \item dipol-dipol interaction (DDI): \begin{equation}
@@ -622,7 +637,7 @@ system size, and a finite interaction range)
     \textsc{James Schloss},
     \emph{            \url{https://www.algorithm-archive.org/contents/split-operator_method/split-operator_method.html}
     } (year)
-    \label{fig:stability}
+    \label{fig:strang_splitting}
 \end{figure}
 
 \section{Goal}
