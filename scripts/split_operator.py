@@ -19,12 +19,12 @@ from matplotlib import animation
 
 # Animate plot
 def init():
-    psi_x_line.set_data([], [])
-    V_x_line.set_data([], [])
+    psi_line.set_data([], [])
+    V_line.set_data([], [])
 
     title.set_text("")
     print(f"Init:\n {Harmonic.psi}")
-    return (psi_x_line, V_x_line, title)
+    return (psi_line, V_line, title)
 
 
 def animate(i):
@@ -32,11 +32,12 @@ def animate(i):
     if i % 10 == 0:
         print(f"Round {i}")
     # print(f"Round {i}:\n {Harmonic.psi}")
-    psi_x_line.set_data(Harmonic.x, np.abs(Harmonic.psi))
-    V_x_line.set_data(Harmonic.x, Harmonic.V(Harmonic.x))
+    psi_line.set_data(Harmonic.x, np.abs(Harmonic.psi) ** 2)
+    x_V = np.linspace(-0.2 * L, 0.2 * L, resolution)
+    V_line.set_data(x_V, Harmonic.V(x_V))
 
     title.set_text("t = %.2f" % Harmonic.t)
-    return (psi_x_line, V_x_line, title)
+    return (psi_line, V_line, title)
 
 
 class Schroedinger(object):
@@ -71,13 +72,16 @@ class Schroedinger(object):
         self.g = g
         self.imag_time = imag_time
 
-        self.x = np.linspace(0, self.L, self.resolution)
-        self.k = np.linspace(-self.L / 2, self.L / 2, self.resolution)
+        self.x = np.linspace(-self.L, self.L, self.resolution)
+        k_over_0 = np.arange(0, resolution/2, 1)
+        k_under_0 = np.arange(-resolution/2, 0, 1)
+        self.k = np.concatenate((k_over_0, k_under_0), axis=0) * (np.pi / L)
 
         if imag_time:
+            # Convention: $e^{-iH} = e^{UH}$
             self.U = -1
         else:
-            self.U = 1.0j
+            self.U = -1.0j
 
         if psi_0 or V:
             x_real = Symbol('x', real=True)
@@ -85,15 +89,15 @@ class Schroedinger(object):
         if V:
             self.V = lambdify(x_real, V, "numpy")
         else:
-            V = 1 / 2 * (x - L / 2) ** 2
+            V = 1 / 2 * x ** 2
             self.V = lambdify(x_real, V, "numpy")
 
-        self.psi = norm.pdf(self.x, loc=0.5 * L, scale=0.1)
+        self.psi = norm.pdf(self.x, loc=-0.1 * L, scale=1.0)
 
-        self.H_kin = np.exp(-self.U * (-0.5 * self.k ** 2) * self.dt)
+        self.H_kin = np.exp(self.U * (-0.5 * self.k ** 2) * self.dt)
 
         # Here we use half steps in real space, but will use it before and after H_kin with normal steps
-        self.H_pot = np.exp(-self.U * (self.V(self.x) + self.g * np.abs(self.psi) ** 2) * (0.5 * self.dt))
+        self.H_pot = np.exp(self.U * (self.V(self.x) + self.g * np.abs(self.psi) ** 2) * (0.5 * self.dt))
 
         self.t = 0.0
         self.psi_x_line = None
@@ -109,11 +113,11 @@ class Schroedinger(object):
 
         self.t += self.dt
 
-        if self.imag_time:
-            norm = np.sum(np.abs(self.psi)) * self.x
-            self.psi /= norm
-            print(f"norm: {norm}")
-            print(f"Normed psi:\n {self.psi}")
+        # if self.imag_time:
+        norm = np.sum(np.abs(self.psi) ** 2) * self.dx
+        self.psi /= np.sqrt(norm)
+        # print(f"norm: {norm}")
+        # print(f"Normed psi:\n {self.psi}")
 
 
 if __name__ == '__main__':
@@ -126,31 +130,39 @@ if __name__ == '__main__':
     datapoints_exponent: int = 5
     resolution = 2 ** datapoints_exponent
 
-    V = 1/2 * (x - L/2) ** 2
-    # psi_0 = syp.exp(- 0.5 * (x - L/2) ** 2)
-    Harmonic = Schroedinger(resolution, L, timesteps=600, dx=(2*L/resolution), dk=(np.pi/L), dt=0.01,
-                            V=V, g=1, imag_time=False)
+    V = 0.5 * x ** 2
+    # psi_0 = syp.exp(- 0.5 * x ** 2)
+    Harmonic = Schroedinger(resolution, L, timesteps=300, dx=(2*L/resolution), dk=(np.pi/L), dt=0.05,
+                            V=V, g=0, imag_time=False)
 
     ######################################################################
     fig = plt.figure()
-
-    xlim = (0, L)
-    ymin = abs(Harmonic.psi).min()
-    ymax = abs(Harmonic.psi).max()
+    xlim = (-L, L)
+    psi_abs = np.abs(Harmonic.psi)
+    psi_prob = psi_abs ** 2
+    psi_abs_max = psi_abs.max()
+    psi_prob_max = psi_prob.max()
+    if psi_prob_max < psi_abs_max:
+        ymin = psi_abs.min()
+        ymax = psi_abs_max
+    else:
+        ymin = psi_prob.min()
+        ymax = psi_prob_max
 
     ax1 = fig.add_subplot(111, xlim=xlim,
                           ylim=(ymin - 0.2 * (ymax - ymin),
                                 ymax + 0.2 * (ymax - ymin)))
-    psi_x_line, = ax1.plot([], [], "x--", c="r", label=r'$|\psi(x)|$')
-    V_x_line, = ax1.plot([], [], ".-", c="k", label=r'$V(x)$')
+    psi_line, = ax1.plot([], [], "x--", c="r", label=r'$|\psi(x)|^2$')
+    V_line, = ax1.plot([], [], ".-", c="k", label=r'$V(x)$')
 
     title = ax1.set_title("")
     ax1.legend(prop=dict(size=12))
     ax1.set_xlabel('$x$')
-    ax1.set_ylabel(r'$|\psi(x)|$')
+    ax1.set_ylabel(r'$|\psi(x)|^2$')
     ax1.grid()
 
-    V_x_line.set_data(Harmonic.x, Harmonic.V(Harmonic.x))
+    x_V = np.linspace(-0.2 * L, 0.2 * L, resolution)
+    V_line.set_data(x_V, Harmonic.V(x_V))
 
     # call the animator. blit=True means only re-draw the parts that have changed.
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=Harmonic.timesteps,
@@ -158,4 +170,3 @@ if __name__ == '__main__':
 
     # requires either mencoder or ffmpeg to be installed on your system
     anim.save('split.mp4', fps=15, extra_args=['-vcodec', 'libx264'])
-

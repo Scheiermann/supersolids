@@ -142,9 +142,9 @@ compressed along the magnetic field direction'' What does frustration mean in th
     \centering
     \includegraphics[width=1.0\textwidth]{IMAGE/find_the_error.png}\\
     \caption{
-      The method from the first draft was implemented, but the resulting split.mp4 looks wrong.
-      probably the error lies in the equations, that were used. Note that Strang-Splitting was used as in       \ref{fig:strang_splitting}: Per timestep $H_{pot}$ was used before and after $H_{kin}$, but with just $0.5dt$.
+      The method from the first draft was implemented, but the resulting split\_time\_real.mp4 looks wrong (imaginary time works). Probably the error lies in the equations, that were used. Note that Strang-Splitting was used as in \ref{fig:strang_splitting}: Per timestep $H_{pot}$ was used before and after $H_{kin}$, but with just $0.5dt$.
       Also in that reference they used $\exp^{-iH}$, which seems right, instead of $\exp^{iH}$ in the draft.
+      Note also the definition of self.k being a concatenation of [0:16] and [-16:0] as fft expecting (this fixed split\_time\_imag.mp4)
     }
     \textsc{Daniel Scheiermann},
     \emph{\url{split_operator.py}} (2020)
