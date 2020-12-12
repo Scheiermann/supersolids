@@ -2,13 +2,12 @@
 """
 Script to test sympy.physics
 
-author: Scheiermann
+author: Daniel Scheiermann
 email: daniel.scheiermann@stud.uni-hannover.de
 license: MIT
 Please feel free to use and modify this, but keep the above information. Thanks!
 """
 
-import sympy as sypy
 from scipy.stats import norm
 import numpy as np
 import scipy as sp
