@@ -2,7 +2,7 @@
 """
 Script to check a calculation in a paper
 
-author: Scheiermann
+author: Daniel Scheiermann
 email: daniel.scheiermann@stud.uni-hannover.de
 license: MIT
 Please feel free to use and modify this, but keep the above information. Thanks!
