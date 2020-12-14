@@ -12,6 +12,7 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 import numpy as np
 import scipy as sp
 from sympy import Symbol, lambdify
+from concurrent import futures
 
 
 class Schroedinger(object):
@@ -47,8 +48,9 @@ class Schroedinger(object):
         self.imag_time = imag_time
 
         self.x = np.linspace(-self.L, self.L, self.resolution)
-        k_over_0 = np.arange(0, resolution/2, 1)
-        k_under_0 = np.arange(-resolution/2, 0, 1)
+        k_over_0 = np.arange(0, resolution / 2, 1)
+        k_under_0 = np.arange(-resolution / 2, 0, 1)
+
         self.k = np.concatenate((k_over_0, k_under_0), axis=0) * (np.pi / L)
 
         if imag_time:
