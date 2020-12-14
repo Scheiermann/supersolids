@@ -1,5 +1,5 @@
-# supersolids_notes
-Notes to supersolids
+# Supersolids
+Notes and script to supersolids
 
 ## How to contribute
 Please read the **CONTRIBUTING.md**.  
