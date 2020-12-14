@@ -24,6 +24,12 @@ def psi_0_gauss(x, a, x_0, k_0):
 
      a : float
         Amplitude of pulse
+
+     x_0 : float
+           Amplitude of pulse
+
+     k_0 : float
+           Group velocity of pulse
     """
 
     return ((a * np.sqrt(np.pi)) ** (-0.5)
