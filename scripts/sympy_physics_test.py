@@ -99,5 +99,5 @@ if __name__ == '__main__':
         axs[i].legend()
         axs[i].grid()
 
-    plt.savefig("double_fft.png")
+    plt.savefig("results/double_fft.png")
     plt.show()

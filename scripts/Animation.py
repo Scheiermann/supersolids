@@ -144,4 +144,4 @@ class Animation():
                                        fargs=(Schroedinger,), frames=Schroedinger.timesteps, interval=30, blit=True)
 
         # requires either mencoder or ffmpeg to be installed on your system
-        anim.save('split.mp4', fps=15, extra_args=['-vcodec', 'libx264'])
+        anim.save('results/split.mp4', fps=15, extra_args=['-vcodec', 'libx264'])
