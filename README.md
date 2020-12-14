@@ -5,9 +5,9 @@ Notes and script to supersolids
 Please read the **CONTRIBUTING.md**.  
 
 ## How to install
-Go to the directory "scripts", where the "setup.py" lies.
+Go to the directory, where the "setup.py" lies.
 
-For **Linux** use "python setup.py install --user" from console to **build** and **install** the package "postcorrection"
+For **Linux** use "python setup.py install --user" from console to **build** and **install** the package
 
 For **Windows**:  
 You need to add python to your path (if you didn't do it, when installing python/anaconda).  
@@ -26,7 +26,7 @@ https://www.magicmathmandarin.org/2017/12/07/setting-up-python-after-installing-
 1. Please read the **README.md** closely.  
 2. If you have please check every step again.  
 3. If the issue persist please **open a "Issue" in git**:  
-a) Click on "New Issue" on https://git.iqo.uni-hannover.de/ATLAS/PC-DE/issues.  
+a) Click on "New Issue" on https://github.com/Scheiermann/supersolids/issues.  
 b) Assign a suitable label.  
 c) Follow the steps on git the to create the issue.
 Please **describe your issue closely** (what are your configurations, did it work before,
@@ -34,4 +34,4 @@ what have you changed, what is the result, what have you expected as a result?).
 d) Try to include screenshots (to the question in 3b).  
 e) Describe what you think causes the issue and if you have **suggestions how to solve** it,
 mention it! (to the question in 3b).  
-f) **Close the issue**, if you accidently did something wrong (but mention that before closing).  
+f) **Close the issue**, if you accidentally did something wrong (but mention that before closing).  
