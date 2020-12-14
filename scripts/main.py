@@ -13,10 +13,10 @@ import functools
 import numpy as np
 from sympy import symbols
 
-import functions
-import Schroedinger
 import Animation
+import functions
 import parallel
+import Schroedinger
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == '__main__':

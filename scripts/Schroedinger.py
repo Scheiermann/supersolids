@@ -12,7 +12,6 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 import numpy as np
 import scipy as sp
 from sympy import Symbol, lambdify
-from concurrent import futures
 
 
 class Schroedinger(object):
