@@ -11,6 +11,7 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 from scipy.stats import norm
 import numpy as np
 import scipy as sp
+import sympy
 from matplotlib import pyplot as plt
 from sympy import Symbol, symbols, Function, Piecewise, pi, N, fft, ifft, lambdify
 from sympy.functions import sqrt, sin
@@ -55,7 +56,7 @@ if __name__ == '__main__':
     print(gauss_function)
     print(gauss_function_standard)
     print(gauss_function_standard_y_arr)
-    print(sypy.latex(gauss_function))
+    print(sympy.latex(gauss_function))
 
     gauss = norm.pdf(x_arr, loc=0.5*L, scale=0.1)
     gauss_fft_scipy = sp.fft.fft(gauss)
