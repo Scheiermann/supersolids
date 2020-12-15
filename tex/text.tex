@@ -119,21 +119,66 @@
 \begin{itemize}
         \item Typo in ``we obtain a 1D equation similar to the a GP equation'', just the or a
         \item ``ground-state wave-function is independent of the in-plane coordinates '' Why?
+        {\color{red}
+         This is because there is no trap on the plane. Then, the wavefunction is flat over xy. This is so if the interactions are repulsive, which is assumed. This is Ok as long as the roton (the energy minimum in Fig. 1.6) remains stable (i.e. remains such that the energy^2 > 0 (i.e. the energy is not imaginary).
+        }
         \item 1.26 to 1.27, where does the $U_{dd}$ go?
+                {\color{red}
+                This is because you take that the density is equal to  $|\psi(\vec r,t)|^2 = (1/S) |\psi_0(z,t)|^2$, with $S$ some quantization surface, to get the units right. The Fourier Transform is then
+$n(\vec k,t) = (2\pi)^2 n(k_z,t) \delta(k_x) \delta(k_y)$. When you integrate, using convolution theorem:
+$\int d^r’ U(r-r’) |\psi(r’)|^2 = \int d^3k/(2\pi)^3 (4\pi d^2/3) (3\cos^2\theta_k -1) n(k,t) e^(ikr)= 
+\int dk_z/2\pi (4\pi d^2/3) * 2 n(k_z,t)  e^(i k_z z) = (8\pi d^2/3) |\psi_0(z,t)|^2 = g_d |\psi_0(z,t)|^2$. 
+   }
         \item Typo If: ``roton momentum. if this were so''
         \item Why should a modulation with a finite wavelength allow superfluids?
+                {\color{red} I guess you mean supersolids. 
+                A density modulation with a finite wavelength (not a diverging length of the order of the size of the whole system, as it is the case for a phonon instability), means that you have a crystal-like modulation, and hence a supersolid. The problem is that in this theory, once the modulation starts to develop there is no way to stop it, and what one gets is actually local collapses.                
+}
         \item Typo repeatance: ``the width of the width''
         \item What are the spin-F matrizes?
+                        {\color{red} It is just the spin matrices for a spin $S=F$: $S_{x,y,z}$. Definining $S_{\pm} = S_x\pm iS_y$, 
+then $S_+ |m\rangle = \sqrt{F(F+1)-m(m+1)}|m+1\rangle$,  $S_- |m\rangle = \sqrt{F(F+1)-m(m-1)}|m-1\rangle$, and $S_z |m\rangle = m|m\rangle$.
+}
         \item Is the occurance of these spin textures in Figure \ref{fig:helical} special?
+                        {\color{red} Special in which sense? They are the result of spin excitations.}
         \item ``In 3D system there exists a regime where no collective modes are below the chemical potential, which corresponds to the particle emission threshold $\Rightarrow$ excitation leads to self-evaporation of the droplet to zero temperature'' Is this a good/useful or is it just counter-productive for experiments? Meaning switching between this regime and a normal one to get probably higher densities?
+                        {\color{red}
+                        It is interesting, because this would mean that the droplet would have zero entropy. One can then use it to e.g. cool other system. For example, you pass energy of a given system into the droplet, then the droplet immediately evaporates the extra energy, and this would cool. It may be useful in this sense, but it is not in my opinion the most relevant feature. In dipolar droplets (rather than those in binary non-dipolar mixtures) there is no regime without any excitation.
+}
         \item In Figure \ref{fig:collective} b, if the theoretical values would fit, then the dashed line would be where the darkest color is? If yes, why is it not?
+                        {\color{red}
+That's right. It's not there because the calculation is based on linear response theory, i.e. it is an approximation. the agreement 
+is however pretty good, I would say.
+}
         \item What are bright and dark solitons?
+                        {\color{red}
+                        Bright solitons are wavepackets that maintain their shape without spreading. 
+A dark soliton is of the form $\psi(x) = \tanh(x/dx)$. Then you see that there is a phase slip of $\phi$ between left and right, and the density has a dip (down to zero density) at $x=0$. A dark soliton does not move, but if the density does not fall to zero, then it may move, and you can visualize it (in terms of the density) as a constant density minus a bright soliton. It is not exact, but it gives you a rough idea.
+}
         \item What is meant by crossover between bright solitons and droplets?
+                        {\color{red}
+                        It is important to understand the difference between droplets and solitons (I mean here bright solitons). In the case of solitons, the wavepackets keeps its shape due to the competition of kinetic energy (which pushes the wavepacket outwards) and attractive interaction energy (which pushes the wavepacket inwards). In 1D (and only in 1D for contact interacting systems), the kinetic energy (which scales with 1/length^2) can eventually counter-rest the interaction energy (which scales as -1/length^D, with D the dimension). As a result you get as soliton.
+
+A droplet is an altogether different issue. There you have the compensation of attractive mean-field interaction energy and the repulsive effect given by quantum fluctuations (LHY correction). One can visualize it as follows. Quantum fluctuations introduce a pressure outwards (this is what is called a Casimir pressure). This Casimier pressure compensates the tendency to collapse. As a result the droplet keeps its shape, i.e. it is self-bound ven in 3D.                        
+}
         \item ``anisotropy of droplets leads to a frustration of the dipolar quantum droplet when
 compressed along the magnetic field direction'' What does frustration mean in that context?
+                {\color{red}            
+Frustration is used in the following sense. In dipolar droplets, the droplet get more elongated (along the dipole direction) when the number of particles increase. However, if one cannot get more elongated because there is a trap along the dipole direction, then the system will find more favorable to form two droplets instead of one. This leads eventually to the formation of a droplet array.
+}
         \item ``multi-droplet states appear upon crossing into the bistable region, due to the fragmentation of the system following a modulational instability $\Rightarrow$ multi-droplet states are not the ground state'' Why is this following (what is the argument here)?
+                        {\color{red}
+                        In the experiments they drive an initially stable condensate into instability. When the BEC becomes unstable, it starts developing ripples (modulational instability). This ripples 
+                        lead eventually (although the nonlinear dynamics involved is pretty complicated) to the observed array of droplets. The droplets are hence formed dynamicall. They are not the ground state. There may be however droplet arrays which are the ground-state of the system. There are experiments which have directly cooled into that ground state.
+}
         \item What is in-situ density profiles?
+                        {\color{red}
+in-situ profiles means that they measure them while in the trap. The most common technique to image cold atoms is actually to release the trap, let the atoms fall and image them after some time of free fall (time-of-flight measurement, TOF). This is practically advantageous because when expanding the cloud becomes much larger and hence easier to image. The drawback is that what one measure in TOF is not the spatial density distribution but rather the momentum distribution. The reason is that expansion acts as a sort of Fourier Transform. You can intuitively understand that by thinking that the larger the initial particle velocity the farther it will move while falling. hence the final spatial distribution after falling matches the initial velocity distribution.
+}
         \item ``interference of multiple quantum droplets, allowing the characterization of the nearest- and next-nearest neighbour coherence'' Can this be seen in Figure \ref{fig:supersolids_exist}, if yes how?
+                        {\color{red}
+                        If a side peak appears in momentum space, this means that there is coherence between the droplets. Otherwise you will see no side peak but just the Fourier transform of each droplet, which will give you only a central peak. In the picture they plot the variance of the peak, which shows that it is reproducible from shot to shot, and hence that the droplets are coherent. 
+}
         \item When running main.py with a rectangle pulse, centered around the potential, the result is NOT the ground state, instead an excited mode. Why
 
 \end{itemize}
