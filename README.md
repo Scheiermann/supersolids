@@ -1,30 +1,30 @@
-# Supersolids
-Notes and script to supersolids
+# Supersolids  
+Notes and script to supersolids  
 
-## How to contribute
+## How to contribute  
 Please read the **CONTRIBUTING.md**.  
 
-## How to install
+## How to install  
 
-### Arch based systems
-Go to the directory, where you build your AUR packages.
-Run the following in console:
-"mkdir python-supersolids"
-"cd python-supersolids"
-Download the PKGBUILD and place it there.
-Run "makepkg -sic" in console, where the PKGBUILD lies.
-This downloads the packages, extract it, gets the dependencies and installs it automatically 
-(you can do it manually for example with "sudo pacman -U python-supersolids-0.1.3-1-any.pkg.tar.zst")
+### Arch based systems  
+Go to the directory, where you build your AUR packages.  
+Run the following in console:  
+"mkdir python-supersolids"  
+"cd python-supersolids"  
+Download the PKGBUILD and place it there.  
+Run "makepkg -sic" in console, where the PKGBUILD lies.  
+This downloads the packages, extract it, gets the dependencies and installs it automatically  
+(you can do it manually for example with "sudo pacman -U python-supersolids-0.1.3-1-any.pkg.tar.zst")  
 
-### With pip
-Go to the directory supersolids/dist/, where the wheel lies (*.whl).
-Use this wheel to install, e.g:
+### With pip  
+Go to the directory supersolids/dist/, where the wheel lies (*.whl).  
+Use this wheel to install, e.g:  
 pip install supersolids-0.1.2-py3-none-any.whl
 
-### With setup.py
-Go to the directory, where the "setup.py" lies.
+### With setup.py  
+Go to the directory, where the "setup.py" lies.  
 
-For **Linux** use "python setup.py install --user" from console to **build** and **install** the package
+For **Linux** use "python setup.py install --user" from console to **build** and **install** the package  
 
 For **Windows**:  
 You need to add python to your path (if you didn't do it, when installing python/anaconda).  
@@ -37,18 +37,18 @@ You need to add python to your path (if you didn't do it, when installing python
 4. Use "python setup.py install" in gitbash from the path where "setup.py" lies.  
 
 Or you can follow the guide here:  
-https://www.magicmathmandarin.org/2017/12/07/setting-up-python-after-installing-or-re-installing-anaconda/
+https://www.magicmathmandarin.org/2017/12/07/setting-up-python-after-installing-or-re-installing-anaconda/  
 
-## Somethings does not work (Issues)
+## Somethings does not work (Issues)  
 1. Please read the **README.md** closely.  
 2. If you have please check every step again.  
 3. If the issue persist please **open a "Issue" in git**:  
 a) Click on "New Issue" on https://github.com/Scheiermann/supersolids/issues.  
 b) Assign a suitable label.  
-c) Follow the steps on git the to create the issue.
-Please **describe your issue closely** (what are your configurations, did it work before,
+c) Follow the steps on git the to create the issue.  
+Please **describe your issue closely** (what are your configurations, did it work before,  
 what have you changed, what is the result, what have you expected as a result?).  
 d) Try to include screenshots (to the question in 3b).  
-e) Describe what you think causes the issue and if you have **suggestions how to solve** it,
+e) Describe what you think causes the issue and if you have **suggestions how to solve** it,  
 mention it! (to the question in 3b).  
 f) **Close the issue**, if you accidentally did something wrong (but mention that before closing).  
