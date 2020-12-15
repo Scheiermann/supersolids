@@ -5,6 +5,23 @@ Notes and script to supersolids
 Please read the **CONTRIBUTING.md**.  
 
 ## How to install
+
+### Arch based systems
+Go to the directory, where you build your AUR packages.
+Run the following in console:
+"mkdir python-supersolids"
+"cd python-supersolids"
+Download the PKGBUILD and place it there.
+Run "makepkg -sic" in console, where the PKGBUILD lies.
+This downloads the packages, extract it, gets the dependencies and installs it automatically 
+(you can do it manually for example with "sudo pacman -U python-supersolids-0.1.3-1-any.pkg.tar.zst")
+
+### With pip
+Go to the directory supersolids/dist/, where the wheel lies (*.whl).
+Use this wheel to install, e.g:
+pip install supersolids-0.1.2-py3-none-any.whl
+
+### With setup.py
 Go to the directory, where the "setup.py" lies.
 
 For **Linux** use "python setup.py install --user" from console to **build** and **install** the package

@@ -14,7 +14,7 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 """
 
 
-class Animation():
+class Animation:
     def __init__(self):
         """
         Creates an Animation for a Schroedinger equation
