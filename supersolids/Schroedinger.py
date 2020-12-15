@@ -91,6 +91,7 @@ class Schroedinger(object):
 
         self.t += self.dt
 
+        # for self.imag_time=False, renormalization should be preserved, but we play safe here (regardless of speedup)
         # if self.imag_time:
         psi_norm = np.sum(np.abs(self.psi) ** 2) * self.dx
         self.psi /= np.sqrt(psi_norm)
