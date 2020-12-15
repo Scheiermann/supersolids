@@ -180,6 +180,9 @@ in-situ profiles means that they measure them while in the trap. The most common
                         If a side peak appears in momentum space, this means that there is coherence between the droplets. Otherwise you will see no side peak but just the Fourier transform of each droplet, which will give you only a central peak. In the picture they plot the variance of the peak, which shows that it is reproducible from shot to shot, and hence that the droplets are coherent. 
 }
         \item When running main.py with a rectangle pulse, centered around the potential, the result is NOT the ground state, instead an excited mode. Why
+        {\color{red}
+        I would say that the problem lies in the kinetic energy. First of all, did you check that the fft gives the correct ordering of the momentum distribution? As I told you the fft scrambles the ordering of momenta. Second, in the kinetic energy you have (-0.5 * self.k ** 2). It should be 0.5 * self.k ** 2. I'm not sure if these are the only problems, but these are in any case an issue.
+        }
 
 \end{itemize}
 
