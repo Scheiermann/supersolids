@@ -29,7 +29,7 @@ class Schroedinger(object):
     We will first implement the split operator without commutator relation ($H = H_{pot} + H_{kin}$)
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
-    def __init__(self, resolution, timesteps, dx, dk, L, dt, g=0,
+    def __init__(self, resolution, timesteps, L, dt, g=0,
         imag_time=False, psi_0=functions.psi_0_pdf, V=functions.v_harmonic):
         """
         Parameters
@@ -37,20 +37,21 @@ class Schroedinger(object):
         x: array_like, float
             description
         """
-        self.resolution = resolution
-        self.L = L
-        self.timesteps = timesteps
-        self.dx = dx
-        self.dk = dk
-        self.dt = dt
-        self.g = g
+        self.resolution = int(resolution)
+        self.timesteps = int(timesteps)
+        self.L = float(L)
+        self.dt = float(dt)
+        self.g = float(g)
         self.imag_time = imag_time
+
+        self.dx = float(2 * L / self.resolution)
+        self.dk = float(np.pi / self.L)
 
         self.x = np.linspace(-self.L, self.L, self.resolution)
         k_over_0 = np.arange(0, resolution / 2, 1)
         k_under_0 = np.arange(-resolution / 2, 0, 1)
 
-        self.k = np.concatenate((k_over_0, k_under_0), axis=0) * (np.pi / L)
+        self.k = np.concatenate((k_over_0, k_under_0), axis=0) * self.dk
 
         if imag_time:
             # Convention: $e^{-iH} = e^{UH}$
@@ -77,6 +78,7 @@ class Schroedinger(object):
         # Here we use half steps in real space, but will use it before and after H_kin with normal steps
         self.H_pot = np.exp(self.U * (self.V(self.x) + self.g * np.abs(self.psi) ** 2) * (0.5 * self.dt))
 
+        # attributes for animation
         self.t = 0.0
         self.psi_x_line = None
         self.psi_k_line = None

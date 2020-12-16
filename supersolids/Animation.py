@@ -3,6 +3,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
+from os import sep
 
 from supersolids import functions
 from supersolids import parallel
@@ -156,7 +157,7 @@ class Animation:
 
         return self.psi_line, self.V_line, self.psi_exact, self.thomas_fermi, self.title
 
-    def start(self, System: Schroedinger.Schroedinger):
+    def start(self, System: Schroedinger.Schroedinger, file_name):
         """
         Sets the plot limits appropriate even if the initial wave function psi_0 is not normalized
 
@@ -174,14 +175,14 @@ class Animation:
                                        fargs=(System,), frames=System.timesteps, interval=30, blit=True)
 
         # requires either mencoder or ffmpeg to be installed on your system
-        anim.save('results/split.mp4', fps=15, extra_args=['-vcodec', 'libx264'])
+        anim.save("results" + sep + file_name, fps=15, extra_args=['-vcodec', 'libx264'])
 
 
-def simulate_case(resolution, timesteps, dx, dk, L, dt, g, imag_time=False,
-                  psi_0=functions.psi_0_pdf, V=functions.v_harmonic):
+def simulate_case(resolution, timesteps, L, dt, g, imag_time=False,
+                  psi_0=functions.psi_0_pdf, V=functions.v_harmonic, file_name="split.mp4"):
 
     with parallel.run_time():
-        Harmonic = Schroedinger.Schroedinger(resolution, timesteps, dx, dk, L, dt, g=g,
+        Harmonic = Schroedinger.Schroedinger(resolution, timesteps, L, dt, g=g,
                                              imag_time=imag_time, psi_0=psi_0, V=V)
 
     ani = Animation()
@@ -189,4 +190,4 @@ def simulate_case(resolution, timesteps, dx, dk, L, dt, g, imag_time=False,
     # ani.set_limits_smart(0, Harmonic)
 
     with parallel.run_time():
-        ani.start(Harmonic)
+        ani.start(Harmonic, file_name)

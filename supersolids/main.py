@@ -26,13 +26,15 @@ if __name__ == '__main__':
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    # box length [-L,L]
-    L = 10
-    timesteps = 10
-    dx = (2 * L / resolution)
-    dk = (np.pi / L)
+    timesteps = 100
     dt = 0.00005
-    g = 100.0
+
+    # box length [-L,L]
+    # generators for L, g, dt to compute for different parameters
+    L_generator = (10,)
+    G = (i for i in range(90, 100, 10))
+    DT = (dt * 10 ** i for i in range(0, -3, -1))
+    cases = itertools.product(L_generator, G, DT)
 
     # functions needed for the Schroedinger equation (e.g. potential: V, initial wave function: psi_0)
     # x = symbols('x')
@@ -40,16 +42,12 @@ if __name__ == '__main__':
 
     # functools.partial sets all arguments except x, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
-    # psi_0 = functools.partial(functions.psi_0_pdf, loc=0.0, scale=1.0)
     # psi_0 = functools.partial(functions.psi_0_gauss, a=4, x_0=0, k_0=0)
 
-    # L = (5, 8, 10)
-    G = (i for i in range(1, 100, 10))
-    DT = (0.00005 * 10 ** i for i in range(1, 3, 1))
-    # cases = itertools.product(L, G, DT)
-    #
-    # for i, case in enumerate(cases):
-    #     print(f"i: {i}, case = {case}")
-
-    Animation.simulate_case(resolution, timesteps, dx, dk, L, dt, g, imag_time=False,
-                            psi_0=functions.psi_0_pdf, V=functions.v_harmonic)
+    i = 0
+    for L, g, dt in cases:
+        i = i + 1
+        print(f"i={i}, L={L}, g={g}, dt={dt}")
+        file_name = "split_{:03}.mp4".format(i)
+        Animation.simulate_case(resolution, timesteps, L=L, g=g, dt=dt, imag_time=True,
+                                psi_0=functions.psi_0_pdf, V=functions.v_harmonic, file_name=file_name)
