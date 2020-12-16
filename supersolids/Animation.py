@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 from matplotlib import animation
 
 from supersolids import functions
+from supersolids import parallel
 from supersolids import Schroedinger
 
 """
@@ -23,6 +24,7 @@ class Animation:
         Creates an Animation for a Schroedinger equation
         Methods need the object Schroedinger with the parameters of the equation
         """
+
         self.fig, self.axs = plt.subplots(nrows=1, ncols=1, squeeze=False)
 
         for ax in plt.gcf().get_axes():
@@ -81,8 +83,10 @@ class Animation:
         System: Schroedinger, object
                 Defines the Schroedinger equation for a given problem
         """
-        assert type(System) is Schroedinger.Schroedinger, ("System" 
-            "needs to be {}, but it is {}".format(Schroedinger.Schroedinger, type(System)))
+
+        assert type(System) is Schroedinger.Schroedinger, ("System"
+                                                           "needs to be {}, but it is {}".format(
+            Schroedinger.Schroedinger, type(System)))
 
         x_min = -System.L
         x_max = System.L
@@ -106,6 +110,7 @@ class Animation:
         """
         Initializes lines for animation
         """
+
         self.psi_line.set_data([], [])
         self.V_line.set_data([], [])
         self.psi_exact.set_data([], [])
@@ -126,6 +131,7 @@ class Animation:
         System: Schroedinger, object
                 Defines the Schroedinger equation for a given problem
         """
+
         assert type(System) is Schroedinger.Schroedinger, ("System needs to be class Schroedinger,"
                                                            "but it is {}".format(type(System)))
 
@@ -142,11 +148,11 @@ class Animation:
 
         self.title.set_text(("g = {:.2}, dt = {:.6}, timesteps = {:d}, "
                              "imag_time = {}, t = {:02.05f}").format(System.g,
-                                                                    System.dt,
-                                                                    System.timesteps,
-                                                                    System.imag_time,
-                                                                    System.t,
-                                                                    ))
+                                                                     System.dt,
+                                                                     System.timesteps,
+                                                                     System.imag_time,
+                                                                     System.t,
+                                                                     ))
 
         return self.psi_line, self.V_line, self.psi_exact, self.thomas_fermi, self.title
 
@@ -159,6 +165,7 @@ class Animation:
         System: Schroedinger, object
                 Defines the Schroedinger equation for a given problem
         """
+
         assert type(System) is Schroedinger.Schroedinger, ("System needs to be class Schroedinger,"
                                                            "but it is {}".format(type(System)))
 
@@ -168,3 +175,18 @@ class Animation:
 
         # requires either mencoder or ffmpeg to be installed on your system
         anim.save('results/split.mp4', fps=15, extra_args=['-vcodec', 'libx264'])
+
+
+def simulate_case(resolution, timesteps, dx, dk, L, dt, g, imag_time=False,
+                  psi_0=functions.psi_0_pdf, V=functions.v_harmonic):
+
+    with parallel.run_time():
+        Harmonic = Schroedinger.Schroedinger(resolution, timesteps, dx, dk, L, dt, g=g,
+                                             imag_time=imag_time, psi_0=psi_0, V=V)
+
+    ani = Animation()
+    ani.set_limits(0, 0, -L, L, 0, 0.2)
+    # ani.set_limits_smart(0, Harmonic)
+
+    with parallel.run_time():
+        ani.start(Harmonic)

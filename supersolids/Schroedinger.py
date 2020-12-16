@@ -29,9 +29,8 @@ class Schroedinger(object):
     We will first implement the split operator without commutator relation ($H = H_{pot} + H_{kin}$)
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
-
-    def __init__(self, resolution, L, timesteps, dx, dk, dt,
-        psi_0=functions.psi_0_pdf, V=functions.v_harmonic, g=0, imag_time=False):
+    def __init__(self, resolution, timesteps, dx, dk, L, dt, g=0,
+        imag_time=False, psi_0=functions.psi_0_pdf, V=functions.v_harmonic):
         """
         Parameters
         ----------

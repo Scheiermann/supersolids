@@ -92,6 +92,7 @@ def psi_gauss_solution(x):
 
     return np.exp(-x ** 2) / np.sqrt(np.pi)
 
+
 def thomas_fermi(x, g):
     """
      Mathematical function of Thomas-Fermi distribution with coupling constant g
