@@ -10,7 +10,7 @@ license=('MIT')
 depends=('python-matplotlib' 'python-numpy' 'python-scipy' 'python-sympy')
 makedepends=('python-setuptools')
 optdepends=('')
-source=(${_name}-$pkgver.tar.gz::"https://test-files.pythonhosted.org/packages/75/24/bbbef5332fc11866512abc2b200aa591de8ac33769f9ef867e88db533c81/${_name}-$pkgver.tar.gz")
+source=(${_name}-$pkgver.tar.gz::"https://test-files.pythonhosted.org/packages/b3/bd/3de80bca4928d5444241d54b944b01c6e24463200dcfab06d3b0adb9e808/${_name}-$pkgver.tar.gz")
 sha256sums=("SKIP")
 
 build() {
