@@ -7,16 +7,14 @@ from setuptools import setup
 
 setup(
     name="supersolids",
-    version="0.1.4",
+    version="0.1.5",
     packages=["", "supersolids"],
-    package_data={"": ["PKGBUILD"], "supersolids": ["results/split_time_imag.mp4"]},
+    package_data={"supersolids": ["results/split_time_imag.mp4", "results/split_time_real.mp4"]},
     url="https://github.com/Scheiermann/supersolids",
     license="MIT",
     author="Scheiermann",
     author_email="daniel.scheiermann@stud.uni-hannover.de",
     install_requires=["matplotlib", "numpy", "scipy", "sympy"],
-    # py_modules=["Animation", "constants", "functions", "main", "parallel", "Schroedinger",
-    #          "sympy_physics_test"],
     # ext_modules=cythonize("*.pyx", language_level=3),
     python_requires=">=3.8",
     description="Notes and script to supersolids"

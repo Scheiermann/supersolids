@@ -4,8 +4,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
 
-import functions
-import Schroedinger
+from supersolids import functions
+from supersolids import Schroedinger
 
 """
 Implements animation

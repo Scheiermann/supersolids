@@ -1,7 +1,7 @@
 # Maintainer: Daniel Scheiermann  <daniel.scheiermann@stud.uni-hannover.de>
 _name=supersolids
 pkgname=python-${_name}
-pkgver=0.1.4
+pkgver=0.1.5
 pkgrel=1
 pkgdesc="Notes and script to supersolids"
 url="https://github.com/Scheiermann/${_name}"
@@ -10,7 +10,7 @@ license=('MIT')
 depends=('python-matplotlib' 'python-numpy' 'python-scipy' 'python-sympy')
 makedepends=('python-setuptools')
 optdepends=('')
-source=(${_name}-$pkgver.tar.gz::"https://test-files.pythonhosted.org/packages/b3/bd/3de80bca4928d5444241d54b944b01c6e24463200dcfab06d3b0adb9e808/${_name}-$pkgver.tar.gz")
+source=(${_name}-$pkgver.tar.gz::"https://test-files.pythonhosted.org/packages/37/1e/8d2826417067ac3eeb2303258d8c3f91b56150d609c04e1b8ddfbd09ead3/${_name}-$pkgver.tar.gz")
 sha256sums=("SKIP")
 
 build() {

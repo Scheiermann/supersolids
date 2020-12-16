@@ -27,7 +27,6 @@ class Schroedinger(object):
 
     We will first implement the split operator without commutator relation ($H = H_{pot} + H_{kin}$)
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
-    WARNING: Normalization of $\psi$ at every step needs to be checked, but is NOT implemented.
     """
 
     def __init__(self, resolution, L, timesteps, dx, dk, dt, psi_0=None, V=None, g=1, imag_time=False):
