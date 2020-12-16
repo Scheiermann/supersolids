@@ -4,6 +4,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
 
+import functions
+import Schroedinger
+
 """
 Implements animation
 
@@ -25,6 +28,8 @@ class Animation:
         for ax in plt.gcf().get_axes():
             self.psi_line, = ax.plot([], [], "x--", c="r", label=r'$|\psi(x)|^2$')
             self.V_line, = ax.plot([], [], ".-", c="k", label=r'$V(x)$')
+            self.psi_exact, = ax.plot([], [], ".-", c="blue", label=r'$\psi_{sol(x)}$')
+            self.thomas_fermi, = ax.plot([], [], ".-", c="green", label=r'$n(x)$')
 
             self.title = ax.set_title("")
             ax.set_xlabel('$x$')
@@ -61,26 +66,29 @@ class Animation:
         self.axs[row, col].set_xlim(x_min, x_max)
         self.axs[row, col].set_ylim(y_lim)
 
-    def set_limits_smart(self, row, col, Schroedinger):
+    def set_limits_smart(self, row, col, System: Schroedinger.Schroedinger):
         """
         Sets the plot limits appropriate even if the initial wave function psi_0 is not normalized
 
         Parameters
         ----------
-        row : int, index
-              row of the subplot for the animation
+        row: int, index
+            row of the subplot for the animation
 
-        col : int, index
-              column of the subplot for the animation
+        col: int, index
+            column of the subplot for the animation
 
-        Schroedinger : Schroedinger, object
-                       Defines the Schroedinger equation for a given problem
+        System: Schroedinger, object
+                Defines the Schroedinger equation for a given problem
         """
-        x_min = -Schroedinger.L
-        x_max = Schroedinger.L
+        assert type(System) is Schroedinger.Schroedinger, ("System needs to be class Schroedinger,"
+                                                           "but it is {}".format(type(System)))
+
+        x_min = -System.L
+        x_max = System.L
 
         # Save calculations in variable to shortcut repeated calculations
-        psi_abs = np.abs(Schroedinger.psi)
+        psi_abs = np.abs(System.psi)
         psi_prob = psi_abs ** 2
 
         # Use named expressions to shortcut repeated calculations
@@ -100,11 +108,13 @@ class Animation:
         """
         self.psi_line.set_data([], [])
         self.V_line.set_data([], [])
+        self.psi_exact.set_data([], [])
+        self.thomas_fermi.set_data([], [])
         self.title.set_text("")
 
-        return self.psi_line, self.V_line, self.title
+        return self.psi_line, self.V_line, self.title, self.psi_exact
 
-    def animate(self, frame_index, Schoredinger):
+    def animate(self, frame_index, System: Schroedinger.Schroedinger):
         """
         Sets the plot limits appropriate even if the initial wave function psi_0 is not normalized
 
@@ -113,35 +123,48 @@ class Animation:
         frame_index: int, index
                      Current index of frame
 
-        Schroedinger : Schroedinger, object
-                       Defines the Schroedinger equation for a given problem
+        System: Schroedinger, object
+                Defines the Schroedinger equation for a given problem
         """
+        assert type(System) is Schroedinger.Schroedinger, ("System needs to be class Schroedinger,"
+                                                           "but it is {}".format(type(System)))
 
-        Schoredinger.time_step()
+        System.time_step()
         if frame_index % 10 == 0:
             print(f"Round {frame_index}")
 
-        x_V = np.linspace(Schoredinger.x.min(), Schoredinger.x.max(), 5 * Schoredinger.resolution)
-        self.V_line.set_data(x_V, Schoredinger.V(x_V))
-        self.psi_line.set_data(Schoredinger.x, np.abs(Schoredinger.psi) ** 2)
+        x_V = np.linspace(System.x.min(), System.x.max(), 5 * System.resolution)
+        self.V_line.set_data(x_V, System.V(x_V))
+        self.psi_line.set_data(System.x, np.abs(System.psi) ** 2)
+        self.psi_exact.set_data(x_V, functions.psi_gauss_solution(x_V))
+        if System.g:
+            self.thomas_fermi.set_data(x_V, functions.thomas_fermi(x_V, System.g))
 
-        self.title.set_text("t = %.2f" % Schoredinger.t)
+        self.title.set_text(("g = {:.2}, dt = {:.6}, timesteps = {:d}, "
+                             "imag_time = {}, t = {:02.05f}").format(System.g,
+                                                                    System.dt,
+                                                                    System.timesteps,
+                                                                    System.imag_time,
+                                                                    System.t,
+                                                                    ))
 
-        return self.psi_line, self.V_line, self.title
+        return self.psi_line, self.V_line, self.psi_exact, self.thomas_fermi, self.title
 
-    def start(self, Schroedinger):
+    def start(self, System: Schroedinger.Schroedinger):
         """
         Sets the plot limits appropriate even if the initial wave function psi_0 is not normalized
 
         Parameters
         ----------
-        Schroedinger : Schroedinger, object
-                       Defines the Schroedinger equation for a given problem
+        System: Schroedinger, object
+                Defines the Schroedinger equation for a given problem
         """
+        assert type(System) is Schroedinger.Schroedinger, ("System needs to be class Schroedinger,"
+                                                           "but it is {}".format(type(System)))
 
         # blit=True means only re-draw the parts that have changed.
         anim = animation.FuncAnimation(self.fig, self.animate, init_func=self.init_func,
-                                       fargs=(Schroedinger,), frames=Schroedinger.timesteps, interval=30, blit=True)
+                                       fargs=(System,), frames=System.timesteps, interval=30, blit=True)
 
         # requires either mencoder or ffmpeg to be installed on your system
         anim.save('results/split.mp4', fps=15, extra_args=['-vcodec', 'libx264'])

@@ -34,7 +34,7 @@ class Schroedinger(object):
         """
         Parameters
         ----------
-        x : array_like, float
+        x: array_like, float
             description
         """
         self.resolution = resolution
@@ -72,7 +72,7 @@ class Schroedinger(object):
         else:
             self.psi = psi_0
 
-        self.H_kin = np.exp(self.U * (-0.5 * self.k ** 2) * self.dt)
+        self.H_kin = np.exp(self.U * (0.5 * self.k ** 2) * self.dt)
 
         # Here we use half steps in real space, but will use it before and after H_kin with normal steps
         self.H_pot = np.exp(self.U * (self.V(self.x) + self.g * np.abs(self.psi) ** 2) * (0.5 * self.dt))
