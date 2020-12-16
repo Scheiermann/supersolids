@@ -13,6 +13,7 @@ import numpy as np
 import scipy as sp
 from sympy import Symbol, lambdify
 
+from supersolids import functions
 
 class Schroedinger(object):
     """
@@ -29,7 +30,8 @@ class Schroedinger(object):
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
 
-    def __init__(self, resolution, L, timesteps, dx, dk, dt, psi_0=None, V=None, g=1, imag_time=False):
+    def __init__(self, resolution, L, timesteps, dx, dk, dt,
+        psi_0=functions.psi_0_pdf, V=functions.v_harmonic, g=0, imag_time=False):
         """
         Parameters
         ----------

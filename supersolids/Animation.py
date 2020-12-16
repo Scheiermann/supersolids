@@ -81,8 +81,8 @@ class Animation:
         System: Schroedinger, object
                 Defines the Schroedinger equation for a given problem
         """
-        assert type(System) is Schroedinger.Schroedinger, ("System needs to be class Schroedinger,"
-                                                           "but it is {}".format(type(System)))
+        assert type(System) is Schroedinger.Schroedinger, ("System" 
+            "needs to be {}, but it is {}".format(Schroedinger.Schroedinger, type(System)))
 
         x_min = -System.L
         x_max = System.L

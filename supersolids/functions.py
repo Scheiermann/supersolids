@@ -36,7 +36,7 @@ def psi_0_gauss(x, a, x_0, k_0):
             * np.exp(-0.5 * ((x - x_0) * 1. / a) ** 2 + 1j * x * k_0))
 
 
-def psi_0_pdf(x, loc, scale):
+def psi_0_pdf(x, loc=0.0, scale=1.0):
     """
     Mathematical function of gauss pulse
 
@@ -113,3 +113,8 @@ def thomas_fermi(x, g):
     # print(np.sqrt(2 * mu))
 
     return mu * (1 - ((x ** 2) / (2 * mu))) / g
+
+
+def v_harmonic(x):
+    return 0.5 * x ** 2
+

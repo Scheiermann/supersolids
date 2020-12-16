@@ -8,4 +8,6 @@
 *.bbl
 *.bcf
 .*
+build/*
+supersolids.egg-info/*
 !/.gitignore
