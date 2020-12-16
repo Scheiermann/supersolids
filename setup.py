@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name="supersolids",
-    version="0.1.3",
+    version="0.1.4",
     packages=["", "supersolids"],
     package_data={"": ["PKGBUILD"], "supersolids": ["results/split_time_imag.mp4"]},
     url="https://github.com/Scheiermann/supersolids",

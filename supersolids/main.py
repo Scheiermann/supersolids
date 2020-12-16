@@ -31,15 +31,16 @@ if __name__ == '__main__':
     x = symbols('x')
     V = 0.5 * x ** 2
     # functools.partial sets all arguments except x, as multiple arguments for Schroedinger aren't implement yet
-    psi_0 = functools.partial(functions.psi_0_rect, x_min=-0.00, x_max=0.60, a=2)
-    # psi_0 = functools.partial(functions.psi_0_pdf, L=10.0)
+    # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
+    # psi_0 = functools.partial(functions.psi_0_pdf, loc=0.0, scale=1.0)
+    psi_0 = functools.partial(functions.psi_0_gauss, a=4, x_0=0, k_0=0)
 
     with parallel.run_time():
-        Harmonic = Schroedinger.Schroedinger(resolution, L, timesteps=500, dx=(2*L/resolution), dk=(np.pi/L), dt=0.005,
-            psi_0=psi_0, V=V, g=1, imag_time=True)
+        Harmonic = Schroedinger.Schroedinger(resolution, L, timesteps=500, dx=(2*L/resolution), dk=(np.pi/L),
+            dt=0.00005, psi_0=psi_0, V=V, g=100.0, imag_time=True)
 
     ani = Animation.Animation()
-    ani.set_limits(0, 0, -L, L, 0, 2.5)
+    ani.set_limits(0, 0, -L, L, 0, 0.2)
     # ani.set_limits_smart(0, Harmonic)
 
     with parallel.run_time():
