@@ -3,6 +3,9 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
+from matplotlib import cm
+from matplotlib import colors
+from mpl_toolkits.mplot3d import axes3d
 from os import sep
 
 from supersolids import functions
@@ -179,7 +182,7 @@ class Animation:
 
 
 def simulate_case(resolution, timesteps, L, dt, g, imag_time=False,
-                  psi_0=functions.psi_0_pdf, V=functions.v_harmonic, file_name="split.mp4"):
+                  psi_0=functions.psi_pdf, V=functions.v_harmonic, file_name="split.mp4"):
 
     with parallel.run_time():
         Harmonic = Schroedinger.Schroedinger(resolution, timesteps, L, dt, g=g,
@@ -191,3 +194,27 @@ def simulate_case(resolution, timesteps, L, dt, g, imag_time=False,
 
     with parallel.run_time():
         ani.start(Harmonic, file_name)
+
+
+def plot_2d(X, Y, pos, rv, L):
+    Z = rv.pdf(pos)
+
+    fig = plt.figure()
+    ax = fig.gca(projection="3d")
+    ax.plot_surface(X, Y, Z, cmap=cm.viridis, linewidth=5,  rstride=8, cstride=8, alpha=0.3)
+
+    norm = colors.Normalize(vmin=0, vmax=1)
+    cmap = cm.coolwarm
+    levels = 20
+    # levels = np.linspace(0, 1, 20, endpoint=True)
+
+    ax.contourf(X, Y, Z, zdir='z', offset=0.0, cmap=cmap, levels=levels)
+    ax.contourf(X, Y, Z, zdir='x', offset=-L, cmap=cmap, levels=levels)
+    p = ax.contourf(X, Y, Z, zdir='y', offset=L, cmap=cmap, levels=levels)
+    cbaxes = fig.add_axes([0.9, 0.1, 0.03, 0.8])
+    fig.colorbar(p, cax=cbaxes)
+
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.set_zlabel("Z")
+    plt.show()

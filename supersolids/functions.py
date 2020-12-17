@@ -10,10 +10,59 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 """
 
 import numpy as np
-from scipy.stats import norm
+from scipy import stats
 
 
-def psi_0_gauss(x, a, x_0, k_0):
+def psi_gauss_2d(resolution, x_min, x_max, y_min, y_max, mu_x=0.0, mu_y=0.0, var_x=1.0, var_y=1.0):
+    x = np.linspace(x_min, x_max, resolution)
+    y = np.linspace(y_min, y_max, resolution)
+    X, Y = np.meshgrid(x, y)
+    pos = np.empty(X.shape + (2,))
+    pos[:, :, 0] = X
+    pos[:, :, 1] = Y
+    print(pos.shape)
+    rv = stats.multivariate_normal([mu_x, mu_y], [[var_x, 0], [0, var_y]])
+
+    return X, Y, pos, rv
+
+def psi_gauss_3d(x, y, z, a, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0):
+    """
+    Gaussian wave packet of width a and momentum k_0, centered at x_0
+
+     Parameters
+     ----------
+     x : sympy.symbol
+         mathematical variable
+
+     y : sympy.symbol
+         mathematical variable
+
+     z : sympy.symbol
+         mathematical variable
+
+     a : float
+        Amplitude of pulse
+
+     x_0 : float
+           Mean spatial x of pulse
+
+     y_0 : float
+           Mean spatial y of pulse
+
+     z_0 : float
+           Mean spatial z of pulse
+
+     k_0 : float
+           Group velocity of pulse
+    """
+
+    return ((a * np.sqrt(np.pi)) ** (-0.5)
+            * np.exp(-0.5 * (((x - x_0) * 1.0) ** 2
+                            + ((y - y_0) * 1.0) ** 2
+                            + ((z - z_0) * 1.0) ** 2) / (a ** 2) + 1j * x * k_0))
+
+
+def psi_gauss(x, a, x_0=0.0, k_0=0.0):
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
@@ -26,7 +75,7 @@ def psi_0_gauss(x, a, x_0, k_0):
         Amplitude of pulse
 
      x_0 : float
-           Amplitude of pulse
+           Mean spatial x of pulse
 
      k_0 : float
            Group velocity of pulse
@@ -36,7 +85,7 @@ def psi_0_gauss(x, a, x_0, k_0):
             * np.exp(-0.5 * ((x - x_0) * 1. / a) ** 2 + 1j * x * k_0))
 
 
-def psi_0_pdf(x, loc=0.0, scale=1.0):
+def psi_pdf(x, loc=0.0, scale=1.0):
     """
     Mathematical function of gauss pulse
 
@@ -51,10 +100,10 @@ def psi_0_pdf(x, loc=0.0, scale=1.0):
     scale: float
         Scale of pulse
     """
-    return norm.pdf(x, loc=loc, scale=scale)
+    return stats.norm.pdf(x, loc=loc, scale=scale)
 
 
-def psi_0_rect(x, x_min, x_max, a):
+def psi_rect(x, x_min, x_max, a):
     """
     Mathematical function of rectengular pulse between x_min and x_max with amplitude a
 

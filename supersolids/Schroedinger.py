@@ -30,7 +30,7 @@ class Schroedinger(object):
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
     def __init__(self, resolution, timesteps, L, dt, g=0,
-        imag_time=False, psi_0=functions.psi_0_pdf, V=functions.v_harmonic):
+                 imag_time=False, psi_0=functions.psi_pdf, V=functions.v_harmonic):
         """
         Parameters
         ----------
