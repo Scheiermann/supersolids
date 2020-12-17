@@ -11,6 +11,8 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 
 import numpy as np
 import scipy as sp
+import sys
+
 from sympy import Symbol, lambdify
 
 from supersolids import functions
@@ -30,7 +32,7 @@ class Schroedinger(object):
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
     def __init__(self, resolution, timesteps, L, dt, g=0,
-                 imag_time=False, psi_0=functions.psi_pdf, V=functions.v_harmonic):
+                 imag_time=False, psi_0=functions.psi_pdf, V=functions.v_harmonic_1d, dim=1):
         """
         Parameters
         ----------
@@ -39,19 +41,24 @@ class Schroedinger(object):
         """
         self.resolution = int(resolution)
         self.timesteps = int(timesteps)
+
         self.L = float(L)
         self.dt = float(dt)
         self.g = float(g)
         self.imag_time = imag_time
-
-        self.dx = float(2 * L / self.resolution)
-        self.dk = float(np.pi / self.L)
+        self.psi = psi_0
+        self.V = V
+        self.dim = dim
 
         self.x = np.linspace(-self.L, self.L, self.resolution)
+        self.dx = float(2 * L / self.resolution)
+        self.dkx = float(np.pi / self.L)
+
         k_over_0 = np.arange(0, resolution / 2, 1)
         k_under_0 = np.arange(-resolution / 2, 0, 1)
 
-        self.k = np.concatenate((k_over_0, k_under_0), axis=0) * self.dk
+        self.kx = np.concatenate((k_over_0, k_under_0), axis=0) * self.dkx
+        self.k_squared = self.kx ** 2
 
         if imag_time:
             # Convention: $e^{-iH} = e^{UH}$
@@ -59,42 +66,65 @@ class Schroedinger(object):
         else:
             self.U = -1.0j
 
-        x_real = Symbol('x', real=True)
+        # Add attributes as soon as they are needed (e.g. for dimension 3, all besides the error are needed)
+        if dim >= 2:
+            self.y = np.linspace(-self.L, self.L, self.resolution)
+            self.dy = float(2 * L / self.resolution)
+            self.dky = float(np.pi / self.L)
+            self.ky = np.concatenate((k_over_0, k_under_0), axis=0) * self.dky
+            self.k_squared += self.ky ** 2
+        if dim >= 3:
+            self.z = np.linspace(-self.L, self.L, self.resolution)
+            self.dz = float(2 * L / self.resolution)
+            self.dkz = float(np.pi / self.L)
+            self.kz = np.concatenate((k_over_0, k_under_0), axis=0) * self.dkz
+            self.k_squared += self.kz ** 2
+        if dim > 3:
+            print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
+            sys.exit(1)
 
-        # Makes V callable, if it is not
-        if callable(V):
-            self.V = V
-        else:
-            self.V = lambdify(x_real, V, "numpy")
+        if dim == 1:
+            self.psi_val = psi_0(self.x)
+            self.V_val = V(self.x)
+        elif dim == 2:
+            self.psi_val = psi_0(self.x, self.y)
+            self.V_val = V(self.x, self.y)
+        elif dim == 3:
+            self.psi_val = psi_0(self.x, self.y, self.z)
+            self.V_val = V(self.x, self.y, self.z)
 
-        # Gets values of psi even if its callable
-        if callable(psi_0):
-            self.psi = psi_0(self.x)
-        else:
-            self.psi = psi_0
-
-        self.H_kin = np.exp(self.U * (0.5 * self.k ** 2) * self.dt)
+        self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 
         # Here we use half steps in real space, but will use it before and after H_kin with normal steps
-        self.H_pot = np.exp(self.U * (self.V(self.x) + self.g * np.abs(self.psi) ** 2) * (0.5 * self.dt))
+        self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
+
+        print(f"H_pot = {self.H_pot}")
+        print(f"H_kin = {self.H_kin}")
 
         # attributes for animation
         self.t = 0.0
-        self.psi_x_line = None
-        self.psi_k_line = None
-        self.V_x_line = None
+        self.psi_line = None
+        self.V_line = None
 
     def time_step(self):
-        self.psi = self.H_pot * self.psi
-        self.psi = sp.fft.fft(self.psi)
-        self.psi = self.H_kin * self.psi
-        self.psi = sp.fft.ifft(self.psi)
-        self.psi = self.H_pot * self.psi
+        self.psi_val = self.H_pot * self.psi_val
+        self.psi_val = sp.fft.fft(self.psi_val)
+        self.psi_val = self.H_kin * self.psi_val
+        self.psi_val = sp.fft.ifft(self.psi_val)
+        self.psi_val = self.H_pot * self.psi_val
 
         self.t += self.dt
 
         # for self.imag_time=False, renormalization should be preserved, but we play safe here (regardless of speedup)
         # if self.imag_time:
-        psi_norm = np.sum(np.abs(self.psi) ** 2) * self.dx
-        self.psi /= np.sqrt(psi_norm)
+        if self.dim == 1:
+            psi_norm = np.sum(np.abs(self.psi_val) ** 2) * self.dx
+        elif self.dim == 2:
+            psi_norm = np.sum(np.abs(self.psi_val) ** 2) * self.dx * self.dy
+        elif self.dim == 3:
+            psi_norm = np.sum(np.abs(self.psi_val) ** 2) * self.dx * self.dy * self.dz
+        else:
+            print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
+            sys.exit(1)
 
+        self.psi_val /= np.sqrt(psi_norm)

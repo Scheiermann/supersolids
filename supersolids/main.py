@@ -29,7 +29,7 @@ if __name__ == '__main__':
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    timesteps = 8000
+    timesteps = 200
     dt = 0.00005
 
     # box length [-L,L]
@@ -42,16 +42,18 @@ if __name__ == '__main__':
     cases = itertools.product(L_generator, G, DT)
 
     # functions needed for the Schroedinger equation (e.g. potential: V, initial wave function: psi_0)
-    V = functions.v_harmonic
+    V_1d = functions.v_harmonic_1d
+    V_2d = functions.v_harmonic_2d
+    V_3d = functions.v_harmonic_3d
 
     # functools.partial sets all arguments except x, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
-    psi_0 = functools.partial(functions.psi_gauss, a=4, x_0=0, k_0=0)
-
-    # psi_0_3d = functools.partial(functions.psi_gauss_3d, a=4, x_0=0, y_0=0, z_0=0, k_0=0)
-    L = 10
+    psi_0_1d = functools.partial(functions.psi_gauss, a=4, x_0=0, k_0=0)
+    L = 12
     psi_0_2d = functions.psi_gauss_2d(resolution, x_min=-L, x_max=L, y_min=-L, y_max=L,
                                       mu_x=0.0, mu_y=0.0, var_x=1.0, var_y=1.0)
+    psi_0_3d = functools.partial(functions.psi_gauss_3d, a=4, x_0=0, y_0=0, z_0=0, k_0=0)
+
     Animation.plot_2d(*psi_0_2d, L)
 
     i: int = 0
@@ -61,4 +63,4 @@ if __name__ == '__main__':
             print(f"i={i}, L={L}, g={g}, dt={dt}")
             file_name = f"split_{i:03}.mp4"
             e.submit(Animation.simulate_case, resolution, timesteps, L=L, g=g, dt=dt, imag_time=True,
-                     psi_0=psi_0, V=V, file_name=file_name)
+                     psi_0=psi_0_1d, V=V_1d, dim=1, file_name=file_name)

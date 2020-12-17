@@ -165,6 +165,13 @@ def thomas_fermi(x, g):
     return mu * (1 - ((x ** 2) / (2 * mu))) / g
 
 
-def v_harmonic(x):
+def v_harmonic_1d(x):
     return 0.5 * x ** 2
 
+
+def v_harmonic_2d(x, y):
+    return 0.5 * (x ** 2 + y ** 2)
+
+
+def v_harmonic_3d(x, y, z):
+    return 0.5 * (x ** 2 + y ** 2 + z ** 2)

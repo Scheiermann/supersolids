@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 import numpy as np
+import sys
 from matplotlib import pyplot as plt
 from matplotlib import animation
 from matplotlib import cm
 from matplotlib import colors
-from mpl_toolkits.mplot3d import axes3d
 from os import sep
 
 from supersolids import functions
@@ -89,14 +89,13 @@ class Animation:
         """
 
         assert type(System) is Schroedinger.Schroedinger, ("System"
-                                                           "needs to be {}, but it is {}".format(
-            Schroedinger.Schroedinger, type(System)))
+            "needs to be {}, but it is {}".format(Schroedinger.Schroedinger, type(System)))
 
         x_min = -System.L
         x_max = System.L
 
         # Save calculations in variable to shortcut repeated calculations
-        psi_abs = np.abs(System.psi)
+        psi_abs = np.abs(System.psi_val)
         psi_prob = psi_abs ** 2
 
         # Use named expressions to shortcut repeated calculations
@@ -121,7 +120,8 @@ class Animation:
         self.thomas_fermi.set_data([], [])
         self.title.set_text("")
 
-        return self.psi_line, self.V_line, self.title, self.psi_exact
+        return self.psi_line, self.V_line, self.psi_exact, self.thomas_fermi, self.title
+        # return self.psi_line, self.V_line, self.title, self.psi_exact
 
     def animate(self, frame_index, System: Schroedinger.Schroedinger):
         """
@@ -135,18 +135,29 @@ class Animation:
         System: Schroedinger, object
                 Defines the Schroedinger equation for a given problem
         """
-
-        assert type(System) is Schroedinger.Schroedinger, ("System needs to be class Schroedinger,"
-                                                           "but it is {}".format(type(System)))
+        assert type(System) is Schroedinger.Schroedinger, ("System"
+            "needs to be {}, but it is {}".format(Schroedinger.Schroedinger, type(System)))
 
         System.time_step()
         if frame_index % 10 == 0:
             print(f"Round {frame_index}")
 
         x_V = np.linspace(System.x.min(), System.x.max(), 5 * System.resolution)
-        self.V_line.set_data(x_V, System.V(x_V))
-        self.psi_line.set_data(System.x, np.abs(System.psi) ** 2)
-        self.psi_exact.set_data(x_V, functions.psi_gauss_solution(x_V))
+        if System.dim == 1:
+            self.V_line.set_data(x_V, System.V(x_V))
+            self.psi_exact.set_data(x_V, functions.psi_gauss_solution(x_V))
+        elif System.dim == 2:
+            self.V_line.set_data(x_V, System.V(x_V, x_V))
+            self.psi_exact.set_data(x_V, functions.psi_gauss_solution(x_V, x_V))
+        elif System.dim == 3:
+            self.V_line.set_data(x_V, System.V(x_V, x_V, x_V))
+            self.psi_exact.set_data(x_V, functions.psi_gauss_solution(x_V, x_V, x_V))
+        else:
+            print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
+            sys.exit(1)
+
+        self.psi_line.set_data(System.x, np.abs(System.psi_val) ** 2)
+
         if System.g:
             self.thomas_fermi.set_data(x_V, functions.thomas_fermi(x_V, System.g))
 
@@ -170,8 +181,8 @@ class Animation:
                 Defines the Schroedinger equation for a given problem
         """
 
-        assert type(System) is Schroedinger.Schroedinger, ("System needs to be class Schroedinger,"
-                                                           "but it is {}".format(type(System)))
+        assert type(System) is Schroedinger.Schroedinger, ("System"
+            "needs to be {}, but it is {}".format(Schroedinger.Schroedinger, type(System)))
 
         # blit=True means only re-draw the parts that have changed.
         anim = animation.FuncAnimation(self.fig, self.animate, init_func=self.init_func,
@@ -182,11 +193,10 @@ class Animation:
 
 
 def simulate_case(resolution, timesteps, L, dt, g, imag_time=False,
-                  psi_0=functions.psi_pdf, V=functions.v_harmonic, file_name="split.mp4"):
-
+                  psi_0=functions.psi_pdf, V=functions.v_harmonic_1d, dim=1, file_name="split.mp4"):
     with parallel.run_time():
         Harmonic = Schroedinger.Schroedinger(resolution, timesteps, L, dt, g=g,
-                                             imag_time=imag_time, psi_0=psi_0, V=V)
+                                             imag_time=imag_time, psi_0=psi_0, V=V, dim=dim)
 
     ani = Animation()
     ani.set_limits(0, 0, -L, L, 0, 0.2)
@@ -201,7 +211,7 @@ def plot_2d(X, Y, pos, rv, L):
 
     fig = plt.figure()
     ax = fig.gca(projection="3d")
-    ax.plot_surface(X, Y, Z, cmap=cm.viridis, linewidth=5,  rstride=8, cstride=8, alpha=0.3)
+    ax.plot_surface(X, Y, Z, cmap=cm.viridis, linewidth=5, rstride=8, cstride=8, alpha=0.3)
 
     norm = colors.Normalize(vmin=0, vmax=1)
     cmap = cm.coolwarm
