@@ -21,7 +21,6 @@ license: MIT
 Please feel free to use and modify this, but keep the above information. Thanks!
 """
 
-
 class Animation:
     def __init__(self, dim=1):
         """
@@ -30,9 +29,9 @@ class Animation:
         """
 
         self.dim = dim
-        self.fig, self.axs = plt.subplots(nrows=1, ncols=1, squeeze=False)
 
         if self.dim == 1:
+            self.fig, self.axs = plt.subplots(nrows=1, ncols=1, squeeze=False)
             # TODO: Currently all subplots have the same plot, change that!
             for ax in plt.gcf().get_axes():
                 self.psi_line, = ax.plot([], [], "x--", c="r", label=r'$|\psi(x)|^2$')
@@ -47,31 +46,29 @@ class Animation:
                 ax.grid()
 
         elif self.dim == 2:
+            self.fig = plt.figure()
+            self.ax = self.fig.add_subplot(111, projection='3d')
+
             cmap = cm.coolwarm
             levels = 20
-            self.X, self.Y = np.meshgrid(np.empty(64), np.empty(64))
-            print(f"self.X = {self.X.shape}")
-
             # TODO: Currently all subplots have the same plot, change that!
-            for ax in plt.gcf().get_axes():
-                plot_args = {"label": r"$|\psi(x)|^2$","cmap": cm.viridis, "linewidth": 5,
-                             "rstride": 8, "cstride": 8, "alpha": 0.3}
-                self.psi_line, = ax.plot_surface(self.X, self.Y, self.X, **plot_args)
-                print("lol")
-                # self.V_line, = ax.plot_surface([], [], [], label=r'$V(x)$')
-                # self.psi_exact, = ax.plot_surface([], [], [], label=r'$\psi_{sol(x)}$')
-                # self.thomas_fermi, = ax.plot([], [], [], label=r'$n(x)$')
+            plot_args = {"label": r"$|\psi(x)|^2$", "cmap": cm.viridis, "linewidth": 5,
+                         "rstride": 8, "cstride": 8, "alpha": 0.3}
+            self.psi_line, = self.ax.plot([], [], [], label=r"$|\psi(x)|^2$")
+            # self.V_line, = ax.plot_surface([], [], [], label=r'$V(x)$')
+            # self.psi_exact, = ax.plot_surface([], [], [], label=r'$\psi_{sol(x)}$')
+            # self.thomas_fermi, = ax.plot([], [], [], label=r'$n(x)$')
 
-                cbaxes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
-                self.fig.colorbar(self.psi_line, cax=cbaxes)
+            # cbaxes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
+            # self.fig.colorbar(self.psi_line, cax=cbaxes)
 
-                self.title = ax.set_title("")
-                ax.set_xlabel('$x$')
-                ax.set_ylabel('$y$')
-                ax.set_zlabel(r'$E$')
-                ax.legend(prop=dict(size=12))
-                ax.grid()
-                print(f"init done: {self.psi_line}")
+            self.title = self.ax.set_title("")
+            self.ax.set_xlabel(r'$x$')
+            self.ax.set_ylabel(r'$y$')
+            # self.ax.set_zlabel('r$E$')
+            # self.ax.legend(prop=dict(size=12))
+            self.ax.grid()
+            # print(f"init done: {self.psi_line}")
 
     def set_limits(self, row, col, x_min, x_max, y_min, y_max):
         """
@@ -140,7 +137,7 @@ class Animation:
 
         self.set_limits(row, col, x_min, x_max, y_min, y_max)
 
-    def init_func(self):
+    def init_func(self, System):
         """
         Initializes lines for animation
         """
@@ -152,7 +149,7 @@ class Animation:
             self.thomas_fermi.set_data([], [])
             self.title.set_text("")
         elif self.dim == 2:
-            self.psi_line.set_data([], [], [])
+            # self.psi_line.set_data([], [], [])
             # self.V_line.set_data([], [], [])
             # self.psi_exact.set_data([], [], [])
             # self.thomas_fermi.set_data([], [], [])
@@ -182,27 +179,31 @@ class Animation:
         System.time_step()
         if frame_index % 10 == 0:
             print(f"Round {frame_index}")
-        #
-        # x_V = np.linspace(System.x.min(), System.x.max(), 5 * System.resolution)
-        # if System.dim == 1:
-        #     self.V_line.set_data(x_V, System.V(x_V))
-        #     self.psi_exact.set_data(x_V, functions.psi_gauss_solution(x_V))
-        # elif System.dim == 2:
-        #     self.V_line.set_data(x_V, System.V(x_V, x_V))
-        #     self.psi_exact.set_data(x_V, functions.psi_gauss_solution(x_V, x_V))
-        # elif System.dim == 3:
-        #     self.V_line.set_data(x_V, System.V(x_V, x_V, x_V))
-        #     self.psi_exact.set_data(x_V, functions.psi_gauss_solution(x_V, x_V, x_V))
-        # else:
-        #     print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
-        #     sys.exit(1)
 
         if System.dim == 1:
             self.psi_line.set_data(System.x, np.abs(System.psi_val) ** 2)
         elif System.dim == 2:
-            self.psi_line.set_data(System.x, System.y, np.abs(System.psi_val) ** 2)
+            # print(f"shape of psi_val ** 2: {(np.abs(System.psi_val) ** 2).shape}")
+            print(f"psi_val ** 2: {(np.abs(System.psi_val) ** 2).max()}")
+            print(f"frame: {frame_index}")
+            # if frame_index == 0:
+            self.psi_line = self.ax.plot_surface(System.x_mesh, System.y_mesh, np.abs(System.psi_val) ** 2,
+                                                 cmap=cm.viridis, linewidth=5, rstride=8, cstride=8, alpha=0.3)
+            cmap = cm.coolwarm
+            levels = 20
+
+            # self.psi_z = self.ax.contourf(System.x_mesh, System.y_mesh, System.z_mesh, zdir='z', offset=0.0, cmap=cmap, levels=levels)
+            # self.psi_x = self.ax.contourf(System.x_mesh, System.y_mesh, System.z_mesh, zdir='x', offset=-System.L, cmap=cmap, levels=levels)
+            # self.psi_y = self.ax.contourf(System.x_mesh, System.y_mesh, System.z_mesh, zdir='y', offset=System.L, cmap=cmap, levels=levels)
+            # cbaxes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
+            # cbaxes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
+            # self.fig.colorbar(p, cax=cbaxes)
+
+            # else:
+            #     self.psi_line.set_data(System.x_mesh, System.y_mesh, np.abs(System.psi_val) ** 2)
         elif System.dim == 3:
-            self.psi_line.set_data(System.x, System.y, System.z, np.abs(System.psi_val) ** 2)
+            # TODO: z needs to be meshgrid too, how to use 3d meshgrids?
+            self.psi_line.set_data(System.x_mesh, System.y_mesh, System.z, np.abs(System.psi_val) ** 2)
         #
         # if System.g:
         #     self.thomas_fermi.set_data(x_V, functions.thomas_fermi(x_V, System.g))
@@ -235,8 +236,12 @@ class Animation:
             Schroedinger.Schroedinger, type(System)))
 
         # blit=True means only re-draw the parts that have changed.
-        anim = animation.FuncAnimation(self.fig, self.animate, init_func=self.init_func,
-                                       fargs=(System,), frames=System.timesteps, interval=30, blit=True)
+        if self.dim == 1:
+            anim = animation.FuncAnimation(self.fig, self.animate, init_func=self.init_func,
+                                           fargs=(System,), frames=System.timesteps, interval=30, blit=True)
+        else:
+            anim = animation.FuncAnimation(self.fig, self.animate,
+                                           fargs=(System,), frames=System.timesteps, interval=30, blit=True)
 
         # requires either mencoder or ffmpeg to be installed on your system
         anim.save("results" + sep + file_name, fps=15, extra_args=['-vcodec', 'libx264'])
@@ -249,8 +254,15 @@ def simulate_case(resolution, timesteps, L, dt, g, imag_time=False,
                                              imag_time=imag_time, psi_0=psi_0, V=V, dim=dim)
 
     ani = Animation(dim=dim)
-    print("Harmonic")
-    ani.set_limits(0, 0, -L, L, 0, 0.2)
+
+    x_lim = (-L, L)
+    y_lim = (0, 0.025)
+    if ani.dim == 1:
+        ani.set_limits(0, 0, *x_lim, *y_lim)
+    else:
+        ani.ax.set_xlim(*x_lim)
+        ani.ax.set_zlim(*y_lim)
+
     # ani.set_limits_smart(0, Harmonic)
 
     with parallel.run_time():
@@ -258,6 +270,19 @@ def simulate_case(resolution, timesteps, L, dt, g, imag_time=False,
 
 
 def plot_2d(X, Y, Z, L):
+    """
+
+    Parameters
+    ----------
+    X : meshgrid
+    Y : meshgrid
+    Z : meshgrid
+    L : Project on this axis
+
+    Returns
+    -------
+
+    """
     fig = plt.figure()
     ax = fig.gca(projection="3d")
     ax.plot_surface(X, Y, Z, cmap=cm.viridis, linewidth=5, rstride=8, cstride=8, alpha=0.3)

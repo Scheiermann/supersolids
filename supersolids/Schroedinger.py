@@ -32,7 +32,7 @@ class Schroedinger(object):
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
     def __init__(self, resolution, timesteps, L, dt, g=0,
-        imag_time=False, psi_0=functions.psi_0_pdf, V=functions.v_harmonic):
+                 imag_time=False, dim=1, psi_0=functions.psi_gauss_1d, V=functions.v_harmonic_1d):
         """
         Parameters
         ----------
@@ -54,6 +54,7 @@ class Schroedinger(object):
         self.dx = float(2 * L / self.resolution)
         self.dkx = float(np.pi / self.L)
 
+        # TODO: This can probably be done with sp.ttf.fftshift
         k_over_0 = np.arange(0, resolution / 2, 1)
         k_under_0 = np.arange(-resolution / 2, 0, 1)
 
@@ -88,6 +89,7 @@ class Schroedinger(object):
             self.V_val = self.V(self.x)
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
         elif dim == 2:
+            self.x_mesh, self.y_mesh = np.meshgrid(self.x, self.y)
             self.psi_val = self.psi(self.x, self.y)
             self.V_val = self.V(self.x, self.y)
             self.H_kin = np.diag(np.exp(self.U * (0.5 * self.k_squared) * self.dt))
@@ -113,9 +115,18 @@ class Schroedinger(object):
         self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
 
         self.psi_val = self.H_pot * self.psi_val
-        self.psi_val = sp.fft.fft(self.psi_val)
-        self.psi_val = self.H_kin * self.psi_val
-        self.psi_val = sp.fft.ifft(self.psi_val)
+        if self.dim == 1:
+            self.psi_val = sp.fft.fft(self.psi_val)
+            self.psi_val = self.H_kin * self.psi_val
+            self.psi_val = sp.fft.ifft(self.psi_val)
+        else:
+            # TODO: get the fftn to work, don't forget the needed order for the k vector like in 1D
+            self.psi_val = sp.fft.fft2(self.psi_val)
+            self.psi_val = sp.fft.fftshift(self.psi_val)
+
+            self.psi_val = self.H_kin * self.psi_val
+            self.psi_val = sp.fft.ifft2(self.psi_val)
+            self.psi_val = sp.fft.ifftshift(self.psi_val)
 
         # update H_pot before use
         self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))

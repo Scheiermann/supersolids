@@ -14,16 +14,33 @@ from scipy import stats
 
 
 def psi_gauss_2d(x, y, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0])):
-    X, Y = np.meshgrid(x, y)
-    pos = np.empty(X.shape + (2,))
-    pos[:, :, 0] = X
-    pos[:, :, 1] = Y
-    print(pos.shape)
+    """
+    Gives values according to gaus dirstribution (2D) with meshgrid of x,y as input
+
+    Parameters
+    ----------
+    x : 1D array, x-axis
+    y : 2D array, y-axis
+    mu : mean of gauss
+    var : var of gauss
+
+    Returns
+    -------
+    z_mesh : meshgrid, 2D surface values
+             values according to gaus dirstribution (2D) with meshgrid of x,y as input
+
+    """
+
+    x_mesh, y_mesh = np.meshgrid(x, y)
+    pos = np.empty(x_mesh.shape + (2,))
+    pos[:, :, 0] = x_mesh
+    pos[:, :, 1] = y_mesh
+
     cov = np.diag(var ** 2)
     rv = stats.multivariate_normal(mean=mu, cov=cov)
-    Z = rv.pdf(pos)
+    z_mesh = rv.pdf(pos)
 
-    return Z
+    return z_mesh
 
 def psi_gauss_3d(x, y, z, a, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0):
     """
@@ -62,7 +79,7 @@ def psi_gauss_3d(x, y, z, a, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0):
                             + ((z - z_0) * 1.0) ** 2) / (a ** 2) + 1j * x * k_0))
 
 
-def psi_gauss(x, a, x_0=0.0, k_0=0.0):
+def psi_gauss_1d(x, a=1.0, x_0=0.0, k_0=0.0):
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 

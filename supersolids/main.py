@@ -29,7 +29,7 @@ if __name__ == '__main__':
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    timesteps = 200
+    timesteps = 10
     dt = 0.05
 
     # box length [-L,L]
@@ -48,18 +48,18 @@ if __name__ == '__main__':
 
     # functools.partial sets all arguments except x, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
-    psi_0_1d = functools.partial(functions.psi_gauss, a=1, x_0=0, k_0=0)
-    L = 12
+    psi_0_1d = functools.partial(functions.psi_gauss_1d, a=1, x_0=0, k_0=0)
     psi_0_2d = functools.partial(functions.psi_gauss_2d, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0]))
-    psi_0_3d = functools.partial(functions.psi_gauss_3d, a=4, x_0=0, y_0=0, z_0=0, k_0=0)
+    psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
 
-    x = np.linspace(-L, L, resolution)
-    y = np.linspace(-L, L, resolution)
-    X, Y = np.meshgrid(x, y)
-    # Animation.plot_2d(X, Y, functions.psi_gauss_2d(x, y), L)
+    # L = 12
+    # x = np.linspace(-L, L, resolution)
+    # y = np.linspace(-L, L, resolution)
+    # x_mesh, y_mesh = np.meshgrid(x, y)
+    # Animation.plot_2d(x_mesh, y_mesh, psi_0_2d(x, y), L)
 
     i: int = 0
-    with futures.ProcessPoolExecutor(max_workers=1) as e:
+    with futures.ProcessPoolExecutor(max_workers=max_workers) as e:
         for L, g, dt in cases:
             i = i + 1
             print(f"i={i}, L={L}, g={g}, dt={dt}")
