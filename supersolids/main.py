@@ -50,12 +50,13 @@ if __name__ == '__main__':
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
     psi_0_1d = functools.partial(functions.psi_gauss, a=4, x_0=0, k_0=0)
     L = 12
-    psi_0_2d = functools.partial(functions.psi_gauss_2d, mu_x=0.0, mu_y=0.0, var_x=1.0, var_y=1.0)
+    psi_0_2d = functools.partial(functions.psi_gauss_2d, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=4, x_0=0, y_0=0, z_0=0, k_0=0)
 
     x = np.linspace(-L, L, resolution)
     y = np.linspace(-L, L, resolution)
-    Animation.plot_2d(x, y, functions.psi_gauss_2d(x, y), L)
+    X, Y = np.meshgrid(x, y)
+    # Animation.plot_2d(X, Y, functions.psi_gauss_2d(x, y), L)
 
     i: int = 0
     with futures.ProcessPoolExecutor(max_workers=1) as e:

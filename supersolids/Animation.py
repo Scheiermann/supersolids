@@ -49,12 +49,14 @@ class Animation:
         elif self.dim == 2:
             cmap = cm.coolwarm
             levels = 20
+            self.X, self.Y = np.meshgrid(np.empty(64), np.empty(64))
+            print(f"self.X = {self.X.shape}")
 
             # TODO: Currently all subplots have the same plot, change that!
             for ax in plt.gcf().get_axes():
                 plot_args = {"label": r"$|\psi(x)|^2$","cmap": cm.viridis, "linewidth": 5,
                              "rstride": 8, "cstride": 8, "alpha": 0.3}
-                self.psi_line, = ax.plot_surface([], [], [], **plot_args)
+                self.psi_line, = ax.plot_surface(self.X, self.Y, self.X, **plot_args)
                 print("lol")
                 # self.V_line, = ax.plot_surface([], [], [], label=r'$V(x)$')
                 # self.psi_exact, = ax.plot_surface([], [], [], label=r'$\psi_{sol(x)}$')

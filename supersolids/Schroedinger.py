@@ -86,20 +86,22 @@ class Schroedinger(object):
         if dim == 1:
             self.psi_val = self.psi(self.x)
             self.V_val = self.V(self.x)
+            self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
         elif dim == 2:
             self.psi_val = self.psi(self.x, self.y)
             self.V_val = self.V(self.x, self.y)
+            self.H_kin = np.diag(np.exp(self.U * (0.5 * self.k_squared) * self.dt))
         elif dim == 3:
             self.psi_val = self.psi(self.x, self.y, self.z)
             self.V_val = self.V(self.x, self.y, self.z)
-
-        self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
+            # TODO: 3D diag needed here
+            self.H_kin = np.diag(np.exp(self.U * (0.5 * self.k_squared) * self.dt))
 
         # Here we use half steps in real space, but will use it before and after H_kin with normal steps
         self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
 
-        print(f"H_pot = {self.H_pot}")
-        print(f"H_kin = {self.H_kin}")
+        # print(f"H_pot {self.H_pot.shape}= {self.H_pot}")
+        # print(f"H_kin {self.H_kin.shape}= {self.H_kin}")
 
         # attributes for animation
         self.t = 0.0

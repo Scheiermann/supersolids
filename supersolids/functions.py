@@ -13,15 +13,17 @@ import numpy as np
 from scipy import stats
 
 
-def psi_gauss_2d(x, y, mu_x=0.0, mu_y=0.0, var_x=1.0, var_y=1.0):
+def psi_gauss_2d(x, y, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0])):
     X, Y = np.meshgrid(x, y)
     pos = np.empty(X.shape + (2,))
     pos[:, :, 0] = X
     pos[:, :, 1] = Y
     print(pos.shape)
-    rv = stats.multivariate_normal([mu_x, mu_y], [[var_x, 0], [0, var_y]])
+    cov = np.diag(var ** 2)
+    rv = stats.multivariate_normal(mean=mu, cov=cov)
+    Z = rv.pdf(pos)
 
-    return rv.pdf(pos)
+    return Z
 
 def psi_gauss_3d(x, y, z, a, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0):
     """
