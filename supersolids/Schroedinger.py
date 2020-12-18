@@ -84,14 +84,14 @@ class Schroedinger(object):
             sys.exit(1)
 
         if dim == 1:
-            self.psi_val = psi_0(self.x)
-            self.V_val = V(self.x)
+            self.psi_val = self.psi(self.x)
+            self.V_val = self.V(self.x)
         elif dim == 2:
-            self.psi_val = psi_0(self.x, self.y)
-            self.V_val = V(self.x, self.y)
+            self.psi_val = self.psi(self.x, self.y)
+            self.V_val = self.V(self.x, self.y)
         elif dim == 3:
-            self.psi_val = psi_0(self.x, self.y, self.z)
-            self.V_val = V(self.x, self.y, self.z)
+            self.psi_val = self.psi(self.x, self.y, self.z)
+            self.V_val = self.V(self.x, self.y, self.z)
 
         self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 

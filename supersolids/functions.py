@@ -13,9 +13,7 @@ import numpy as np
 from scipy import stats
 
 
-def psi_gauss_2d(resolution, x_min, x_max, y_min, y_max, mu_x=0.0, mu_y=0.0, var_x=1.0, var_y=1.0):
-    x = np.linspace(x_min, x_max, resolution)
-    y = np.linspace(y_min, y_max, resolution)
+def psi_gauss_2d(x, y, mu_x=0.0, mu_y=0.0, var_x=1.0, var_y=1.0):
     X, Y = np.meshgrid(x, y)
     pos = np.empty(X.shape + (2,))
     pos[:, :, 0] = X
@@ -23,7 +21,7 @@ def psi_gauss_2d(resolution, x_min, x_max, y_min, y_max, mu_x=0.0, mu_y=0.0, var
     print(pos.shape)
     rv = stats.multivariate_normal([mu_x, mu_y], [[var_x, 0], [0, var_y]])
 
-    return X, Y, pos, rv
+    return rv.pdf(pos)
 
 def psi_gauss_3d(x, y, z, a, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0):
     """
