@@ -32,7 +32,7 @@ class Schroedinger(object):
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
     def __init__(self, resolution, timesteps, L, dt, g=0,
-                 imag_time=False, psi_0=functions.psi_pdf, V=functions.v_harmonic_1d, dim=1):
+        imag_time=False, psi_0=functions.psi_0_pdf, V=functions.v_harmonic):
         """
         Parameters
         ----------
@@ -109,10 +109,16 @@ class Schroedinger(object):
         self.V_line = None
 
     def time_step(self):
+        # update H_pot before use
+        self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
+
         self.psi_val = self.H_pot * self.psi_val
         self.psi_val = sp.fft.fft(self.psi_val)
         self.psi_val = self.H_kin * self.psi_val
         self.psi_val = sp.fft.ifft(self.psi_val)
+
+        # update H_pot before use
+        self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
         self.psi_val = self.H_pot * self.psi_val
 
         self.t += self.dt
