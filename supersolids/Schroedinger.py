@@ -85,10 +85,17 @@ class Schroedinger(object):
         self.V_x_line = None
 
     def time_step(self):
+
+        # update H_pot before use
+        self.H_pot = np.exp(self.U * (self.V(self.x) + self.g * np.abs(self.psi) ** 2) * (0.5 * self.dt))
+
         self.psi = self.H_pot * self.psi
         self.psi = sp.fft.fft(self.psi)
         self.psi = self.H_kin * self.psi
         self.psi = sp.fft.ifft(self.psi)
+
+        # update H_pot before use
+        self.H_pot = np.exp(self.U * (self.V(self.x) + self.g * np.abs(self.psi) ** 2) * (0.5 * self.dt))
         self.psi = self.H_pot * self.psi
 
         self.t += self.dt
