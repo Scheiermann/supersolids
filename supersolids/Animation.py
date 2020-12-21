@@ -5,11 +5,8 @@ import sys
 from matplotlib import pyplot as plt
 from matplotlib import animation
 from matplotlib import cm
-from matplotlib import colors
 from os import sep
 
-from supersolids import functions
-from supersolids import parallel
 from supersolids import Schroedinger
 
 """
@@ -20,6 +17,7 @@ email: daniel.scheiermann@stud.uni-hannover.de
 license: MIT
 Please feel free to use and modify this, but keep the above information. Thanks!
 """
+
 
 class Animation:
     def __init__(self, dim=1):
@@ -36,8 +34,7 @@ class Animation:
             for ax in plt.gcf().get_axes():
                 self.psi_line, = ax.plot([], [], "x--", c="r", label=r'$|\psi(x)|^2$')
                 self.V_line, = ax.plot([], [], ".-", c="k", label=r'$V(x)$')
-                self.psi_exact, = ax.plot([], [], ".-", c="blue", label=r'$\psi_{sol(x)}$')
-                self.thomas_fermi, = ax.plot([], [], ".-", c="green", label=r'$n(x)$')
+                self.psi_sol_line, = ax.plot([], [], ".-", c="blue", label=r'$\psi_{sol(x)}$')
 
                 self.title = ax.set_title("")
                 ax.set_xlabel('$x$')
@@ -55,9 +52,8 @@ class Animation:
             plot_args = {"label": r"$|\psi(x)|^2$", "cmap": cm.viridis, "linewidth": 5,
                          "rstride": 8, "cstride": 8, "alpha": 0.3}
             self.psi_line, = self.ax.plot([], [], [], label=r"$|\psi(x)|^2$")
-            # self.V_line, = ax.plot_surface([], [], [], label=r'$V(x)$')
-            # self.psi_exact, = ax.plot_surface([], [], [], label=r'$\psi_{sol(x)}$')
-            # self.thomas_fermi, = ax.plot([], [], [], label=r'$n(x)$')
+            # self.V_line, = self.ax.plot(System.x, System.V_val, label=r'$V(x)$')
+            # self.psi_sol, = self.ax.plot([], [], [], label=r'$n(x)$')
 
             # cbaxes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
             # self.fig.colorbar(self.psi_line, cax=cbaxes)
@@ -127,7 +123,7 @@ class Animation:
         psi_prob = psi_abs ** 2
 
         # Use named expressions to shortcut repeated calculations
-        # Basic check if the initial wave function is normalized, and ensures to th whole function display if not
+        # checks if the initial wave function is normalized, if not it ensures to display the whole function
         if (psi_prob_max := psi_prob.max()) < (psi_abs_max := psi_abs.max()):
             y_min = psi_abs.min()
             y_max = psi_abs_max
@@ -137,28 +133,18 @@ class Animation:
 
         self.set_limits(row, col, x_min, x_max, y_min, y_max)
 
-    def init_func(self, System):
-        """
-        Initializes lines for animation
-        """
+    def get_V_plot_values(self, i, j, System: Schroedinger.Schroedinger):
+        if System.dim == 1:
+            ylim = self.axs[i, j].get_ylim()
+            # as the plot should be completely shown in the box (we choose a reserve here: 1.5)
+            reserve = 1.5
+            x_range_in_box = System.x[(System.V_val < ylim[1] * reserve) & (System.V_val > ylim[0] * reserve)]
+            # x_range_in_box = System.x[System.V_val < ylim[1] * 1.5]
 
-        if self.dim == 1:
-            self.psi_line.set_data([], [])
-            self.V_line.set_data([], [])
-            self.psi_exact.set_data([], [])
-            self.thomas_fermi.set_data([], [])
-            self.title.set_text("")
-        elif self.dim == 2:
-            # self.psi_line.set_data([], [], [])
-            # self.V_line.set_data([], [], [])
-            # self.psi_exact.set_data([], [], [])
-            # self.thomas_fermi.set_data([], [], [])
-            self.title.set_text("")
+            V_plot_x = np.linspace(x_range_in_box[0], x_range_in_box[-1], System.resolution)
+            V_plot_val = System.V(V_plot_x)
 
-        if self.dim == 1:
-            return self.psi_line, self.V_line, self.psi_exact, self.thomas_fermi, self.title
-        else:
-            return self.psi_line, self.title
+        return V_plot_x, V_plot_val
 
     def animate(self, frame_index, System: Schroedinger.Schroedinger):
         """
@@ -176,19 +162,24 @@ class Animation:
                                                            "needs to be {}, but it is {}".format(
             Schroedinger.Schroedinger, type(System)))
 
+        if frame_index == 0:
+            self.V_plot_x, self.V_plot_val = self.get_V_plot_values(0, 0, System)
+
         System.time_step()
         if frame_index % 10 == 0:
             print(f"Round {frame_index}")
 
         if System.dim == 1:
             self.psi_line.set_data(System.x, np.abs(System.psi_val) ** 2)
+            self.V_line.set_data(self.V_plot_x, self.V_plot_val)
+            self.psi_sol_line.set_data(System.x, System.psi_sol_val)
         elif System.dim == 2:
-            # print(f"shape of psi_val ** 2: {(np.abs(System.psi_val) ** 2).shape}")
-            print(f"psi_val ** 2: {(np.abs(System.psi_val) ** 2).max()}")
+            # print(f"psi_val ** 2: {(np.abs(System.psi_val) ** 2).max()}")
             print(f"frame: {frame_index}")
             # if frame_index == 0:
             self.psi_line = self.ax.plot_surface(System.x_mesh, System.y_mesh, np.abs(System.psi_val) ** 2,
                                                  cmap=cm.viridis, linewidth=5, rstride=8, cstride=8, alpha=0.3)
+            # self.V_line = self.ax.plot_surface(System.x_mesh, System.y_mesh, System.V_val)
             cmap = cm.coolwarm
             levels = 20
 
@@ -217,9 +208,9 @@ class Animation:
                                                                      ))
 
         if System.dim == 1:
-            return self.psi_line, self.V_line, self.psi_exact, self.thomas_fermi, self.title
+            return self.psi_line, self.V_line, self.psi_sol_line, self.title
         else:
-            return self.psi_line, self.title
+            return self.psi_line, self.V_line, self.title
 
     def start(self, System: Schroedinger.Schroedinger, file_name):
         """
@@ -227,46 +218,22 @@ class Animation:
 
         Parameters
         ----------
+        file_name : String
+                    Name of file including file type to save the animation to (tested with mp4)
         System: Schroedinger, object
                 Defines the Schroedinger equation for a given problem
         """
 
         assert type(System) is Schroedinger.Schroedinger, ("System"
                                                            "needs to be {}, but it is {}".format(
-            Schroedinger.Schroedinger, type(System)))
+                                                            Schroedinger.Schroedinger, type(System)))
 
         # blit=True means only re-draw the parts that have changed.
-        if self.dim == 1:
-            anim = animation.FuncAnimation(self.fig, self.animate, init_func=self.init_func,
-                                           fargs=(System,), frames=System.timesteps, interval=30, blit=True)
-        else:
-            anim = animation.FuncAnimation(self.fig, self.animate,
-                                           fargs=(System,), frames=System.timesteps, interval=30, blit=True)
+        anim = animation.FuncAnimation(self.fig, self.animate,
+                                       fargs=(System,), frames=System.timesteps, interval=30, blit=True)
 
         # requires either mencoder or ffmpeg to be installed on your system
         anim.save("results" + sep + file_name, fps=15, extra_args=['-vcodec', 'libx264'])
-
-
-def simulate_case(resolution, timesteps, L, dt, g, imag_time=False,
-                  psi_0=functions.psi_pdf, V=functions.v_harmonic_1d, dim=1, file_name="split.mp4"):
-    with parallel.run_time():
-        Harmonic = Schroedinger.Schroedinger(resolution, timesteps, L, dt, g=g,
-                                             imag_time=imag_time, psi_0=psi_0, V=V, dim=dim)
-
-    ani = Animation(dim=dim)
-
-    x_lim = (-L, L)
-    y_lim = (0, 0.025)
-    if ani.dim == 1:
-        ani.set_limits(0, 0, *x_lim, *y_lim)
-    else:
-        ani.ax.set_xlim(*x_lim)
-        ani.ax.set_zlim(*y_lim)
-
-    # ani.set_limits_smart(0, Harmonic)
-
-    with parallel.run_time():
-        ani.start(Harmonic, file_name)
 
 
 def plot_2d(X, Y, Z, L):
@@ -293,8 +260,8 @@ def plot_2d(X, Y, Z, L):
     ax.contourf(X, Y, Z, zdir='z', offset=0.0, cmap=cmap, levels=levels)
     ax.contourf(X, Y, Z, zdir='x', offset=-L, cmap=cmap, levels=levels)
     p = ax.contourf(X, Y, Z, zdir='y', offset=L, cmap=cmap, levels=levels)
-    cbaxes = fig.add_axes([0.9, 0.1, 0.03, 0.8])
-    fig.colorbar(p, cax=cbaxes)
+    color_bar_axes = fig.add_axes([0.9, 0.1, 0.03, 0.8])
+    fig.colorbar(p, cax=color_bar_axes)
 
     ax.set_xlabel("X")
     ax.set_ylabel("Y")

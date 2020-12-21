@@ -12,8 +12,37 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 import numpy as np
 from scipy import stats
 
+def get_meshgrid(x, y):
+    x_mesh, y_mesh = np.meshgrid(x, y)
+    pos = np.empty(x_mesh.shape + (2,))
+    pos[:, :, 0] = x_mesh
+    pos[:, :, 1] = y_mesh
 
-def psi_gauss_2d(x, y, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0])):
+    return x_mesh, y_mesh, pos
+
+def psi_gauss_2d(pos, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0])):
+    """
+    Gives values according to gaus dirstribution (2D) with meshgrid of x,y as input
+
+    Parameters
+    ----------
+    pos : 3D array, stacked meshgrid of an x (1D) and y (1D)
+    mu : mean of gauss
+    var : var of gauss
+
+    Returns
+    -------
+    z_mesh : meshgrid, 2D surface values
+             values according to gaus dirstribution (2D) with meshgrid of x,y as input
+
+    """
+    cov = np.diag(var ** 2)
+    rv = stats.multivariate_normal(mean=mu, cov=cov)
+    z_mesh = rv.pdf(pos)
+
+    return z_mesh
+
+def psi_gauss_2d_pdf(x, y, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0])):
     """
     Gives values according to gaus dirstribution (2D) with meshgrid of x,y as input
 
@@ -30,12 +59,7 @@ def psi_gauss_2d(x, y, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0])):
              values according to gaus dirstribution (2D) with meshgrid of x,y as input
 
     """
-
-    x_mesh, y_mesh = np.meshgrid(x, y)
-    pos = np.empty(x_mesh.shape + (2,))
-    pos[:, :, 0] = x_mesh
-    pos[:, :, 1] = y_mesh
-
+    pos = get_meshgrid(x, y)
     cov = np.diag(var ** 2)
     rv = stats.multivariate_normal(mean=mu, cov=cov)
     z_mesh = rv.pdf(pos)
@@ -186,7 +210,10 @@ def v_harmonic_1d(x):
     return 0.5 * x ** 2
 
 
-def v_harmonic_2d(x, y):
+# @np.vectorize
+def v_harmonic_2d(pos):
+    x = np.ravel(pos[:, :, 0])
+    y = np.ravel(pos[:, :, 1])
     return 0.5 * (x ** 2 + y ** 2)
 
 

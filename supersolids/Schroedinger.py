@@ -13,9 +13,8 @@ import numpy as np
 import scipy as sp
 import sys
 
-from sympy import Symbol, lambdify
-
 from supersolids import functions
+
 
 class Schroedinger(object):
     """
@@ -31,8 +30,12 @@ class Schroedinger(object):
     We will first implement the split operator without commutator relation ($H = H_{pot} + H_{kin}$)
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
-    def __init__(self, resolution, timesteps, L, dt, g=0,
-                 imag_time=False, dim=1, psi_0=functions.psi_gauss_1d, V=functions.v_harmonic_1d):
+
+    def __init__(self, resolution, timesteps, L, dt, g=0, imag_time=False, dim=1, s=1,
+                 psi_0=functions.psi_gauss_1d,
+                 V=functions.v_harmonic_1d,
+                 psi_sol=functions.thomas_fermi
+                 ):
         """
         Parameters
         ----------
@@ -46,9 +49,13 @@ class Schroedinger(object):
         self.dt = float(dt)
         self.g = float(g)
         self.imag_time = imag_time
+        self.dim = dim
+        # s = - ln(N) / (2 * dtau), where N is the norm of the psi
+        self.s = s
+
         self.psi = psi_0
         self.V = V
-        self.dim = dim
+        self.psi_sol = psi_sol
 
         self.x = np.linspace(-self.L, self.L, self.resolution)
         self.dx = float(2 * L / self.resolution)
@@ -87,11 +94,13 @@ class Schroedinger(object):
         if dim == 1:
             self.psi_val = self.psi(self.x)
             self.V_val = self.V(self.x)
+            self.psi_sol_val = self.psi_sol(self.x)
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
         elif dim == 2:
-            self.x_mesh, self.y_mesh = np.meshgrid(self.x, self.y)
-            self.psi_val = self.psi(self.x, self.y)
-            self.V_val = self.V(self.x, self.y)
+            self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
+            self.psi_val = self.psi(self.pos)
+            self.V_val = self.V(self.pos)
+            self.psi_sol_val = self.psi_sol(self.pos)
             self.H_kin = np.diag(np.exp(self.U * (0.5 * self.k_squared) * self.dt))
         elif dim == 3:
             self.psi_val = self.psi(self.x, self.y, self.z)
@@ -109,6 +118,19 @@ class Schroedinger(object):
         self.t = 0.0
         self.psi_line = None
         self.V_line = None
+
+    def get_norm(self):
+        if self.dim == 1:
+            psi_norm = np.sum(np.abs(self.psi_val) ** 2) * self.dx
+        elif self.dim == 2:
+            psi_norm = np.sum(np.abs(self.psi_val) ** 2) * self.dx * self.dy
+        elif self.dim == 3:
+            psi_norm = np.sum(np.abs(self.psi_val) ** 2) * self.dx * self.dy * self.dz
+        else:
+            print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
+            sys.exit(1)
+
+        return psi_norm
 
     def time_step(self):
         # update H_pot before use
@@ -136,14 +158,8 @@ class Schroedinger(object):
 
         # for self.imag_time=False, renormalization should be preserved, but we play safe here (regardless of speedup)
         # if self.imag_time:
-        if self.dim == 1:
-            psi_norm = np.sum(np.abs(self.psi_val) ** 2) * self.dx
-        elif self.dim == 2:
-            psi_norm = np.sum(np.abs(self.psi_val) ** 2) * self.dx * self.dy
-        elif self.dim == 3:
-            psi_norm = np.sum(np.abs(self.psi_val) ** 2) * self.dx * self.dy * self.dz
-        else:
-            print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
-            sys.exit(1)
+        psi_norm_after_evolution = self.get_norm()
 
-        self.psi_val /= np.sqrt(psi_norm)
+        self.psi_val /= np.sqrt(psi_norm_after_evolution)
+
+        self.s = - np.log(self.get_norm()) / (2 * self.dt)

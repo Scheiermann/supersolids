@@ -18,6 +18,37 @@ from concurrent import futures
 
 from supersolids import Animation
 from supersolids import functions
+from supersolids import parallel
+from supersolids import Schroedinger
+
+
+def simulate_case(resolution, timesteps, L, dt, g, imag_time=False, dim=1, s=1,
+                  psi_0=functions.psi_gauss_1d,
+                  V=functions.v_harmonic_1d,
+                  psi_sol=functions.thomas_fermi,
+                  file_name="split.mp4"):
+
+    with parallel.run_time():
+        Harmonic = Schroedinger.Schroedinger(resolution, timesteps, L, dt, g=g, imag_time=imag_time, dim=dim, s=s,
+                                             psi_0=psi_0, V=V,
+                                             psi_sol=psi_sol
+        )
+
+    ani = Animation.Animation(dim=dim)
+
+    x_lim = (-L, L)
+    y_lim = (0, 0.2)
+    if ani.dim == 1:
+        ani.set_limits(0, 0, *x_lim, *y_lim)
+    else:
+        ani.ax.set_xlim(*x_lim)
+        ani.ax.set_zlim(*y_lim)
+
+    # ani.set_limits_smart(0, Harmonic)
+
+    with parallel.run_time():
+        ani.start(Harmonic, file_name)
+
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == '__main__':
@@ -29,7 +60,7 @@ if __name__ == '__main__':
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    timesteps = 10
+    timesteps = 100
     dt = 0.05
 
     # box length [-L,L]
@@ -52,11 +83,16 @@ if __name__ == '__main__':
     psi_0_2d = functools.partial(functions.psi_gauss_2d, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
 
+
+    # testing for 2d plot
     # L = 12
     # x = np.linspace(-L, L, resolution)
     # y = np.linspace(-L, L, resolution)
-    # x_mesh, y_mesh = np.meshgrid(x, y)
-    # Animation.plot_2d(x_mesh, y_mesh, psi_0_2d(x, y), L)
+    # x_mesh, y_mesh, pos = functions.get_meshgrid(x, y)
+    # Animation.plot_2d(x_mesh, y_mesh, psi_0_2d(pos), L)
+
+    # TODO: get V_2d plot to work
+    # Animation.plot_2d(x_mesh, y_mesh, V_2d(pos), L)
 
     i: int = 0
     with futures.ProcessPoolExecutor(max_workers=max_workers) as e:
@@ -64,5 +100,6 @@ if __name__ == '__main__':
             i = i + 1
             print(f"i={i}, L={L}, g={g}, dt={dt}")
             file_name = f"split_{i:03}.mp4"
-            e.submit(Animation.simulate_case, resolution, timesteps, L=L, g=g, dt=dt, imag_time=True,
-                     psi_0=psi_0_2d, V=V_2d, dim=2, file_name=file_name)
+            psi_sol = functools.partial(functions.thomas_fermi, g=g)
+            e.submit(simulate_case, resolution, timesteps, L=L, g=g, dt=dt, imag_time=True, dim=1, s=1,
+                     psi_0=psi_0_2d, V=V_2d, psi_sol=psi_sol, file_name=file_name)
