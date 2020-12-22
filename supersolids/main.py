@@ -37,12 +37,14 @@ def simulate_case(resolution, timesteps, L, dt, g, imag_time=False, dim=1, s=1,
     ani = Animation.Animation(dim=dim)
 
     x_lim = (-L, L)
-    y_lim = (0, 0.2)
+    y_lim = (-L, L)
     if ani.dim == 1:
         ani.set_limits(0, 0, *x_lim, *y_lim)
     else:
+        z_lim = (0, 0.02)
         ani.ax.set_xlim(*x_lim)
-        ani.ax.set_zlim(*y_lim)
+        ani.ax.set_ylim(*y_lim)
+        ani.ax.set_zlim(*z_lim)
 
     # ani.set_limits_smart(0, Harmonic)
 
@@ -60,14 +62,13 @@ if __name__ == '__main__':
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    timesteps = 100
+    timesteps = 20
     dt = 0.05
 
     # box length [-L,L]
     # generators for L, g, dt to compute for different parameters
     L_generator = (10,)
     G = (i for i in range(100, 110, 10))
-    # DT = (dt * 1.1 ** i for i in range(0, -maxworkers, -1))
     factors = np.linspace(0.2, 0.3, max_workers)
     DT = (i * dt for i in factors)
     cases = itertools.product(L_generator, G, DT)
@@ -83,17 +84,6 @@ if __name__ == '__main__':
     psi_0_2d = functools.partial(functions.psi_gauss_2d, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
 
-
-    # testing for 2d plot
-    # L = 12
-    # x = np.linspace(-L, L, resolution)
-    # y = np.linspace(-L, L, resolution)
-    # x_mesh, y_mesh, pos = functions.get_meshgrid(x, y)
-    # Animation.plot_2d(x_mesh, y_mesh, psi_0_2d(pos), L)
-
-    # TODO: get V_2d plot to work
-    # Animation.plot_2d(x_mesh, y_mesh, V_2d(pos), L)
-
     i: int = 0
     with futures.ProcessPoolExecutor(max_workers=max_workers) as e:
         for L, g, dt in cases:
@@ -101,5 +91,5 @@ if __name__ == '__main__':
             print(f"i={i}, L={L}, g={g}, dt={dt}")
             file_name = f"split_{i:03}.mp4"
             psi_sol = functools.partial(functions.thomas_fermi, g=g)
-            e.submit(simulate_case, resolution, timesteps, L=L, g=g, dt=dt, imag_time=True, dim=1, s=1,
+            e.submit(simulate_case, resolution, timesteps, L=L, g=g, dt=dt, imag_time=True, dim=2, s=1,
                      psi_0=psi_0_2d, V=V_2d, psi_sol=psi_sol, file_name=file_name)

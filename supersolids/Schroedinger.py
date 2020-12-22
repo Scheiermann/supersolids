@@ -144,11 +144,11 @@ class Schroedinger(object):
         else:
             # TODO: get the fftn to work, don't forget the needed order for the k vector like in 1D
             self.psi_val = sp.fft.fft2(self.psi_val)
-            self.psi_val = sp.fft.fftshift(self.psi_val)
+            # self.psi_val = sp.fft.fftshift(self.psi_val)
 
             self.psi_val = self.H_kin * self.psi_val
             self.psi_val = sp.fft.ifft2(self.psi_val)
-            self.psi_val = sp.fft.ifftshift(self.psi_val)
+            # self.psi_val = sp.fft.ifftshift(self.psi_val)
 
         # update H_pot before use
         self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))

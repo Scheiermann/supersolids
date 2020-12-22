@@ -7,7 +7,7 @@ from matplotlib import animation
 from matplotlib import cm
 from os import sep
 
-from supersolids import Schroedinger
+from supersolids import Schroedinger, functions
 
 """
 Implements animation
@@ -25,7 +25,6 @@ class Animation:
         Creates an Animation for a Schroedinger equation
         Methods need the object Schroedinger with the parameters of the equation
         """
-
         self.dim = dim
 
         if self.dim == 1:
@@ -52,7 +51,7 @@ class Animation:
             plot_args = {"label": r"$|\psi(x)|^2$", "cmap": cm.viridis, "linewidth": 5,
                          "rstride": 8, "cstride": 8, "alpha": 0.3}
             self.psi_line, = self.ax.plot([], [], [], label=r"$|\psi(x)|^2$")
-            # self.V_line, = self.ax.plot(System.x, System.V_val, label=r'$V(x)$')
+            self.V_line, = self.ax.plot([], [], [], label=r'$V(x)$')
             # self.psi_sol, = self.ax.plot([], [], [], label=r'$n(x)$')
 
             # cbaxes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
@@ -138,13 +137,23 @@ class Animation:
             ylim = self.axs[i, j].get_ylim()
             # as the plot should be completely shown in the box (we choose a reserve here: 1.5)
             reserve = 1.5
-            x_range_in_box = System.x[(System.V_val < ylim[1] * reserve) & (System.V_val > ylim[0] * reserve)]
-            # x_range_in_box = System.x[System.V_val < ylim[1] * 1.5]
+            range_in_box = System.x[(System.V_val < ylim[1] * reserve) & (System.V_val > ylim[0] * reserve)]
 
-            V_plot_x = np.linspace(x_range_in_box[0], x_range_in_box[-1], System.resolution)
-            V_plot_val = System.V(V_plot_x)
+            V_pos = np.linspace(range_in_box[0], range_in_box[-1], System.resolution)
+            V_plot_val = System.V(V_pos)
 
-        return V_plot_x, V_plot_val
+        elif System.dim == 2:
+            zlim = self.ax.get_zlim()
+            # as the plot should be completely shown in the box (we choose a reserve here: 1.5)
+            reserve = 1.5
+            range_in_box = System.pos[(System.V_val < zlim[1] * reserve) & (System.V_val > zlim[0] * reserve)]
+
+            x = np.linspace(range_in_box[:, 0].min(), range_in_box[:, 0].max(), System.resolution)
+            y = np.linspace(range_in_box[:, 1].min(), range_in_box[:, 1].max(), System.resolution)
+            xx, yy, V_pos = functions.get_meshgrid(x, y)
+            V_plot_val = System.V(V_pos)
+
+        return V_pos, V_plot_val
 
     def animate(self, frame_index, System: Schroedinger.Schroedinger):
         """
@@ -163,23 +172,28 @@ class Animation:
             Schroedinger.Schroedinger, type(System)))
 
         if frame_index == 0:
-            self.V_plot_x, self.V_plot_val = self.get_V_plot_values(0, 0, System)
+            if System.dim == 1:
+                self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System)
+            elif System.dim == 2:
+                self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System)
+                self.V_line = self.ax.plot_surface(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
+                                                   cmap=cm.Blues, linewidth=5, rstride=8, cstride=8, alpha=0.7)
 
-        System.time_step()
+        # System.time_step()
         if frame_index % 10 == 0:
             print(f"Round {frame_index}")
 
         if System.dim == 1:
             self.psi_line.set_data(System.x, np.abs(System.psi_val) ** 2)
-            self.V_line.set_data(self.V_plot_x, self.V_plot_val)
+            self.V_line.set_data(self.V_pos, self.V_plot_val)
             self.psi_sol_line.set_data(System.x, System.psi_sol_val)
         elif System.dim == 2:
-            # print(f"psi_val ** 2: {(np.abs(System.psi_val) ** 2).max()}")
-            print(f"frame: {frame_index}")
-            # if frame_index == 0:
-            self.psi_line = self.ax.plot_surface(System.x_mesh, System.y_mesh, np.abs(System.psi_val) ** 2,
-                                                 cmap=cm.viridis, linewidth=5, rstride=8, cstride=8, alpha=0.3)
-            # self.V_line = self.ax.plot_surface(System.x_mesh, System.y_mesh, System.V_val)
+            if frame_index >= 2:
+                test_factor = (1.0/(float(frame_index) + 1.0))
+                self.psi_line = self.ax.plot_surface(System.x_mesh, System.y_mesh,
+                                                     test_factor * np.abs(System.psi_val) ** 2,
+                                                     cmap=cm.Greys, linewidth=5, rstride=8, cstride=8, alpha=0.3)
+
             cmap = cm.coolwarm
             levels = 20
 
@@ -190,14 +204,9 @@ class Animation:
             # cbaxes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
             # self.fig.colorbar(p, cax=cbaxes)
 
-            # else:
-            #     self.psi_line.set_data(System.x_mesh, System.y_mesh, np.abs(System.psi_val) ** 2)
         elif System.dim == 3:
             # TODO: z needs to be meshgrid too, how to use 3d meshgrids?
             self.psi_line.set_data(System.x_mesh, System.y_mesh, System.z, np.abs(System.psi_val) ** 2)
-        #
-        # if System.g:
-        #     self.thomas_fermi.set_data(x_V, functions.thomas_fermi(x_V, System.g))
 
         self.title.set_text(("g = {:.2}, dt = {:.6}, timesteps = {:d}, "
                              "imag_time = {}, t = {:02.05f}").format(System.g,
@@ -236,7 +245,7 @@ class Animation:
         anim.save("results" + sep + file_name, fps=15, extra_args=['-vcodec', 'libx264'])
 
 
-def plot_2d(X, Y, Z, L):
+def plot_2d(L=1, resolution=32, alpha=0.6, x_lim = (-1, 1), y_lim = (-1, 1),  z_lim = (0, 1), **kwargs):
     """
 
     Parameters
@@ -252,18 +261,62 @@ def plot_2d(X, Y, Z, L):
     """
     fig = plt.figure()
     ax = fig.gca(projection="3d")
-    ax.plot_surface(X, Y, Z, cmap=cm.viridis, linewidth=5, rstride=8, cstride=8, alpha=0.3)
+    ax.set_xlim(*x_lim)
+    ax.set_ylim(*y_lim)
+    ax.set_zlim(*z_lim)
 
     cmap = cm.coolwarm
     levels = 20
+    for key, values in kwargs.items():
+        if key == "pos":
+            if type(values) == list:
+                pos = values
+            else:
+                pos = values
 
-    ax.contourf(X, Y, Z, zdir='z', offset=0.0, cmap=cmap, levels=levels)
-    ax.contourf(X, Y, Z, zdir='x', offset=-L, cmap=cmap, levels=levels)
-    p = ax.contourf(X, Y, Z, zdir='y', offset=L, cmap=cmap, levels=levels)
-    color_bar_axes = fig.add_axes([0.9, 0.1, 0.03, 0.8])
-    fig.colorbar(p, cax=color_bar_axes)
+        elif key == "func":
+            if type(values) == list:
+                psi_pos_adjusted, psi_val_adjusted = get_V_plot_values(ax, pos[0], values[0], resolution)
+                ax.plot_surface(psi_pos_adjusted[:, :, 0], psi_pos_adjusted[:, :, 1], psi_val_adjusted,
+                                cmap=cm.viridis, linewidth=5, rstride=8, cstride=8, alpha=alpha[0])
+
+                ax.contourf(psi_pos_adjusted[:, :, 0], psi_pos_adjusted[:, :, 1], psi_val_adjusted,
+                            zdir='z', offset=0.0, cmap=cmap, levels=levels)
+                ax.contourf(psi_pos_adjusted[:, :, 0], psi_pos_adjusted[:, :, 1], psi_val_adjusted,
+                            zdir='x', offset=-L, cmap=cmap, levels=levels)
+                p = ax.contourf(psi_pos_adjusted[:, :, 0], psi_pos_adjusted[:, :, 1], psi_val_adjusted,
+                                zdir='y', offset=L, cmap=cmap, levels=levels)
+                color_bar_axes = fig.add_axes([0.9, 0.1, 0.03, 0.8])
+
+                fig.colorbar(p, cax=color_bar_axes)
+
+                for i, func in enumerate(values[1:]):
+                    pos_adjusted, V_val_adjusted = get_V_plot_values(ax, pos[i], func, resolution)
+                    # ax.plot_surface(pos[i][:, :, 0], pos[i][:, :, 1], func(pos[i]),
+                    ax.plot_surface(pos_adjusted[:, :, 0], pos_adjusted[:, :, 1], V_val_adjusted,
+                                    cmap=cm.viridis, linewidth=5, rstride=8, cstride=8, alpha=alpha[i])
+            else:
+                ax.plot_surface(pos[:, :, 0], pos[:, :, 1], values(pos),
+                                cmap=cm.viridis, linewidth=5, rstride=8, cstride=8, alpha=alpha)
 
     ax.set_xlabel("X")
     ax.set_ylabel("Y")
     ax.set_zlabel("Z")
     plt.show()
+
+def get_V_plot_values(ax, pos, V, resolution):
+    Z = V(pos)
+    zlim = ax.get_zlim()
+    # as the plot should be completely shown in the box (we choose a reserve here: 1.5)
+    reserve = 1.5
+    range_in_box = pos[(Z < zlim[1] * reserve) & (Z > zlim[0] * reserve)]
+
+    print(f"{Z[Z < 0.04]}")
+    print(f"{range_in_box}")
+    x = np.linspace(range_in_box[:, 0].min(), range_in_box[:, 0].max(), resolution)
+    y = np.linspace(range_in_box[:, 1].min(), range_in_box[:, 1].max(), resolution)
+    xx, yy, V_pos = functions.get_meshgrid(x, y)
+    V_plot_val = V(V_pos)
+
+    return V_pos, V_plot_val
+
