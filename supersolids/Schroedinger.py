@@ -118,6 +118,11 @@ class Schroedinger(object):
         self.t = 0.0
         self.psi_line = None
         self.V_line = None
+        self.psi_sol_line = None
+
+        self.psi_x_line = None
+        self.psi_y_line = None
+        self.psi_z_line = None
 
     def get_norm(self):
         if self.dim == 1:

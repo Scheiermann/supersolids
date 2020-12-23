@@ -26,25 +26,28 @@ def simulate_case(resolution, timesteps, L, dt, g, imag_time=False, dim=1, s=1,
                   psi_0=functions.psi_gauss_1d,
                   V=functions.v_harmonic_1d,
                   psi_sol=functions.thomas_fermi,
-                  file_name="split.mp4"):
+                  file_name="split.mp4",
+                  x_lim=(-1, 1),
+                  y_lim=(-1, 1),
+                  z_lim=(0, 1.0)
+                  ):
 
     with parallel.run_time():
         Harmonic = Schroedinger.Schroedinger(resolution, timesteps, L, dt, g=g, imag_time=imag_time, dim=dim, s=s,
                                              psi_0=psi_0, V=V,
-                                             psi_sol=psi_sol
-        )
+                                             psi_sol=psi_sol,
+                                             )
 
     ani = Animation.Animation(dim=dim)
 
-    x_lim = (-L, L)
-    y_lim = (-L, L)
     if ani.dim == 1:
         ani.set_limits(0, 0, *x_lim, *y_lim)
     else:
-        z_lim = (0, 0.02)
         ani.ax.set_xlim(*x_lim)
         ani.ax.set_ylim(*y_lim)
         ani.ax.set_zlim(*z_lim)
+        ani.ax.view_init(20.0, 45.0)
+        ani.ax.dist = 10.0
 
     # ani.set_limits_smart(0, Harmonic)
 
@@ -62,7 +65,7 @@ if __name__ == '__main__':
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    timesteps = 20
+    timesteps = 30
     dt = 0.05
 
     # box length [-L,L]
@@ -92,4 +95,8 @@ if __name__ == '__main__':
             file_name = f"split_{i:03}.mp4"
             psi_sol = functools.partial(functions.thomas_fermi, g=g)
             e.submit(simulate_case, resolution, timesteps, L=L, g=g, dt=dt, imag_time=True, dim=2, s=1,
-                     psi_0=psi_0_2d, V=V_2d, psi_sol=psi_sol, file_name=file_name)
+                     psi_0=psi_0_2d, V=V_2d, psi_sol=psi_sol, file_name=file_name,
+                     x_lim=(-2, 2),
+                     y_lim=(-2, 2),
+                     z_lim=(0, 0.025)
+                     )

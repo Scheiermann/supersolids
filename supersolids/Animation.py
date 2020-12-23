@@ -45,25 +45,11 @@ class Animation:
             self.fig = plt.figure()
             self.ax = self.fig.add_subplot(111, projection='3d')
 
-            cmap = cm.coolwarm
-            levels = 20
-            # TODO: Currently all subplots have the same plot, change that!
-            plot_args = {"label": r"$|\psi(x)|^2$", "cmap": cm.viridis, "linewidth": 5,
-                         "rstride": 8, "cstride": 8, "alpha": 0.3}
-            self.psi_line, = self.ax.plot([], [], [], label=r"$|\psi(x)|^2$")
-            self.V_line, = self.ax.plot([], [], [], label=r'$V(x)$')
-            # self.psi_sol, = self.ax.plot([], [], [], label=r'$n(x)$')
-
-            # cbaxes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
-            # self.fig.colorbar(self.psi_line, cax=cbaxes)
-
             self.title = self.ax.set_title("")
             self.ax.set_xlabel(r'$x$')
             self.ax.set_ylabel(r'$y$')
-            # self.ax.set_zlabel('r$E$')
-            # self.ax.legend(prop=dict(size=12))
+            self.ax.set_zlabel('r$z$')
             self.ax.grid()
-            # print(f"init done: {self.psi_line}")
 
     def set_limits(self, row, col, x_min, x_max, y_min, y_max):
         """
@@ -171,13 +157,22 @@ class Animation:
                                                            "needs to be {}, but it is {}".format(
             Schroedinger.Schroedinger, type(System)))
 
+        # As V is constant, calculate and plot it just one time (at first frame)
         if frame_index == 0:
             if System.dim == 1:
                 self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System)
             elif System.dim == 2:
+                color_bar_axes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
+
                 self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System)
-                self.V_line = self.ax.plot_surface(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
-                                                   cmap=cm.Blues, linewidth=5, rstride=8, cstride=8, alpha=0.7)
+                System.V_line = self.ax.plot_surface(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
+                                                   cmap=cm.Blues, linewidth=5, rstride=8, cstride=8, alpha=0.8)
+        else:
+            # Delete old plot, if it exists
+            System.psi_line.remove()
+            System.psi_x_line.remove()
+            System.psi_y_line.remove()
+            System.psi_z_line.remove()
 
         # System.time_step()
         if frame_index % 10 == 0:
@@ -188,38 +183,43 @@ class Animation:
             self.V_line.set_data(self.V_pos, self.V_plot_val)
             self.psi_sol_line.set_data(System.x, System.psi_sol_val)
         elif System.dim == 2:
-            if frame_index >= 2:
-                test_factor = (1.0/(float(frame_index) + 1.0))
-                self.psi_line = self.ax.plot_surface(System.x_mesh, System.y_mesh,
-                                                     test_factor * np.abs(System.psi_val) ** 2,
-                                                     cmap=cm.Greys, linewidth=5, rstride=8, cstride=8, alpha=0.3)
+            psi_pos, psi_val = crop_pos_to_limits(self.ax, System.pos, System.psi, func_val=System.psi_val)
+            psi_prob = (0.8 ** frame_index) * np.abs(psi_val) ** 2
+            print(f"frame: {frame_index}")
+            print(f"prob: {psi_prob.max()}")
+            System.psi_line = self.ax.plot_surface(psi_pos[:, :, 0], psi_pos[:, :, 1],
+                                                 psi_prob,
+                                                 cmap=cm.viridis, linewidth=5,
+                                                 rstride=1, cstride=1, alpha=0.2)
 
             cmap = cm.coolwarm
             levels = 20
 
-            # self.psi_z = self.ax.contourf(System.x_mesh, System.y_mesh, System.z_mesh, zdir='z', offset=0.0, cmap=cmap, levels=levels)
-            # self.psi_x = self.ax.contourf(System.x_mesh, System.y_mesh, System.z_mesh, zdir='x', offset=-System.L, cmap=cmap, levels=levels)
-            # self.psi_y = self.ax.contourf(System.x_mesh, System.y_mesh, System.z_mesh, zdir='y', offset=System.L, cmap=cmap, levels=levels)
-            # cbaxes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
-            # cbaxes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
-            # self.fig.colorbar(p, cax=cbaxes)
+            System.psi_x_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
+                                                 zdir='x', offset=self.ax.get_xlim()[0], cmap=cmap, levels=levels)
+            System.psi_y_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
+                                                 zdir='y', offset=self.ax.get_ylim()[0], cmap=cmap, levels=levels)
+            System.psi_z_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
+                                                 zdir='z', offset=self.ax.get_zlim()[0], cmap=cmap, levels=levels)
+            self.fig.colorbar(System.psi_x_line, cax=color_bar_axes)
 
         elif System.dim == 3:
             # TODO: z needs to be meshgrid too, how to use 3d meshgrids?
-            self.psi_line.set_data(System.x_mesh, System.y_mesh, System.z, np.abs(System.psi_val) ** 2)
+            System.psi_line.set_data(System.x_mesh, System.y_mesh, System.z, np.abs(System.psi_val) ** 2)
 
-        self.title.set_text(("g = {:.2}, dt = {:.6}, timesteps = {:d}, "
-                             "imag_time = {}, t = {:02.05f}").format(System.g,
-                                                                     System.dt,
-                                                                     System.timesteps,
-                                                                     System.imag_time,
-                                                                     System.t,
-                                                                     ))
+        self.title.set_text(("g = {:.2}, dt = {:.6}, timesteps = {:d}, imag_time = {},\n"
+                             "t = {:02.05f}").format(System.g,
+                                                     System.dt,
+                                                     System.timesteps,
+                                                     System.imag_time,
+                                                     System.t,
+                                                     ))
 
         if System.dim == 1:
             return self.psi_line, self.V_line, self.psi_sol_line, self.title
         else:
-            return self.psi_line, self.V_line, self.title
+            # return System.psi_line, System.V_line, System.psi_x_line, System.psi_y_line, System.psi_z_line, self.title
+            return System.psi_line, System.V_line, self.title
 
     def start(self, System: Schroedinger.Schroedinger, file_name):
         """
@@ -239,10 +239,11 @@ class Animation:
 
         # blit=True means only re-draw the parts that have changed.
         anim = animation.FuncAnimation(self.fig, self.animate,
-                                       fargs=(System,), frames=System.timesteps, interval=30, blit=True)
+                                       fargs=(System,), frames=System.timesteps, interval=30,
+                                       blit=True, cache_frame_data=False)
 
         # requires either mencoder or ffmpeg to be installed on your system
-        anim.save("results" + sep + file_name, fps=15, extra_args=['-vcodec', 'libx264'])
+        anim.save("results" + sep + file_name, fps=15, dpi=300, extra_args=['-vcodec', 'libx264'])
 
 
 def plot_2d(resolution=32, x_lim=(-1, 1), y_lim=(-1, 1),  z_lim=(0, 1), alpha=0.6, **kwargs):
@@ -282,7 +283,7 @@ def plot_2d(resolution=32, x_lim=(-1, 1), y_lim=(-1, 1),  z_lim=(0, 1), alpha=0.
                 for i, func in enumerate(values[1:], 1):
                     pos_adjusted, V_val_adjusted = get_V_plot_values(ax, pos[i], func, resolution)
                     ax.plot_surface(pos_adjusted[:, :, 0], pos_adjusted[:, :, 1], V_val_adjusted,
-                                    cmap=cm.viridis, linewidth=5, rstride=1, cstride=1, alpha=alpha[i])
+                                    cmap=cm.Blues, linewidth=5, rstride=1, cstride=1, alpha=alpha[i])
             else:
                 psi_val = values(psi_pos)
                 ax.plot_surface(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_val,
@@ -307,22 +308,24 @@ def plot_2d(resolution=32, x_lim=(-1, 1), y_lim=(-1, 1),  z_lim=(0, 1), alpha=0.
     plt.show()
 
 
-def round_z_to_0(pos, func):
-    tol = 1.0 * 10 ** (-5)
-
+def round_z_to_0(pos, func, tol=1.0e-5):
     z = func(pos)
     z.real[abs(z.real) < tol] = 0.0
 
     return pos, z
 
 
-def crop_pos_to_limits(ax, pos, func):
+def crop_pos_to_limits(ax, pos, func, func_val=None):
     x_lim = ax.get_xlim()
     y_lim = ax.get_ylim()
 
     x = pos[:, :, 0][0]
     y = pos[:, :, 1][:, 0]
-    z = func(pos)
+    if func_val is None:
+        z = func(pos)
+    else:
+        z = func_val
+
     x_cropped = x[(x_lim[0] < x) & (x < x_lim[1])]
     y_cropped = y[(y_lim[0] < y) & (y < y_lim[1])]
     xx_cropped, yy_cropped, pos_cropped = functions.get_meshgrid(x_cropped, y_cropped)

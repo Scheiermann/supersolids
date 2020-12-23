@@ -258,6 +258,6 @@ if __name__ == '__main__':
     y = np.linspace(-L, L, resolution)
     x_mesh, y_mesh, pos = get_meshgrid(x, y)
     Animation.plot_2d(L=L, resolution=resolution,
-                      x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(0.0, 0.20),
-                      alpha=[0.6, 0.8], pos=[pos, pos], func=[psi_0_2d, V_2d])
+                      x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(0.0, 0.025),
+                      alpha=[0.6, 0.8], pos=[pos, pos], func=[lambda pos: np.abs(psi_0_2d(pos)) ** 2, V_2d])
 
