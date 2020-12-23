@@ -162,17 +162,23 @@ class Animation:
             if System.dim == 1:
                 self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System)
             elif System.dim == 2:
-                color_bar_axes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
+                # color_bar_axes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
 
                 self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System)
                 System.V_line = self.ax.plot_surface(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
-                                                   cmap=cm.Blues, linewidth=5, rstride=8, cstride=8, alpha=0.8)
-        else:
+                                                     cmap=cm.Blues, linewidth=5, rstride=8, cstride=8, alpha=0.8)
+        elif frame_index >= 2:
             # Delete old plot, if it exists
             System.psi_line.remove()
-            System.psi_x_line.remove()
-            System.psi_y_line.remove()
-            System.psi_z_line.remove()
+
+            # Delete old contours, if they exists.
+            # psi_x_line is a ContourPlotSet without remove, collections gives a list of PolyColletion with remove
+            for contour in System.psi_x_line.collections:
+                contour.remove()
+            for contour in System.psi_y_line.collections:
+                contour.remove()
+            for contour in System.psi_z_line.collections:
+                contour.remove()
 
         # System.time_step()
         if frame_index % 10 == 0:
@@ -183,25 +189,29 @@ class Animation:
             self.V_line.set_data(self.V_pos, self.V_plot_val)
             self.psi_sol_line.set_data(System.x, System.psi_sol_val)
         elif System.dim == 2:
-            psi_pos, psi_val = crop_pos_to_limits(self.ax, System.pos, System.psi, func_val=System.psi_val)
-            psi_prob = (0.8 ** frame_index) * np.abs(psi_val) ** 2
-            print(f"frame: {frame_index}")
-            print(f"prob: {psi_prob.max()}")
-            System.psi_line = self.ax.plot_surface(psi_pos[:, :, 0], psi_pos[:, :, 1],
-                                                 psi_prob,
-                                                 cmap=cm.viridis, linewidth=5,
-                                                 rstride=1, cstride=1, alpha=0.2)
+            if frame_index >= 1:
+                psi_pos, psi_val = crop_pos_to_limits(self.ax, System.pos, System.psi, func_val=System.psi_val)
+                # test_factor = 1.0
+                test_factor = (0.98 ** frame_index)
+                psi_prob = test_factor * np.abs(psi_val) ** 2
+                # print(f"\tframe: {frame_index}")
+                System.psi_line = self.ax.plot_surface(psi_pos[:, :, 0],
+                                                       psi_pos[:, :, 1],
+                                                       psi_prob,
+                                                       cmap=cm.viridis, linewidth=5,
+                                                       rstride=1, cstride=1, alpha=0.2)
 
-            cmap = cm.coolwarm
-            levels = 20
+                cmap = cm.coolwarm
+                levels = 20
 
-            System.psi_x_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
-                                                 zdir='x', offset=self.ax.get_xlim()[0], cmap=cmap, levels=levels)
-            System.psi_y_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
-                                                 zdir='y', offset=self.ax.get_ylim()[0], cmap=cmap, levels=levels)
-            System.psi_z_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
-                                                 zdir='z', offset=self.ax.get_zlim()[0], cmap=cmap, levels=levels)
-            self.fig.colorbar(System.psi_x_line, cax=color_bar_axes)
+                System.psi_x_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
+                                                     zdir='x', offset=self.ax.get_xlim()[0], cmap=cmap, levels=levels)
+                System.psi_y_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
+                                                     zdir='y', offset=self.ax.get_ylim()[0], cmap=cmap, levels=levels)
+                System.psi_z_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
+                                                     zdir='z', offset=self.ax.get_zlim()[0], cmap=cmap, levels=levels)
+                # if frame_index == 0:
+                    # self.fig.colorbar(System.psi_x_line, cax=color_bar_axes)
 
         elif System.dim == 3:
             # TODO: z needs to be meshgrid too, how to use 3d meshgrids?
@@ -218,8 +228,11 @@ class Animation:
         if System.dim == 1:
             return self.psi_line, self.V_line, self.psi_sol_line, self.title
         else:
-            # return System.psi_line, System.V_line, System.psi_x_line, System.psi_y_line, System.psi_z_line, self.title
-            return System.psi_line, System.V_line, self.title
+            if frame_index == 0:
+                return System.V_line, self.title
+            else:
+                # return System.psi_line, System.V_line, System.psi_x_line, self.title
+                return System.psi_line, System.V_line, self.title
 
     def start(self, System: Schroedinger.Schroedinger, file_name):
         """
@@ -235,7 +248,7 @@ class Animation:
 
         assert type(System) is Schroedinger.Schroedinger, ("System"
                                                            "needs to be {}, but it is {}".format(
-                                                            Schroedinger.Schroedinger, type(System)))
+            Schroedinger.Schroedinger, type(System)))
 
         # blit=True means only re-draw the parts that have changed.
         anim = animation.FuncAnimation(self.fig, self.animate,
@@ -246,14 +259,22 @@ class Animation:
         anim.save("results" + sep + file_name, fps=15, dpi=300, extra_args=['-vcodec', 'libx264'])
 
 
-def plot_2d(resolution=32, x_lim=(-1, 1), y_lim=(-1, 1),  z_lim=(0, 1), alpha=0.6, **kwargs):
+def plot_2d(resolution=32, x_lim=(-1, 1), y_lim=(-1, 1), z_lim=(0, 1), alpha=0.6, **kwargs):
     """
 
     Parameters
     ----------
-    X : meshgrid
-    Y : meshgrid
-    Z : meshgrid
+    alpha :
+    x_lim : pair of float
+            limits of plot in x direction
+    y_lim : pair of float
+            limits of plot in y direction
+    z_lim : pair of float
+            limits of plot in z direction
+    resolution : int
+                 number of grid points in one direction
+    alpha : float
+            alpha value for plot transparency
 
     Returns
     -------
