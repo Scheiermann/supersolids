@@ -253,13 +253,11 @@ if __name__ == '__main__':
     psi_0_3d = functools.partial(psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
 
     # testing for 2d plot
-    L = 12
+    L = 10
     x = np.linspace(-L, L, resolution)
     y = np.linspace(-L, L, resolution)
     x_mesh, y_mesh, pos = get_meshgrid(x, y)
-    Animation.plot_2d(L=L, resolution=resolution, alpha=[0.6, 0.1],
-                      x_lim=(-5, 5), y_lim=(-5, 5), z_lim=(0, 0.03),
-                      pos=[pos, pos], func=[psi_0_2d, V_2d])
-    # Animation.plot_2d(x_mesh, y_mesh, psi_0_2d(pos), V_2d(pos), L=L, resolution=resolution)
-    # Animation.plot_2d(x_mesh, y_mesh, V_2d(pos), L)
+    Animation.plot_2d(L=L, resolution=resolution,
+                      x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(0.0, 0.20),
+                      alpha=[0.6, 0.8], pos=[pos, pos], func=[psi_0_2d, V_2d])
 

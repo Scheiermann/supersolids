@@ -245,7 +245,7 @@ class Animation:
         anim.save("results" + sep + file_name, fps=15, extra_args=['-vcodec', 'libx264'])
 
 
-def plot_2d(L=1, resolution=32, alpha=0.6, x_lim = (-1, 1), y_lim = (-1, 1),  z_lim = (0, 1), **kwargs):
+def plot_2d(resolution=32, x_lim=(-1, 1), y_lim=(-1, 1),  z_lim=(0, 1), alpha=0.6, **kwargs):
     """
 
     Parameters
@@ -253,7 +253,6 @@ def plot_2d(L=1, resolution=32, alpha=0.6, x_lim = (-1, 1), y_lim = (-1, 1),  z_
     X : meshgrid
     Y : meshgrid
     Z : meshgrid
-    L : Project on this axis
 
     Returns
     -------
@@ -272,51 +271,77 @@ def plot_2d(L=1, resolution=32, alpha=0.6, x_lim = (-1, 1), y_lim = (-1, 1),  z_
             if type(values) == list:
                 pos = values
             else:
-                pos = values
+                psi_pos = values
 
         elif key == "func":
             if type(values) == list:
-                psi_pos_adjusted, psi_val_adjusted = get_V_plot_values(ax, pos[0], values[0], resolution)
-                ax.plot_surface(psi_pos_adjusted[:, :, 0], psi_pos_adjusted[:, :, 1], psi_val_adjusted,
-                                cmap=cm.viridis, linewidth=5, rstride=8, cstride=8, alpha=alpha[0])
+                psi_pos, psi_val = crop_pos_to_limits(ax, pos[0], values[0])
+                ax.plot_surface(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_val,
+                                cmap=cm.viridis, linewidth=5, rstride=1, cstride=1, alpha=alpha[0])
 
-                ax.contourf(psi_pos_adjusted[:, :, 0], psi_pos_adjusted[:, :, 1], psi_val_adjusted,
-                            zdir='z', offset=0.0, cmap=cmap, levels=levels)
-                ax.contourf(psi_pos_adjusted[:, :, 0], psi_pos_adjusted[:, :, 1], psi_val_adjusted,
-                            zdir='x', offset=-L, cmap=cmap, levels=levels)
-                p = ax.contourf(psi_pos_adjusted[:, :, 0], psi_pos_adjusted[:, :, 1], psi_val_adjusted,
-                                zdir='y', offset=L, cmap=cmap, levels=levels)
-                color_bar_axes = fig.add_axes([0.9, 0.1, 0.03, 0.8])
-
-                fig.colorbar(p, cax=color_bar_axes)
-
-                for i, func in enumerate(values[1:]):
+                for i, func in enumerate(values[1:], 1):
                     pos_adjusted, V_val_adjusted = get_V_plot_values(ax, pos[i], func, resolution)
-                    # ax.plot_surface(pos[i][:, :, 0], pos[i][:, :, 1], func(pos[i]),
                     ax.plot_surface(pos_adjusted[:, :, 0], pos_adjusted[:, :, 1], V_val_adjusted,
-                                    cmap=cm.viridis, linewidth=5, rstride=8, cstride=8, alpha=alpha[i])
+                                    cmap=cm.viridis, linewidth=5, rstride=1, cstride=1, alpha=alpha[i])
             else:
-                ax.plot_surface(pos[:, :, 0], pos[:, :, 1], values(pos),
-                                cmap=cm.viridis, linewidth=5, rstride=8, cstride=8, alpha=alpha)
+                psi_val = values(psi_pos)
+                ax.plot_surface(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_val,
+                                cmap=cm.viridis, linewidth=5, rstride=1, cstride=1, alpha=alpha)
+
+            ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_val,
+                        zdir='z', offset=z_lim[0], cmap=cmap, levels=levels)
+            ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_val,
+                        zdir='x', offset=x_lim[0], cmap=cmap, levels=levels)
+            p = ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_val,
+                            zdir='y', offset=y_lim[0], cmap=cmap, levels=levels)
+            color_bar_axes = fig.add_axes([0.9, 0.1, 0.03, 0.8])
+
+            fig.colorbar(p, cax=color_bar_axes)
+
+    ax.view_init(20.0, 45.0)
+    ax.dist = 10.0
 
     ax.set_xlabel("X")
     ax.set_ylabel("Y")
     ax.set_zlabel("Z")
     plt.show()
 
+
+def round_z_to_0(pos, func):
+    tol = 1.0 * 10 ** (-5)
+
+    z = func(pos)
+    z.real[abs(z.real) < tol] = 0.0
+
+    return pos, z
+
+
+def crop_pos_to_limits(ax, pos, func):
+    x_lim = ax.get_xlim()
+    y_lim = ax.get_ylim()
+
+    x = pos[:, :, 0][0]
+    y = pos[:, :, 1][:, 0]
+    z = func(pos)
+    x_cropped = x[(x_lim[0] < x) & (x < x_lim[1])]
+    y_cropped = y[(y_lim[0] < y) & (y < y_lim[1])]
+    xx_cropped, yy_cropped, pos_cropped = functions.get_meshgrid(x_cropped, y_cropped)
+    z_corresponding = func(pos_cropped)
+
+    return pos_cropped, z_corresponding
+
+
 def get_V_plot_values(ax, pos, V, resolution):
     Z = V(pos)
     zlim = ax.get_zlim()
+
     # as the plot should be completely shown in the box (we choose a reserve here: 1.5)
     reserve = 1.5
     range_in_box = pos[(Z < zlim[1] * reserve) & (Z > zlim[0] * reserve)]
 
-    print(f"{Z[Z < 0.04]}")
-    print(f"{range_in_box}")
     x = np.linspace(range_in_box[:, 0].min(), range_in_box[:, 0].max(), resolution)
     y = np.linspace(range_in_box[:, 1].min(), range_in_box[:, 1].max(), resolution)
     xx, yy, V_pos = functions.get_meshgrid(x, y)
     V_plot_val = V(V_pos)
 
     return V_pos, V_plot_val
-
