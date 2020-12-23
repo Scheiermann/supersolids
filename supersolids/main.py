@@ -65,12 +65,14 @@ if __name__ == '__main__':
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    dt = 0.05
+    g = 1.0
+    g_step = 10
+    dt = 0.5
 
     # box length [-L,L]
     # generators for L, g, dt to compute for different parameters
     L_generator = (10,)
-    G = (i for i in range(100, 110, 10))
+    G = (i for i in np.arange(g, g + g_step, g_step))
     factors = np.linspace(0.2, 0.3, max_workers)
     DT = (i * dt for i in factors)
     cases = itertools.product(L_generator, G, DT)
@@ -83,7 +85,7 @@ if __name__ == '__main__':
     # functools.partial sets all arguments except x, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
     psi_0_1d = functools.partial(functions.psi_gauss_1d, a=1, x_0=0, k_0=0)
-    psi_0_2d = functools.partial(functions.psi_gauss_2d, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0]))
+    psi_0_2d = functools.partial(functions.psi_gauss_2d, mu=np.array([1.0, 0.0]), var=np.array([1.0, 1.0]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
 
     i: int = 0

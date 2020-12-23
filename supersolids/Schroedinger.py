@@ -62,6 +62,7 @@ class Schroedinger(object):
         self.dkx = float(np.pi / self.L)
 
         # TODO: This can probably be done with sp.ttf.fftshift
+        # self.kx = sp.fft.fftshift(self.psi_val)
         k_over_0 = np.arange(0, resolution / 2, 1)
         k_under_0 = np.arange(-resolution / 2, 0, 1)
 
@@ -96,23 +97,33 @@ class Schroedinger(object):
             self.V_val = self.V(self.x)
             self.psi_sol_val = self.psi_sol(self.x)
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
+            # Here we use half steps in real space, but will use it before and after H_kin with normal steps
+            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
+
         elif dim == 2:
             self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
             self.psi_val = self.psi(self.pos)
             self.V_val = self.V(self.pos)
             self.psi_sol_val = self.psi_sol(self.pos)
-            self.H_kin = np.diag(np.exp(self.U * (0.5 * self.k_squared) * self.dt))
+
+            # tranform from 1D to 2D array (diagonal)
+            g_arr = np.full_like(self.pos[:, :, 0][0], self.g)
+            self.g = np.diag(np.full_like(self.pos[:, :, 0][0], self.g))
+            self.U = np.diag(np.full_like(self.pos[:, :, 0][0], self.U))
+
+            # here we still use the 1D k_squared, dt
+            self.H_kin = np.diag(np.exp(np.multiply(self.U, (0.5 * self.k_squared)) * self.dt))
+
+            # Here we use half steps in real space, but will use it before and after H_kin with normal steps
+            self.H_pot = np.exp(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2))
+                                * (0.5 * self.dt))
+
         elif dim == 3:
             self.psi_val = self.psi(self.x, self.y, self.z)
             self.V_val = self.V(self.x, self.y, self.z)
             # TODO: 3D diag needed here
             self.H_kin = np.diag(np.exp(self.U * (0.5 * self.k_squared) * self.dt))
 
-        # Here we use half steps in real space, but will use it before and after H_kin with normal steps
-        self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
-
-        # print(f"H_pot {self.H_pot.shape}= {self.H_pot}")
-        # print(f"H_kin {self.H_kin.shape}= {self.H_kin}")
 
         # attributes for animation
         self.t = 0.0
@@ -138,26 +149,34 @@ class Schroedinger(object):
         return psi_norm
 
     def time_step(self):
-        # update H_pot before use
-        self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
-
-        self.psi_val = self.H_pot * self.psi_val
         if self.dim == 1:
+            # update H_pot before use
+            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
+            self.psi_val = self.H_pot * self.psi_val
+
             self.psi_val = sp.fft.fft(self.psi_val)
             self.psi_val = self.H_kin * self.psi_val
             self.psi_val = sp.fft.ifft(self.psi_val)
+
+            # update H_pot before use
+            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
+            self.psi_val = self.H_pot * self.psi_val
+
         else:
             # TODO: get the fftn to work, don't forget the needed order for the k vector like in 1D
-            self.psi_val = sp.fft.fft2(self.psi_val)
-            # self.psi_val = sp.fft.fftshift(self.psi_val)
+            # update H_pot before use
+            self.H_pot = np.exp(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2))
+                                * (0.5 * self.dt))
+            self.psi_val = np.matmul(self.H_pot, self.psi_val)
 
+            self.psi_val = sp.fft.fft2(self.psi_val)
             self.psi_val = self.H_kin * self.psi_val
             self.psi_val = sp.fft.ifft2(self.psi_val)
-            # self.psi_val = sp.fft.ifftshift(self.psi_val)
 
-        # update H_pot before use
-        self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
-        self.psi_val = self.H_pot * self.psi_val
+            # update H_pot before use
+            self.H_pot = np.exp(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2))
+                                * (0.5 * self.dt))
+            self.psi_val = np.matmul(self.H_pot, self.psi_val)
 
         self.t += self.dt
 
@@ -167,4 +186,5 @@ class Schroedinger(object):
 
         self.psi_val /= np.sqrt(psi_norm_after_evolution)
 
+        print(f"prob max: {np.abs(self.psi_val.max().max()) ** 2}")
         self.s = - np.log(self.get_norm()) / (2 * self.dt)

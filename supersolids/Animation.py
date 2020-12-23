@@ -36,7 +36,7 @@ class Animation:
                 self.psi_sol_line, = ax.plot([], [], ".-", c="blue", label=r'$\psi_{sol(x)}$')
 
                 self.title = ax.set_title("")
-                ax.set_xlabel('$x$')
+                ax.set_xlabel(r'$x$')
                 ax.set_ylabel(r'$E$')
                 ax.legend(prop=dict(size=12))
                 ax.grid()
@@ -48,7 +48,7 @@ class Animation:
             self.title = self.ax.set_title("")
             self.ax.set_xlabel(r'$x$')
             self.ax.set_ylabel(r'$y$')
-            self.ax.set_zlabel('r$z$')
+            self.ax.set_zlabel(r'$z$')
             self.ax.grid()
 
     def set_limits(self, row, col, x_min, x_max, y_min, y_max):
@@ -180,7 +180,7 @@ class Animation:
             for contour in System.psi_z_line.collections:
                 contour.remove()
 
-        # System.time_step()
+        System.time_step()
         if frame_index % 10 == 0:
             print(f"Round {frame_index}")
 
@@ -191,10 +191,9 @@ class Animation:
         elif System.dim == 2:
             if frame_index >= 1:
                 psi_pos, psi_val = crop_pos_to_limits(self.ax, System.pos, System.psi, func_val=System.psi_val)
-                # test_factor = 1.0
-                test_factor = (0.98 ** frame_index)
+                test_factor = 1.0
+                # test_factor = (0.98 ** frame_index)
                 psi_prob = test_factor * np.abs(psi_val) ** 2
-                # print(f"\tframe: {frame_index}")
                 System.psi_line = self.ax.plot_surface(psi_pos[:, :, 0],
                                                        psi_pos[:, :, 1],
                                                        psi_prob,
@@ -218,7 +217,7 @@ class Animation:
             System.psi_line.set_data(System.x_mesh, System.y_mesh, System.z, np.abs(System.psi_val) ** 2)
 
         self.title.set_text(("g = {:.2}, dt = {:.6}, timesteps = {:d}, imag_time = {},\n"
-                             "t = {:02.05f}").format(System.g,
+                             "t = {:02.05f}").format(System.g[0, 0],
                                                      System.dt,
                                                      System.timesteps,
                                                      System.imag_time,
@@ -342,17 +341,23 @@ def crop_pos_to_limits(ax, pos, func, func_val=None):
 
     x = pos[:, :, 0][0]
     y = pos[:, :, 1][:, 0]
-    if func_val is None:
-        z = func(pos)
-    else:
-        z = func_val
 
     x_cropped = x[(x_lim[0] < x) & (x < x_lim[1])]
     y_cropped = y[(y_lim[0] < y) & (y < y_lim[1])]
     xx_cropped, yy_cropped, pos_cropped = functions.get_meshgrid(x_cropped, y_cropped)
-    z_corresponding = func(pos_cropped)
 
-    return pos_cropped, z_corresponding
+    # TODO: use func_val, but cropp it according to pos_cropped
+    if func_val is None:
+        z_cropped = func(pos_cropped)
+    else:
+        for i in range(0, pos.shape[0], 1):
+            print(f"pos: {pos[:, :, 0][0][i][i]}")
+            print(f"crop: {pos_cropped[:, :, 0][0][0]}")
+
+        z_cropped = func(pos_cropped)
+        # z_cropped = func_val
+
+    return pos_cropped, z_cropped
 
 
 def get_V_plot_values(ax, pos, V, resolution):
