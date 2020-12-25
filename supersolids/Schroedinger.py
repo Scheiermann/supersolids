@@ -116,7 +116,7 @@ class Schroedinger(object):
             self.psi_val = self.psi(self.x, self.y, self.z)
             self.V_val = self.V(self.x, self.y, self.z)
             # TODO: 3D diag needed here
-            self.H_kin = sp.linalg.expm(np.multiply(self.U, (0.5 * self.k_squared)) * self.dt)
+            self.H_kin = np.diag(np.exp(self.U * (0.5 * self.k_squared) * self.dt))
 
 
         # attributes for animation
