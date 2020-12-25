@@ -13,9 +13,8 @@ import numpy as np
 import scipy as sp
 import sys
 
-from sympy import Symbol, lambdify
-
 from supersolids import functions
+
 
 class Schroedinger(object):
     """
@@ -31,8 +30,12 @@ class Schroedinger(object):
     We will first implement the split operator without commutator relation ($H = H_{pot} + H_{kin}$)
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
-    def __init__(self, resolution, timesteps, L, dt, g=0,
-        imag_time=False, psi_0=functions.psi_0_pdf, V=functions.v_harmonic):
+
+    def __init__(self, resolution, timesteps, L, dt, g=0, imag_time=False, dim=1, s=1,
+                 psi_0=functions.psi_gauss_1d,
+                 V=functions.v_harmonic_1d,
+                 psi_sol=functions.thomas_fermi
+                 ):
         """
         Parameters
         ----------
@@ -46,14 +49,20 @@ class Schroedinger(object):
         self.dt = float(dt)
         self.g = float(g)
         self.imag_time = imag_time
+        self.dim = dim
+        # s = - ln(N) / (2 * dtau), where N is the norm of the psi
+        self.s = s
+
         self.psi = psi_0
         self.V = V
-        self.dim = dim
+        self.psi_sol = psi_sol
 
         self.x = np.linspace(-self.L, self.L, self.resolution)
         self.dx = float(2 * L / self.resolution)
         self.dkx = float(np.pi / self.L)
 
+        # TODO: This can probably be done with sp.ttf.fftshift
+        # self.kx = sp.fft.fftshift(self.psi_val)
         k_over_0 = np.arange(0, resolution / 2, 1)
         k_under_0 = np.arange(-resolution / 2, 0, 1)
 
@@ -84,45 +93,56 @@ class Schroedinger(object):
             sys.exit(1)
 
         if dim == 1:
-            self.psi_val = psi_0(self.x)
-            self.V_val = V(self.x)
+            self.psi_val = self.psi(self.x)
+            self.V_val = self.V(self.x)
+            self.psi_sol_val = self.psi_sol(self.x)
+            self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
+            # Here we use half steps in real space, but will use it before and after H_kin with normal steps
+            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
+
         elif dim == 2:
-            self.psi_val = psi_0(self.x, self.y)
-            self.V_val = V(self.x, self.y)
+            self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
+            self.psi_val = self.psi(self.pos)
+            self.V_val = self.V(self.pos)
+            self.psi_sol_val = self.psi_sol(self.pos)
+
+            # tranform from 1D to 2D array (diagonal)
+            g_arr = np.full_like(self.pos[:, :, 0][0], self.g)
+            self.g = np.diag(np.full_like(self.pos[:, :, 0][0], self.g))
+            self.U = np.diag(np.full_like(self.pos[:, :, 0][0], self.U))
+
+            # here we still use the 1D k_squared, dt
+            self.H_kin = np.diag(np.exp(np.multiply(self.U, (0.5 * self.k_squared)) * self.dt))
+
+            # Here we use half steps in real space, but will use it before and after H_kin with normal steps
+            self.H_pot = np.exp(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2))
+                                * (0.5 * self.dt))
+
         elif dim == 3:
-            self.psi_val = psi_0(self.x, self.y, self.z)
-            self.V_val = V(self.x, self.y, self.z)
+            self.psi_val = self.psi(self.x, self.y, self.z)
+            self.V_val = self.V(self.x, self.y, self.z)
+            # TODO: 3D diag needed here
+            self.H_kin = np.diag(np.exp(self.U * (0.5 * self.k_squared) * self.dt))
 
-        self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
-
-        # Here we use half steps in real space, but will use it before and after H_kin with normal steps
-        self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
-
-        print(f"H_pot = {self.H_pot}")
-        print(f"H_kin = {self.H_kin}")
 
         # attributes for animation
         self.t = 0.0
+
         self.psi_line = None
+        self.alpha_psi = 0.5
+
         self.V_line = None
+        self.alpha_V = 0.5
 
-    def time_step(self):
-        # update H_pot before use
-        self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
+        self.psi_sol_line = None
 
-        self.psi_val = self.H_pot * self.psi_val
-        self.psi_val = sp.fft.fft(self.psi_val)
-        self.psi_val = self.H_kin * self.psi_val
-        self.psi_val = sp.fft.ifft(self.psi_val)
+        self.psi_x_line = None
+        self.psi_y_line = None
+        self.psi_z_line = None
 
-        # update H_pot before use
-        self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
-        self.psi_val = self.H_pot * self.psi_val
+        self.V_z_line = None
 
-        self.t += self.dt
-
-        # for self.imag_time=False, renormalization should be preserved, but we play safe here (regardless of speedup)
-        # if self.imag_time:
+    def get_norm(self):
         if self.dim == 1:
             psi_norm = np.sum(np.abs(self.psi_val) ** 2) * self.dx
         elif self.dim == 2:
@@ -133,4 +153,45 @@ class Schroedinger(object):
             print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
             sys.exit(1)
 
-        self.psi_val /= np.sqrt(psi_norm)
+        return psi_norm
+
+    def time_step(self):
+        if self.dim == 1:
+            # update H_pot before use
+            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
+            self.psi_val = self.H_pot * self.psi_val
+
+            self.psi_val = sp.fft.fft(self.psi_val)
+            self.psi_val = self.H_kin * self.psi_val
+            self.psi_val = sp.fft.ifft(self.psi_val)
+
+            # update H_pot before use
+            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
+            self.psi_val = self.H_pot * self.psi_val
+
+        else:
+            # TODO: get the fftn to work, don't forget the needed order for the k vector like in 1D
+            # TODO: psi_0_2d is not plotted symmetric after first step
+            # update H_pot before use
+            self.H_pot = np.exp(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2))
+                                * (0.5 * self.dt))
+            self.psi_val = np.matmul(self.H_pot, self.psi_val)
+
+            self.psi_val = sp.fft.fft2(self.psi_val)
+            self.psi_val = self.H_kin * self.psi_val
+            self.psi_val = sp.fft.ifft2(self.psi_val)
+
+            # update H_pot before use
+            self.H_pot = np.exp(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2))
+                                * (0.5 * self.dt))
+            self.psi_val = np.matmul(self.H_pot, self.psi_val)
+
+        self.t += self.dt
+
+        # for self.imag_time=False, renormalization should be preserved, but we play safe here (regardless of speedup)
+        # if self.imag_time:
+        psi_norm_after_evolution = self.get_norm()
+
+        self.psi_val /= np.sqrt(psi_norm_after_evolution)
+
+        self.s = - np.log(self.get_norm()) / (2 * self.dt)
