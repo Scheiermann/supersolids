@@ -171,6 +171,7 @@ class Schroedinger(object):
 
         else:
             # TODO: get the fftn to work, don't forget the needed order for the k vector like in 1D
+            # TODO: psi_0_2d is not plotted symmetric after first step
             # update H_pot before use
             self.H_pot = np.exp(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2))
                                 * (0.5 * self.dt))
@@ -193,5 +194,4 @@ class Schroedinger(object):
 
         self.psi_val /= np.sqrt(psi_norm_after_evolution)
 
-        # print(f"prob max: {np.abs(self.psi_val.max().max()) ** 2}")
         self.s = - np.log(self.get_norm()) / (2 * self.dt)

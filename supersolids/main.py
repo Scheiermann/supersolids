@@ -87,9 +87,8 @@ if __name__ == '__main__':
     # functools.partial sets all arguments except x, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
     psi_0_1d = functools.partial(functions.psi_gauss_1d, a=1, x_0=0, k_0=0)
-    psi_0_2d = functools.partial(functions.psi_gauss_2d, mu=np.array([3.0, 3.0]), var=np.array([1.0, 1.0]))
+    psi_0_2d = functools.partial(functions.psi_gauss_2d, mu=[0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
-    # TODO: psi_0_2d is not plotted symmetric
 
     i: int = 0
     with futures.ProcessPoolExecutor(max_workers=max_workers) as e:
@@ -102,8 +101,8 @@ if __name__ == '__main__':
                      psi_0=psi_0_2d, V=V_2d, psi_sol=psi_sol, file_name=file_name,
                      x_lim=(-L, L),
                      y_lim=(-L, L),
-                     z_lim=(0, 0.090),
-                     view_height=20.0,
+                     z_lim=(0, 0.080),
+                     view_height=15.0,
                      view_angle=45.0,
                      view_distance=10.0
                      )

@@ -175,7 +175,10 @@ class Animation:
                                                    alpha=System.alpha_V
                                                    )
 
-        elif frame_index >= 2:
+        # FuncAnimation calls animate 3 times with frame_index=0,
+        # causing problems with removing corresponding plot_lines
+        # so we want to start plotting with frame_index=1, and delete from upon the next frame, hence frame_index>=2
+        if frame_index >= 2:
             # Delete old plot, if it exists
             System.psi_line.remove()
 
@@ -188,7 +191,7 @@ class Animation:
             for contour in System.psi_z_line.collections:
                 contour.remove()
 
-        if frame_index >= 1:
+            # print(f"prob max: {np.abs(System.psi_val.max().max()) ** 2}")
             System.time_step()
 
         if frame_index % 10 == 0:
@@ -200,6 +203,8 @@ class Animation:
             self.psi_sol_line.set_data(System.x, System.psi_sol_val)
         elif System.dim == 2:
             if frame_index >= 1:
+                # psi_pos, psi_val = System.pos, System.psi_val
+                # psi_pos, psi_val = System.pos, System.psi(System.pos)
                 psi_pos, psi_val = crop_pos_to_limits(self.ax, System.pos, System.psi, func_val=System.psi_val)
                 psi_prob = np.abs(psi_val) ** 2
                 System.psi_line = self.ax.plot_surface(psi_pos[:, :, 0],
@@ -308,6 +313,7 @@ def plot_2d(resolution=32, x_lim=(-1, 1), y_lim=(-1, 1), z_lim=(0, 1), alpha=0.6
 
         elif key == "func":
             if type(values) == list:
+                # psi_pos, psi_val = pos[0], values[0](pos[0])
                 psi_pos, psi_val = crop_pos_to_limits(ax, pos[0], values[0])
                 ax.plot_surface(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_val,
                                 cmap=cm.viridis, linewidth=5, rstride=1, cstride=1, alpha=alpha[0])
@@ -355,8 +361,8 @@ def crop_pos_to_limits(ax, pos, func, func_val=None):
     y = pos[:, :, 1][:, 0]
 
     # crop x and y 1D arrays to plot axis limits
-    x_cropped = x[(x_lim[0] < x) & (x < x_lim[1])]
-    y_cropped = y[(y_lim[0] < y) & (y < y_lim[1])]
+    x_cropped = x[(x_lim[0] <= x) & (x <= x_lim[1])]
+    y_cropped = y[(y_lim[0] <= y) & (y <= y_lim[1])]
     xx_cropped, yy_cropped, pos_cropped = functions.get_meshgrid(x_cropped, y_cropped)
 
     if func_val is None:
@@ -364,8 +370,8 @@ def crop_pos_to_limits(ax, pos, func, func_val=None):
     else:
         # As func_val is calculated for whole pos, which may be larger than the plot axis limits
         # (i.e to see one specific area, but don't change the boundary conditions), it needs to be cropped too
-        x_bol = np.where((x_lim[0] < x) & (x < x_lim[1]), True, False)
-        y_bol = np.where((y_lim[0] < y) & (y < y_lim[1]), True, False)
+        x_bol = np.where((x_lim[0] <= x) & (x <= x_lim[1]), True, False)
+        y_bol = np.where((y_lim[0] <= y) & (y <= y_lim[1]), True, False)
         xx_bol, yy_bol, pos_bol = functions.get_meshgrid(x_bol, y_bol)
 
         # Reshape is needed as func_val[xx_bol & yy_bol] is a 1D array (flat)

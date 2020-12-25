@@ -26,7 +26,7 @@ def get_meshgrid(x, y):
     return x_mesh, y_mesh, pos
 
 
-def psi_gauss_2d(pos, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0])):
+def psi_gauss_2d(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]])):
     """
     Gives values according to gaus dirstribution (2D) with meshgrid of x,y as input
 
