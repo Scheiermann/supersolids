@@ -203,8 +203,6 @@ class Animation:
             self.psi_sol_line.set_data(System.x, System.psi_sol_val)
         elif System.dim == 2:
             if frame_index >= 1:
-                # psi_pos, psi_val = System.pos, System.psi_val
-                # psi_pos, psi_val = System.pos, System.psi(System.pos)
                 psi_pos, psi_val = crop_pos_to_limits(self.ax, System.pos, System.psi, func_val=System.psi_val)
                 psi_prob = np.abs(psi_val) ** 2
                 System.psi_line = self.ax.plot_surface(psi_pos[:, :, 0],
@@ -313,7 +311,6 @@ def plot_2d(resolution=32, x_lim=(-1, 1), y_lim=(-1, 1), z_lim=(0, 1), alpha=0.6
 
         elif key == "func":
             if type(values) == list:
-                # psi_pos, psi_val = pos[0], values[0](pos[0])
                 psi_pos, psi_val = crop_pos_to_limits(ax, pos[0], values[0])
                 ax.plot_surface(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_val,
                                 cmap=cm.viridis, linewidth=5, rstride=1, cstride=1, alpha=alpha[0])
