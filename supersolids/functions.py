@@ -11,6 +11,8 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 
 import functools
 import numpy as np
+
+from mayavi import mlab
 from scipy import stats
 
 from supersolids import Animation
@@ -202,14 +204,17 @@ def thomas_fermi(x, g):
         coupling constant
     """
 
-    # mu is the chemical potential
-    mu = ((3 * g) / (4 * np.sqrt(2))) ** (2 / 3)
-    # print(mu)
+    if g != 0:
+        # mu is the chemical potential
+        mu = ((3 * g) / (4 * np.sqrt(2))) ** (2 / 3)
 
-    # this needs to be >> 1, e.g 5.3
-    # print(np.sqrt(2 * mu))
+        # this needs to be >> 1, e.g 5.3
+        # print(np.sqrt(2 * mu))
 
-    return mu * (1 - ((x ** 2) / (2 * mu))) / g
+        return mu * (1 - ((x ** 2) / (2 * mu))) / g
+
+    else:
+        return None
 
 
 def v_harmonic_1d(x):
@@ -260,4 +265,12 @@ if __name__ == '__main__':
     Animation.plot_2d(L=L, resolution=resolution,
                       x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(0.0, 0.025),
                       alpha=[0.6, 0.8], pos=[pos, pos], func=[lambda pos: np.abs(psi_0_2d(pos)) ** 2, V_2d])
+
+    fig = mlab.figure()
+    z_mesh = np.abs(psi_0_2d(pos)) ** 2
+    s = mlab.surf(x_mesh, y_mesh, z_mesh, representation="wireframe")
+    # mlab.plot3d(x_mesh, y_mesh, z, np.sin(n * theta), tube_radius=0.025, colormap="spectral")
+    ax = mlab.axes(line_width=2, nb_labels=5)
+    mlab.title("Test mayavi")
+    mlab.show()
 

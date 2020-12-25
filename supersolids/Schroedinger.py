@@ -127,13 +127,20 @@ class Schroedinger(object):
 
         # attributes for animation
         self.t = 0.0
+
         self.psi_line = None
+        self.alpha_psi = 0.5
+
         self.V_line = None
+        self.alpha_V = 0.5
+
         self.psi_sol_line = None
 
         self.psi_x_line = None
         self.psi_y_line = None
         self.psi_z_line = None
+
+        self.V_z_line = None
 
     def get_norm(self):
         if self.dim == 1:
@@ -186,5 +193,5 @@ class Schroedinger(object):
 
         self.psi_val /= np.sqrt(psi_norm_after_evolution)
 
-        print(f"prob max: {np.abs(self.psi_val.max().max()) ** 2}")
+        # print(f"prob max: {np.abs(self.psi_val.max().max()) ** 2}")
         self.s = - np.log(self.get_norm()) / (2 * self.dt)

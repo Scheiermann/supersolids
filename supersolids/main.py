@@ -29,9 +29,11 @@ def simulate_case(resolution, timesteps, L, dt, g, imag_time=False, dim=1, s=1,
                   file_name="split.mp4",
                   x_lim=(-1, 1),
                   y_lim=(-1, 1),
-                  z_lim=(0, 1.0)
+                  z_lim=(0, 1.0),
+                  view_height=20.0,
+                  view_angle=45.0,
+                  view_distance=10.0
                   ):
-
     with parallel.run_time():
         Harmonic = Schroedinger.Schroedinger(resolution, timesteps, L, dt, g=g, imag_time=imag_time, dim=dim, s=s,
                                              psi_0=psi_0, V=V,
@@ -46,8 +48,8 @@ def simulate_case(resolution, timesteps, L, dt, g, imag_time=False, dim=1, s=1,
         ani.ax.set_xlim(*x_lim)
         ani.ax.set_ylim(*y_lim)
         ani.ax.set_zlim(*z_lim)
-        ani.ax.view_init(20.0, 45.0)
-        ani.ax.dist = 10.0
+        ani.ax.view_init(view_height, view_angle)
+        ani.ax.dist = view_distance
 
     # ani.set_limits_smart(0, Harmonic)
 
@@ -65,7 +67,7 @@ if __name__ == '__main__':
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    g = 1.0
+    g = 0.0
     g_step = 10
     dt = 0.5
 
@@ -85,8 +87,9 @@ if __name__ == '__main__':
     # functools.partial sets all arguments except x, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
     psi_0_1d = functools.partial(functions.psi_gauss_1d, a=1, x_0=0, k_0=0)
-    psi_0_2d = functools.partial(functions.psi_gauss_2d, mu=np.array([1.0, 0.0]), var=np.array([1.0, 1.0]))
+    psi_0_2d = functools.partial(functions.psi_gauss_2d, mu=np.array([3.0, 3.0]), var=np.array([1.0, 1.0]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
+    # TODO: psi_0_2d is not plotted symmetric
 
     i: int = 0
     with futures.ProcessPoolExecutor(max_workers=max_workers) as e:
@@ -95,9 +98,12 @@ if __name__ == '__main__':
             print(f"i={i}, L={L}, g={g}, dt={dt}")
             file_name = f"split_{i:03}.mp4"
             psi_sol = functools.partial(functions.thomas_fermi, g=g)
-            e.submit(simulate_case, resolution, timesteps=100, L=L, g=g, dt=dt, imag_time=True, dim=2, s=1,
+            e.submit(simulate_case, resolution, timesteps=5, L=L, g=g, dt=dt, imag_time=True, dim=2, s=1,
                      psi_0=psi_0_2d, V=V_2d, psi_sol=psi_sol, file_name=file_name,
-                     x_lim=(-2, 2),
-                     y_lim=(-2, 2),
-                     z_lim=(0, 0.025)
+                     x_lim=(-L, L),
+                     y_lim=(-L, L),
+                     z_lim=(0, 0.090),
+                     view_height=20.0,
+                     view_angle=45.0,
+                     view_distance=10.0
                      )

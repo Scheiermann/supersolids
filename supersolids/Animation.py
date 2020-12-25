@@ -118,11 +118,10 @@ class Animation:
 
         self.set_limits(row, col, x_min, x_max, y_min, y_max)
 
-    def get_V_plot_values(self, i, j, System: Schroedinger.Schroedinger):
+    def get_V_plot_values(self, i, j, System: Schroedinger.Schroedinger, reserve=1.0):
         if System.dim == 1:
             ylim = self.axs[i, j].get_ylim()
             # as the plot should be completely shown in the box (we choose a reserve here: 1.5)
-            reserve = 1.5
             range_in_box = System.x[(System.V_val < ylim[1] * reserve) & (System.V_val > ylim[0] * reserve)]
 
             V_pos = np.linspace(range_in_box[0], range_in_box[-1], System.resolution)
@@ -160,13 +159,22 @@ class Animation:
         # As V is constant, calculate and plot it just one time (at first frame)
         if frame_index == 0:
             if System.dim == 1:
-                self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System)
+                self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System, reserve=1.0)
             elif System.dim == 2:
-                # color_bar_axes = self.fig.add_axes([0.9, 0.1, 0.03, 0.8])
-
-                self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System)
+                self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System, reserve=1.0)
                 System.V_line = self.ax.plot_surface(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
-                                                     cmap=cm.Blues, linewidth=5, rstride=8, cstride=8, alpha=0.8)
+                                                     cmap=cm.Blues, linewidth=5,
+                                                     rstride=8, cstride=8,
+                                                     alpha=System.alpha_V
+                                                     )
+
+                System.V_z_line = self.ax.contourf(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
+                                                   zdir='z',
+                                                   offset=self.ax.get_zlim()[0],
+                                                   cmap=cm.Blues, levels=20,
+                                                   alpha=System.alpha_V
+                                                   )
+
         elif frame_index >= 2:
             # Delete old plot, if it exists
             System.psi_line.remove()
@@ -180,7 +188,9 @@ class Animation:
             for contour in System.psi_z_line.collections:
                 contour.remove()
 
-        System.time_step()
+        if frame_index >= 1:
+            System.time_step()
+
         if frame_index % 10 == 0:
             print(f"Round {frame_index}")
 
@@ -191,14 +201,14 @@ class Animation:
         elif System.dim == 2:
             if frame_index >= 1:
                 psi_pos, psi_val = crop_pos_to_limits(self.ax, System.pos, System.psi, func_val=System.psi_val)
-                test_factor = 1.0
-                # test_factor = (0.98 ** frame_index)
-                psi_prob = test_factor * np.abs(psi_val) ** 2
+                psi_prob = np.abs(psi_val) ** 2
                 System.psi_line = self.ax.plot_surface(psi_pos[:, :, 0],
                                                        psi_pos[:, :, 1],
                                                        psi_prob,
                                                        cmap=cm.viridis, linewidth=5,
-                                                       rstride=1, cstride=1, alpha=0.2)
+                                                       rstride=1, cstride=1,
+                                                       alpha=System.alpha_psi
+                                                       )
 
                 cmap = cm.coolwarm
                 levels = 20
@@ -208,9 +218,12 @@ class Animation:
                 System.psi_y_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
                                                      zdir='y', offset=self.ax.get_ylim()[0], cmap=cmap, levels=levels)
                 System.psi_z_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
-                                                     zdir='z', offset=self.ax.get_zlim()[0], cmap=cmap, levels=levels)
-                # if frame_index == 0:
-                    # self.fig.colorbar(System.psi_x_line, cax=color_bar_axes)
+                                                     zdir='z', offset=self.ax.get_zlim()[0],
+                                                     cmap=cmap, levels=levels,
+                                                     )
+                if frame_index == 1:
+                    color_bar_axes = self.fig.add_axes([0.85, 0.1, 0.03, 0.8])
+                    self.fig.colorbar(System.psi_x_line, cax=color_bar_axes)
 
         elif System.dim == 3:
             # TODO: z needs to be meshgrid too, how to use 3d meshgrids?
@@ -230,7 +243,6 @@ class Animation:
             if frame_index == 0:
                 return System.V_line, self.title
             else:
-                # return System.psi_line, System.V_line, System.psi_x_line, self.title
                 return System.psi_line, System.V_line, self.title
 
     def start(self, System: Schroedinger.Schroedinger, file_name):
@@ -301,7 +313,7 @@ def plot_2d(resolution=32, x_lim=(-1, 1), y_lim=(-1, 1), z_lim=(0, 1), alpha=0.6
                                 cmap=cm.viridis, linewidth=5, rstride=1, cstride=1, alpha=alpha[0])
 
                 for i, func in enumerate(values[1:], 1):
-                    pos_adjusted, V_val_adjusted = get_V_plot_values(ax, pos[i], func, resolution)
+                    pos_adjusted, V_val_adjusted = get_V_plot_values(ax, pos[i], func, resolution, reserve=1.0)
                     ax.plot_surface(pos_adjusted[:, :, 0], pos_adjusted[:, :, 1], V_val_adjusted,
                                     cmap=cm.Blues, linewidth=5, rstride=1, cstride=1, alpha=alpha[i])
             else:
@@ -342,30 +354,31 @@ def crop_pos_to_limits(ax, pos, func, func_val=None):
     x = pos[:, :, 0][0]
     y = pos[:, :, 1][:, 0]
 
+    # crop x and y 1D arrays to plot axis limits
     x_cropped = x[(x_lim[0] < x) & (x < x_lim[1])]
     y_cropped = y[(y_lim[0] < y) & (y < y_lim[1])]
     xx_cropped, yy_cropped, pos_cropped = functions.get_meshgrid(x_cropped, y_cropped)
 
-    # TODO: use func_val, but cropp it according to pos_cropped
     if func_val is None:
         z_cropped = func(pos_cropped)
     else:
-        for i in range(0, pos.shape[0], 1):
-            print(f"pos: {pos[:, :, 0][0][i][i]}")
-            print(f"crop: {pos_cropped[:, :, 0][0][0]}")
+        # As func_val is calculated for whole pos, which may be larger than the plot axis limits
+        # (i.e to see one specific area, but don't change the boundary conditions), it needs to be cropped too
+        x_bol = np.where((x_lim[0] < x) & (x < x_lim[1]), True, False)
+        y_bol = np.where((y_lim[0] < y) & (y < y_lim[1]), True, False)
+        xx_bol, yy_bol, pos_bol = functions.get_meshgrid(x_bol, y_bol)
 
-        z_cropped = func(pos_cropped)
-        # z_cropped = func_val
+        # Reshape is needed as func_val[xx_bol & yy_bol] is a 1D array (flat)
+        z_cropped = np.reshape(func_val[xx_bol & yy_bol], xx_cropped.shape)
 
     return pos_cropped, z_cropped
 
 
-def get_V_plot_values(ax, pos, V, resolution):
+def get_V_plot_values(ax, pos, V, resolution, reserve=1.0):
     Z = V(pos)
     zlim = ax.get_zlim()
 
     # as the plot should be completely shown in the box (we choose a reserve here: 1.5)
-    reserve = 1.5
     range_in_box = pos[(Z < zlim[1] * reserve) & (Z > zlim[0] * reserve)]
 
     x = np.linspace(range_in_box[:, 0].min(), range_in_box[:, 0].max(), resolution)
