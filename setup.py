@@ -7,9 +7,10 @@ from setuptools import setup
 
 setup(
     name="supersolids",
-    version="0.1.6",
+    version="0.1.7",
     packages=["", "supersolids"],
-    package_data={"supersolids": ["results/split_time_imag.mp4", "results/split_time_real.mp4"]},
+    package_data={"supersolids": ["results/split_time_imag.mp4", "results/split_time_real.mp4",
+                                  "results/2d_gauss.mp4"]},
     url="https://github.com/Scheiermann/supersolids",
     license="MIT",
     author="Scheiermann",

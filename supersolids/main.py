@@ -97,7 +97,7 @@ if __name__ == '__main__':
             print(f"i={i}, L={L}, g={g}, dt={dt}")
             file_name = f"split_{i:03}.mp4"
             psi_sol = functools.partial(functions.thomas_fermi, g=g)
-            e.submit(simulate_case, resolution, timesteps=5, L=L, g=g, dt=dt, imag_time=True, dim=2, s=1,
+            e.submit(simulate_case, resolution, timesteps=100, L=L, g=g, dt=dt, imag_time=True, dim=2, s=1,
                      psi_0=psi_0_2d, V=V_2d, psi_sol=psi_sol, file_name=file_name,
                      x_lim=(-L, L),
                      y_lim=(-L, L),
