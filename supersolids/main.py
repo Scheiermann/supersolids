@@ -87,7 +87,7 @@ if __name__ == '__main__':
     # functools.partial sets all arguments except x, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
     psi_0_1d = functools.partial(functions.psi_gauss_1d, a=1, x_0=0, k_0=0)
-    psi_0_2d = functools.partial(functions.psi_gauss_2d, mu=[0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
+    psi_0_2d = functools.partial(functions.psi_gauss_2d, mu=[-5.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
 
     i: int = 0
@@ -97,12 +97,12 @@ if __name__ == '__main__':
             print(f"i={i}, L={L}, g={g}, dt={dt}")
             file_name = f"split_{i:03}.mp4"
             psi_sol = functools.partial(functions.thomas_fermi, g=g)
-            e.submit(simulate_case, resolution, timesteps=100, L=L, g=g, dt=dt, imag_time=True, dim=2, s=1,
+            e.submit(simulate_case, resolution, timesteps=20, L=L, g=g, dt=dt, imag_time=False, dim=2, s=1,
                      psi_0=psi_0_2d, V=V_2d, psi_sol=psi_sol, file_name=file_name,
-                     x_lim=(-L, L),
-                     y_lim=(-L, L),
-                     z_lim=(0, 0.080),
+                     x_lim=(-8, 2),
+                     y_lim=(-5, 5),
+                     z_lim=(0, 0.4),
                      view_height=15.0,
-                     view_angle=45.0,
+                     view_angle=75.0,
                      view_distance=10.0
                      )

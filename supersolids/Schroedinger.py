@@ -31,7 +31,7 @@ class Schroedinger(object):
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
 
-    def __init__(self, resolution, timesteps, L, dt, g=0, imag_time=False, dim=1, s=1,
+    def __init__(self, resolution, timesteps, L, dt, g=0.0, imag_time=False, dim=1, s=1.0,
                  psi_0=functions.psi_gauss_1d,
                  V=functions.v_harmonic_1d,
                  psi_sol=functions.thomas_fermi
@@ -58,22 +58,31 @@ class Schroedinger(object):
         self.psi_sol = psi_sol
 
         self.x = np.linspace(-self.L, self.L, self.resolution)
-        self.dx = float(2 * L / self.resolution)
+        self.dx = float(2.0 * L / self.resolution)
         self.dkx = float(np.pi / self.L)
 
         # TODO: This can probably be done with sp.ttf.fftshift
         # self.kx = sp.fft.fftshift(self.psi_val)
-        k_over_0 = np.arange(0, resolution / 2, 1)
-        k_under_0 = np.arange(-resolution / 2, 0, 1)
+        k_over_0 = np.arange(0.0, resolution / 2.0, 1.0)
+        k_under_0 = np.arange(-resolution / 2.0, 0.0, 1.0)
 
         self.kx = np.concatenate((k_over_0, k_under_0), axis=0) * self.dkx
-        self.k_squared = self.kx ** 2
+        self.k_squared = self.kx ** 2.0
 
         if imag_time:
             # Convention: $e^{-iH} = e^{UH}$
-            self.U = -1
+            if dim == 1:
+                self.U = -1.0
+            elif dim >= 2:
+                spatial = np.full_like((dim-1,), 1.0)
+                self.U = np.diag(np.append([-1.0], spatial))
         else:
-            self.U = -1.0j
+            if dim == 1:
+                self.U = -1.0j
+            elif dim >= 2:
+                spatial = np.full_like((dim-1,), 1.0)
+                self.U = np.diag(np.append([-1.0j], spatial))
+
 
         # Add attributes as soon as they are needed (e.g. for dimension 3, all besides the error are needed)
         if dim >= 2:
@@ -81,13 +90,13 @@ class Schroedinger(object):
             self.dy = float(2 * L / self.resolution)
             self.dky = float(np.pi / self.L)
             self.ky = np.concatenate((k_over_0, k_under_0), axis=0) * self.dky
-            self.k_squared += self.ky ** 2
+            self.k_squared += self.ky ** 2.0
         if dim >= 3:
             self.z = np.linspace(-self.L, self.L, self.resolution)
             self.dz = float(2 * L / self.resolution)
             self.dkz = float(np.pi / self.L)
             self.kz = np.concatenate((k_over_0, k_under_0), axis=0) * self.dkz
-            self.k_squared += self.kz ** 2
+            self.k_squared += self.kz ** 2.0
         if dim > 3:
             print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
             sys.exit(1)
@@ -98,7 +107,7 @@ class Schroedinger(object):
             self.psi_sol_val = self.psi_sol(self.x)
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
             # Here we use half steps in real space, but will use it before and after H_kin with normal steps
-            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
+            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
 
         elif dim == 2:
             self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
@@ -108,21 +117,24 @@ class Schroedinger(object):
 
             # tranform from 1D to 2D array (diagonal)
             g_arr = np.full_like(self.pos[:, :, 0][0], self.g)
-            self.g = np.diag(np.full_like(self.pos[:, :, 0][0], self.g))
-            self.U = np.diag(np.full_like(self.pos[:, :, 0][0], self.U))
+            self.g = np.diag(np.full_like((dim, dim), self.g))
 
             # here we still use the 1D k_squared, dt
-            self.H_kin = np.diag(np.exp(np.multiply(self.U, (0.5 * self.k_squared)) * self.dt))
+            a = np.diag([[self.kx, self.ky]])
+            print(f"{a.shape}")
+            buffer = np.multiply(self.U, (0.5 * a))
+            # print(f"{self.buffer.shape}")
+            self.H_kin = sp.linalg.expm(np.multiply(self.U, (0.5 * self.k_squared)) * self.dt)
 
             # Here we use half steps in real space, but will use it before and after H_kin with normal steps
-            self.H_pot = np.exp(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2))
+            self.H_pot = sp.linalg.expm(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2.0))
                                 * (0.5 * self.dt))
 
         elif dim == 3:
             self.psi_val = self.psi(self.x, self.y, self.z)
             self.V_val = self.V(self.x, self.y, self.z)
             # TODO: 3D diag needed here
-            self.H_kin = np.diag(np.exp(self.U * (0.5 * self.k_squared) * self.dt))
+            self.H_kin = sp.linalg.expm(np.multiply(self.U, (0.5 * self.k_squared)) * self.dt)
 
 
         # attributes for animation
@@ -144,11 +156,11 @@ class Schroedinger(object):
 
     def get_norm(self):
         if self.dim == 1:
-            psi_norm = np.sum(np.abs(self.psi_val) ** 2) * self.dx
+            psi_norm = np.sum(np.abs(self.psi_val) ** 2.0) * self.dx
         elif self.dim == 2:
-            psi_norm = np.sum(np.abs(self.psi_val) ** 2) * self.dx * self.dy
+            psi_norm = np.sum(np.abs(self.psi_val) ** 2.0) * self.dx * self.dy
         elif self.dim == 3:
-            psi_norm = np.sum(np.abs(self.psi_val) ** 2) * self.dx * self.dy * self.dz
+            psi_norm = np.sum(np.abs(self.psi_val) ** 2.0) * self.dx * self.dy * self.dz
         else:
             print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
             sys.exit(1)
@@ -156,9 +168,10 @@ class Schroedinger(object):
         return psi_norm
 
     def time_step(self):
+        # H_kin is just dependend on U and the gridpoints, which are constants, so it does not need to be recaculated
         if self.dim == 1:
             # update H_pot before use
-            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
+            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
             self.psi_val = self.H_pot * self.psi_val
 
             self.psi_val = sp.fft.fft(self.psi_val)
@@ -166,24 +179,23 @@ class Schroedinger(object):
             self.psi_val = sp.fft.ifft(self.psi_val)
 
             # update H_pot before use
-            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2) * (0.5 * self.dt))
+            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
             self.psi_val = self.H_pot * self.psi_val
 
         else:
             # TODO: get the fftn to work, don't forget the needed order for the k vector like in 1D
-            # TODO: psi_0_2d is not plotted symmetric after first step
             # update H_pot before use
-            self.H_pot = np.exp(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2))
-                                * (0.5 * self.dt))
+            self.H_pot = sp.linalg.expm(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2.0))
+                                        * (0.5 * self.dt))
             self.psi_val = np.matmul(self.H_pot, self.psi_val)
 
             self.psi_val = sp.fft.fft2(self.psi_val)
-            self.psi_val = self.H_kin * self.psi_val
+            self.psi_val = np.matmul(self.H_kin, self.psi_val)
             self.psi_val = sp.fft.ifft2(self.psi_val)
 
             # update H_pot before use
-            self.H_pot = np.exp(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2))
-                                * (0.5 * self.dt))
+            self.H_pot = sp.linalg.expm(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2.0))
+                                        * (0.5 * self.dt))
             self.psi_val = np.matmul(self.H_pot, self.psi_val)
 
         self.t += self.dt
@@ -194,4 +206,4 @@ class Schroedinger(object):
 
         self.psi_val /= np.sqrt(psi_norm_after_evolution)
 
-        self.s = - np.log(self.get_norm()) / (2 * self.dt)
+        # self.s = - np.log(self.get_norm()) / (2.0 * self.dt)
