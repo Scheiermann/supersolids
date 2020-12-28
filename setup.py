@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name="supersolids",
-    version="0.1.7",
+    version="0.1.8",
     packages=["", "supersolids"],
     package_data={"supersolids": ["results/split_time_imag.mp4", "results/split_time_real.mp4",
                                   "results/2d_gauss.mp4"]},
@@ -15,7 +15,7 @@ setup(
     license="MIT",
     author="Scheiermann",
     author_email="daniel.scheiermann@stud.uni-hannover.de",
-    install_requires=["matplotlib", "numpy", "psutil", "scipy", "sympy"],
+    install_requires=["apptools", "envisage", "matplotlib", "numpy", "psutil", "scipy", "sympy", "traits", "traitsui"],
     # ext_modules=cythonize("*.pyx", language_level=3),
     python_requires=">=3.8",
     description="Notes and script to supersolids"

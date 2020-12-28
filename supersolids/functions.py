@@ -26,7 +26,7 @@ def get_meshgrid(x, y):
     return x_mesh, y_mesh, pos
 
 
-def psi_gauss_2d(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]])):
+def psi_gauss_2d_pdf(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]])):
     """
     Gives values according to gaus dirstribution (2D) with meshgrid of x,y as input
 
@@ -49,29 +49,34 @@ def psi_gauss_2d(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1
     return z_mesh
 
 
-def psi_gauss_2d_pdf(x, y, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0])):
+def psi_gauss_2d(x, y, a, x_0=0.0, y_0=0.0, k_0=0.0):
     """
-    Gives values according to gaus dirstribution (2D) with meshgrid of x,y as input
+    Gaussian wave packet of width a and momentum k_0, centered at x_0
 
-    Parameters
-    ----------
-    x : 1D array, x-axis
-    y : 2D array, y-axis
-    mu : mean of gauss
-    var : var of gauss
+     Parameters
+     ----------
+     x : sympy.symbol
+         mathematical variable
 
-    Returns
-    -------
-    z_mesh : meshgrid, 2D surface values
-             values according to gaus dirstribution (2D) with meshgrid of x,y as input
+     y : sympy.symbol
+         mathematical variable
 
+     a : float
+        Amplitude of pulse
+
+     x_0 : float
+           Mean spatial x of pulse
+
+     y_0 : float
+           Mean spatial y of pulse
+
+     k_0 : float
+           Group velocity of pulse
     """
-    pos = get_meshgrid(x, y)
-    cov = np.diag(var ** 2)
-    rv = stats.multivariate_normal(mean=mu, cov=cov)
-    z_mesh = rv.pdf(pos)
 
-    return z_mesh
+    return ((a * np.sqrt(np.pi)) ** (-0.5)
+            * np.exp(-0.5 * (((x - x_0) * 1.0) ** 2
+                             + ((y - y_0) * 1.0) ** 2) / (a ** 2) + 1j * x * k_0))
 
 
 def psi_gauss_3d(x, y, z, a, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0):
@@ -254,7 +259,7 @@ if __name__ == '__main__':
     # functools.partial sets all arguments except x, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
     psi_0_1d = functools.partial(psi_gauss_1d, a=1, x_0=0, k_0=0)
-    psi_0_2d = functools.partial(psi_gauss_2d, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0]))
+    psi_0_2d = functools.partial(psi_gauss_2d_pdf, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0]))
     psi_0_3d = functools.partial(psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
 
     # testing for 2d plot
@@ -265,12 +270,3 @@ if __name__ == '__main__':
     Animation.plot_2d(L=L, resolution=resolution,
                       x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(0.0, 0.025),
                       alpha=[0.6, 0.8], pos=[pos, pos], func=[lambda pos: np.abs(psi_0_2d(pos)) ** 2, V_2d])
-
-    fig = mlab.figure()
-    z_mesh = np.abs(psi_0_2d(pos)) ** 2
-    s = mlab.surf(x_mesh, y_mesh, z_mesh, representation="wireframe")
-    # mlab.plot3d(x_mesh, y_mesh, z, np.sin(n * theta), tube_radius=0.025, colormap="spectral")
-    ax = mlab.axes(line_width=2, nb_labels=5)
-    mlab.title("Test mayavi")
-    mlab.show()
-
