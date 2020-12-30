@@ -12,7 +12,6 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 import functools
 import numpy as np
 
-from mayavi import mlab
 from scipy import stats
 
 from supersolids import Animation
@@ -49,7 +48,7 @@ def psi_gauss_2d_pdf(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.
     return z_mesh
 
 
-def psi_gauss_2d(x, y, a, x_0=0.0, y_0=0.0, k_0=0.0):
+def psi_gauss_2d(x, y, a=1.0, x_0=0.0, y_0=0.0, k_0=0.0):
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 

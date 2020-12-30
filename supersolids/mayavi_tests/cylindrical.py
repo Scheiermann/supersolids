@@ -20,7 +20,7 @@ from supersolids import Animation, functions
 
 
 # Script runs, if script is run as main script (called by python *.py)
-if __name__ == '__main__':
+if __name__ == "__main__":
     # due to fft of the points the resolution needs to be 2 ** datapoints_exponent
     datapoints_exponent: int = 6
     resolution: int = 2 ** datapoints_exponent
@@ -61,9 +61,11 @@ if __name__ == '__main__':
     cut = mlab.pipeline.scalar_cut_plane(src)
 
     iso = mlab.pipeline.iso_surface(src, opacity=0.6)
-    # write_data(cylinder_grid, "cylinder_grid.vtk")
+    write_data(cylinder_grid, "cylinder_grid.vtk")
 
     ax = mlab.axes(line_width=2, nb_labels=5)
     ax.axes.visibility = False
     mlab.title("")
+    mlab.savefig("cylincrical.png")
     mlab.show()
+

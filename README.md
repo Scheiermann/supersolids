@@ -6,6 +6,8 @@ Please read the **CONTRIBUTING.md**.
 
 ## How to install  
 
+For the animation to work, ffmpeg needs to be installed on your system.
+
 ### Arch based systems  
 Go to the directory, where you build your AUR packages.  
 Run the following in console:  

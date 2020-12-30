@@ -58,7 +58,7 @@ def simulate_case(resolution, timesteps, L, dt, g, imag_time=False, dim=1, s=1,
 
 
 # Script runs, if script is run as main script (called by python *.py)
-if __name__ == '__main__':
+if __name__ == "__main__":
     # for parallelization (use all cores)
     max_workers = psutil.cpu_count(logical=False)
 
