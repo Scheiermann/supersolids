@@ -67,9 +67,9 @@ if __name__ == "__main__":
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    g = 0.0
+    g = 10.0
     g_step = 10
-    dt = 0.5
+    dt = 1.0
 
     # box length [-L,L]
     # generators for L, g, dt to compute for different parameters
@@ -97,9 +97,9 @@ if __name__ == "__main__":
             print(f"i={i}, L={L}, g={g}, dt={dt}")
             file_name = f"split_{i:03}.mp4"
             psi_sol = functools.partial(functions.thomas_fermi, g=g)
-            e.submit(simulate_case, resolution, timesteps=20, L=L, g=g, dt=dt, imag_time=False, dim=2, s=1,
+            e.submit(simulate_case, resolution, timesteps=30, L=L, g=g, dt=dt, imag_time=True, dim=2, s=1,
                      psi_0=psi_0_2d, V=V_2d, psi_sol=psi_sol, file_name=file_name,
-                     x_lim=(-8, 2),
+                     x_lim=(-8, 8),
                      y_lim=(-5, 5),
                      z_lim=(0, 0.4),
                      view_height=15.0,

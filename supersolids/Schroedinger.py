@@ -71,18 +71,9 @@ class Schroedinger(object):
 
         if imag_time:
             # Convention: $e^{-iH} = e^{UH}$
-            if dim == 1:
-                self.U = -1.0
-            elif dim >= 2:
-                spatial = np.full_like((dim-1,), 1.0)
-                self.U = np.diag(np.append([-1.0], spatial))
+            self.U = -1.0
         else:
-            if dim == 1:
-                self.U = -1.0j
-            elif dim >= 2:
-                spatial = np.full_like((dim-1,), 1.0)
-                self.U = np.diag(np.append([-1.0j], spatial))
-
+            self.U = -1.0j
 
         # Add attributes as soon as they are needed (e.g. for dimension 3, all besides the error are needed)
         if dim >= 2:
@@ -115,19 +106,10 @@ class Schroedinger(object):
             self.V_val = self.V(self.pos)
             self.psi_sol_val = self.psi_sol(self.pos)
 
-            # tranform from 1D to 2D array (diagonal)
-            g_arr = np.full_like(self.pos[:, :, 0][0], self.g)
-            self.g = np.diag(np.full_like((dim, dim), self.g))
-
-            # here we still use the 1D k_squared, dt
-            a = np.diag([[self.kx, self.ky]])
-            print(f"{a.shape}")
-            buffer = np.multiply(self.U, (0.5 * a))
-            # print(f"{self.buffer.shape}")
-            self.H_kin = sp.linalg.expm(np.multiply(self.U, (0.5 * self.k_squared)) * self.dt)
+            self.H_kin = np.exp(np.multiply(self.U, (0.5 * self.k_squared)) * self.dt)
 
             # Here we use half steps in real space, but will use it before and after H_kin with normal steps
-            self.H_pot = sp.linalg.expm(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2.0))
+            self.H_pot = np.exp(np.multiply(self.U, (self.V_val + np.multiply(self.g, np.abs(self.psi_val)) ** 2.0))
                                 * (0.5 * self.dt))
 
         elif dim == 3:
@@ -169,34 +151,18 @@ class Schroedinger(object):
 
     def time_step(self):
         # H_kin is just dependend on U and the gridpoints, which are constants, so it does not need to be recaculated
-        if self.dim == 1:
-            # update H_pot before use
-            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
-            self.psi_val = self.H_pot * self.psi_val
+        # update H_pot before use
+        self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
 
-            self.psi_val = sp.fft.fft(self.psi_val)
-            self.psi_val = self.H_kin * self.psi_val
-            self.psi_val = sp.fft.ifft(self.psi_val)
+        # multiply element-wise the 2D with each other (not np.multiply)
+        self.psi_val = self.H_pot * self.psi_val
 
-            # update H_pot before use
-            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
-            self.psi_val = self.H_pot * self.psi_val
+        self.psi_val = sp.fft.fft(self.psi_val)
 
-        else:
-            # TODO: get the fftn to work, don't forget the needed order for the k vector like in 1D
-            # update H_pot before use
-            self.H_pot = sp.linalg.expm(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2.0))
-                                        * (0.5 * self.dt))
-            self.psi_val = np.matmul(self.H_pot, self.psi_val)
+        # multiply element-wise the 2D with each other (not np.multiply)
+        self.psi_val = self.H_kin * self.psi_val
 
-            self.psi_val = sp.fft.fft2(self.psi_val)
-            self.psi_val = np.matmul(self.H_kin, self.psi_val)
-            self.psi_val = sp.fft.ifft2(self.psi_val)
-
-            # update H_pot before use
-            self.H_pot = sp.linalg.expm(np.matmul(self.U, (self.V_val + np.matmul(self.g, np.abs(self.psi_val)) ** 2.0))
-                                        * (0.5 * self.dt))
-            self.psi_val = np.matmul(self.H_pot, self.psi_val)
+        self.psi_val = sp.fft.ifft(self.psi_val)
 
         self.t += self.dt
 

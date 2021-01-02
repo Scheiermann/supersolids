@@ -59,7 +59,7 @@ class Animation:
         ----------
         row : int, index
               row of the subplot for the animation
-            
+
         col : int, index
               column of the subplot for the animation
 
@@ -233,7 +233,7 @@ class Animation:
             System.psi_line.set_data(System.x_mesh, System.y_mesh, System.z, np.abs(System.psi_val) ** 2)
 
         self.title.set_text(("g = {:.2}, dt = {:.6}, timesteps = {:d}, imag_time = {},\n"
-                             "t = {:02.05f}").format(System.g[0, 0],
+                             "t = {:02.05f}").format(System.g,
                                                      System.dt,
                                                      System.timesteps,
                                                      System.imag_time,
