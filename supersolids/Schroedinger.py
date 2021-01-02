@@ -106,8 +106,10 @@ class Schroedinger(object):
             self.V_val = self.V(self.pos)
             self.psi_sol_val = self.psi_sol(self.pos)
 
+            # here np.multiply is needed to multiply a number with an 1D array
             self.H_kin = np.exp(np.multiply(self.U, (0.5 * self.k_squared)) * self.dt)
 
+            # here np.multiply is needed two times to multiply a number with an 2D array
             # Here we use half steps in real space, but will use it before and after H_kin with normal steps
             self.H_pot = np.exp(np.multiply(self.U, (self.V_val + np.multiply(self.g, np.abs(self.psi_val)) ** 2.0))
                                 * (0.5 * self.dt))
@@ -116,7 +118,7 @@ class Schroedinger(object):
             self.psi_val = self.psi(self.x, self.y, self.z)
             self.V_val = self.V(self.x, self.y, self.z)
             # TODO: 3D diag needed here
-            self.H_kin = np.diag(np.exp(self.U * (0.5 * self.k_squared) * self.dt))
+            self.H_kin = sp.linalg.expm(np.multiply(self.U, (0.5 * self.k_squared)) * self.dt)
 
 
         # attributes for animation
@@ -157,12 +159,18 @@ class Schroedinger(object):
         # multiply element-wise the 2D with each other (not np.multiply)
         self.psi_val = self.H_pot * self.psi_val
 
-        self.psi_val = sp.fft.fft(self.psi_val)
+        self.psi_val = np.fft.fft(self.psi_val)
 
         # multiply element-wise the 2D with each other (not np.multiply)
         self.psi_val = self.H_kin * self.psi_val
 
-        self.psi_val = sp.fft.ifft(self.psi_val)
+        self.psi_val = np.fft.ifft(self.psi_val)
+
+        # update H_pot before use
+        self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
+
+        # multiply element-wise the 2D with each other (not np.multiply)
+        self.psi_val = self.H_pot * self.psi_val
 
         self.t += self.dt
 
