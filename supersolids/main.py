@@ -12,9 +12,10 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 import itertools
 import functools
 from concurrent import futures
+import psutil
 
 import numpy as np
-import psutil
+from mayavi import mlab
 
 from supersolids import Animation
 from supersolids import functions
@@ -23,7 +24,7 @@ from supersolids import run_time
 from supersolids import Schroedinger
 
 
-def simulate_case(resolution, timesteps, L, dt, g, imag_time=False, dim=1, s=1,
+def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1,
                   psi_0=functions.psi_gauss_1d,
                   V=functions.v_harmonic_1d,
                   psi_sol=functions.thomas_fermi,
@@ -62,8 +63,10 @@ def simulate_case(resolution, timesteps, L, dt, g, imag_time=False, dim=1, s=1,
         # mayavi for 3D
         may = MayaviAnimation.MayaviAnimation(dim=dim)
         with run_time.run_time():
+            # may.animate(Harmonic)
             may.animate(Harmonic, x_lim=x_lim, y_lim=y_lim, z_lim=z_lim)
-        may.create_movie(input_data_file_pattern="*.png", filename="anim.mp4")
+        mlab.show()
+        may.create_movie(input_data_file_pattern="*.png", filename=file_name)
 
 
 # Script runs, if script is run as main script (called by python *.py)
@@ -98,6 +101,14 @@ if __name__ == "__main__":
     psi_0_1d = functools.partial(functions.psi_gauss_1d, a=1, x_0=0, k_0=0)
     psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
+
+    # 3D works in single core mode
+    simulate_case(resolution, timesteps=30, L=L_generator[0], g=g, dt=dt, imag_time=True, dim=3, s=1,
+                  psi_0=psi_0_3d, V=V_3d, psi_sol=functions.thomas_fermi, file_name="anim.mp4",
+                  x_lim=(-8, 8), y_lim=(-5, 5), z_lim=(0, 0.4),
+                  view_height=15.0, view_angle=75.0, view_distance=10.0
+                  )
+    print("Single core done")
 
     i: int = 0
     with futures.ProcessPoolExecutor(max_workers=max_workers) as e:

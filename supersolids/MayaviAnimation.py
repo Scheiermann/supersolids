@@ -38,14 +38,17 @@ def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str
     """
     # "movie" and "%03d" strings are hardcoded in mayavi movie_maker _update_subdir
     existing = sorted([x for x in dir_path.glob(dir_name + "*") if x.is_dir()])
-    last_index = int(existing[-1].name.split(dir_name)[1])
+    try:
+       last_index = int(existing[-1].name.split(dir_name)[1])
+    except Exception as e:
+        assert last_index is not None, ("Extracting last index from dir_path failed")
     input_path = Path(dir_path, dir_name + counting_format % last_index)
 
     return input_path
 
 
 @mlab.animate(delay=10, ui=True)
-def animate(System: Schroedinger.Schroedinger, x_lim=[-1, 1], y_lim=[-1, 1], z_lim=[-1, 1]):
+def animate(System: Schroedinger.Schroedinger, x_lim=(-1, 1), y_lim=(-1, 1), z_lim=(-1, 1)):
     prob_3d = np.abs(System.psi_val) ** 2
     p = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d,
                        colormap="spectral", opacity=0.5, transparent=True)
@@ -58,7 +61,6 @@ def animate(System: Schroedinger.Schroedinger, x_lim=[-1, 1], y_lim=[-1, 1], z_l
                                 plane_orientation="y_axes",
                                 slice_index=System.resolution // 2,
                                 extent=[*x_lim, *y_lim, *z_lim])
-
     for i in range(0, System.timesteps):
         System.time_step()
         prob_3d = np.abs(System.psi_val) ** 2
@@ -70,7 +72,7 @@ def animate(System: Schroedinger.Schroedinger, x_lim=[-1, 1], y_lim=[-1, 1], z_l
 
 class MayaviAnimation:
     mayavi_counter: int = 0
-    animate = classmethod(animate)
+    animate = staticmethod(animate)
 
     def __init__(self, dim=3):
         """
@@ -80,7 +82,9 @@ class MayaviAnimation:
         MayaviAnimation.mayavi_counter += 1
         self.dim = dim
 
-        self.fig = mlab.figure(figure="")
+        print("start")
+        self.fig = mlab.figure()
+        print("end")
         mlab.title("")
         self.ax = mlab.axes(line_width=2, nb_labels=5)
         self.ax.axes.visibility = True
@@ -99,6 +103,7 @@ class MayaviAnimation:
         input_path = get_image_path(self.dir_path)
         input_data = Path(input_path, input_data_file_pattern)
         output_path = Path(input_path, filename)
+        print(input_data)
 
         # requires either mencoder or ffmpeg to be installed on your system
         # from command line:
@@ -114,7 +119,7 @@ if __name__ == "__main__":
                                          V=functions.v_harmonic_3d,
                                          psi_sol=functions.thomas_fermi
                                          )
-    may = MayaviAnimation(dim=1)
-    animate(Harmonic, x_lim=[-10, 5], y_lim=[-1, 1], z_lim=[-1, 1])
+    may = MayaviAnimation(dim=Harmonic.dim)
+    animate(Harmonic, x_lim=(-10, 5), y_lim=(-1, 1), z_lim=(-1, 1))
     mlab.show()
     may.create_movie(input_data_file_pattern="*.png", filename="anim.mp4")
