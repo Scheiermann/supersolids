@@ -8,9 +8,9 @@ email: daniel.scheiermann@stud.uni-hannover.de
 license: MIT
 Please feel free to use and modify this, but keep the above information. Thanks!
 """
+import sys
 
 import numpy as np
-import sys
 
 from supersolids import functions
 
@@ -60,12 +60,7 @@ class Schroedinger(object):
         self.dx = float(2.0 * L / self.resolution)
         self.dkx = float(np.pi / self.L)
 
-        # TODO: This can probably be done with sp.ttf.fftshift
-        # self.kx = sp.fft.fftshift(self.psi_val)
-        k_over_0 = np.arange(0.0, resolution / 2.0, 1.0)
-        k_under_0 = np.arange(-resolution / 2.0, 0.0, 1.0)
-
-        self.kx = np.concatenate((k_over_0, k_under_0), axis=0) * self.dkx
+        self.kx = np.fft.fftfreq(resolution, d=1.0/(self.dkx * self.resolution))
         self.k_squared = self.kx ** 2.0
 
         if imag_time:
@@ -79,13 +74,13 @@ class Schroedinger(object):
             self.y = np.linspace(-self.L, self.L, self.resolution)
             self.dy = float(2 * L / self.resolution)
             self.dky = float(np.pi / self.L)
-            self.ky = np.concatenate((k_over_0, k_under_0), axis=0) * self.dky
+            self.ky = np.fft.fftfreq(resolution, d=1.0 / (self.dky * self.resolution))
             self.k_squared += self.ky ** 2.0
         if dim >= 3:
             self.z = np.linspace(-self.L, self.L, self.resolution)
             self.dz = float(2 * L / self.resolution)
             self.dkz = float(np.pi / self.L)
-            self.kz = np.concatenate((k_over_0, k_under_0), axis=0) * self.dkz
+            self.kz = np.fft.fftfreq(resolution, d=1.0 / (self.dkz * self.resolution))
             self.k_squared += self.kz ** 2.0
         if dim > 3:
             print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)

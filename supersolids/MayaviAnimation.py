@@ -9,10 +9,9 @@ license: MIT
 Please feel free to use and modify this, but keep the above information. Thanks!
 """
 
-import functools
-import numpy as np
 from pathlib import Path
 
+import numpy as np
 import ffmpeg
 from mayavi import mlab
 
@@ -52,15 +51,18 @@ def animate(System: Schroedinger.Schroedinger, x_lim=[-1, 1], y_lim=[-1, 1], z_l
         yield
 
 
-class mayavi_animation:
+class MayaviAnimation:
+    mayavi_counter: int = 0
+    animate = classmethod(animate)
     def __init__(self, dim=3):
         """
         Creates an Animation with mayavi for a Schroedinger equation
         Methods need the object Schroedinger with the parameters of the equation
         """
+        MayaviAnimation.mayavi_counter += 1
         self.dim = dim
 
-        self.fig = mlab.figure()
+        self.fig = mlab.figure(figure="")
         mlab.title("")
         self.ax = mlab.axes(line_width=2, nb_labels=5)
         self.ax.axes.visibility = True
@@ -88,12 +90,12 @@ class mayavi_animation:
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    Harmonic = Schroedinger.Schroedinger(resolution=2**6, timesteps=30, L=3, dt=1.0, g=1.0, imag_time=True, dim=3, s=1,
+    Harmonic = Schroedinger.Schroedinger(resolution=2**6, timesteps=100, L=3, dt=1.0, g=1.0, imag_time=True, dim=3, s=1,
                                          psi_0=functions.psi_gauss_3d,
                                          V=functions.v_harmonic_3d,
                                          psi_sol=functions.thomas_fermi
                                          )
-    may = mayavi_animation(dim=1)
+    may = MayaviAnimation(dim=1)
     animate(Harmonic, x_lim=[-10, 5], y_lim=[-1, 1], z_lim=[-1, 1])
     mlab.show()
     may.create_movie(input_data_file_pattern="*.png", filename="anim.mp4")

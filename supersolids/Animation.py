@@ -8,12 +8,12 @@ email: daniel.scheiermann@stud.uni-hannover.de
 license: MIT
 Please feel free to use and modify this, but keep the above information. Thanks!
 """
+from os import sep
 
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
 from matplotlib import cm
-from os import sep
 
 from supersolids import Schroedinger, functions
 
@@ -50,7 +50,6 @@ class Animation:
             self.ax.set_ylabel(r'$y$')
             self.ax.set_zlabel(r'$z$')
             self.ax.grid()
-
 
     def set_limits(self, row, col, x_min, x_max, y_min, y_max):
         """

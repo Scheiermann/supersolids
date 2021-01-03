@@ -11,15 +11,15 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 
 import itertools
 import functools
+from concurrent import futures
+
 import numpy as np
 import psutil
 
-from mayavi import mlab
-from concurrent import futures
 
 from supersolids import Animation
 from supersolids import functions
-from supersolids import mayavi_animation
+from supersolids import MayaviAnimation
 from supersolids import run_time
 from supersolids import Schroedinger
 
@@ -43,6 +43,7 @@ def simulate_case(resolution, timesteps, L, dt, g, imag_time=False, dim=1, s=1,
                                              )
 
     if dim < 3:
+        # matplotlib for 1D and 2D
         ani = Animation.Animation(dim=dim)
 
         if ani.dim == 1:
@@ -59,10 +60,10 @@ def simulate_case(resolution, timesteps, L, dt, g, imag_time=False, dim=1, s=1,
         with run_time.run_time():
             ani.start(Harmonic, file_name)
     else:
-        may = mayavi_animation.mayavi_animation(dim=dim)
+        # mayavi for 3D
+        may = MayaviAnimation.MayaviAnimation(dim=dim)
         with run_time.run_time():
-            mayavi_animation.animate(Harmonic, x_lim=x_lim, y_lim=y_lim, z_lim=z_lim)
-        mlab.show()
+            may.animate(Harmonic, x_lim=x_lim, y_lim=y_lim, z_lim=z_lim)
         may.create_movie(input_data_file_pattern="*.png", filename="anim.mp4")
 
 
