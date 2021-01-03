@@ -30,10 +30,11 @@ class Schroedinger(object):
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
 
-    def __init__(self, resolution, timesteps, L, dt, g=0.0, imag_time=False, dim=1, s=1.0,
+    def __init__(self, resolution, timesteps, L, dt, g=0.0, imag_time=False, dim=1, s=1.1, E=1.0,
                  psi_0=functions.psi_gauss_1d,
                  V=functions.v_harmonic_1d,
-                 psi_sol=functions.thomas_fermi
+                 psi_sol=functions.thomas_fermi,
+                 mu_sol=functions.mu_3d,
                  ):
         """
         Parameters
@@ -49,8 +50,16 @@ class Schroedinger(object):
         self.g = float(g)
         self.imag_time = imag_time
         self.dim = dim
+
+        print(f"{self.g}")
+        self.mu_sol = mu_sol(self.g)
+
         # s = - ln(N) / (2 * dtau), where N is the norm of the psi
         self.s = s
+        print(f"init s: {self.s}")
+
+        # E = mu - 0.5 * g * int psi_val ** 2
+        self.E = E
 
         self.psi = psi_0
         self.V = V
@@ -140,13 +149,13 @@ class Schroedinger(object):
 
         self.V_z_line = None
 
-    def get_norm(self):
+    def get_norm(self, p=2.0):
         if self.dim == 1:
-            psi_norm = np.sum(np.abs(self.psi_val) ** 2.0) * self.dx
+            psi_norm = np.sum(np.abs(self.psi_val) ** p) * self.dx
         elif self.dim == 2:
-            psi_norm = np.sum(np.abs(self.psi_val) ** 2.0) * self.dx * self.dy
+            psi_norm = np.sum(np.abs(self.psi_val) ** p) * self.dx * self.dy
         elif self.dim == 3:
-            psi_norm = np.sum(np.abs(self.psi_val) ** 2.0) * self.dx * self.dy * self.dz
+            psi_norm = np.sum(np.abs(self.psi_val) ** p) * self.dx * self.dy * self.dz
         else:
             print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
             sys.exit(1)
@@ -178,8 +187,12 @@ class Schroedinger(object):
 
         # for self.imag_time=False, renormalization should be preserved, but we play safe here (regardless of speedup)
         # if self.imag_time:
-        psi_norm_after_evolution = self.get_norm()
+        psi_norm_after_evolution = self.get_norm(p=2.0)
+        psi_quadratic_integral = self.get_norm(p=4.0)
+
+        self.s = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+        self.E = self.s - 0.5 * self.g * psi_quadratic_integral
 
         self.psi_val /= np.sqrt(psi_norm_after_evolution)
-
-        # self.s = - np.log(self.get_norm()) / (2.0 * self.dt)
+        # print(f"s: {self.s}")
+        print(f"E: {self.E}, E_sol: {self.mu_sol - 0.5 * self.g * psi_quadratic_integral}")

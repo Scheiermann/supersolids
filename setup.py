@@ -8,7 +8,7 @@ from setuptools import setup
 
 setup(
     name="supersolids",
-    version="0.1.13",
+    version="0.1.14",
     packages=["", "supersolids"],
     package_data={"supersolids": ["results/split_time_imag.mp4",
                                   "results/split_time_real.mp4",

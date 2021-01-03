@@ -221,6 +221,13 @@ def thomas_fermi(x, g):
         return None
 
 
+def mu_3d(g):
+    # mu is the chemical potential
+    mu = ((15 * g) / (16 * np.sqrt(2) * np.pi)) ** (2 / 5)
+
+    return mu
+
+
 def v_harmonic_1d(x):
     return 0.5 * x ** 2
 

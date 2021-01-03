@@ -24,22 +24,26 @@ from supersolids import run_time
 from supersolids import Schroedinger
 
 
-def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1,
+def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1.1, E=1.0, accuracy=10**-6,
                   psi_0=functions.psi_gauss_1d,
                   V=functions.v_harmonic_1d,
                   psi_sol=functions.thomas_fermi,
+                  mu_sol=functions.mu_3d,
                   file_name="split.mp4",
                   x_lim=(-1, 1),
                   y_lim=(-1, 1),
                   z_lim=(0, 1.0),
+                  slice_x_index=0, slice_y_index=0,
                   view_height=20.0,
                   view_angle=45.0,
                   view_distance=10.0
                   ):
     with run_time.run_time():
-        Harmonic = Schroedinger.Schroedinger(resolution, timesteps, L, dt, g=g, imag_time=imag_time, dim=dim, s=s,
+        Harmonic = Schroedinger.Schroedinger(resolution, timesteps, L, dt, g=g, imag_time=imag_time, dim=dim,
+                                             s=s, E=E,
                                              psi_0=psi_0, V=V,
                                              psi_sol=psi_sol,
+                                             mu_sol=mu_sol,
                                              )
 
     if dim < 3:
@@ -64,8 +68,13 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1,
         may = MayaviAnimation.MayaviAnimation(dim=dim)
         with run_time.run_time():
             # may.animate(Harmonic)
-            may.animate(Harmonic, x_lim=x_lim, y_lim=y_lim, z_lim=z_lim)
+            may.animate(Harmonic, accuracy=accuracy, x_lim=x_lim, y_lim=y_lim, z_lim=z_lim,
+                        slice_x_index=slice_x_index, slice_y_index=slice_y_index)
         mlab.show()
+        # TODO: close window after last frame
+        # print(f"{Harmonic.t}, {Harmonic.dt * Harmonic.timesteps}")
+        # if Harmonic.t >= Harmonic.dt * Harmonic.timesteps:
+        #     mlab.close()
         may.create_movie(input_data_file_pattern="*.png", filename=file_name)
 
 
@@ -81,15 +90,16 @@ if __name__ == "__main__":
     # constants needed for the Schroedinger equation
     g = 10.0
     g_step = 10
-    dt = 1.0
+    dt = 0.1
 
     # box length [-L,L]
     # generators for L, g, dt to compute for different parameters
-    L_generator = (10,)
-    G = (i for i in np.arange(g, g + g_step, g_step))
+    L_generator = (4,)
+    g_generator = (i for i in np.arange(g, g + g_step, g_step))
+    mu_sol_list = [functions.mu_3d for g in g_generator]
     factors = np.linspace(0.2, 0.3, max_workers)
-    DT = (i * dt for i in factors)
-    cases = itertools.product(L_generator, G, DT)
+    dt_generator = (i * dt for i in factors)
+    cases = itertools.product(L_generator, g_generator, dt_generator, mu_sol_list)
 
     # functions needed for the Schroedinger equation (e.g. potential: V, initial wave function: psi_0)
     V_1d = functions.v_harmonic_1d
@@ -102,27 +112,38 @@ if __name__ == "__main__":
     psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
 
+    # TODO: get mayavi lim to work
     # 3D works in single core mode
-    simulate_case(resolution, timesteps=30, L=L_generator[0], g=g, dt=dt, imag_time=True, dim=3, s=1,
-                  psi_0=psi_0_3d, V=V_3d, psi_sol=functions.thomas_fermi, file_name="anim.mp4",
-                  x_lim=(-8, 8), y_lim=(-5, 5), z_lim=(0, 0.4),
+    simulate_case(resolution, timesteps=500, L=L_generator[0], g=g, dt=dt, imag_time=True, dim=3,
+                  s=1.1, E=1.0,
+                  psi_0=psi_0_3d, V=V_3d,
+                  psi_sol=functions.thomas_fermi, mu_sol=mu_sol_list[0],
+                  accuracy=10 ** -6,
+                  file_name="anim.mp4",
+                  x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(0, 0.4),
+                  slice_x_index=resolution//3, slice_y_index=resolution//3,
                   view_height=15.0, view_angle=75.0, view_distance=10.0
                   )
     print("Single core done")
 
+    # TODO: get mayavi concurrent to work
     i: int = 0
-    with futures.ProcessPoolExecutor(max_workers=max_workers) as e:
-        for L, g, dt in cases:
+    with futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
+        for L, g, dt, mu_sol in cases:
             i = i + 1
-            print(f"i={i}, L={L}, g={g}, dt={dt}")
+            print(f"i={i}, L={L}, g={g}, dt={dt}, mu={mu_sol}")
             file_name = f"split_{i:03}.mp4"
             psi_sol = functools.partial(functions.thomas_fermi, g=g)
-            e.submit(simulate_case, resolution, timesteps=30, L=L, g=g, dt=dt, imag_time=True, dim=3, s=1,
-                     psi_0=psi_0_3d, V=V_3d, psi_sol=psi_sol, file_name=file_name,
-                     x_lim=(-8, 8),
-                     y_lim=(-5, 5),
-                     z_lim=(0, 0.4),
-                     view_height=15.0,
-                     view_angle=75.0,
-                     view_distance=10.0
-                     )
+            executor.submit(simulate_case, resolution, timesteps=30, L=L, g=g, dt=dt, imag_time=True,
+                            dim=3, s=1.1, accuracy=10**-6,
+                            psi_0=psi_0_3d, V=V_3d,
+                            psi_sol=psi_sol, mu_sol=mu_sol,
+                            file_name=file_name,
+                            x_lim=(-8, 8),
+                            y_lim=(-5, 5),
+                            z_lim=(0, 0.4),
+                            slice_x_index=0, slice_y_index=0,
+                            view_height=15.0,
+                            view_angle=75.0,
+                            view_distance=10.0
+                            )

@@ -1,7 +1,7 @@
 # Maintainer: Daniel Scheiermann  <daniel.scheiermann@stud.uni-hannover.de>
 _name=supersolids
 pkgname=python-${_name}
-pkgver=0.1.13
+pkgver=0.1.14
 pkgrel=1
 pkgdesc="Notes and script to supersolids"
 url="https://github.com/Scheiermann/${_name}"

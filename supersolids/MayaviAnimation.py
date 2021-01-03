@@ -48,21 +48,28 @@ def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str
 
 
 @mlab.animate(delay=10, ui=True)
-def animate(System: Schroedinger.Schroedinger, x_lim=(-1, 1), y_lim=(-1, 1), z_lim=(-1, 1)):
+def animate(System: Schroedinger.Schroedinger, accuracy=10**-6, x_lim=(-1, 1), y_lim=(-1, 1), z_lim=(-1, 1),
+            slice_x_index=0, slice_y_index=0):
     prob_3d = np.abs(System.psi_val) ** 2
     p = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d,
                        colormap="spectral", opacity=0.5, transparent=True)
 
     slice_x = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
                                 plane_orientation="x_axes",
-                                slice_index=System.resolution // 2,
+                                slice_index=slice_x_index,
                                 extent=[*x_lim, *y_lim, *z_lim])
     slice_y = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
                                 plane_orientation="y_axes",
-                                slice_index=System.resolution // 2,
+                                slice_index=slice_y_index,
                                 extent=[*x_lim, *y_lim, *z_lim])
     for i in range(0, System.timesteps):
+        s_old = System.s
         System.time_step()
+        s_rel = np.abs((System.s - s_old) / System.s)
+        print(f"s_rel: {s_rel}")
+        if s_rel < accuracy:
+            print(f"accuracy reached: {s_rel}")
+            break
         prob_3d = np.abs(System.psi_val) ** 2
         slice_x.mlab_source.trait_set(scalars=prob_3d)
         slice_y.mlab_source.trait_set(scalars=prob_3d)
@@ -114,7 +121,7 @@ class MayaviAnimation:
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     Harmonic = Schroedinger.Schroedinger(resolution=2 ** 6, timesteps=100, L=3, dt=1.0, g=1.0, imag_time=True, dim=3,
-                                         s=1,
+                                         s=1.1, E=1.0,
                                          psi_0=functions.psi_gauss_3d,
                                          V=functions.v_harmonic_3d,
                                          psi_sol=functions.thomas_fermi
