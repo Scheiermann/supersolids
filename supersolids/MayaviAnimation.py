@@ -19,6 +19,23 @@ from supersolids import Animation, functions, Schroedinger
 
 
 def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str = "%03d"):
+    """
+    Looks up all directories with matching dir_name and counting format in dir_path.
+    Gets the highest number and returns a path with dir_name counted one up (prevents colliding with old data).
+
+    Parameters
+    ----------
+    dir_path : Path
+               Path where to look for old directories (movie data)
+    dir_name : str
+               General name of the directories without the counter
+    counting_format :
+                     Format of counter of the directories
+
+    Returns
+    -------
+    Path for the new directory (not colliding with old data)
+    """
     # "movie" and "%03d" strings are hardcoded in mayavi movie_maker _update_subdir
     existing = sorted([x for x in dir_path.glob(dir_name + "*") if x.is_dir()])
     last_index = int(existing[-1].name.split(dir_name)[1])
@@ -54,6 +71,7 @@ def animate(System: Schroedinger.Schroedinger, x_lim=[-1, 1], y_lim=[-1, 1], z_l
 class MayaviAnimation:
     mayavi_counter: int = 0
     animate = classmethod(animate)
+
     def __init__(self, dim=3):
         """
         Creates an Animation with mayavi for a Schroedinger equation
@@ -90,7 +108,8 @@ class MayaviAnimation:
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    Harmonic = Schroedinger.Schroedinger(resolution=2**6, timesteps=100, L=3, dt=1.0, g=1.0, imag_time=True, dim=3, s=1,
+    Harmonic = Schroedinger.Schroedinger(resolution=2 ** 6, timesteps=100, L=3, dt=1.0, g=1.0, imag_time=True, dim=3,
+                                         s=1,
                                          psi_0=functions.psi_gauss_3d,
                                          V=functions.v_harmonic_3d,
                                          psi_sol=functions.thomas_fermi

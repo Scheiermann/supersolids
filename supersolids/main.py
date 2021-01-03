@@ -16,7 +16,6 @@ from concurrent import futures
 import numpy as np
 import psutil
 
-
 from supersolids import Animation
 from supersolids import functions
 from supersolids import MayaviAnimation
