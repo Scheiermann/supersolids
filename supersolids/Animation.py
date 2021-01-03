@@ -1,14 +1,5 @@
 #!/usr/bin/env python
 
-import numpy as np
-import sys
-from matplotlib import pyplot as plt
-from matplotlib import animation
-from matplotlib import cm
-from os import sep
-
-from supersolids import Schroedinger, functions
-
 """
 Implements animation
 
@@ -17,6 +8,14 @@ email: daniel.scheiermann@stud.uni-hannover.de
 license: MIT
 Please feel free to use and modify this, but keep the above information. Thanks!
 """
+
+import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib import animation
+from matplotlib import cm
+from os import sep
+
+from supersolids import Schroedinger, functions
 
 
 class Animation:
@@ -27,6 +26,7 @@ class Animation:
         """
         self.dim = dim
 
+        # matplotlib
         if self.dim == 1:
             self.fig, self.axs = plt.subplots(nrows=1, ncols=1, squeeze=False)
             # TODO: Currently all subplots have the same plot, change that!
@@ -50,6 +50,7 @@ class Animation:
             self.ax.set_ylabel(r'$y$')
             self.ax.set_zlabel(r'$z$')
             self.ax.grid()
+
 
     def set_limits(self, row, col, x_min, x_max, y_min, y_max):
         """
@@ -135,7 +136,7 @@ class Animation:
 
             x = np.linspace(range_in_box[:, 0].min(), range_in_box[:, 0].max(), System.resolution)
             y = np.linspace(range_in_box[:, 1].min(), range_in_box[:, 1].max(), System.resolution)
-            xx, yy, V_pos = functions.get_meshgrid(x, y)
+            _, _, V_pos = functions.get_meshgrid(x, y)
             V_plot_val = System.V(V_pos)
 
         return V_pos, V_plot_val
@@ -203,6 +204,8 @@ class Animation:
             self.psi_sol_line.set_data(System.x, System.psi_sol_val)
         elif System.dim == 2:
             if frame_index >= 1:
+                # here we crop the calculated mesh to the viewable mesh,
+                # but the rest is still calculated to not change the boundary conditions. Essentially we just zoom
                 psi_pos, psi_val = crop_pos_to_limits(self.ax, System.pos, System.psi, func_val=System.psi_val)
                 psi_prob = np.abs(psi_val) ** 2
                 System.psi_line = self.ax.plot_surface(psi_pos[:, :, 0],
@@ -227,10 +230,6 @@ class Animation:
                 if frame_index == 1:
                     color_bar_axes = self.fig.add_axes([0.85, 0.1, 0.03, 0.8])
                     self.fig.colorbar(System.psi_x_line, cax=color_bar_axes)
-
-        elif System.dim == 3:
-            # TODO: z needs to be meshgrid too, how to use 3d meshgrids?
-            System.psi_line.set_data(System.x_mesh, System.y_mesh, System.z, np.abs(System.psi_val) ** 2)
 
         self.title.set_text(("g = {:.2}, dt = {:.6}, timesteps = {:d}, imag_time = {},\n"
                              "t = {:02.05f}").format(System.g,
@@ -360,7 +359,7 @@ def crop_pos_to_limits(ax, pos, func, func_val=None):
     # crop x and y 1D arrays to plot axis limits
     x_cropped = x[(x_lim[0] <= x) & (x <= x_lim[1])]
     y_cropped = y[(y_lim[0] <= y) & (y <= y_lim[1])]
-    xx_cropped, yy_cropped, pos_cropped = functions.get_meshgrid(x_cropped, y_cropped)
+    xx_cropped, _, pos_cropped = functions.get_meshgrid(x_cropped, y_cropped)
 
     if func_val is None:
         z_cropped = func(pos_cropped)
@@ -369,7 +368,7 @@ def crop_pos_to_limits(ax, pos, func, func_val=None):
         # (i.e to see one specific area, but don't change the boundary conditions), it needs to be cropped too
         x_bol = np.where((x_lim[0] <= x) & (x <= x_lim[1]), True, False)
         y_bol = np.where((y_lim[0] <= y) & (y <= y_lim[1]), True, False)
-        xx_bol, yy_bol, pos_bol = functions.get_meshgrid(x_bol, y_bol)
+        xx_bol, yy_bol, _ = functions.get_meshgrid(x_bol, y_bol)
 
         # Reshape is needed as func_val[xx_bol & yy_bol] is a 1D array (flat)
         z_cropped = np.reshape(func_val[xx_bol & yy_bol], xx_cropped.shape)
@@ -386,7 +385,7 @@ def get_V_plot_values(ax, pos, V, resolution, reserve=1.0):
 
     x = np.linspace(range_in_box[:, 0].min(), range_in_box[:, 0].max(), resolution)
     y = np.linspace(range_in_box[:, 1].min(), range_in_box[:, 1].max(), resolution)
-    xx, yy, V_pos = functions.get_meshgrid(x, y)
+    _, _, V_pos = functions.get_meshgrid(x, y)
     V_plot_val = V(V_pos)
 
     return V_pos, V_plot_val

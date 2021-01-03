@@ -27,7 +27,7 @@ check_disabled() { #ERROR: TypeError None is not callable
 package() {
   cd "$srcdir/${_name}-$pkgver"
   # alternatively install dependencies with pip
-  python -m pip install -U apptools envisage ffmpeg matplotlib mayavi numpy traits traitsui scipy sympy
+  python -m pip install -U apptools envisage ffmpeg-python matplotlib mayavi numpy traits traitsui scipy sympy
   python setup.py install --skip-build --root="$pkgdir" --optimize=1
 
 }

@@ -112,6 +112,22 @@ class Schroedinger(object):
             # Here we use half steps in real space, but will use it before and after H_kin with normal steps
             self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
 
+        elif dim == 3:
+            self.x_mesh, self.y_mesh, self.z_mesh = np.mgrid[self.x[0]:self.x[-1]:complex(0, self.resolution),
+                                                             self.y[0]:self.y[-1]:complex(0, self.resolution),
+                                                             self.z[0]:self.z[-1]:complex(0, self.resolution)
+                                                             ]
+            self.psi_val = self.psi(self.x_mesh, self.y_mesh, self.z_mesh)
+            self.V_val = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
+            # self.psi_sol_val = self.psi_sol(self.x_mesh, self.y_mesh, self.z_mesh)
+
+            # here a number (U) is multiplied elementwise with an 1D array (k_squared)
+            self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
+
+            # here a number (g, then U) is multiplied elementwise with an 2D array (psi_val, then the sum)
+            # Here we use half steps in real space, but will use it before and after H_kin with normal steps
+            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
+
         # attributes for animation
         self.t = 0.0
 
