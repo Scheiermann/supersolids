@@ -11,14 +11,16 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 
 import itertools
 import functools
+from concurrent import futures
+
 import numpy as np
 import psutil
 
-from concurrent import futures
 
 from supersolids import Animation
 from supersolids import functions
-from supersolids import parallel
+from supersolids import MayaviAnimation
+from supersolids import run_time
 from supersolids import Schroedinger
 
 
@@ -34,27 +36,35 @@ def simulate_case(resolution, timesteps, L, dt, g, imag_time=False, dim=1, s=1,
                   view_angle=45.0,
                   view_distance=10.0
                   ):
-    with parallel.run_time():
+    with run_time.run_time():
         Harmonic = Schroedinger.Schroedinger(resolution, timesteps, L, dt, g=g, imag_time=imag_time, dim=dim, s=s,
                                              psi_0=psi_0, V=V,
                                              psi_sol=psi_sol,
                                              )
 
-    ani = Animation.Animation(dim=dim)
+    if dim < 3:
+        # matplotlib for 1D and 2D
+        ani = Animation.Animation(dim=dim)
 
-    if ani.dim == 1:
-        ani.set_limits(0, 0, *x_lim, *y_lim)
+        if ani.dim == 1:
+            ani.set_limits(0, 0, *x_lim, *y_lim)
+        elif ani.dim == 2:
+            ani.ax.set_xlim(*x_lim)
+            ani.ax.set_ylim(*y_lim)
+            ani.ax.set_zlim(*z_lim)
+            ani.ax.view_init(view_height, view_angle)
+            ani.ax.dist = view_distance
+
+        # ani.set_limits_smart(0, Harmonic)
+
+        with run_time.run_time():
+            ani.start(Harmonic, file_name)
     else:
-        ani.ax.set_xlim(*x_lim)
-        ani.ax.set_ylim(*y_lim)
-        ani.ax.set_zlim(*z_lim)
-        ani.ax.view_init(view_height, view_angle)
-        ani.ax.dist = view_distance
-
-    # ani.set_limits_smart(0, Harmonic)
-
-    with parallel.run_time():
-        ani.start(Harmonic, file_name)
+        # mayavi for 3D
+        may = MayaviAnimation.MayaviAnimation(dim=dim)
+        with run_time.run_time():
+            may.animate(Harmonic, x_lim=x_lim, y_lim=y_lim, z_lim=z_lim)
+        may.create_movie(input_data_file_pattern="*.png", filename="anim.mp4")
 
 
 # Script runs, if script is run as main script (called by python *.py)
@@ -97,8 +107,8 @@ if __name__ == "__main__":
             print(f"i={i}, L={L}, g={g}, dt={dt}")
             file_name = f"split_{i:03}.mp4"
             psi_sol = functools.partial(functions.thomas_fermi, g=g)
-            e.submit(simulate_case, resolution, timesteps=30, L=L, g=g, dt=dt, imag_time=True, dim=2, s=1,
-                     psi_0=psi_0_2d, V=V_2d, psi_sol=psi_sol, file_name=file_name,
+            e.submit(simulate_case, resolution, timesteps=30, L=L, g=g, dt=dt, imag_time=True, dim=3, s=1,
+                     psi_0=psi_0_3d, V=V_3d, psi_sol=psi_sol, file_name=file_name,
                      x_lim=(-8, 8),
                      y_lim=(-5, 5),
                      z_lim=(0, 0.4),

@@ -78,7 +78,7 @@ def psi_gauss_2d(x, y, a=1.0, x_0=0.0, y_0=0.0, k_0=0.0):
                              + ((y - y_0) * 1.0) ** 2) / (a ** 2) + 1j * x * k_0))
 
 
-def psi_gauss_3d(x, y, z, a, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0):
+def psi_gauss_3d(x, y, z, a=1.0, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0):
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
@@ -267,5 +267,5 @@ if __name__ == '__main__':
     y = np.linspace(-L, L, resolution)
     x_mesh, y_mesh, pos = get_meshgrid(x, y)
     Animation.plot_2d(L=L, resolution=resolution,
-                      x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(0.0, 0.025),
+                      x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(0.0, 0.040),
                       alpha=[0.6, 0.8], pos=[pos, pos], func=[lambda pos: np.abs(psi_0_2d(pos)) ** 2, V_2d])

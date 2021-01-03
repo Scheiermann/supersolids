@@ -8,9 +8,9 @@ email: daniel.scheiermann@stud.uni-hannover.de
 license: MIT
 Please feel free to use and modify this, but keep the above information. Thanks!
 """
+import sys
 
 import numpy as np
-import sys
 
 from supersolids import functions
 
@@ -60,12 +60,7 @@ class Schroedinger(object):
         self.dx = float(2.0 * L / self.resolution)
         self.dkx = float(np.pi / self.L)
 
-        # TODO: This can probably be done with sp.ttf.fftshift
-        # self.kx = sp.fft.fftshift(self.psi_val)
-        k_over_0 = np.arange(0.0, resolution / 2.0, 1.0)
-        k_under_0 = np.arange(-resolution / 2.0, 0.0, 1.0)
-
-        self.kx = np.concatenate((k_over_0, k_under_0), axis=0) * self.dkx
+        self.kx = np.fft.fftfreq(resolution, d=1.0/(self.dkx * self.resolution))
         self.k_squared = self.kx ** 2.0
 
         if imag_time:
@@ -79,13 +74,13 @@ class Schroedinger(object):
             self.y = np.linspace(-self.L, self.L, self.resolution)
             self.dy = float(2 * L / self.resolution)
             self.dky = float(np.pi / self.L)
-            self.ky = np.concatenate((k_over_0, k_under_0), axis=0) * self.dky
+            self.ky = np.fft.fftfreq(resolution, d=1.0 / (self.dky * self.resolution))
             self.k_squared += self.ky ** 2.0
         if dim >= 3:
             self.z = np.linspace(-self.L, self.L, self.resolution)
             self.dz = float(2 * L / self.resolution)
             self.dkz = float(np.pi / self.L)
-            self.kz = np.concatenate((k_over_0, k_under_0), axis=0) * self.dkz
+            self.kz = np.fft.fftfreq(resolution, d=1.0 / (self.dkz * self.resolution))
             self.k_squared += self.kz ** 2.0
         if dim > 3:
             print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
@@ -104,6 +99,22 @@ class Schroedinger(object):
             self.psi_val = self.psi(self.pos)
             self.V_val = self.V(self.pos)
             self.psi_sol_val = self.psi_sol(self.pos)
+
+            # here a number (U) is multiplied elementwise with an 1D array (k_squared)
+            self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
+
+            # here a number (g, then U) is multiplied elementwise with an 2D array (psi_val, then the sum)
+            # Here we use half steps in real space, but will use it before and after H_kin with normal steps
+            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
+
+        elif dim == 3:
+            self.x_mesh, self.y_mesh, self.z_mesh = np.mgrid[self.x[0]:self.x[-1]:complex(0, self.resolution),
+                                                             self.y[0]:self.y[-1]:complex(0, self.resolution),
+                                                             self.z[0]:self.z[-1]:complex(0, self.resolution)
+                                                             ]
+            self.psi_val = self.psi(self.x_mesh, self.y_mesh, self.z_mesh)
+            self.V_val = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
+            # self.psi_sol_val = self.psi_sol(self.x_mesh, self.y_mesh, self.z_mesh)
 
             # here a number (U) is multiplied elementwise with an 1D array (k_squared)
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)

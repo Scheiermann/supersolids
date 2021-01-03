@@ -72,7 +72,6 @@ if __name__ == "__main__":
 
     x, y, z = np.mgrid[-R:R:complex(0, resolution), -R:R:complex(0, resolution), -R:R:complex(0, resolution)]
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0)
-    prob_3d = np.abs(psi_0_3d(x, y, z)) ** 2
 
     dir_path = Path(__file__).parent
     fig.scene.disable_render = False
