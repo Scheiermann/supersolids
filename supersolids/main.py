@@ -93,8 +93,8 @@ if __name__ == "__main__":
 
     # functions needed for the Schroedinger equation (e.g. potential: V, initial wave function: psi_0)
     V_1d = functions.v_harmonic_1d
-    V_2d = functions.v_harmonic_2d
-    V_3d = functions.v_harmonic_3d
+    V_2d = functools.partial(functions.v_harmonic_2d, alpha_y=1.0)
+    V_3d = functools.partial(functions.v_harmonic_3d, alpha_y=1.0, alpha_z=1.0)
 
     # functools.partial sets all arguments except x, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)

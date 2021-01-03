@@ -232,12 +232,12 @@ def v_harmonic_2d(pos):
     return v_2d(x, y)
 
 
-def v_2d(x, y):
+def v_2d(x, y, alpha_y=1.0):
     return 0.5 * (x ** 2 + y ** 2)
 
 
-def v_harmonic_3d(x, y, z):
-    return 0.5 * (x ** 2 + y ** 2 + z ** 2)
+def v_harmonic_3d(x, y, z, alpha_y=1.0, alpha_z=1.0):
+    return 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2)
 
 
 # Script runs, if script is run as main script (called by python *.py)
