@@ -14,6 +14,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
 from matplotlib import cm
+from typing import Tuple
 
 from supersolids import Schroedinger, functions
 
@@ -51,7 +52,7 @@ class Animation:
             self.ax.set_zlabel(r'$z$')
             self.ax.grid()
 
-    def set_limits(self, row, col, x_min, x_max, y_min, y_max):
+    def set_limits(self, row: int, col: int, x_min: float, x_max: float, y_min: float, y_max: float):
         """
         Sets the plot limits appropriate even if the initial wave function psi_0 is not normalized
 
@@ -80,7 +81,7 @@ class Animation:
         self.axs[row, col].set_xlim(x_min, x_max)
         self.axs[row, col].set_ylim(y_lim)
 
-    def set_limits_smart(self, row, col, System: Schroedinger.Schroedinger):
+    def set_limits_smart(self, row: int, col: int, System: Schroedinger.Schroedinger):
         """
         Sets the plot limits appropriate even if the initial wave function psi_0 is not normalized
 
@@ -118,7 +119,7 @@ class Animation:
 
         self.set_limits(row, col, x_min, x_max, y_min, y_max)
 
-    def get_V_plot_values(self, i, j, System: Schroedinger.Schroedinger, reserve=1.0):
+    def get_V_plot_values(self, i: int, j: int, System: Schroedinger.Schroedinger, reserve: float = 1.0):
         if System.dim == 1:
             ylim = self.axs[i, j].get_ylim()
             # as the plot should be completely shown in the box (we choose a reserve here: 1.5)
@@ -140,7 +141,7 @@ class Animation:
 
         return V_pos, V_plot_val
 
-    def animate(self, frame_index, System: Schroedinger.Schroedinger):
+    def animate(self, frame_index: int, System: Schroedinger.Schroedinger):
         """
         Sets the plot limits appropriate even if the initial wave function psi_0 is not normalized
 
@@ -271,7 +272,12 @@ class Animation:
         anim.save("results" + sep + file_name, fps=15, dpi=300, extra_args=['-vcodec', 'libx264'])
 
 
-def plot_2d(resolution=32, x_lim=(-1, 1), y_lim=(-1, 1), z_lim=(0, 1), alpha=0.6, **kwargs):
+def plot_2d(resolution=32,
+            x_lim: Tuple[float, float] = (-1, 1),
+            y_lim: Tuple[float, float] = (-1, 1),
+            z_lim: Tuple[float, float] = (0, 1),
+            alpha: float = 0.6,
+            **kwargs):
     """
 
     Parameters
@@ -341,7 +347,7 @@ def plot_2d(resolution=32, x_lim=(-1, 1), y_lim=(-1, 1), z_lim=(0, 1), alpha=0.6
     plt.show()
 
 
-def round_z_to_0(pos, func, tol=1.0e-5):
+def round_z_to_0(pos, func, tol: float = 1.0e-5):
     z = func(pos)
     z.real[abs(z.real) < tol] = 0.0
 
@@ -375,7 +381,7 @@ def crop_pos_to_limits(ax, pos, func, func_val=None):
     return pos_cropped, z_cropped
 
 
-def get_V_plot_values(ax, pos, V, resolution, reserve=1.0):
+def get_V_plot_values(ax, pos, V, resolution: int, reserve: float = 1.0):
     Z = V(pos)
     zlim = ax.get_zlim()
 

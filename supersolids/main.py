@@ -65,7 +65,7 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1.1
             ani.start(Harmonic, file_name)
     else:
         # mayavi for 3D
-        may = MayaviAnimation.MayaviAnimation(dim=dim)
+        may = MayaviAnimation.MayaviAnimation(dim=3)
         with run_time.run_time():
             # may.animate(Harmonic)
             may.animate(Harmonic, accuracy=accuracy, x_lim=x_lim, y_lim=y_lim, z_lim=z_lim,
@@ -75,7 +75,7 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1.1
         # print(f"{Harmonic.t}, {Harmonic.dt * Harmonic.timesteps}")
         # if Harmonic.t >= Harmonic.dt * Harmonic.timesteps:
         #     mlab.close()
-        may.create_movie(input_data_file_pattern="*.png", filename=file_name)
+        MayaviAnimation.create_movie(may.dir_path, input_data_file_pattern="*.png", filename=file_name)
 
 
 # Script runs, if script is run as main script (called by python *.py)

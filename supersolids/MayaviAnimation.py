@@ -14,6 +14,7 @@ from pathlib import Path
 import numpy as np
 import ffmpeg
 from mayavi import mlab
+from typing import Tuple
 
 from supersolids import Animation, functions, Schroedinger
 
@@ -29,8 +30,8 @@ def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str
                Path where to look for old directories (movie data)
     dir_name : str
                General name of the directories without the counter
-    counting_format :
-                     Format of counter of the directories
+    counting_format : str
+                      Format of counter of the directories
 
     Returns
     -------
@@ -39,7 +40,7 @@ def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str
     # "movie" and "%03d" strings are hardcoded in mayavi movie_maker _update_subdir
     existing = sorted([x for x in dir_path.glob(dir_name + "*") if x.is_dir()])
     try:
-       last_index = int(existing[-1].name.split(dir_name)[1])
+        last_index = int(existing[-1].name.split(dir_name)[1])
     except Exception as e:
         assert last_index is not None, ("Extracting last index from dir_path failed")
     input_path = Path(dir_path, dir_name + counting_format % last_index)
@@ -48,8 +49,36 @@ def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str
 
 
 @mlab.animate(delay=10, ui=True)
-def animate(System: Schroedinger.Schroedinger, accuracy=10**-6, x_lim=(-1, 1), y_lim=(-1, 1), z_lim=(-1, 1),
-            slice_x_index=0, slice_y_index=0):
+def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
+            x_lim: Tuple[float, float] = (-1, 1),
+            y_lim: Tuple[float, float] = (-1, 1),
+            z_lim: Tuple[float, float] = (-1, 1),
+            slice_x_index: int = 0, slice_y_index: int = 0):
+    """
+    Animates solving of the Schroedinger equations of System with mayavi in 3D.
+    Animation is limited to System.timesteps or the convergence according to accuracy.
+
+    Parameters
+    ----------
+    System : Schroedinger.Schoredinger
+             Schrödinger equations for the specified system
+
+    accuracy : float
+               Convergence is reached when relative error of s ios smaller than accuracy,
+               where s is System.s = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+
+    x_lim : Tuple[float, float]
+    y_lim : Tuple[float, float]
+    z_lim : Tuple[float, float]
+    slice_x_index : int
+                    Index of projection in terms of indexes of System.x
+    slice_y_index : int
+                    Index of projection in terms of indexes of System.y
+
+    Returns
+    -------
+
+    """
     prob_3d = np.abs(System.psi_val) ** 2
     p = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d,
                        colormap="spectral", opacity=0.5, transparent=True)
@@ -75,6 +104,48 @@ def animate(System: Schroedinger.Schroedinger, accuracy=10**-6, x_lim=(-1, 1), y
         slice_y.mlab_source.trait_set(scalars=prob_3d)
         p.mlab_source.trait_set(scalars=prob_3d)
         yield
+
+
+def create_movie(dir_path,
+                 input_data_file_pattern: str = "*.png",
+                 filename: str = "anim.mp4",
+                 delete_input: bool = True):
+    """
+    Creates movie filename with all matching pictures from input_data_file_pattern.
+    By default deletes all input pictures after creation of movie to save disk space.
+
+    Parameters
+    ----------
+    delete_input : bool
+                   Flag to delete input_data after creation of movie
+    dir_path : Path
+               Path where to look for old directories (movie data)
+
+    input_data_file_pattern : str
+                              regex pattern to find all input data
+
+    filename : str
+              filename with filetype to save the movie to
+
+    Returns
+    -------
+
+    """
+    input_path = get_image_path(dir_path)
+    input_data = Path(input_path, input_data_file_pattern)
+    output_path = Path(input_path, filename)
+    print(f"input_data: {input_data}")
+
+    # requires either mencoder or ffmpeg to be installed on your system
+    # from command line:
+    # ffmpeg -f image2 -r 10 -i anim%05d.png -qscale 0 anim.mp4 -pass 2
+    ffmpeg.input(input_data, pattern_type="glob", framerate=25).output(str(output_path)).run()
+
+    if delete_input:
+        # remove all input files
+        input_data_used = [x for x in input_path.glob(input_data_file_pattern) if x.is_file()]
+        for trash_file in input_data_used:
+            trash_file.unlink()
 
 
 class MayaviAnimation:
@@ -106,17 +177,6 @@ class MayaviAnimation:
         # set dir_path to save images to
         self.fig.scene.movie_maker.directory = self.dir_path
 
-    def create_movie(self, input_data_file_pattern="*.png", filename="anim.mp4"):
-        input_path = get_image_path(self.dir_path)
-        input_data = Path(input_path, input_data_file_pattern)
-        output_path = Path(input_path, filename)
-        print(input_data)
-
-        # requires either mencoder or ffmpeg to be installed on your system
-        # from command line:
-        # ffmpeg -f image2 -r 10 -i anim%05d.png -qscale 0 anim.mp4 -pass 2
-        ffmpeg.input(input_data, pattern_type="glob", framerate=25).output(str(output_path)).run()
-
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
@@ -129,4 +189,4 @@ if __name__ == "__main__":
     may = MayaviAnimation(dim=Harmonic.dim)
     animate(Harmonic, x_lim=(-10, 5), y_lim=(-1, 1), z_lim=(-1, 1))
     mlab.show()
-    may.create_movie(input_data_file_pattern="*.png", filename="anim.mp4")
+    create_movie(may.dir_path, input_data_file_pattern="*.png", filename="anim.mp4")
