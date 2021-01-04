@@ -20,8 +20,8 @@ setup(
     license="MIT",
     author="Scheiermann",
     author_email="daniel.scheiermann@stud.uni-hannover.de",
-    install_requires=["apptools", "envisage", "ffmpeg-python", "matplotlib", "numpy", "psutil", "scipy",
-                      "sympy", "traits", "traitsui"],
+    install_requires=["apptools", "envisage", "ffmpeg-python", "matplotlib", "mayavi", "numpy", "psutil", "PyQt5",
+                      "scipy", "sympy", "traits", "traitsui", "vtk"],
     # ext_modules=cythonize("*.pyx", language_level=3),
     python_requires=">=3.8",
     description="Notes and script to supersolids"

@@ -1,8 +1,7 @@
-setuptools~=50.3.2
-psutil~=5.7.2
-numpy~=1.19.4
-mayavi~=4.7.3.dev0
-supersolids~=0.1.13
-matplotlib~=3.3.3
-scipy~=1.6.0
-sympy~=1.7.1
+setuptools
+psutil
+numpy
+mayavi
+matplotlib
+scipy
+sympy
