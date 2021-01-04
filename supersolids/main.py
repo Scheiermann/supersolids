@@ -75,7 +75,7 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1.1
         # print(f"{Harmonic.t}, {Harmonic.dt * Harmonic.timesteps}")
         # if Harmonic.t >= Harmonic.dt * Harmonic.timesteps:
         #     mlab.close()
-        MayaviAnimation.create_movie(may.dir_path, input_data_file_pattern="*.png", filename=file_name)
+        may.create_movie(input_data_file_pattern="*.png", filename=file_name)
 
 
 # Script runs, if script is run as main script (called by python *.py)
@@ -126,7 +126,7 @@ if __name__ == "__main__":
                   )
     print("Single core done")
 
-    # TODO: get mayavi concurrent to work
+    # TODO: get mayavi concurrent to work (problem with mlab.figure())
     i: int = 0
     with futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
         for L, g, dt, mu_sol in cases:

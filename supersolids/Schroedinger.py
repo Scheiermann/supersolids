@@ -51,12 +51,10 @@ class Schroedinger(object):
         self.imag_time = imag_time
         self.dim = dim
 
-        print(f"{self.g}")
         self.mu_sol = mu_sol(self.g)
 
         # s = - ln(N) / (2 * dtau), where N is the norm of the psi
         self.s = s
-        print(f"init s: {self.s}")
 
         # E = mu - 0.5 * g * int psi_val ** 2
         self.E = E

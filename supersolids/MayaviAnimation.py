@@ -106,76 +106,81 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
         yield
 
 
-def create_movie(dir_path,
-                 input_data_file_pattern: str = "*.png",
-                 filename: str = "anim.mp4",
-                 delete_input: bool = True):
-    """
-    Creates movie filename with all matching pictures from input_data_file_pattern.
-    By default deletes all input pictures after creation of movie to save disk space.
-
-    Parameters
-    ----------
-    delete_input : bool
-                   Flag to delete input_data after creation of movie
-    dir_path : Path
-               Path where to look for old directories (movie data)
-
-    input_data_file_pattern : str
-                              regex pattern to find all input data
-
-    filename : str
-              filename with filetype to save the movie to
-
-    Returns
-    -------
-
-    """
-    input_path = get_image_path(dir_path)
-    input_data = Path(input_path, input_data_file_pattern)
-    output_path = Path(input_path, filename)
-    print(f"input_data: {input_data}")
-
-    # requires either mencoder or ffmpeg to be installed on your system
-    # from command line:
-    # ffmpeg -f image2 -r 10 -i anim%05d.png -qscale 0 anim.mp4 -pass 2
-    ffmpeg.input(input_data, pattern_type="glob", framerate=25).output(str(output_path)).run()
-
-    if delete_input:
-        # remove all input files
-        input_data_used = [x for x in input_path.glob(input_data_file_pattern) if x.is_file()]
-        for trash_file in input_data_used:
-            trash_file.unlink()
-
-
 class MayaviAnimation:
     mayavi_counter: int = 0
     animate = staticmethod(animate)
 
-    def __init__(self, dim=3):
+    def __init__(self, dim=3, dir_path=Path(__file__).parent.joinpath("results")):
         """
         Creates an Animation with mayavi for a Schroedinger equation
         Methods need the object Schroedinger with the parameters of the equation
         """
+        if not dir_path.is_dir():
+            dir_path.mkdir(parents=True)
+
         MayaviAnimation.mayavi_counter += 1
         self.dim = dim
 
-        print("start")
         self.fig = mlab.figure()
-        print("end")
         mlab.title("")
         self.ax = mlab.axes(line_width=2, nb_labels=5)
         self.ax.axes.visibility = True
 
         # dir_path need to be saved to access it after the figure closed
-        self.dir_path = Path(__file__).parent
+        self.dir_path = dir_path
 
         self.fig.scene.disable_render = False
         # anti_aliasing default is 8, and removes resolution issues when downscaling, but takes longer
         self.fig.scene.anti_aliasing_frames = 8
         self.fig.scene.movie_maker.record = True
         # set dir_path to save images to
-        self.fig.scene.movie_maker.directory = self.dir_path
+        self.fig.scene.movie_maker.directory = dir_path
+
+    def create_movie(self,
+                     dir_path: Path = None,
+                     input_data_file_pattern: str = "*.png",
+                     filename: str = "anim.mp4",
+                     delete_input: bool = True):
+        """
+        Creates movie filename with all matching pictures from input_data_file_pattern.
+        By default deletes all input pictures after creation of movie to save disk space.
+
+        Parameters
+        ----------
+        delete_input : bool
+                       Flag to delete input_data after creation of movie
+        dir_path : Path
+                   Path where to look for old directories (movie data)
+
+        input_data_file_pattern : str
+                                  regex pattern to find all input data
+
+        filename : str
+                  filename with filetype to save the movie to
+
+        Returns
+        -------
+
+        """
+        if dir_path is None:
+            input_path = get_image_path(self.dir_path)
+        else:
+            input_path = get_image_path(dir_path)
+
+        input_data = Path(input_path, input_data_file_pattern)
+        output_path = Path(input_path, filename)
+        print(f"input_data: {input_data}")
+
+        # requires either mencoder or ffmpeg to be installed on your system
+        # from command line:
+        # ffmpeg -f image2 -r 10 -i anim%05d.png -qscale 0 anim.mp4 -pass 2
+        ffmpeg.input(input_data, pattern_type="glob", framerate=25).output(str(output_path)).run()
+
+        if delete_input:
+            # remove all input files
+            input_data_used = [x for x in input_path.glob(input_data_file_pattern) if x.is_file()]
+            for trash_file in input_data_used:
+                trash_file.unlink()
 
 
 # Script runs, if script is run as main script (called by python *.py)
@@ -186,7 +191,7 @@ if __name__ == "__main__":
                                          V=functions.v_harmonic_3d,
                                          psi_sol=functions.thomas_fermi
                                          )
-    may = MayaviAnimation(dim=Harmonic.dim)
-    animate(Harmonic, x_lim=(-10, 5), y_lim=(-1, 1), z_lim=(-1, 1))
+    may = MayaviAnimation(dim=Harmonic.dim, dir_path=Path(__file__).parent.joinpath("results"))
+    may.animate(Harmonic, x_lim=(-10, 5), y_lim=(-1, 1), z_lim=(-1, 1))
     mlab.show()
-    create_movie(may.dir_path, input_data_file_pattern="*.png", filename="anim.mp4")
+    may.create_movie(dir_path=None, input_data_file_pattern="*.png", filename="anim.mp4")
