@@ -8,22 +8,30 @@ Please read the **CONTRIBUTING.md**.
 
 For the animation to work, ffmpeg needs to be installed on your system.
 
+For **python3.9** currently there is no vtk wheel for python3.9, so you need to build it from source or use my build:  
+git clone https://github.com/Scheiermann/vtk_python39_wheel. Go to the directory vtk_python39_wheel/,
+where the wheel lies (*.whl).  
+Use this wheel to install, e.g:  
+pip install vtk-9.0.20210105-cp39-cp39-linux_x86_64.whl
+Then install mayavi (pip install mayavi or also build it from source, as there could be incapabilities with vtk9).  
+
 ### Arch based systems  
+For **python3.9** follow the instructions above, then continue with (else do the following):  
 Go to the directory, where you build your AUR packages.  
 Run the following in console:  
 "mkdir python-supersolids"  
 "cd python-supersolids"  
 Download the PKGBUILD and place it there.  
 Run "makepkg -sic" in console, where the PKGBUILD lies.  
-For **python3.9** currently there is no vtk wheel for python3.9, so you need to build it from source  
-and then install mayavi (pip install mayavi or also build it from source, as there could be incapabilities with vtk9).  
 This downloads the packages, extract it, gets the dependencies and installs it automatically  
-(you can do it manually for example with "sudo pacman -U python-supersolids-0.1.14-1-any.pkg.tar.zst")  
+(you can do it manually for example with "sudo pacman -U python-supersolids-0.1.15-1-any.pkg.tar.zst")  
 
 ### With pip  
+For **python3.9** follow the instructions above, then continue with (else do the following):  
 Go to the directory supersolids/dist/, where the wheel lies (*.whl).  
 Use this wheel to install, e.g:  
-pip install supersolids-0.1.14-py3-none-any.whl
+pip install supersolids-0.1.15-py3-none-any.whl  
+
 
 ### With setup.py  
 Go to the directory, where the "setup.py" lies.  
