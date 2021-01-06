@@ -99,7 +99,7 @@ class Schroedinger(object):
             self.psi_sol_val = self.psi_sol(self.x)
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
             # Here we use half steps in real space, but will use it before and after H_kin with normal steps
-            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
+            # self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
 
         elif dim == 2:
             self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
@@ -112,7 +112,7 @@ class Schroedinger(object):
 
             # here a number (g, then U) is multiplied elementwise with an 2D array (psi_val, then the sum)
             # Here we use half steps in real space, but will use it before and after H_kin with normal steps
-            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
+            # self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
 
         elif dim == 3:
             self.x_mesh, self.y_mesh, self.z_mesh = np.mgrid[self.x[0]:self.x[-1]:complex(0, self.resolution),
@@ -128,7 +128,7 @@ class Schroedinger(object):
 
             # here a number (g, then U) is multiplied elementwise with an 2D array (psi_val, then the sum)
             # Here we use half steps in real space, but will use it before and after H_kin with normal steps
-            self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
+            # self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
 
         # attributes for animation
         self.t = 0.0
@@ -163,34 +163,33 @@ class Schroedinger(object):
     def time_step(self):
         # H_kin is just dependend on U and the gridpoints, which are constants, so it does not need to be recaculated
         # update H_pot before use
-        self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
+        H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
 
         # multiply element-wise the 2D with each other (not np.multiply)
-        self.psi_val = self.H_pot * self.psi_val
+        self.psi_val = H_pot * self.psi_val
 
-        self.psi_val = np.fft.fft(self.psi_val)
-
+        self.psi_val = np.fft.fftn(self.psi_val)
         # multiply element-wise the 2D with each other (not np.multiply)
         self.psi_val = self.H_kin * self.psi_val
-
-        self.psi_val = np.fft.ifft(self.psi_val)
+        self.psi_val = np.fft.ifftn(self.psi_val)
 
         # update H_pot before use
-        self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
+        H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
 
         # multiply element-wise the 2D with each other (not np.multiply)
-        self.psi_val = self.H_pot * self.psi_val
+        self.psi_val = H_pot * self.psi_val
 
         self.t += self.dt
 
         # for self.imag_time=False, renormalization should be preserved, but we play safe here (regardless of speedup)
         # if self.imag_time:
         psi_norm_after_evolution = self.get_norm(p=2.0)
+        self.psi_val /= np.sqrt(psi_norm_after_evolution)
+
         psi_quadratic_integral = self.get_norm(p=4.0)
 
         self.s = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
         self.E = self.s - 0.5 * self.g * psi_quadratic_integral
 
-        self.psi_val /= np.sqrt(psi_norm_after_evolution)
-        # print(f"s: {self.s}")
+        print(f"s: {self.s}")
         print(f"E: {self.E}, E_sol: {self.mu_sol - 0.5 * self.g * psi_quadratic_integral}")

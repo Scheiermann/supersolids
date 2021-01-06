@@ -53,7 +53,8 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
             x_lim: Tuple[float, float] = (-1, 1),
             y_lim: Tuple[float, float] = (-1, 1),
             z_lim: Tuple[float, float] = (-1, 1),
-            slice_x_index: int = 0, slice_y_index: int = 0):
+            slice_x_index: int = 0, slice_y_index: int = 0,
+            psi_sol=functions.thomas_fermi_3d):
     """
     Animates solving of the Schroedinger equations of System with mayavi in 3D.
     Animation is limited to System.timesteps or the convergence according to accuracy.
@@ -91,6 +92,10 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
                                 plane_orientation="y_axes",
                                 slice_index=slice_y_index,
                                 extent=[*x_lim, *y_lim, *z_lim])
+
+    sol = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, psi_sol,
+                         colormap="spectral", opacity=0.5, transparent=True)
+
     for i in range(0, System.timesteps):
         s_old = System.s
         System.time_step()
@@ -103,6 +108,7 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
         slice_x.mlab_source.trait_set(scalars=prob_3d)
         slice_y.mlab_source.trait_set(scalars=prob_3d)
         p.mlab_source.trait_set(scalars=prob_3d)
+        # sol.mlab_source.trait_set(scalars=psi_sol)
         yield
 
 

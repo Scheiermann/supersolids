@@ -221,6 +221,65 @@ def thomas_fermi(x, g):
         return None
 
 
+def thomas_fermi_2d(x, y, g):
+    """
+     Mathematical function of Thomas-Fermi distribution with coupling constant g
+
+     Parameters
+     ----------
+     x : sympy.symbol
+         mathematical variable
+
+     g : float
+        coupling constant
+    """
+
+    if g != 0:
+        # mu is the chemical potential
+        mu = mu_2d(g)
+
+        # this needs to be >> 1, e.g 5.3
+        # print(np.sqrt(2 * mu))
+
+        return mu * (1 - ((x ** 2 + y ** 2) / (2 * mu))) / g
+
+    else:
+        return None
+
+
+def thomas_fermi_3d(x, y, z, g):
+    """
+     Mathematical function of Thomas-Fermi distribution with coupling constant g
+
+     Parameters
+     ----------
+     x : sympy.symbol
+         mathematical variable
+
+     g : float
+        coupling constant
+    """
+
+    if g != 0:
+        # mu is the chemical potential
+        mu = mu_3d(g)
+
+        # this needs to be >> 1, e.g 5.3
+        # print(np.sqrt(2 * mu))
+
+        return mu * (1 - ((x ** 2 + y ** 2 + z ** 2) / (2 * mu))) / g
+
+    else:
+        return None
+
+
+def mu_2d(g):
+    # mu is the chemical potential
+    mu = np.sqrt(g / np.pi)
+
+    return mu
+
+
 def mu_3d(g):
     # mu is the chemical potential
     mu = ((15 * g) / (16 * np.sqrt(2) * np.pi)) ** (2 / 5)
@@ -239,7 +298,8 @@ def v_harmonic_2d(pos):
     return v_2d(x, y)
 
 
-def v_2d(x, y, alpha_y=1.0):
+# def v_2d(x, y, alpha_y=1.0):
+def v_2d(x, y):
     return 0.5 * (x ** 2 + y ** 2)
 
 
