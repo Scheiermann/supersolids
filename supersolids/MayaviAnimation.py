@@ -53,8 +53,7 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
             x_lim: Tuple[float, float] = (-1, 1),
             y_lim: Tuple[float, float] = (-1, 1),
             z_lim: Tuple[float, float] = (-1, 1),
-            slice_x_index: int = 0, slice_y_index: int = 0,
-            psi_sol=functions.thomas_fermi_3d):
+            slice_x_index: int = 0, slice_y_index: int = 0):
     """
     Animates solving of the Schroedinger equations of System with mayavi in 3D.
     Animation is limited to System.timesteps or the convergence according to accuracy.
@@ -81,34 +80,37 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
 
     """
     prob_3d = np.abs(System.psi_val) ** 2
-    p = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d,
-                       colormap="spectral", opacity=0.5, transparent=True)
+    plot_prob = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d,
+                       colormap="spectral", opacity=System.alpha_psi, transparent=True)
 
-    slice_x = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
+    plot_slice_x = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
                                 plane_orientation="x_axes",
                                 slice_index=slice_x_index,
                                 extent=[*x_lim, *y_lim, *z_lim])
-    slice_y = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
+    plot_slice_y = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
                                 plane_orientation="y_axes",
                                 slice_index=slice_y_index,
                                 extent=[*x_lim, *y_lim, *z_lim])
 
-    sol = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, psi_sol,
-                         colormap="spectral", opacity=0.5, transparent=True)
+    plot_V = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, System.V_val,
+                         colormap="spectral", opacity=System.alpha_V, transparent=True)
+
+    # plot_psi_sol = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, System.psi_sol,
+    #                               colormap="spectral", opacity=System.alpha_V, transparent=True)
 
     for i in range(0, System.timesteps):
-        s_old = System.s
+        mu_old = System.mu
         System.time_step()
-        s_rel = np.abs((System.s - s_old) / System.s)
-        print(f"s_rel: {s_rel}")
-        if s_rel < accuracy:
-            print(f"accuracy reached: {s_rel}")
+        mu_rel = np.abs((System.mu - mu_old) / System.mu)
+        print(f"mu_rel: {mu_rel}")
+        if mu_rel < accuracy:
+            print(f"accuracy reached: {mu_rel}")
             break
         prob_3d = np.abs(System.psi_val) ** 2
-        slice_x.mlab_source.trait_set(scalars=prob_3d)
-        slice_y.mlab_source.trait_set(scalars=prob_3d)
-        p.mlab_source.trait_set(scalars=prob_3d)
-        # sol.mlab_source.trait_set(scalars=psi_sol)
+        plot_slice_x.mlab_source.trait_set(scalars=prob_3d)
+        plot_slice_y.mlab_source.trait_set(scalars=prob_3d)
+        plot_prob.mlab_source.trait_set(scalars=prob_3d)
+        # psi_sol.mlab_source.trait_set(scalars=psi_sol)
         yield
 
 
@@ -141,6 +143,7 @@ class MayaviAnimation:
         self.fig.scene.movie_maker.record = True
         # set dir_path to save images to
         self.fig.scene.movie_maker.directory = dir_path
+        self.fig.scene.show_axes = True
 
     def create_movie(self,
                      dir_path: Path = None,
@@ -183,7 +186,7 @@ class MayaviAnimation:
         ffmpeg.input(input_data, pattern_type="glob", framerate=25).output(str(output_path)).run()
 
         if delete_input:
-            # remove all input files
+            # remove all input files (pictures), after animation is created and saved
             input_data_used = [x for x in input_path.glob(input_data_file_pattern) if x.is_file()]
             for trash_file in input_data_used:
                 trash_file.unlink()

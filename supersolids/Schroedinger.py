@@ -35,6 +35,8 @@ class Schroedinger(object):
                  V=functions.v_harmonic_1d,
                  psi_sol=functions.thomas_fermi,
                  mu_sol=functions.mu_3d,
+                 alpha_psi=0.8,
+                 alpha_V=0.3,
                  ):
         """
         Parameters
@@ -53,8 +55,8 @@ class Schroedinger(object):
 
         self.mu_sol = mu_sol(self.g)
 
-        # s = - ln(N) / (2 * dtau), where N is the norm of the psi
-        self.s = s
+        # mu = - ln(N) / (2 * dtau), where N is the norm of the psi
+        self.mu = s
 
         # E = mu - 0.5 * g * int psi_val ** 2
         self.E = E
@@ -79,13 +81,13 @@ class Schroedinger(object):
         # Add attributes as soon as they are needed (e.g. for dimension 3, all besides the error are needed)
         if dim >= 2:
             self.y = np.linspace(-self.L, self.L, self.resolution)
-            self.dy = float(2 * L / self.resolution)
+            self.dy = float(2.0 * L / self.resolution)
             self.dky = float(np.pi / self.L)
             self.ky = np.fft.fftfreq(resolution, d=1.0 / (self.dky * self.resolution))
             self.k_squared += self.ky ** 2.0
         if dim >= 3:
             self.z = np.linspace(-self.L, self.L, self.resolution)
-            self.dz = float(2 * L / self.resolution)
+            self.dz = float(2.0 * L / self.resolution)
             self.dkz = float(np.pi / self.L)
             self.kz = np.fft.fftfreq(resolution, d=1.0 / (self.dkz * self.resolution))
             self.k_squared += self.kz ** 2.0
@@ -134,10 +136,10 @@ class Schroedinger(object):
         self.t = 0.0
 
         self.psi_line = None
-        self.alpha_psi = 0.5
+        self.alpha_psi = alpha_psi
 
         self.V_line = None
-        self.alpha_V = 0.5
+        self.alpha_V = alpha_V
 
         self.psi_sol_line = None
 
@@ -164,7 +166,6 @@ class Schroedinger(object):
         # H_kin is just dependend on U and the gridpoints, which are constants, so it does not need to be recaculated
         # update H_pot before use
         H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
-
         # multiply element-wise the 2D with each other (not np.multiply)
         self.psi_val = H_pot * self.psi_val
 
@@ -175,7 +176,6 @@ class Schroedinger(object):
 
         # update H_pot before use
         H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
-
         # multiply element-wise the 2D with each other (not np.multiply)
         self.psi_val = H_pot * self.psi_val
 
@@ -188,8 +188,8 @@ class Schroedinger(object):
 
         psi_quadratic_integral = self.get_norm(p=4.0)
 
-        self.s = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
-        self.E = self.s - 0.5 * self.g * psi_quadratic_integral
+        self.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+        self.E = self.mu - 0.5 * self.g * psi_quadratic_integral
 
-        print(f"s: {self.s}")
+        print(f"mu: {self.mu}")
         print(f"E: {self.E}, E_sol: {self.mu_sol - 0.5 * self.g * psi_quadratic_integral}")

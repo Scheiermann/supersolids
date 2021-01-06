@@ -291,15 +291,21 @@ def v_harmonic_1d(x):
     return 0.5 * x ** 2
 
 
-def v_harmonic_2d(pos):
+def thomas_fermi_2d_pos(pos, g=0.0):
     x = pos[:, :, 0]
     y = pos[:, :, 1]
 
-    return v_2d(x, y)
+    return thomas_fermi_2d(x, y, g=g)
 
 
-# def v_2d(x, y, alpha_y=1.0):
-def v_2d(x, y):
+def v_harmonic_2d(pos, alpha_y=1.0):
+    x = pos[:, :, 0]
+    y = pos[:, :, 1]
+
+    return v_2d(x, y, alpha_y=1.0)
+
+
+def v_2d(x, y, alpha_y=1.0):
     return 0.5 * (x ** 2 + y ** 2)
 
 

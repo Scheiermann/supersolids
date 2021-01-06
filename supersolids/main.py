@@ -29,13 +29,15 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1.1
                   V=functions.v_harmonic_1d,
                   psi_sol=functions.thomas_fermi_3d,
                   mu_sol=functions.mu_3d,
+                  alpha_psi=0.8,
+                  alpha_V=0.3,
                   file_name="split.mp4",
                   x_lim=(-1.0, 1.0),
                   y_lim=(-1.0, 1.0),
                   z_lim=(-1.0, 1.0),
                   slice_x_index=0, slice_y_index=0,
                   view_height=20.0,
-                  view_angle=45.0,
+                  view_angle=0.0,
                   view_distance=10.0,
                   delete_input=True):
     with run_time.run_time():
@@ -44,8 +46,9 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1.1
                                              psi_0=psi_0, V=V,
                                              psi_sol=psi_sol,
                                              mu_sol=mu_sol,
+                                             alpha_psi=alpha_psi,
+                                             alpha_V=alpha_V
                                              )
-
     if dim < 3:
         # matplotlib for 1D and 2D
         ani = Animation.Animation(dim=dim)
@@ -69,7 +72,7 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1.1
         with run_time.run_time():
             # may.animate(Harmonic)
             may.animate(Harmonic, accuracy=accuracy, x_lim=x_lim, y_lim=y_lim, z_lim=z_lim,
-                        slice_x_index=slice_x_index, slice_y_index=slice_y_index, psi_sol=psi_sol)
+                        slice_x_index=slice_x_index, slice_y_index=slice_y_index)
         mlab.show()
         # TODO: close window after last framself.z = np.linspace(-self.L, self.L, self.resolution)e
         # print(f"{Harmonic.t}, {Harmonic.dt * Harmonic.timesteps}")
@@ -92,7 +95,7 @@ if __name__ == "__main__":
     g_step = 10
     dt = 0.8
 
-    # box length [-L,L]
+    # box length in 1D: [-L,L], in 2D: [-L,L, -L,L], , in 3D: [-L,L, -L,L, -L,L]
     # generators for L, g, dt to compute for different parameters
     L_generator = (4,)
     g_generator = (i for i in np.arange(g, g + g_step, g_step))
@@ -106,26 +109,28 @@ if __name__ == "__main__":
     V_2d = functools.partial(functions.v_harmonic_2d, alpha_y=1.0)
     V_3d = functools.partial(functions.v_harmonic_3d, alpha_y=1.0, alpha_z=1.0)
 
-    # functools.partial sets all arguments except x, as multiple arguments for Schroedinger aren't implement yet
+    # functools.partial sets all arguments except x, y, z, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
     psi_0_1d = functools.partial(functions.psi_gauss_1d, a=1, x_0=0, k_0=0)
     psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
 
-    psi_sol_2d = functools.partial(functions.thomas_fermi_2d, g=g)
+    psi_sol_2d = functools.partial(functions.thomas_fermi_2d_pos, g=g)
     psi_sol_3d = functools.partial(functions.thomas_fermi_3d, g=g)
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    simulate_case(resolution, timesteps=500, L=L_generator[0], g=g, dt=dt, imag_time=True, dim=2,
+    simulate_case(resolution, timesteps=20, L=L_generator[0], g=g, dt=dt, imag_time=True, dim=2,
                   s=1.1, E=1.0,
                   psi_0=psi_0_2d, V=V_2d,
                   psi_sol=psi_sol_2d, mu_sol=mu_sol_list[0],
                   accuracy=10 ** -6,
+                  alpha_psi=0.8,
+                  alpha_V=0.3,
                   file_name="anim.mp4",
                   x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(-2, 2),
                   slice_x_index=resolution//2, slice_y_index=resolution//2,
-                  view_height=15.0, view_angle=75.0, view_distance=10.0
+                  view_height=35.0, view_angle=45.0, view_distance=10.0
                   )
     print("Single core done")
 
