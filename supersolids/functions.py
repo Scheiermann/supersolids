@@ -319,6 +319,25 @@ def v_harmonic_3d(x, y, z, alpha_y: float = 1.0, alpha_z: float = 1.0):
     return 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2)
 
 
+def camera_func_r(frame: int,
+                  r_0: float = 10.0,
+                  phi_0: float = 45.0,
+                  z_0: float = 20.0,
+                  r_per_frame: float = 10.0) -> float:
+    r = r_0 + r_per_frame * frame
+    return r
+
+
+def camera_func_phi(frame: int,
+                    r_0: float = 10.0,
+                    phi_0: float = 45.0,
+                    z_0: float = 20.0,
+                    phi_per_frame: float = 10.0) -> float:
+    phi = phi_0 + (2.0 * np.pi / 360.0) * phi_per_frame * frame
+    return phi
+
+
+
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == '__main__':
     # due to fft of the points the resolution needs to be 2 ** datapoints_exponent

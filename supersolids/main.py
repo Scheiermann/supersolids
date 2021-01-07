@@ -38,9 +38,12 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, s=1.1, E=1.0
                   z_lim=(-1.0, 1.0),
                   slice_x_index=0,
                   slice_y_index=0,
-                  view_height=20.0,
-                  view_angle=75.0,
-                  view_distance=10.0,
+                  r_func=None,
+                  phi_func=functools.partial(functions.camera_func_phi, phi_per_frame=20.0),
+                  z_func=None,
+                  camera_r=10.0,
+                  camera_phi=75.0,
+                  camera_z=20.0,
                   delete_input=True):
     with run_time.run_time():
         Harmonic = Schroedinger.Schroedinger(resolution, timesteps, L, dt, g=g, imag_time=imag_time,
@@ -55,7 +58,13 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, s=1.1, E=1.0
                                              )
     if dim < 3:
         # matplotlib for 1D and 2D
-        ani = Animation.Animation(dim=dim)
+        ani = Animation.Animation(dim=dim,
+                                  r_func=r_func,
+                                  phi_func=phi_func,
+                                  z_func=z_func,
+                                  camera_r=camera_r,
+                                  camera_phi=camera_phi,
+                                  camera_z=camera_z)
 
         if ani.dim == 1:
             ani.set_limits(0, 0, *x_lim, *y_lim)
@@ -63,8 +72,6 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, s=1.1, E=1.0
             ani.ax.set_xlim(*x_lim)
             ani.ax.set_ylim(*y_lim)
             ani.ax.set_zlim(*z_lim)
-            ani.ax.view_init(view_height, view_angle)
-            ani.ax.dist = view_distance
 
         # ani.set_limits_smart(0, Harmonic)
 
@@ -97,7 +104,7 @@ if __name__ == "__main__":
     # constants needed for the Schroedinger equation
     g = 0.0
     g_step = 10
-    dt = 0.2
+    dt = 0.05
 
     # box length in 1D: [-L,L], in 2D: [-L,L, -L,L], , in 3D: [-L,L, -L,L, -L,L]
     # generators for L, g, dt to compute for different parameters
@@ -127,19 +134,25 @@ if __name__ == "__main__":
     # 3D works in single core mode
     simulate_case(resolution, timesteps=40, L=L_generator[0], g=g, dt=dt, imag_time=True,
                   s=1.1, E=1.0,
-                  dim=3,
-                  psi_0=psi_0_3d,
-                  V=V_3d,
-                  psi_sol=psi_sol_3d,
-                  mu_sol=functions.mu_3d,
+                  dim=2,
+                  psi_0=psi_0_2d,
+                  V=V_2d,
+                  psi_sol=psi_sol_2d,
+                  mu_sol=functions.mu_2d,
                   accuracy=10**-6,
                   alpha_psi=0.8,
                   alpha_V=0.3,
                   file_name="anim.mp4",
                   x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(-2, 2),
-                  slice_x_index=resolution//2, slice_y_index=resolution//2, # just for mayavi (3D)
-                  view_height=20.0, view_angle=45.0, view_distance=10.0 # just for matplotlib (2D)
-                  )
+                  slice_x_index=resolution//2, slice_y_index=resolution//2,  # just for mayavi (3D)
+                  r_func=functools.partial(functions.camera_func_r, r_0=10.0, r_per_frame=0.01), # from here just 2D
+                  phi_func=functools.partial(functions.camera_func_phi, phi_0=45.0, phi_per_frame=20.0),
+                  z_func=functools.partial(functions.camera_func_r, r_0=20.0, r_per_frame=2.0),
+                  camera_r=10.0,
+                  camera_phi=45.0,
+                  camera_z=20.0,
+                  delete_input=True
+                 )
     print("Single core done")
 
     # TODO: get mayavi concurrent to work (problem with mlab.figure())

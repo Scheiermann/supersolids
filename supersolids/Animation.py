@@ -14,13 +14,38 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
 from matplotlib import cm
-from typing import Tuple
+from typing import Callable, Tuple
 
 from supersolids import Schroedinger, functions
 
 
+def camera_3d_trajectory(frame, r_func: Callable = None, phi_func: Callable = None, z_func: Callable = None,
+                         r_0: float = 10.0, phi_0: float = 45.0, z_0: float = 20.0) -> Tuple[float, float, float]:
+    if r_func is None:
+        r = r_0
+    else:
+        r = r_func(frame, r_0=r_0, phi_0=phi_0, z_0=z_0)
+    if phi_func is None:
+        phi = phi_0
+    else:
+        phi = phi_func(frame, r_0=r_0, phi_0=phi_0, z_0=z_0)
+    if z_func is None:
+        z = z_0
+    else:
+        z = z_func(frame, r_0=r_0, phi_0=phi_0, z_0=z_0)
+
+    return r, phi, z
+
+
 class Animation:
-    def __init__(self, dim=2):
+    def __init__(self,
+                 dim=2,
+                 r_func=None,
+                 phi_func=functions.camera_func_phi,
+                 z_func=None,
+                 camera_r: float = 10.0,
+                 camera_phi: float = 45.0,
+                 camera_z: float = 20.0):
         """
         Creates an Animation for a Schroedinger equation
         Methods need the object Schroedinger with the parameters of the equation
@@ -51,6 +76,15 @@ class Animation:
             self.ax.set_ylabel(r'$y$')
             self.ax.set_zlabel(r'$z$')
             self.ax.grid()
+
+            self.camera_r, self.camera_phi, self.camera_z = camera_r, camera_phi, camera_z
+            self.r_func = r_func
+            self.phi_func = phi_func
+            self.z_func = z_func
+
+            self.ax.dist = camera_r
+            self.ax.azim = camera_phi
+            self.ax.elev = camera_z
 
     def set_limits(self, row: int, col: int, x_min: float, x_max: float, y_min: float, y_max: float):
         """
@@ -205,6 +239,18 @@ class Animation:
             self.psi_sol_line.set_data(System.x, System.psi_sol_val)
         elif System.dim == 2:
             if frame_index >= 1:
+                # rotate camera
+                camera_r, camera_phi, camera_z = camera_3d_trajectory(frame_index,
+                                                                      r_func=self.r_func,
+                                                                      phi_func=self.phi_func,
+                                                                      z_func=self.z_func,
+                                                                      r_0=self.camera_r,
+                                                                      phi_0=self.camera_phi,
+                                                                      z_0=self.camera_z)
+                self.ax.dist = camera_r
+                self.ax.azim = camera_phi
+                self.ax.elev = camera_z
+
                 # here we crop the calculated mesh to the viewable mesh,
                 # but the rest is still calculated to not change the boundary conditions. Essentially we just zoom
                 psi_pos, psi_val = crop_pos_to_limits(self.ax, System.pos, System.psi, func_val=System.psi_val)
