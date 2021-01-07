@@ -48,7 +48,7 @@ def psi_gauss_2d_pdf(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.
     return z_mesh
 
 
-def psi_gauss_2d(x, y, a=1.0, x_0=0.0, y_0=0.0, k_0=0.0):
+def psi_gauss_2d(x, y, a: float = 1.0, x_0: float = 0.0, y_0: float = 0.0, k_0: float = 0.0):
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
@@ -78,7 +78,7 @@ def psi_gauss_2d(x, y, a=1.0, x_0=0.0, y_0=0.0, k_0=0.0):
                              + ((y - y_0) * 1.0) ** 2) / (a ** 2) + 1j * x * k_0))
 
 
-def psi_gauss_3d(x, y, z, a=1.0, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0):
+def psi_gauss_3d(x, y, z, a: float = 1.0, x_0: float = 0.0, y_0: float = 0.0, z_0: float = 0.0, k_0: float = 0.0):
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
@@ -115,7 +115,7 @@ def psi_gauss_3d(x, y, z, a=1.0, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0):
                              + ((z - z_0) * 1.0) ** 2) / (a ** 2) + 1j * x * k_0))
 
 
-def psi_gauss_1d(x, a=1.0, x_0=0.0, k_0=0.0):
+def psi_gauss_1d(x, a: float = 1.0, x_0: float = 0.0, k_0: float = 0.0):
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
@@ -138,7 +138,7 @@ def psi_gauss_1d(x, a=1.0, x_0=0.0, k_0=0.0):
             * np.exp(-0.5 * ((x - x_0) * 1. / a) ** 2 + 1j * x * k_0))
 
 
-def psi_pdf(x, loc=0.0, scale=1.0):
+def psi_pdf(x, loc: float = 0.0, scale: float = 1.0):
     """
     Mathematical function of gauss pulse
 
@@ -156,7 +156,7 @@ def psi_pdf(x, loc=0.0, scale=1.0):
     return stats.norm.pdf(x, loc=loc, scale=scale)
 
 
-def psi_rect(x, x_min, x_max, a):
+def psi_rect(x, x_min: float = -0.5, x_max: float = 0.5, a: float = 1.0):
     """
     Mathematical function of rectengular pulse between x_min and x_max with amplitude a
 
@@ -195,7 +195,7 @@ def psi_gauss_solution(x):
     return np.exp(-x ** 2) / np.sqrt(np.pi)
 
 
-def thomas_fermi(x, g):
+def thomas_fermi_1d(x, g: float = 0.0):
     """
      Mathematical function of Thomas-Fermi distribution with coupling constant g
 
@@ -221,7 +221,7 @@ def thomas_fermi(x, g):
         return None
 
 
-def thomas_fermi_2d(x, y, g):
+def thomas_fermi_2d(x, y, g: float = 0.0):
     """
      Mathematical function of Thomas-Fermi distribution with coupling constant g
 
@@ -247,7 +247,14 @@ def thomas_fermi_2d(x, y, g):
         return None
 
 
-def thomas_fermi_3d(x, y, z, g):
+def thomas_fermi_2d_pos(pos, g: float = 0.0):
+    x = pos[:, :, 0]
+    y = pos[:, :, 1]
+
+    return thomas_fermi_2d(x, y, g=g)
+
+
+def thomas_fermi_3d(x, y, z, g: float = 0.0):
     """
      Mathematical function of Thomas-Fermi distribution with coupling constant g
 
@@ -273,14 +280,14 @@ def thomas_fermi_3d(x, y, z, g):
         return None
 
 
-def mu_2d(g):
+def mu_2d(g: float = 0.0):
     # mu is the chemical potential
     mu = np.sqrt(g / np.pi)
 
     return mu
 
 
-def mu_3d(g):
+def mu_3d(g: float = 0.0):
     # mu is the chemical potential
     mu = ((15 * g) / (16 * np.sqrt(2) * np.pi)) ** (2 / 5)
 
@@ -291,14 +298,7 @@ def v_harmonic_1d(x):
     return 0.5 * x ** 2
 
 
-def thomas_fermi_2d_pos(pos, g=0.0):
-    x = pos[:, :, 0]
-    y = pos[:, :, 1]
-
-    return thomas_fermi_2d(x, y, g=g)
-
-
-def v_harmonic_2d(pos, alpha_y=1.0):
+def v_harmonic_2d(pos, alpha_y: float = 1.0):
     x = pos[:, :, 0]
     y = pos[:, :, 1]
 
@@ -309,7 +309,7 @@ def v_2d(x, y, alpha_y=1.0):
     return 0.5 * (x ** 2 + y ** 2)
 
 
-def v_harmonic_3d(x, y, z, alpha_y=1.0, alpha_z=1.0):
+def v_harmonic_3d(x, y, z, alpha_y: float = 1.0, alpha_z: float = 1.0):
     return 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2)
 
 

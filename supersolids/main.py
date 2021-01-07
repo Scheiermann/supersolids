@@ -25,8 +25,8 @@ from supersolids import Schroedinger
 
 
 def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1.1, E=1.0, accuracy=10**-6,
-                  psi_0=functions.psi_gauss_1d,
-                  V=functions.v_harmonic_1d,
+                  psi_0=functions.psi_gauss_3d,
+                  V=functions.v_harmonic_3d,
                   psi_sol=functions.thomas_fermi_3d,
                   mu_sol=functions.mu_3d,
                   alpha_psi=0.8,
@@ -37,7 +37,7 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1.1
                   z_lim=(-1.0, 1.0),
                   slice_x_index=0, slice_y_index=0,
                   view_height=20.0,
-                  view_angle=0.0,
+                  view_angle=75.0,
                   view_distance=10.0,
                   delete_input=True):
     with run_time.run_time():
@@ -115,22 +115,23 @@ if __name__ == "__main__":
     psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
 
+    psi_sol_1d = functools.partial(functions.thomas_fermi_1d, g=g)
     psi_sol_2d = functools.partial(functions.thomas_fermi_2d_pos, g=g)
     psi_sol_3d = functools.partial(functions.thomas_fermi_3d, g=g)
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    simulate_case(resolution, timesteps=20, L=L_generator[0], g=g, dt=dt, imag_time=True, dim=2,
+    simulate_case(resolution, timesteps=20, L=L_generator[0], g=g, dt=dt, imag_time=True, dim=1,
                   s=1.1, E=1.0,
-                  psi_0=psi_0_2d, V=V_2d,
-                  psi_sol=psi_sol_2d, mu_sol=mu_sol_list[0],
+                  psi_0=psi_0_1d, V=V_1d,
+                  psi_sol=psi_sol_1d, mu_sol=mu_sol_list[0],
                   accuracy=10 ** -6,
                   alpha_psi=0.8,
                   alpha_V=0.3,
                   file_name="anim.mp4",
                   x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(-2, 2),
                   slice_x_index=resolution//2, slice_y_index=resolution//2,
-                  view_height=35.0, view_angle=45.0, view_distance=10.0
+                  view_height=100.0, view_angle=45.0, view_distance=10.0 # These are just for matplotlib (2D)
                   )
     print("Single core done")
 

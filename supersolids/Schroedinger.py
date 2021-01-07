@@ -11,6 +11,7 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 import sys
 
 import numpy as np
+from typing import Callable
 
 from supersolids import functions
 
@@ -30,13 +31,14 @@ class Schroedinger(object):
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
 
-    def __init__(self, resolution, timesteps, L, dt, g=0.0, imag_time=False, dim=1, s=1.1, E=1.0,
-                 psi_0=functions.psi_gauss_1d,
-                 V=functions.v_harmonic_1d,
-                 psi_sol=functions.thomas_fermi,
-                 mu_sol=functions.mu_3d,
-                 alpha_psi=0.8,
-                 alpha_V=0.3,
+    def __init__(self, resolution: int, timesteps: int, L: float, dt: float, g: float = 0.0,
+                 imag_time: bool = True, dim: int = 3, s: float = 1.1, E: float = 1.0,
+                 psi_0: Callable = functions.psi_gauss_3d,
+                 V: Callable = functions.v_harmonic_3d,
+                 psi_sol: Callable = functions.thomas_fermi_3d,
+                 mu_sol: Callable = functions.mu_3d,
+                 alpha_psi: float = 0.8,
+                 alpha_V: float = 0.3,
                  ):
         """
         Parameters
@@ -149,7 +151,7 @@ class Schroedinger(object):
 
         self.V_z_line = None
 
-    def get_norm(self, p=2.0):
+    def get_norm(self, p: float = 2.0) -> float:
         if self.dim == 1:
             psi_norm = np.sum(np.abs(self.psi_val) ** p) * self.dx
         elif self.dim == 2:

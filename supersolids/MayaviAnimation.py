@@ -110,7 +110,6 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
         plot_slice_x.mlab_source.trait_set(scalars=prob_3d)
         plot_slice_y.mlab_source.trait_set(scalars=prob_3d)
         plot_prob.mlab_source.trait_set(scalars=prob_3d)
-        # psi_sol.mlab_source.trait_set(scalars=psi_sol)
         yield
 
 
@@ -118,7 +117,7 @@ class MayaviAnimation:
     mayavi_counter: int = 0
     animate = staticmethod(animate)
 
-    def __init__(self, dim=3, dir_path=Path(__file__).parent.joinpath("results")):
+    def __init__(self, dim: float = 3, dir_path: Path = Path(__file__).parent.joinpath("results")):
         """
         Creates an Animation with mayavi for a Schroedinger equation
         Methods need the object Schroedinger with the parameters of the equation
@@ -198,7 +197,7 @@ if __name__ == "__main__":
                                          s=1.1, E=1.0,
                                          psi_0=functions.psi_gauss_3d,
                                          V=functions.v_harmonic_3d,
-                                         psi_sol=functions.thomas_fermi
+                                         psi_sol=functions.thomas_fermi_1d
                                          )
     may = MayaviAnimation(dim=Harmonic.dim, dir_path=Path(__file__).parent.joinpath("results"))
     may.animate(Harmonic, x_lim=(-10, 5), y_lim=(-1, 1), z_lim=(-1, 1))

@@ -20,7 +20,7 @@ from supersolids import Schroedinger, functions
 
 
 class Animation:
-    def __init__(self, dim=1):
+    def __init__(self, dim=2):
         """
         Creates an Animation for a Schroedinger equation
         Methods need the object Schroedinger with the parameters of the equation
@@ -199,7 +199,7 @@ class Animation:
             print(f"Round {frame_index}")
 
         if System.dim == 1:
-            self.psi_line.set_data(System.x, np.abs(System.psi_val) ** 2)
+            self.psi_line.set_data(System.x, np.abs(System.psi_val) ** 2.0)
             self.V_line.set_data(self.V_pos, self.V_plot_val)
             self.psi_sol_line.set_data(System.x, System.psi_sol_val)
         elif System.dim == 2:
@@ -207,7 +207,7 @@ class Animation:
                 # here we crop the calculated mesh to the viewable mesh,
                 # but the rest is still calculated to not change the boundary conditions. Essentially we just zoom
                 psi_pos, psi_val = crop_pos_to_limits(self.ax, System.pos, System.psi, func_val=System.psi_val)
-                psi_prob = np.abs(psi_val) ** 2
+                psi_prob = np.abs(psi_val) ** 2.0
                 System.psi_line = self.ax.plot_surface(psi_pos[:, :, 0],
                                                        psi_pos[:, :, 1],
                                                        psi_prob,
