@@ -93,7 +93,7 @@ if __name__ == "__main__":
     # constants needed for the Schroedinger equation
     g = 0.0
     g_step = 10
-    dt = 0.8
+    dt = 0.1
 
     # box length in 1D: [-L,L], in 2D: [-L,L, -L,L], , in 3D: [-L,L, -L,L, -L,L]
     # generators for L, g, dt to compute for different parameters
@@ -111,9 +111,9 @@ if __name__ == "__main__":
 
     # functools.partial sets all arguments except x, y, z, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
-    psi_0_1d = functools.partial(functions.psi_gauss_1d, a=1, x_0=0, k_0=0)
+    psi_0_1d = functools.partial(functions.psi_gauss_1d, a=2.0, x_0=1.0, k_0=0.0)
     psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
-    psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
+    psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1.0, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0)
 
     psi_sol_1d = functools.partial(functions.thomas_fermi_1d, g=g)
     psi_sol_2d = functools.partial(functions.thomas_fermi_2d_pos, g=g)
@@ -121,7 +121,7 @@ if __name__ == "__main__":
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    simulate_case(resolution, timesteps=20, L=L_generator[0], g=g, dt=dt, imag_time=True, dim=1,
+    simulate_case(resolution, timesteps=100, L=L_generator[0], g=g, dt=dt, imag_time=True, dim=1,
                   s=1.1, E=1.0,
                   psi_0=psi_0_1d, V=V_1d,
                   psi_sol=psi_sol_1d, mu_sol=mu_sol_list[0],

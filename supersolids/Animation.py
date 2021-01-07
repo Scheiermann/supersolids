@@ -180,17 +180,22 @@ class Animation:
         # causing problems with removing corresponding plot_lines
         # so we want to start plotting with frame_index=1, and delete from upon the next frame, hence frame_index>=2
         if frame_index >= 2:
-            # Delete old plot, if it exists
-            System.psi_line.remove()
+            if System.dim == 1:
+                # Delete old plot, if it exists
+                print()
+                # self.psi_line.remove()
+            elif System.dim == 2:
+                # Delete old plot, if it exists
+                System.psi_line.remove()
 
-            # Delete old contours, if they exists.
-            # psi_x_line is a ContourPlotSet without remove, collections gives a list of PolyColletion with remove
-            for contour in System.psi_x_line.collections:
-                contour.remove()
-            for contour in System.psi_y_line.collections:
-                contour.remove()
-            for contour in System.psi_z_line.collections:
-                contour.remove()
+                # Delete old contours, if they exists.
+                # psi_x_line is a ContourPlotSet without remove, collections gives a list of PolyColletion with remove
+                for contour in System.psi_x_line.collections:
+                    contour.remove()
+                for contour in System.psi_y_line.collections:
+                    contour.remove()
+                for contour in System.psi_z_line.collections:
+                    contour.remove()
 
             # print(f"prob max: {np.abs(System.psi_val.max().max()) ** 2}")
             System.time_step()
