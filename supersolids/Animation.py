@@ -164,17 +164,17 @@ class Animation:
             elif System.dim == 2:
                 self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System, reserve=1.0)
                 self.V_line = self.ax.plot_surface(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
-                                                     cmap=cm.Blues, linewidth=5,
-                                                     rstride=8, cstride=8,
-                                                     alpha=System.alpha_V
-                                                     )
-
-                self.V_z_line = self.ax.contourf(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
-                                                   zdir='z',
-                                                   offset=self.ax.get_zlim()[0],
-                                                   cmap=cm.Blues, levels=20,
+                                                   cmap=cm.Blues, linewidth=5,
+                                                   rstride=8, cstride=8,
                                                    alpha=System.alpha_V
                                                    )
+
+                self.V_z_line = self.ax.contourf(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
+                                                 zdir='z',
+                                                 offset=self.ax.get_zlim()[0],
+                                                 cmap=cm.Blues, levels=20,
+                                                 alpha=System.alpha_V
+                                                 )
 
         # FuncAnimation calls animate 3 times with frame_index=0,
         # causing problems with removing corresponding plot_lines
@@ -210,12 +210,12 @@ class Animation:
                 psi_pos, psi_val = crop_pos_to_limits(self.ax, System.pos, System.psi, func_val=System.psi_val)
                 psi_prob = np.abs(psi_val) ** 2.0
                 self.psi_line = self.ax.plot_surface(psi_pos[:, :, 0],
-                                                       psi_pos[:, :, 1],
-                                                       psi_prob,
-                                                       cmap=cm.viridis, linewidth=5,
-                                                       rstride=1, cstride=1,
-                                                       alpha=System.alpha_psi
-                                                       )
+                                                     psi_pos[:, :, 1],
+                                                     psi_prob,
+                                                     cmap=cm.viridis, linewidth=5,
+                                                     rstride=1, cstride=1,
+                                                     alpha=System.alpha_psi
+                                                     )
 
                 cmap = cm.coolwarm
                 levels = 20

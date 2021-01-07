@@ -161,12 +161,22 @@ class Schroedinger(object):
         # update H_pot before use
         H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
         # multiply element-wise the 2D with each other (not np.multiply)
+
         self.psi_val = H_pot * self.psi_val
 
+        a = np.abs(self.psi_val[29:35, 29:34]) ** 2.0
+
         self.psi_val = np.fft.fftn(self.psi_val)
-        # multiply element-wise the 2D with each other (not np.multiply)
+
+        # TODO: solve H_kin bug (issue 13)
+        # multiply element-wise the 1D array (H_kin) with psi_val (1D, 2D or 3D), so for 2D and 3D np.multiply is needed
+        # self.H_kin = np.diag(np.exp(self.U * (0.5 * self.k_squared) * self.dt))
+        # self.psi_val = np.matmul(self.H_kin, self.psi_val)
+        # self.psi_val = np.multiply(self.H_kin, self.psi_val)
         self.psi_val = self.H_kin * self.psi_val
         self.psi_val = np.fft.ifftn(self.psi_val)
+
+        a = np.abs(self.psi_val[29:35, 29:34]) ** 2.0
 
         # update H_pot before use
         H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))

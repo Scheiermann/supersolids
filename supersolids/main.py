@@ -36,7 +36,8 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, s=1.1, E=1.0
                   x_lim=(-1.0, 1.0),
                   y_lim=(-1.0, 1.0),
                   z_lim=(-1.0, 1.0),
-                  slice_x_index=0, slice_y_index=0,
+                  slice_x_index=0,
+                  slice_y_index=0,
                   view_height=20.0,
                   view_angle=75.0,
                   view_distance=10.0,
@@ -136,31 +137,31 @@ if __name__ == "__main__":
                   alpha_V=0.3,
                   file_name="anim.mp4",
                   x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(-2, 2),
-                  slice_x_index=resolution//2, slice_y_index=resolution//2, # for mayavi (3D)
-                  view_height=20.0, view_angle=45.0, view_distance=10.0 # These are just for matplotlib (2D)
+                  slice_x_index=resolution//2, slice_y_index=resolution//2, # just for mayavi (3D)
+                  view_height=20.0, view_angle=45.0, view_distance=10.0 # just for matplotlib (2D)
                   )
     print("Single core done")
 
     # TODO: get mayavi concurrent to work (problem with mlab.figure())
-    i: int = 0
-    with futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
-        for L, g, dt in cases:
-            i = i + 1
-            print(f"i={i}, L={L}, g={g}, dt={dt}")
-            file_name = f"split_{i:03}.mp4"
-            executor.submit(simulate_case, resolution, timesteps=50, L=L, g=g, dt=dt, imag_time=True,
-                            s=1.1, accuracy=10**-6,
-                            dim=2,
-                            psi_0=psi_0_2d,
-                            V=V_2d,
-                            psi_sol=psi_sol_2d,
-                            mu_sol=functions.mu_2d,
-                            file_name=file_name,
-                            x_lim=(-L, L),
-                            y_lim=(-5, 5),
-                            z_lim=(0, 0.6),
-                            slice_x_index=0, slice_y_index=0,
-                            view_height=15.0,
-                            view_angle=75.0,
-                            view_distance=10.0
-                            )
+    # i: int = 0
+    # with futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
+    #     for L, g, dt in cases:
+    #         i = i + 1
+    #         print(f"i={i}, L={L}, g={g}, dt={dt}")
+    #         file_name = f"split_{i:03}.mp4"
+    #         executor.submit(simulate_case, resolution, timesteps=50, L=L, g=g, dt=dt, imag_time=True,
+    #                         s=1.1, accuracy=10**-6,
+    #                         dim=2,
+    #                         psi_0=psi_0_2d,
+    #                         V=V_2d,
+    #                         psi_sol=psi_sol_2d,
+    #                         mu_sol=functions.mu_2d,
+    #                         file_name=file_name,
+    #                         x_lim=(-L, L),
+    #                         y_lim=(-5, 5),
+    #                         z_lim=(0, 0.6),
+    #                         slice_x_index=0, slice_y_index=0,
+    #                         view_height=15.0,
+    #                         view_angle=75.0,
+    #                         view_distance=10.0
+    #                         )
