@@ -24,7 +24,8 @@ from supersolids import run_time
 from supersolids import Schroedinger
 
 
-def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1.1, E=1.0, accuracy=10**-6,
+def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, s=1.1, E=1.0, accuracy=10**-6,
+                  dim=1,
                   psi_0=functions.psi_gauss_3d,
                   V=functions.v_harmonic_3d,
                   psi_sol=functions.thomas_fermi_3d,
@@ -41,9 +42,11 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1.1
                   view_distance=10.0,
                   delete_input=True):
     with run_time.run_time():
-        Harmonic = Schroedinger.Schroedinger(resolution, timesteps, L, dt, g=g, imag_time=imag_time, dim=dim,
+        Harmonic = Schroedinger.Schroedinger(resolution, timesteps, L, dt, g=g, imag_time=imag_time,
                                              s=s, E=E,
-                                             psi_0=psi_0, V=V,
+                                             dim=dim,
+                                             psi_0=psi_0,
+                                             V=V,
                                              psi_sol=psi_sol,
                                              mu_sol=mu_sol,
                                              alpha_psi=alpha_psi,
@@ -74,7 +77,7 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, dim=1, s=1.1
             may.animate(Harmonic, accuracy=accuracy, x_lim=x_lim, y_lim=y_lim, z_lim=z_lim,
                         slice_x_index=slice_x_index, slice_y_index=slice_y_index)
         mlab.show()
-        # TODO: close window after last framself.z = np.linspace(-self.L, self.L, self.resolution)e
+        # TODO: close window after last frame
         # print(f"{Harmonic.t}, {Harmonic.dt * Harmonic.timesteps}")
         # if Harmonic.t >= Harmonic.dt * Harmonic.timesteps:
         #     mlab.close()
@@ -93,16 +96,15 @@ if __name__ == "__main__":
     # constants needed for the Schroedinger equation
     g = 0.0
     g_step = 10
-    dt = 0.1
+    dt = 0.2
 
     # box length in 1D: [-L,L], in 2D: [-L,L, -L,L], , in 3D: [-L,L, -L,L, -L,L]
     # generators for L, g, dt to compute for different parameters
     L_generator = (4,)
     g_generator = (i for i in np.arange(g, g + g_step, g_step))
-    mu_sol_list = [functions.mu_3d for g in g_generator]
     factors = np.linspace(0.2, 0.3, max_workers)
     dt_generator = (i * dt for i in factors)
-    cases = itertools.product(L_generator, g_generator, dt_generator, mu_sol_list)
+    cases = itertools.product(L_generator, g_generator, dt_generator)
 
     # functions needed for the Schroedinger equation (e.g. potential: V, initial wave function: psi_0)
     V_1d = functions.v_harmonic_1d
@@ -110,49 +112,55 @@ if __name__ == "__main__":
     V_3d = functools.partial(functions.v_harmonic_3d, alpha_y=1.0, alpha_z=1.0)
 
     # functools.partial sets all arguments except x, y, z, as multiple arguments for Schroedinger aren't implement yet
-    # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
-    psi_0_1d = functools.partial(functions.psi_gauss_1d, a=2.0, x_0=1.0, k_0=0.0)
+    # psi_0 = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
+    psi_0_1d = functools.partial(functions.psi_gauss_1d, a=3.0, x_0=2.0, k_0=0.0)
     psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1.0, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0)
 
-    psi_sol_1d = functools.partial(functions.thomas_fermi_1d, g=g)
-    psi_sol_2d = functools.partial(functions.thomas_fermi_2d_pos, g=g)
-    psi_sol_3d = functools.partial(functions.thomas_fermi_3d, g=g)
+    # Used to remember that 2D need the special pos function (g is set inside of Schoerdinger for convenicence)
+    psi_sol_1d = functions.thomas_fermi_1d
+    psi_sol_2d = functions.thomas_fermi_2d_pos
+    psi_sol_3d = functions.thomas_fermi_3d
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    simulate_case(resolution, timesteps=100, L=L_generator[0], g=g, dt=dt, imag_time=True, dim=1,
+    simulate_case(resolution, timesteps=40, L=L_generator[0], g=g, dt=dt, imag_time=True,
                   s=1.1, E=1.0,
-                  psi_0=psi_0_1d, V=V_1d,
-                  psi_sol=psi_sol_1d, mu_sol=mu_sol_list[0],
-                  accuracy=10 ** -6,
+                  dim=3,
+                  psi_0=psi_0_3d,
+                  V=V_3d,
+                  psi_sol=psi_sol_3d,
+                  mu_sol=functions.mu_3d,
+                  accuracy=10**-6,
                   alpha_psi=0.8,
                   alpha_V=0.3,
                   file_name="anim.mp4",
                   x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(-2, 2),
-                  slice_x_index=resolution//2, slice_y_index=resolution//2,
-                  view_height=100.0, view_angle=45.0, view_distance=10.0 # These are just for matplotlib (2D)
+                  slice_x_index=resolution//2, slice_y_index=resolution//2, # for mayavi (3D)
+                  view_height=20.0, view_angle=45.0, view_distance=10.0 # These are just for matplotlib (2D)
                   )
     print("Single core done")
 
     # TODO: get mayavi concurrent to work (problem with mlab.figure())
-    # i: int = 0
-    # with futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
-    #     for L, g, dt, mu_sol in cases:
-    #         i = i + 1
-    #         print(f"i={i}, L={L}, g={g}, dt={dt}, mu={mu_sol}")
-    #         file_name = f"split_{i:03}.mp4"
-    #         psi_sol = functools.partial(functions.thomas_fermi, g=g)
-    #         executor.submit(simulate_case, resolution, timesteps=30, L=L, g=g, dt=dt, imag_time=True,
-    #                         dim=3, s=1.1, accuracy=10**-6,
-    #                         psi_0=psi_0_3d, V=V_3d,
-    #                         psi_sol=psi_sol, mu_sol=mu_sol,
-    #                         file_name=file_name,
-    #                         x_lim=(-8, 8),
-    #                         y_lim=(-5, 5),
-    #                         z_lim=(0, 0.4),
-    #                         slice_x_index=0, slice_y_index=0,
-    #                         view_height=15.0,
-    #                         view_angle=75.0,
-    #                         view_distance=10.0
-    #                         )
+    i: int = 0
+    with futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
+        for L, g, dt in cases:
+            i = i + 1
+            print(f"i={i}, L={L}, g={g}, dt={dt}")
+            file_name = f"split_{i:03}.mp4"
+            executor.submit(simulate_case, resolution, timesteps=50, L=L, g=g, dt=dt, imag_time=True,
+                            s=1.1, accuracy=10**-6,
+                            dim=2,
+                            psi_0=psi_0_2d,
+                            V=V_2d,
+                            psi_sol=psi_sol_2d,
+                            mu_sol=functions.mu_2d,
+                            file_name=file_name,
+                            x_lim=(-L, L),
+                            y_lim=(-5, 5),
+                            z_lim=(0, 0.6),
+                            slice_x_index=0, slice_y_index=0,
+                            view_height=15.0,
+                            view_angle=75.0,
+                            view_distance=10.0
+                            )

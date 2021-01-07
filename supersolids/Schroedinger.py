@@ -10,6 +10,7 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 """
 import sys
 
+import functools
 import numpy as np
 from typing import Callable
 
@@ -32,7 +33,8 @@ class Schroedinger(object):
     """
 
     def __init__(self, resolution: int, timesteps: int, L: float, dt: float, g: float = 0.0,
-                 imag_time: bool = True, dim: int = 3, s: float = 1.1, E: float = 1.0,
+                 imag_time: bool = True, s: float = 1.1, E: float = 1.0,
+                 dim: int = 3,
                  psi_0: Callable = functions.psi_gauss_3d,
                  V: Callable = functions.v_harmonic_3d,
                  psi_sol: Callable = functions.thomas_fermi_3d,
@@ -45,6 +47,7 @@ class Schroedinger(object):
         ----------
         x: array_like, float
             description
+
         """
         self.resolution = int(resolution)
         self.timesteps = int(timesteps)
@@ -65,7 +68,7 @@ class Schroedinger(object):
 
         self.psi = psi_0
         self.V = V
-        self.psi_sol = psi_sol
+        self.psi_sol = functools.partial(psi_sol, g=self.g)
 
         self.x = np.linspace(-self.L, self.L, self.resolution)
         self.dx = float(2.0 * L / self.resolution)
@@ -137,19 +140,8 @@ class Schroedinger(object):
         # attributes for animation
         self.t = 0.0
 
-        self.psi_line = None
         self.alpha_psi = alpha_psi
-
-        self.V_line = None
         self.alpha_V = alpha_V
-
-        self.psi_sol_line = None
-
-        self.psi_x_line = None
-        self.psi_y_line = None
-        self.psi_z_line = None
-
-        self.V_z_line = None
 
     def get_norm(self, p: float = 2.0) -> float:
         if self.dim == 1:

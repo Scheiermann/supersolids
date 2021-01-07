@@ -128,8 +128,8 @@ class MayaviAnimation:
         MayaviAnimation.mayavi_counter += 1
         self.dim = dim
 
-        self.fig = mlab.figure()
-        mlab.title("")
+        self.fig = mlab.figure(f"{MayaviAnimation.mayavi_counter:02d}")
+        mlab.title(f"{MayaviAnimation.mayavi_counter:02d}")
         self.ax = mlab.axes(line_width=2, nb_labels=5)
         self.ax.axes.visibility = True
 
@@ -193,11 +193,12 @@ class MayaviAnimation:
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    Harmonic = Schroedinger.Schroedinger(resolution=2 ** 6, timesteps=100, L=3, dt=1.0, g=1.0, imag_time=True, dim=3,
+    Harmonic = Schroedinger.Schroedinger(resolution=2 ** 6, timesteps=100, L=3, dt=1.0, g=1.0, imag_time=True,
                                          s=1.1, E=1.0,
+                                         dim=3,
                                          psi_0=functions.psi_gauss_3d,
                                          V=functions.v_harmonic_3d,
-                                         psi_sol=functions.thomas_fermi_1d
+                                         psi_sol=functions.thomas_fermi_3d
                                          )
     may = MayaviAnimation(dim=Harmonic.dim, dir_path=Path(__file__).parent.joinpath("results"))
     may.animate(Harmonic, x_lim=(-10, 5), y_lim=(-1, 1), z_lim=(-1, 1))

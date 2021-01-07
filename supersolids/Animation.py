@@ -163,13 +163,13 @@ class Animation:
                 self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System, reserve=1.0)
             elif System.dim == 2:
                 self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System, reserve=1.0)
-                System.V_line = self.ax.plot_surface(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
+                self.V_line = self.ax.plot_surface(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
                                                      cmap=cm.Blues, linewidth=5,
                                                      rstride=8, cstride=8,
                                                      alpha=System.alpha_V
                                                      )
 
-                System.V_z_line = self.ax.contourf(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
+                self.V_z_line = self.ax.contourf(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
                                                    zdir='z',
                                                    offset=self.ax.get_zlim()[0],
                                                    cmap=cm.Blues, levels=20,
@@ -180,21 +180,17 @@ class Animation:
         # causing problems with removing corresponding plot_lines
         # so we want to start plotting with frame_index=1, and delete from upon the next frame, hence frame_index>=2
         if frame_index >= 2:
-            if System.dim == 1:
+            if System.dim == 2:
                 # Delete old plot, if it exists
-                print()
-                # self.psi_line.remove()
-            elif System.dim == 2:
-                # Delete old plot, if it exists
-                System.psi_line.remove()
+                self.psi_line.remove()
 
                 # Delete old contours, if they exists.
                 # psi_x_line is a ContourPlotSet without remove, collections gives a list of PolyColletion with remove
-                for contour in System.psi_x_line.collections:
+                for contour in self.psi_x_line.collections:
                     contour.remove()
-                for contour in System.psi_y_line.collections:
+                for contour in self.psi_y_line.collections:
                     contour.remove()
-                for contour in System.psi_z_line.collections:
+                for contour in self.psi_z_line.collections:
                     contour.remove()
 
             # print(f"prob max: {np.abs(System.psi_val.max().max()) ** 2}")
@@ -213,7 +209,7 @@ class Animation:
                 # but the rest is still calculated to not change the boundary conditions. Essentially we just zoom
                 psi_pos, psi_val = crop_pos_to_limits(self.ax, System.pos, System.psi, func_val=System.psi_val)
                 psi_prob = np.abs(psi_val) ** 2.0
-                System.psi_line = self.ax.plot_surface(psi_pos[:, :, 0],
+                self.psi_line = self.ax.plot_surface(psi_pos[:, :, 0],
                                                        psi_pos[:, :, 1],
                                                        psi_prob,
                                                        cmap=cm.viridis, linewidth=5,
@@ -224,17 +220,17 @@ class Animation:
                 cmap = cm.coolwarm
                 levels = 20
 
-                System.psi_x_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
+                self.psi_x_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
                                                      zdir='x', offset=self.ax.get_xlim()[0], cmap=cmap, levels=levels)
-                System.psi_y_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
+                self.psi_y_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
                                                      zdir='y', offset=self.ax.get_ylim()[0], cmap=cmap, levels=levels)
-                System.psi_z_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
+                self.psi_z_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
                                                      zdir='z', offset=self.ax.get_zlim()[0],
                                                      cmap=cmap, levels=levels,
                                                      )
                 if frame_index == 1:
                     color_bar_axes = self.fig.add_axes([0.85, 0.1, 0.03, 0.8])
-                    self.fig.colorbar(System.psi_x_line, cax=color_bar_axes)
+                    self.fig.colorbar(self.psi_x_line, cax=color_bar_axes)
 
         self.title.set_text(("g = {:.2}, dt = {:.6}, timesteps = {:d}, imag_time = {},\n"
                              "t = {:02.05f}").format(System.g,
@@ -248,9 +244,9 @@ class Animation:
             return self.psi_line, self.V_line, self.psi_sol_line, self.title
         else:
             if frame_index == 0:
-                return System.V_line, self.title
+                return self.V_line, self.title
             else:
-                return System.psi_line, System.V_line, self.title
+                return self.psi_line, self.V_line, self.title
 
     def start(self, System: Schroedinger.Schroedinger, file_name):
         """

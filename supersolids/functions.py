@@ -210,7 +210,7 @@ def thomas_fermi_1d(x, g: float = 0.0):
 
     if g != 0:
         # mu is the chemical potential
-        mu = ((3 * g) / (4 * np.sqrt(2))) ** (2 / 3)
+        mu = mu_1d(g)
 
         # this needs to be >> 1, e.g 5.3
         # print(np.sqrt(2 * mu))
@@ -278,6 +278,12 @@ def thomas_fermi_3d(x, y, z, g: float = 0.0):
 
     else:
         return None
+
+def mu_1d(g: float = 0.0):
+    # mu is the chemical potential
+    mu = ((3.0 * g) / (4.0 * np.sqrt(2.0))) ** (2.0 / 3.0)
+
+    return mu
 
 
 def mu_2d(g: float = 0.0):
