@@ -28,6 +28,7 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, s=1.1, E=1.0
                   dim=1,
                   psi_0=functions.psi_gauss_3d,
                   V=functions.v_harmonic_3d,
+                  V_interaction=None,
                   psi_sol=functions.thomas_fermi_3d,
                   mu_sol=functions.mu_3d,
                   alpha_psi=0.8,
@@ -52,6 +53,7 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, s=1.1, E=1.0
                                              dim=dim,
                                              psi_0=psi_0,
                                              V=V,
+                                             V_interaction=V_interaction,
                                              psi_sol=psi_sol,
                                              mu_sol=mu_sol,
                                              alpha_psi=alpha_psi,
@@ -103,9 +105,9 @@ if __name__ == "__main__":
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    g = 0.0
+    g = 100.0
     g_step = 10
-    dt = 0.4
+    dt = 0.001
 
     # box length in 1D: [-L,L], in 2D: [-L,L, -L,L], , in 3D: [-L,L, -L,L, -L,L]
     # generators for L, g, dt to compute for different parameters
@@ -120,6 +122,8 @@ if __name__ == "__main__":
     V_2d = functools.partial(functions.v_harmonic_2d, alpha_y=1.0)
     V_3d = functools.partial(functions.v_harmonic_3d, alpha_y=1.0, alpha_z=1.0)
 
+    V_3d_ddi = functools.partial(functions.dipol_dipol_interaction, d=1.0, epsilon_dd=1.0)
+
     # functools.partial sets all arguments except x, y, z, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
     psi_0_1d = functools.partial(functions.psi_gauss_1d, a=3.0, x_0=2.0, k_0=0.0)
@@ -133,20 +137,21 @@ if __name__ == "__main__":
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    simulate_case(resolution, timesteps=200, L=L_generator[0], g=g, dt=dt, imag_time=True,
+    simulate_case(resolution, timesteps=800, L=L_generator[0], g=g, dt=dt, imag_time=True,
                   s=1.1, E=1.0,
                   dim=3,
                   psi_0=psi_0_3d,
                   V=V_3d,
+                  V_interaction=V_3d_ddi,
                   psi_sol=psi_sol_3d,
                   mu_sol=functions.mu_3d,
-                  accuracy=10**-6,
+                  accuracy=10**-8,
                   alpha_psi=0.8,
                   alpha_psi_sol=0.5,
                   alpha_V=0.3,
                   file_name="anim.mp4",
                   x_lim=(-2.0, 2.0), y_lim=(-2.0, 2.0), z_lim=(0, 0.5),
-                  slice_x_index=resolution//2, slice_y_index=resolution//2,  # just for mayavi (3D)
+                  slice_x_index=resolution//3, slice_y_index=resolution//3,  # just for mayavi (3D)
                   r_func=functools.partial(functions.camera_func_r, r_0=10.0, r_per_frame=0.0), # from here just 2D
                   phi_func=functools.partial(functions.camera_func_phi, phi_0=45.0, phi_per_frame=10.0),
                   z_func=functools.partial(functions.camera_func_r, r_0=20.0, r_per_frame=0.0),

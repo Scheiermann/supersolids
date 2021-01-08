@@ -289,6 +289,7 @@ def thomas_fermi_3d(x, y, z, g: float = 0.0):
     else:
         return None
 
+
 def mu_1d(g: float = 0.0):
     # mu is the chemical potential
     mu = ((3.0 * g) / (4.0 * np.sqrt(2.0))) ** (2.0 / 3.0)
@@ -327,6 +328,17 @@ def v_2d(x, y, alpha_y=1.0):
 
 def v_harmonic_3d(x, y, z, alpha_y: float = 1.0, alpha_z: float = 1.0):
     return 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2)
+
+
+def dipol_dipol_interaction(kx_mesh: float, ky_mesh: float, kz_mesh: float,
+                            g: float = 1.0, d: float = 1.0, epsilon_dd: float = 1.0):
+    k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
+    factor = 3.0 * (kz_mesh ** 2.0)
+    V_k_val = epsilon_dd * g * (4.0 * np.pi / 3.0) * d ** 2.0 * ((factor / k_squared) - 1.0)
+    # Remove singularity
+    V_k_val[np.isnan(V_k_val)] = 0.0
+
+    return V_k_val
 
 
 def camera_func_r(frame: int,

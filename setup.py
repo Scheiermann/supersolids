@@ -8,7 +8,7 @@ from setuptools import setup
 
 setup(
     name="supersolids",
-    version="0.1.16",
+    version="0.1.17",
     packages=["", "supersolids"],
     package_data={"supersolids": ["results/anim.mp4",
                                   ]},

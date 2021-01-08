@@ -93,7 +93,7 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
                                 extent=[*x_lim, *y_lim, *z_lim])
 
     plot_V = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, System.V_val,
-                         colormap="hot", opacity=System.alpha_V, transparent=True)
+                            colormap="hot", opacity=System.alpha_V, transparent=True)
 
     if System.psi_sol_val is not None:
         plot_psi_sol = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, System.psi_sol_val,
