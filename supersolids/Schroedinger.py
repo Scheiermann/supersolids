@@ -40,6 +40,7 @@ class Schroedinger(object):
                  psi_sol: Callable = functions.thomas_fermi_3d,
                  mu_sol: Callable = functions.mu_3d,
                  alpha_psi: float = 0.8,
+                 alpha_psi_sol: float = 0.5,
                  alpha_V: float = 0.3,
                  ):
         """
@@ -75,7 +76,6 @@ class Schroedinger(object):
         self.dkx = float(np.pi / self.L)
 
         self.kx = np.fft.fftfreq(resolution, d=1.0/(self.dkx * self.resolution))
-        self.k_squared = self.kx ** 2.0
 
         if imag_time:
             # Convention: $e^{-iH} = e^{UH}$
@@ -89,13 +89,11 @@ class Schroedinger(object):
             self.dy = float(2.0 * L / self.resolution)
             self.dky = float(np.pi / self.L)
             self.ky = np.fft.fftfreq(resolution, d=1.0 / (self.dky * self.resolution))
-            self.k_squared += self.ky ** 2.0
         if dim >= 3:
             self.z = np.linspace(-self.L, self.L, self.resolution)
             self.dz = float(2.0 * L / self.resolution)
             self.dkz = float(np.pi / self.L)
             self.kz = np.fft.fftfreq(resolution, d=1.0 / (self.dkz * self.resolution))
-            self.k_squared += self.kz ** 2.0
         if dim > 3:
             print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
             sys.exit(1)
@@ -104,9 +102,9 @@ class Schroedinger(object):
             self.psi_val = self.psi(self.x)
             self.V_val = self.V(self.x)
             self.psi_sol_val = self.psi_sol(self.x)
+
+            self.k_squared = self.kx ** 2.0
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
-            # Here we use half steps in real space, but will use it before and after H_kin with normal steps
-            # self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
 
         elif dim == 2:
             self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
@@ -114,12 +112,10 @@ class Schroedinger(object):
             self.V_val = self.V(self.pos)
             self.psi_sol_val = self.psi_sol(self.pos)
 
-            # here a number (U) is multiplied elementwise with an 1D array (k_squared)
+            kx_mesh, ky_mesh, _ = functions.get_meshgrid(self.kx, self.ky)
+            self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0
+            # here a number (U) is multiplied elementwise with an (1D, 2D or 3D) array (k_squared)
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
-
-            # here a number (g, then U) is multiplied elementwise with an 2D array (psi_val, then the sum)
-            # Here we use half steps in real space, but will use it before and after H_kin with normal steps
-            # self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
 
         elif dim == 3:
             self.x_mesh, self.y_mesh, self.z_mesh = np.mgrid[self.x[0]:self.x[-1]:complex(0, self.resolution),
@@ -128,19 +124,18 @@ class Schroedinger(object):
                                                              ]
             self.psi_val = self.psi(self.x_mesh, self.y_mesh, self.z_mesh)
             self.V_val = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
-            # self.psi_sol_val = self.psi_sol(self.x_mesh, self.y_mesh, self.z_mesh)
+            self.psi_sol_val = self.psi_sol(self.x_mesh, self.y_mesh, self.z_mesh)
 
-            # here a number (U) is multiplied elementwise with an 1D array (k_squared)
+            kx_mesh, ky_mesh, kz_mesh, _ = functions.get_meshgrid_3d(self.kx, self.ky, self.kz)
+            self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
+            # here a number (U) is multiplied elementwise with an (1D, 2D or 3D) array (k_squared)
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
-
-            # here a number (g, then U) is multiplied elementwise with an 2D array (psi_val, then the sum)
-            # Here we use half steps in real space, but will use it before and after H_kin with normal steps
-            # self.H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
 
         # attributes for animation
         self.t = 0.0
 
         self.alpha_psi = alpha_psi
+        self.alpha_psi_sol = alpha_psi_sol
         self.alpha_V = alpha_V
 
     def get_norm(self, p: float = 2.0) -> float:
@@ -157,30 +152,21 @@ class Schroedinger(object):
         return psi_norm
 
     def time_step(self):
-        # H_kin is just dependend on U and the gridpoints, which are constants, so it does not need to be recaculated
+        # Here we use half steps in real space, but will use it before and after H_kin with normal steps
         # update H_pot before use
         H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
-        # multiply element-wise the 2D with each other (not np.multiply)
-
+        # multiply element-wise the (1D, 2D or 3D) arrays with each other
         self.psi_val = H_pot * self.psi_val
 
-        a = np.abs(self.psi_val[29:35, 29:34]) ** 2.0
-
         self.psi_val = np.fft.fftn(self.psi_val)
-
-        # TODO: solve H_kin bug (issue 13)
-        # multiply element-wise the 1D array (H_kin) with psi_val (1D, 2D or 3D), so for 2D and 3D np.multiply is needed
-        # self.H_kin = np.diag(np.exp(self.U * (0.5 * self.k_squared) * self.dt))
-        # self.psi_val = np.matmul(self.H_kin, self.psi_val)
-        # self.psi_val = np.multiply(self.H_kin, self.psi_val)
+        # H_kin is just dependent on U and the grid-points, which are constants, so it does not need to be recalculated
+        # multiply element-wise the (1D, 2D or 3D) array (H_kin) with psi_val (1D, 2D or 3D)
         self.psi_val = self.H_kin * self.psi_val
         self.psi_val = np.fft.ifftn(self.psi_val)
 
-        a = np.abs(self.psi_val[29:35, 29:34]) ** 2.0
-
         # update H_pot before use
         H_pot = np.exp(self.U * (self.V_val + self.g * np.abs(self.psi_val) ** 2.0) * (0.5 * self.dt))
-        # multiply element-wise the 2D with each other (not np.multiply)
+        # multiply element-wise the (1D, 2D or 3D) arrays with each other
         self.psi_val = H_pot * self.psi_val
 
         self.t += self.dt

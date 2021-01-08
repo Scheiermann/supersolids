@@ -25,6 +25,16 @@ def get_meshgrid(x, y):
     return x_mesh, y_mesh, pos
 
 
+def get_meshgrid_3d(x, y, z):
+    x_mesh, y_mesh, z_mesh = np.meshgrid(x, y, z)
+    pos = np.empty(x_mesh.shape + (3,))
+    pos[:, :, :, 0] = x_mesh
+    pos[:, :, :, 1] = y_mesh
+    pos[:, :, :, 2] = z_mesh
+
+    return x_mesh, y_mesh, z_mesh, pos
+
+
 def psi_gauss_2d_pdf(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]])):
     """
     Gives values according to gaus dirstribution (2D) with meshgrid of x,y as input

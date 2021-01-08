@@ -80,8 +80,8 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
 
     """
     prob_3d = np.abs(System.psi_val) ** 2
-    plot_prob = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d,
-                       colormap="spectral", opacity=System.alpha_psi, transparent=True)
+    # plot_prob = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d,
+    #                    colormap="spectral", opacity=System.alpha_psi, transparent=True)
 
     plot_slice_x = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
                                 plane_orientation="x_axes",
@@ -93,10 +93,11 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
                                 extent=[*x_lim, *y_lim, *z_lim])
 
     plot_V = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, System.V_val,
-                         colormap="spectral", opacity=System.alpha_V, transparent=True)
+                         colormap="hot", opacity=System.alpha_V, transparent=True)
 
-    # plot_psi_sol = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, System.psi_sol,
-    #                               colormap="spectral", opacity=System.alpha_V, transparent=True)
+    if System.psi_sol_val is not None:
+        plot_psi_sol = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, System.psi_sol_val,
+                                      colormap="cool", opacity=System.alpha_psi_sol, transparent=True)
 
     for i in range(0, System.timesteps):
         mu_old = System.mu
@@ -109,7 +110,7 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
         prob_3d = np.abs(System.psi_val) ** 2
         plot_slice_x.mlab_source.trait_set(scalars=prob_3d)
         plot_slice_y.mlab_source.trait_set(scalars=prob_3d)
-        plot_prob.mlab_source.trait_set(scalars=prob_3d)
+        # plot_prob.mlab_source.trait_set(scalars=prob_3d)
         yield
 
 

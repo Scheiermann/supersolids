@@ -31,6 +31,7 @@ def simulate_case(resolution, timesteps, L, g, dt, imag_time=False, s=1.1, E=1.0
                   psi_sol=functions.thomas_fermi_3d,
                   mu_sol=functions.mu_3d,
                   alpha_psi=0.8,
+                  alpha_psi_sol=0.5,
                   alpha_V=0.3,
                   file_name="split.mp4",
                   x_lim=(-1.0, 1.0),
@@ -102,9 +103,9 @@ if __name__ == "__main__":
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    g = 0.0
+    g = 1.0
     g_step = 10
-    dt = 0.05
+    dt = 0.4
 
     # box length in 1D: [-L,L], in 2D: [-L,L, -L,L], , in 3D: [-L,L, -L,L, -L,L]
     # generators for L, g, dt to compute for different parameters
@@ -122,7 +123,7 @@ if __name__ == "__main__":
     # functools.partial sets all arguments except x, y, z, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
     psi_0_1d = functools.partial(functions.psi_gauss_1d, a=3.0, x_0=2.0, k_0=0.0)
-    psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
+    psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[1.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1.0, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0)
 
     # Used to remember that 2D need the special pos function (g is set inside of Schoerdinger for convenicence)
@@ -132,22 +133,23 @@ if __name__ == "__main__":
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    simulate_case(resolution, timesteps=40, L=L_generator[0], g=g, dt=dt, imag_time=True,
+    simulate_case(resolution, timesteps=200, L=L_generator[0], g=g, dt=dt, imag_time=True,
                   s=1.1, E=1.0,
-                  dim=2,
-                  psi_0=psi_0_2d,
-                  V=V_2d,
-                  psi_sol=psi_sol_2d,
-                  mu_sol=functions.mu_2d,
+                  dim=3,
+                  psi_0=psi_0_3d,
+                  V=V_3d,
+                  psi_sol=psi_sol_3d,
+                  mu_sol=functions.mu_3d,
                   accuracy=10**-6,
                   alpha_psi=0.8,
+                  alpha_psi_sol=0.5,
                   alpha_V=0.3,
                   file_name="anim.mp4",
-                  x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(-2, 2),
+                  x_lim=(-2.0, 2.0), y_lim=(-2.0, 2.0), z_lim=(0, 0.5),
                   slice_x_index=resolution//2, slice_y_index=resolution//2,  # just for mayavi (3D)
-                  r_func=functools.partial(functions.camera_func_r, r_0=10.0, r_per_frame=0.01), # from here just 2D
-                  phi_func=functools.partial(functions.camera_func_phi, phi_0=45.0, phi_per_frame=20.0),
-                  z_func=functools.partial(functions.camera_func_r, r_0=20.0, r_per_frame=2.0),
+                  r_func=functools.partial(functions.camera_func_r, r_0=10.0, r_per_frame=0.0), # from here just 2D
+                  phi_func=functools.partial(functions.camera_func_phi, phi_0=45.0, phi_per_frame=10.0),
+                  z_func=functools.partial(functions.camera_func_r, r_0=20.0, r_per_frame=0.0),
                   camera_r=10.0,
                   camera_phi=45.0,
                   camera_z=20.0,
@@ -162,19 +164,24 @@ if __name__ == "__main__":
     #         i = i + 1
     #         print(f"i={i}, L={L}, g={g}, dt={dt}")
     #         file_name = f"split_{i:03}.mp4"
-    #         executor.submit(simulate_case, resolution, timesteps=50, L=L, g=g, dt=dt, imag_time=True,
-    #                         s=1.1, accuracy=10**-6,
+    #         executor.submit(simulate_case, resolution, timesteps=30, L=L, g=g, dt=dt, imag_time=True,
+    #                         s=1.1, E=1.0,
     #                         dim=2,
     #                         psi_0=psi_0_2d,
     #                         V=V_2d,
     #                         psi_sol=psi_sol_2d,
     #                         mu_sol=functions.mu_2d,
+    #                         accuracy=10 ** -6,
+    #                         alpha_psi=0.8,
+    #                         alpha_V=0.3,
     #                         file_name=file_name,
-    #                         x_lim=(-L, L),
-    #                         y_lim=(-5, 5),
-    #                         z_lim=(0, 0.6),
-    #                         slice_x_index=0, slice_y_index=0,
-    #                         view_height=15.0,
-    #                         view_angle=75.0,
-    #                         view_distance=10.0
+    #                         x_lim=(-2.0, 2.0), y_lim=(-2.0, 2.0), z_lim=(0, 0.5),
+    #                         slice_x_index=resolution // 2, slice_y_index=resolution // 2,  # just for mayavi (3D)
+    #                         r_func=functools.partial(functions.camera_func_r, r_0=10.0, r_per_frame=0.0),
+    #                         phi_func=functools.partial(functions.camera_func_phi, phi_0=45.0, phi_per_frame=10.0),
+    #                         z_func=functools.partial(functions.camera_func_r, r_0=20.0, r_per_frame=0.0),
+    #                         camera_r=10.0,
+    #                         camera_phi=45.0,
+    #                         camera_z=20.0,
+    #                         delete_input=True
     #                         )
