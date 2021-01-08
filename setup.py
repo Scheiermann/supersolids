@@ -8,13 +8,9 @@ from setuptools import setup
 
 setup(
     name="supersolids",
-    version="0.1.15",
+    version="0.1.16",
     packages=["", "supersolids"],
-    package_data={"supersolids": ["results/split_time_imag.mp4",
-                                  "results/split_time_real.mp4",
-                                  "results/2d_gauss.mp4",
-                                  "mayavi_tests/gauss_2d/anim.mp4",
-                                  "mayavi_tests/gauss_3d/anim.mp4"
+    package_data={"supersolids": ["results/anim.mp4",
                                   ]},
     url="https://github.com/Scheiermann/supersolids",
     license="MIT",

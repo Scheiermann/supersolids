@@ -103,7 +103,7 @@ if __name__ == "__main__":
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    g = 1.0
+    g = 0.0
     g_step = 10
     dt = 0.4
 
