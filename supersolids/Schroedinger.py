@@ -32,8 +32,8 @@ class Schroedinger(object):
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
 
-    def __init__(self, resolution: int, timesteps: int, L: float, dt: float, g: float = 0.0,
-                 imag_time: bool = True, s: float = 1.1, E: float = 1.0,
+    def __init__(self, resolution: int, max_timesteps: int, L: float, dt: float, g: float = 0.0,
+                 g_qf: float = 0.0, imag_time: bool = True, s: float = 1.1, E: float = 1.0,
                  dim: int = 3,
                  psi_0: Callable = functions.psi_gauss_3d,
                  V: Callable = functions.v_harmonic_3d,
@@ -52,15 +52,14 @@ class Schroedinger(object):
 
         """
         self.resolution = int(resolution)
-        self.timesteps = int(timesteps)
+        self.max_timesteps = int(max_timesteps)
 
         self.L = float(L)
         self.dt = float(dt)
         self.g = float(g)
+        self.g_qf = float(g_qf)
         self.imag_time = imag_time
         self.dim = dim
-
-        self.mu_sol = mu_sol(self.g)
 
         # mu = - ln(N) / (2 * dtau), where N is the norm of the psi
         self.mu = s
@@ -70,7 +69,12 @@ class Schroedinger(object):
 
         self.psi = psi_0
         self.V = V
-        self.psi_sol = functools.partial(psi_sol, g=self.g)
+        if psi_sol is not None:
+            self.psi_sol = functools.partial(psi_sol, g=self.g)
+            self.mu_sol = mu_sol(self.g)
+        else:
+            self.psi_sol = None
+            self.mu_sol = None
 
         self.x = np.linspace(-self.L, self.L, self.resolution)
         self.dx = float(2.0 * L / self.resolution)
@@ -102,7 +106,10 @@ class Schroedinger(object):
         if dim == 1:
             self.psi_val = self.psi(self.x)
             self.V_val = self.V(self.x)
-            self.psi_sol_val = self.psi_sol(self.x)
+            if self.psi_sol is not None:
+                self.psi_sol_val = self.psi_sol(self.x)
+            else:
+                self.psi_sol_val = None
 
             self.k_squared = self.kx ** 2.0
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
@@ -111,7 +118,10 @@ class Schroedinger(object):
             self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
             self.psi_val = self.psi(self.pos)
             self.V_val = self.V(self.pos)
-            self.psi_sol_val = self.psi_sol(self.pos)
+            if self.psi_sol is not None:
+                self.psi_sol_val = self.psi_sol(self.pos)
+            else:
+                self.psi_sol_val = None
 
             kx_mesh, ky_mesh, _ = functions.get_meshgrid(self.kx, self.ky)
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0
@@ -125,7 +135,11 @@ class Schroedinger(object):
                                                              ]
             self.psi_val = self.psi(self.x_mesh, self.y_mesh, self.z_mesh)
             self.V_val = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
-            self.psi_sol_val = self.psi_sol(self.x_mesh, self.y_mesh, self.z_mesh)
+
+            if self.psi_sol is not None:
+                self.psi_sol_val = self.psi_sol(self.x_mesh, self.y_mesh, self.z_mesh)
+            else:
+                self.psi_sol_val = None
 
             kx_mesh, ky_mesh, kz_mesh, _ = functions.get_meshgrid_3d(self.kx, self.ky, self.kz)
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
@@ -150,13 +164,22 @@ class Schroedinger(object):
         self.alpha_psi_sol = alpha_psi_sol
         self.alpha_V = alpha_V
 
+    def get_density(self, p: float = 2.0) -> float:
+        if self.dim <= 3:
+            psi_density = np.sum(np.abs(self.psi_val) ** p)
+        else:
+            print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
+            sys.exit(1)
+
+        return psi_density
+
     def get_norm(self, p: float = 2.0) -> float:
         if self.dim == 1:
-            psi_norm = np.sum(np.abs(self.psi_val) ** p) * self.dx
+            psi_norm = self.get_density(p=p) * self.dx
         elif self.dim == 2:
-            psi_norm = np.sum(np.abs(self.psi_val) ** p) * self.dx * self.dy
+            psi_norm = self.get_density(p=p) * self.dx * self.dy
         elif self.dim == 3:
-            psi_norm = np.sum(np.abs(self.psi_val) ** p) * self.dx * self.dy * self.dz
+            psi_norm = self.get_density(p=p) * self.dx * self.dy * self.dz
         else:
             print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
             sys.exit(1)
@@ -167,10 +190,12 @@ class Schroedinger(object):
         # Here we use half steps in real space, but will use it before and after H_kin with normal steps
 
         # Calculate the interaction by appling it to the density in k-space (transform back and forth)
-        density = np.abs(self.psi_val) ** 2.0
+        density = self.get_density(p=2.0)
+        density_3 = self.get_density(p=3.0)
         U_interaction = np.fft.ifftn(self.V_k_val * np.fft.fftn(density))
         # update H_pot before use
-        H_pot = np.exp(self.U * (self.V_val + self.g * density + U_interaction) * (0.5 * self.dt))
+        H_pot = np.exp(self.U * (self.V_val + self.g * density + U_interaction + self.g_qf * density_3)
+                       * (0.5 * self.dt))
         # multiply element-wise the (1D, 2D or 3D) arrays with each other
         self.psi_val = H_pot * self.psi_val
 
@@ -181,9 +206,11 @@ class Schroedinger(object):
         self.psi_val = np.fft.ifftn(self.psi_val)
 
         # update H_pot, density, U_interaction before use
-        density = np.abs(self.psi_val) ** 2.0
+        density = self.get_density(p=2.0)
+        density_3 = self.get_density(p=3.0)
         U_interaction = np.fft.ifftn(self.V_k_val * np.fft.fftn(density))
-        H_pot = np.exp(self.U * (self.V_val + self.g * density + U_interaction) * (0.5 * self.dt))
+        H_pot = np.exp(self.U * (self.V_val + self.g * density + U_interaction + self.g_qf * density_3)
+                       * (0.5 * self.dt))
         # multiply element-wise the (1D, 2D or 3D) arrays with each other
         self.psi_val = H_pot * self.psi_val
 
@@ -196,11 +223,12 @@ class Schroedinger(object):
 
         psi_quadratic_integral = self.get_norm(p=4.0)
 
+        # TODO: adjust for DDI
         self.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
         self.E = self.mu - 0.5 * self.g * psi_quadratic_integral
 
-        print(f"mu: {self.mu}")
-        if self.g != 0:
-            print(f"E: {self.E}, E_sol: {self.mu_sol - 0.5 * self.g * psi_quadratic_integral}")
-        else:
-            print(f"E: {self.E}")
+        # print(f"mu: {self.mu}")
+        # if self.g != 0:
+        #     print(f"E: {self.E}, E_sol: {self.mu_sol - 0.5 * self.g * psi_quadratic_integral}")
+        # else:
+        #     print(f"E: {self.E}")

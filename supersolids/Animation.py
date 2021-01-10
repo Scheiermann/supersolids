@@ -45,7 +45,8 @@ class Animation:
                  z_func=None,
                  camera_r: float = 10.0,
                  camera_phi: float = 45.0,
-                 camera_z: float = 20.0):
+                 camera_z: float = 20.0,
+                ):
         """
         Creates an Animation for a Schroedinger equation
         Methods need the object Schroedinger with the parameters of the equation
@@ -175,7 +176,7 @@ class Animation:
 
         return V_pos, V_plot_val
 
-    def animate(self, frame_index: int, System: Schroedinger.Schroedinger):
+    def animate(self, frame_index: int, System: Schroedinger.Schroedinger, plot_V=True, plot_psi_sol=False):
         """
         Sets the plot limits appropriate even if the initial wave function psi_0 is not normalized
 
@@ -194,21 +195,23 @@ class Animation:
         # As V is constant, calculate and plot it just one time (at first frame)
         if frame_index == 0:
             if System.dim == 1:
-                self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System, reserve=1.0)
+                if plot_V:
+                    self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System, reserve=1.0)
             elif System.dim == 2:
-                self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System, reserve=1.0)
-                self.V_line = self.ax.plot_surface(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
-                                                   cmap=cm.Blues, linewidth=5,
-                                                   rstride=8, cstride=8,
-                                                   alpha=System.alpha_V
-                                                   )
+                if plot_V:
+                    self.V_pos, self.V_plot_val = self.get_V_plot_values(0, 0, System, reserve=1.0)
+                    self.V_line = self.ax.plot_surface(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
+                                                       cmap=cm.Blues, linewidth=5,
+                                                       rstride=8, cstride=8,
+                                                       alpha=System.alpha_V
+                                                       )
 
-                self.V_z_line = self.ax.contourf(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
-                                                 zdir='z',
-                                                 offset=self.ax.get_zlim()[0],
-                                                 cmap=cm.Blues, levels=20,
-                                                 alpha=System.alpha_V
-                                                 )
+                    self.V_z_line = self.ax.contourf(self.V_pos[:, :, 0], self.V_pos[:, :, 1], self.V_plot_val,
+                                                     zdir='z',
+                                                     offset=self.ax.get_zlim()[0],
+                                                     cmap=cm.Blues, levels=20,
+                                                     alpha=System.alpha_V
+                                                     )
 
         # FuncAnimation calls animate 3 times with frame_index=0,
         # causing problems with removing corresponding plot_lines
@@ -235,8 +238,10 @@ class Animation:
 
         if System.dim == 1:
             self.psi_line.set_data(System.x, np.abs(System.psi_val) ** 2.0)
-            self.V_line.set_data(self.V_pos, self.V_plot_val)
-            self.psi_sol_line.set_data(System.x, System.psi_sol_val)
+            if plot_V:
+                self.V_line.set_data(self.V_pos, self.V_plot_val)
+            if plot_psi_sol:
+                self.psi_sol_line.set_data(System.x, System.psi_sol_val)
         elif System.dim == 2:
             if frame_index >= 1:
                 # rotate camera
@@ -278,10 +283,10 @@ class Animation:
                     color_bar_axes = self.fig.add_axes([0.85, 0.1, 0.03, 0.8])
                     self.fig.colorbar(self.psi_x_line, cax=color_bar_axes)
 
-        self.title.set_text(("g = {:.2}, dt = {:.6}, timesteps = {:d}, imag_time = {},\n"
+        self.title.set_text(("g = {:.2}, dt = {:.6}, max_timesteps = {:d}, imag_time = {},\n"
                              "t = {:02.05f}").format(System.g,
                                                      System.dt,
-                                                     System.timesteps,
+                                                     System.max_timesteps,
                                                      System.imag_time,
                                                      System.t,
                                                      ))
@@ -294,7 +299,7 @@ class Animation:
             else:
                 return self.psi_line, self.V_line, self.title
 
-    def start(self, System: Schroedinger.Schroedinger, file_name):
+    def start(self, System: Schroedinger.Schroedinger, file_name, plot_V=True, plot_psi_sol=False):
         """
         Sets the plot limits appropriate even if the initial wave function psi_0 is not normalized
 
@@ -302,8 +307,16 @@ class Animation:
         ----------
         file_name : String
                     Name of file including file type to save the animation to (tested with mp4)
+
         System: Schroedinger, object
                 Defines the Schroedinger equation for a given problem
+
+        plot_V : bool
+                 Condition if V should be plotted.
+
+        plot_psi_sol :
+                 Condition if psi_sol should be plotted.
+
         """
 
         assert type(System) is Schroedinger.Schroedinger, ("System"
@@ -312,7 +325,7 @@ class Animation:
 
         # blit=True means only re-draw the parts that have changed.
         anim = animation.FuncAnimation(self.fig, self.animate,
-                                       fargs=(System,), frames=System.timesteps, interval=30,
+                                       fargs=(System, plot_V, plot_psi_sol), frames=System.max_timesteps, interval=30,
                                        blit=True, cache_frame_data=False)
 
         # requires either mencoder or ffmpeg to be installed on your system

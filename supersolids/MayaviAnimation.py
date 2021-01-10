@@ -50,13 +50,17 @@ def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str
 
 @mlab.animate(delay=10, ui=True)
 def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
+            plot_psi_sol: bool = False,
+            plot_V: bool = True,
             x_lim: Tuple[float, float] = (-1, 1),
             y_lim: Tuple[float, float] = (-1, 1),
             z_lim: Tuple[float, float] = (-1, 1),
-            slice_x_index: int = 0, slice_y_index: int = 0):
+            slice_x_index: int = 0,
+            slice_y_index: int = 0
+            ):
     """
     Animates solving of the Schroedinger equations of System with mayavi in 3D.
-    Animation is limited to System.timesteps or the convergence according to accuracy.
+    Animation is limited to System.max_timesteps or the convergence according to accuracy.
 
     Parameters
     ----------
@@ -74,32 +78,38 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
                     Index of projection in terms of indexes of System.x
     slice_y_index : int
                     Index of projection in terms of indexes of System.y
+    plot_V : bool
+             Condition if V should be plotted.
+    plot_psi_sol :
+             Condition if psi_sol should be plotted.
 
     Returns
     -------
 
     """
     prob_3d = np.abs(System.psi_val) ** 2
-    plot_prob = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d,
+    prob_plot = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d,
                                colormap="spectral", opacity=System.alpha_psi, transparent=True)
 
-    plot_slice_x = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
+    slice_x_plot = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
                                 plane_orientation="x_axes",
                                 slice_index=slice_x_index,
                                 extent=[*x_lim, *y_lim, *z_lim])
-    plot_slice_y = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
+    slice_y_plot = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
                                 plane_orientation="y_axes",
                                 slice_index=slice_y_index,
                                 extent=[*x_lim, *y_lim, *z_lim])
 
-    plot_V = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, System.V_val,
-                            colormap="hot", opacity=System.alpha_V, transparent=True)
+    if plot_V:
+        V_plot = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, System.V_val,
+                                colormap="hot", opacity=System.alpha_V, transparent=True)
 
     if System.psi_sol_val is not None:
-        plot_psi_sol = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, System.psi_sol_val,
-                                      colormap="cool", opacity=System.alpha_psi_sol, transparent=True)
+        if plot_psi_sol:
+            psi_sol_plot = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, System.psi_sol_val,
+                                          colormap="cool", opacity=System.alpha_psi_sol, transparent=True)
 
-    for i in range(0, System.timesteps):
+    for i in range(0, System.max_timesteps):
         mu_old = System.mu
         System.time_step()
         mu_rel = np.abs((System.mu - mu_old) / System.mu)
@@ -108,9 +118,9 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
             print(f"accuracy reached: {mu_rel}")
             break
         prob_3d = np.abs(System.psi_val) ** 2
-        plot_slice_x.mlab_source.trait_set(scalars=prob_3d)
-        plot_slice_y.mlab_source.trait_set(scalars=prob_3d)
-        plot_prob.mlab_source.trait_set(scalars=prob_3d)
+        slice_x_plot.mlab_source.trait_set(scalars=prob_3d)
+        slice_y_plot.mlab_source.trait_set(scalars=prob_3d)
+        prob_plot.mlab_source.trait_set(scalars=prob_3d)
         yield
 
 
@@ -194,7 +204,7 @@ class MayaviAnimation:
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    Harmonic = Schroedinger.Schroedinger(resolution=2 ** 6, timesteps=100, L=3, dt=1.0, g=1.0, imag_time=True,
+    Harmonic = Schroedinger.Schroedinger(resolution=2 ** 6, max_timesteps=100, L=3, dt=1.0, g=1.0, imag_time=True,
                                          s=1.1, E=1.0,
                                          dim=3,
                                          psi_0=functions.psi_gauss_3d,

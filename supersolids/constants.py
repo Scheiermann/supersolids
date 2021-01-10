@@ -14,6 +14,9 @@ from scipy.constants import mu_0
 from scipy.constants import m_u
 import scipy.constants as sci_const
 
+a_0: float = sci_const.physical_constants["Bohr radius"][0]
+u_in_kg: float = sci_const.physical_constants["atomic mass constant"][0]
+
 if __name__ == "__main__":
     a_0 = sci_const.physical_constants["Bohr radius"][0]
     mu_b = sci_const.physical_constants["Bohr magneton"][0]

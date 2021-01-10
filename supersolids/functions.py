@@ -15,6 +15,8 @@ import numpy as np
 from scipy import stats
 
 from supersolids import Animation
+from supersolids import constants
+
 
 def get_meshgrid(x, y):
     x_mesh, y_mesh = np.meshgrid(x, y)
@@ -33,6 +35,58 @@ def get_meshgrid_3d(x, y, z):
     pos[:, :, :, 2] = z_mesh
 
     return x_mesh, y_mesh, z_mesh, pos
+
+
+def get_parameters(N: int = 10 ** 4,
+                   m: float = 164 * constants.u_in_kg,
+                   a_s: float = 90.0 * constants.a_0,
+                   a_dd: float = 130.0 * constants.a_0,
+                   w_x: float = 2.0 * np.pi * 30.0):
+    a_s_l_ho_ratio, epsilon_dd = g_qf_helper(m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
+    g = get_g(N, a_s_l_ho_ratio)
+    g_qf = get_g_qf(N, a_s_l_ho_ratio, epsilon_dd)
+
+    return g, g_qf, epsilon_dd
+
+
+def get_g(N: int, a_s_l_ho_ratio: float):
+    g = 4.0 * np.pi * a_s_l_ho_ratio * N
+
+    return g
+
+
+def g_qf_helper(m: float = 164 * constants.u_in_kg,
+                a_s: float = 90.0 * constants.a_0,
+                a_dd: float = 130.0 * constants.a_0,
+                w_x: float = 2.0 * np.pi * 30.0):
+    l_ho = get_l_ho(m, w_x)
+    epsilon_dd = a_dd / a_s
+    a_s_l_ho_ratio = a_s / l_ho
+
+    return a_s_l_ho_ratio, epsilon_dd
+
+
+def get_g_qf(N: int, a_s_l_ho_ratio: float, epsilon_dd: float):
+    g_qf = (32.0 / (3.0 * np.sqrt(np.pi))
+            * 4.0 * np.pi * a_s_l_ho_ratio ** (5.0 / 2.0)
+            * N ** (3.0 / 2.0)
+            * (1.0 + (3.0 / 2.0) * epsilon_dd ** 2.0))
+
+    return g_qf
+
+
+def get_l_ho(m: float = 164 * constants.u_in_kg, w_x: float = 2.0 * np.pi * 30.0):
+    l_ho = np.sqrt(constants.hbar / (m * w_x))
+    return l_ho
+
+
+def get_alphas(w_x: float = 2.0 * np.pi * 30.0,
+               w_y: float = 2.0 * np.pi * 30.0,
+               w_z: float = 2.0 * np.pi * 30.0):
+    alpha_y = w_y / w_x
+    alpha_z = w_z / w_x
+
+    return alpha_y, alpha_z
 
 
 def psi_gauss_2d_pdf(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]])):
@@ -334,7 +388,9 @@ def dipol_dipol_interaction(kx_mesh: float, ky_mesh: float, kz_mesh: float,
                             g: float = 1.0, d: float = 1.0, epsilon_dd: float = 1.0):
     k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
     factor = 3.0 * (kz_mesh ** 2.0)
+    # singularity = np.where(k_squared == 0.0, factor, k_squared)
     V_k_val = epsilon_dd * g * (4.0 * np.pi / 3.0) * d ** 2.0 * ((factor / k_squared) - 1.0)
+
     # Remove singularity
     V_k_val[np.isnan(V_k_val)] = 0.0
 
@@ -343,8 +399,6 @@ def dipol_dipol_interaction(kx_mesh: float, ky_mesh: float, kz_mesh: float,
 
 def camera_func_r(frame: int,
                   r_0: float = 10.0,
-                  phi_0: float = 45.0,
-                  z_0: float = 20.0,
                   r_per_frame: float = 10.0) -> float:
     r = r_0 + r_per_frame * frame
     return r
@@ -359,7 +413,6 @@ def camera_func_phi(frame: int,
     return phi
 
 
-
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == '__main__':
     # due to fft of the points the resolution needs to be 2 ** datapoints_exponent
@@ -367,7 +420,7 @@ if __name__ == '__main__':
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    timesteps = 10
+    max_timesteps = 10
     dt = 0.05
 
     # functions needed for the Schroedinger equation (e.g. potential: V, initial wave function: psi_0)

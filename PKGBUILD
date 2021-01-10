@@ -30,7 +30,8 @@ package() {
   # for python3.8
   python -m pip install -U apptools envisage ffmpeg-python mayavi matplotlib numpy scipy sympy traits traitsui vtk
   # for python3.9
-  # (watch out: currently there is no vtk wheel for python3.9, so you need to build it from source, then install mayavi)
+  # (watch out: currently there is no vtk wheel for python3.9, so you need to build it from source
+  #  or take a unofficial build (provided by the project creator of this package), then install mayavi)
   # python -m pip install -U apptools envisage ffmpeg-python matplotlib numpy scipy sympy traits traitsui
   python setup.py install --skip-build --root="$pkgdir" --optimize=1
 
