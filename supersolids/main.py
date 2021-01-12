@@ -36,6 +36,7 @@ def simulate_case(resolution: int, max_timesteps: int, L: float, dt: float, g: f
                   mu_sol: Callable = functions.mu_3d,
                   plot_psi_sol: bool = False,
                   plot_V: bool = True,
+                  psi_0_noise: Callable = functions.noise,
                   alpha_psi: float = 0.8,
                   alpha_psi_sol: float = 0.5,
                   alpha_V: float = 0.3,
@@ -137,6 +138,7 @@ def simulate_case(resolution: int, max_timesteps: int, L: float, dt: float, g: f
                                              V_interaction=V_interaction,
                                              psi_sol=psi_sol,
                                              mu_sol=mu_sol,
+                                             psi_0_noise=psi_0_noise,
                                              alpha_psi=alpha_psi,
                                              alpha_psi_sol=alpha_psi_sol,
                                              alpha_V=alpha_V
@@ -189,17 +191,17 @@ if __name__ == "__main__":
     resolution: int = 2 ** datapoints_exponent
 
     # constants needed for the Schroedinger equation
-    L = 4
-    dt: float = 0.1
-    N: int = 10 ** 2
+    # box length in 1D: [-L,L], in 2D: [-L,L, -L,L], , in 3D: [-L,L, -L,L, -L,L]
+    L = 8
+    dt: float = 0.001
+    N: int = 4.0 * 10 ** 4
     m: float = 164.0 * constants.u_in_kg
-    a_s: float = 90.0 * constants.a_0
+    a_s: float = 85.0 * constants.a_0
     a_dd: float = 130.0 * constants.a_0
 
-    w: float = 2.0 * np.pi * 30.0
-    w_x: float = w
-    w_y: float = w
-    w_z: float = w
+    w_x: float = 2.0 * np.pi * 30.0
+    w_y: float = 2.0 * np.pi * 60.0
+    w_z: float = 2.0 * np.pi * 140.0
 
     alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
     g, g_qf, epsilon_dd = functions.get_parameters(N=N, m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
@@ -210,13 +212,13 @@ if __name__ == "__main__":
     V_2d = functools.partial(functions.v_harmonic_2d, alpha_y=alpha_y)
     V_3d = functools.partial(functions.v_harmonic_3d, alpha_y=alpha_y, alpha_z=alpha_z)
 
-    V_3d_ddi = functools.partial(functions.dipol_dipol_interaction, d=1.0, epsilon_dd=epsilon_dd)
+    V_3d_ddi = functools.partial(functions.dipol_dipol_interaction, epsilon_dd=epsilon_dd)
 
     # functools.partial sets all arguments except x, y, z, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
     psi_0_1d = functools.partial(functions.psi_gauss_1d, a=3.0, x_0=2.0, k_0=0.0)
     psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[1.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
-    psi_0_3d = functools.partial(functions.psi_gauss_3d, a=1.0, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0)
+    psi_0_3d = functools.partial(functions.psi_gauss_3d, a=3.0, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0)
 
     # Used to remember that 2D need the special pos function (g is set inside of Schoerdinger for convenicence)
     psi_sol_1d = functions.thomas_fermi_1d
@@ -235,10 +237,11 @@ if __name__ == "__main__":
                   mu_sol=functions.mu_3d,
                   plot_psi_sol=False,
                   plot_V=False,
+                  psi_0_noise=functions.noise(0.8, 1.4),
                   alpha_psi=0.8,
                   alpha_psi_sol=0.5,
                   alpha_V=0.3,
-                  accuracy=10 ** -10,
+                  accuracy=10 ** -7,
                   filename="anim.mp4",
                   x_lim=(-2.0, 2.0), y_lim=(-2.0, 2.0), z_lim=(0, 0.5),
                   slice_x_index=resolution // 3, slice_y_index=resolution // 3,  # just for mayavi (3D)

@@ -11,6 +11,7 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 import sys
 
 import functools
+
 import numpy as np
 from typing import Callable
 
@@ -41,8 +42,9 @@ class Schroedinger(object):
                  V_interaction: Callable = None,
                  psi_sol: Callable = functions.thomas_fermi_3d,
                  mu_sol: Callable = functions.mu_3d,
+                 psi_0_noise: Callable = functions.noise,
                  alpha_psi: float = 0.8,
-                 alpha_psi_sol: float = 0.5,
+                 alpha_psi_sol: float = 0.53,
                  alpha_V: float = 0.3,
                  ):
         """
@@ -158,7 +160,9 @@ class Schroedinger(object):
                                                              self.y[0]:self.y[-1]:complex(0, self.resolution),
                                                              self.z[0]:self.z[-1]:complex(0, self.resolution)
                                                              ]
-            self.psi_val = self.psi(self.x_mesh, self.y_mesh, self.z_mesh)
+
+            self.psi_val = psi_0_noise * self.psi(self.x_mesh, self.y_mesh, self.z_mesh)
+
             self.V_val = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
 
             if self.psi_sol is not None:
