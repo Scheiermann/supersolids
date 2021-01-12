@@ -16,6 +16,7 @@ import psutil
 
 import numpy as np
 from mayavi import mlab
+from typing import Callable, Tuple
 
 from supersolids import Animation
 from supersolids import constants
@@ -25,31 +26,108 @@ from supersolids import run_time
 from supersolids import Schroedinger
 
 
-def simulate_case(resolution, max_timesteps, L, dt, g, g_qf, imag_time=False, s=1.1, E=1.0, accuracy=10 ** -6,
-                  dim=1,
-                  psi_0=functions.psi_gauss_3d,
-                  V=functions.v_harmonic_3d,
-                  V_interaction=None,
-                  psi_sol=functions.thomas_fermi_3d,
-                  mu_sol=functions.mu_3d,
-                  plot_psi_sol=False,
-                  plot_V=True,
-                  alpha_psi=0.8,
-                  alpha_psi_sol=0.5,
-                  alpha_V=0.3,
-                  file_name="split.mp4",
-                  x_lim=(-1.0, 1.0),
-                  y_lim=(-1.0, 1.0),
-                  z_lim=(-1.0, 1.0),
-                  slice_x_index=0,
-                  slice_y_index=0,
-                  r_func=None,
-                  phi_func=functools.partial(functions.camera_func_phi, phi_per_frame=20.0),
-                  z_func=None,
-                  camera_r=10.0,
-                  camera_phi=75.0,
-                  camera_z=20.0,
-                  delete_input=True):
+def simulate_case(resolution: int, max_timesteps: int, L: float, dt: float, g: float = 0.0, g_qf: float = 0.0,
+                  imag_time: bool = False, s: float = 1.1, E: float = 1.0,
+                  dim: int = 1,
+                  psi_0: Callable = functions.psi_gauss_3d,
+                  V: Callable = functions.v_harmonic_3d,
+                  V_interaction: Callable = None,
+                  psi_sol: Callable = functions.thomas_fermi_3d,
+                  mu_sol: Callable = functions.mu_3d,
+                  plot_psi_sol: bool = False,
+                  plot_V: bool = True,
+                  alpha_psi: float = 0.8,
+                  alpha_psi_sol: float = 0.5,
+                  alpha_V: float = 0.3,
+                  accuracy: float = 10 ** -6,
+                  filename: str = "split.mp4",
+                  x_lim: Tuple[float, float] = (-1.0, 1.0),
+                  y_lim: Tuple[float, float] = (-1.0, 1.0),
+                  z_lim: Tuple[float, float] = (-1.0, 1.0),
+                  slice_x_index: int = 0,
+                  slice_y_index: int = 0,
+                  camera_r_func: Callable = None,
+                  camera_phi_func: Callable = functools.partial(functions.camera_func_phi, phi_per_frame=20.0),
+                  camera_z_func: Callable = None,
+                  camera_r_0: float = 10.0,
+                  camera_phi_0: float = 75.0,
+                  camera_z_0: float = 20.0,
+                  delete_input: bool = True):
+    """
+    Wrapper for Animation and Schroedinger to get a working Animation of a System
+    through the equations given by Schroedinger.
+
+    Parameters
+    ----------
+    resolution : int
+                 number of grid points in one direction
+
+    max_timesteps : int
+        Maximum timesteps  with length dt for the animation.
+
+    accuracy : float
+        Convergence is reached when relative error of s ios smaller than accuracy,
+        where s is System.s = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+
+    plot_psi_sol :
+        Condition if psi_sol should be plotted.
+
+    plot_V : bool
+        Condition if V should be plotted.
+
+    x_lim : Tuple[float, float]
+        Limits of plot in x direction
+
+    y_lim : Tuple[float, float]
+        Limits of plot in y direction
+
+    z_lim : Tuple[float, float]
+        Limits of plot in z direction
+
+    alpha_psi : float
+        Alpha value for plot transparency of psi
+
+    alpha_psi_sol : float
+        Alpha value for plot transparency of psi_sol
+
+    alpha_V : float
+        Alpha value for plot transparency of V
+
+    filename : str
+        Filename with filetype to save the movie to
+
+    slice_x_index : int
+        Index of grid point in x direction to produce a slice/plane in mayavi,
+        where psi_prob = |psi| ** 2 is used for the slice
+
+    slice_y_index : int
+        Index of grid point in y direction to produce a slice/plane in mayavi,
+        where psi_prob = |psi| ** 2 is used for the slice
+
+    camera_r_func : Callable or None
+        r component of the movement of the camera.
+
+    camera_phi_func : Callable or None
+        phi component of the movement of the camera.
+
+    camera_z_func : Callable or None
+        z component of the movement of the camera.
+
+    camera_r_0 : float
+        r component of the starting point of the camera movement.
+
+    camera_phi_0 :
+        phi component of the starting point of the camera movement.
+
+    camera_z_0 :
+        z component of the starting point of the camera movement.
+
+    delete_input : bool
+        Condition if the input pictures should be deleted, after creation the creation of the animation as e.g. mp4
+
+    Returns
+    -------
+    """
     with run_time.run_time():
         Harmonic = Schroedinger.Schroedinger(resolution, max_timesteps, L, dt, g=g, g_qf=g_qf, imag_time=imag_time,
                                              s=s, E=E,
@@ -66,12 +144,12 @@ def simulate_case(resolution, max_timesteps, L, dt, g, g_qf, imag_time=False, s=
     if dim < 3:
         # matplotlib for 1D and 2D
         ani = Animation.Animation(dim=dim,
-                                  r_func=r_func,
-                                  phi_func=phi_func,
-                                  z_func=z_func,
-                                  camera_r=camera_r,
-                                  camera_phi=camera_phi,
-                                  camera_z=camera_z
+                                  camera_r_func=camera_r_func,
+                                  camera_phi_func=camera_phi_func,
+                                  camera_z_func=camera_z_func,
+                                  camera_r_0=camera_r_0,
+                                  camera_phi_0=camera_phi_0,
+                                  camera_z_0=camera_z_0
                                   )
 
         if ani.dim == 1:
@@ -84,7 +162,7 @@ def simulate_case(resolution, max_timesteps, L, dt, g, g_qf, imag_time=False, s=
         # ani.set_limits_smart(0, Harmonic)
 
         with run_time.run_time():
-            ani.start(Harmonic, file_name, plot_V=plot_V, plot_psi_sol=plot_psi_sol)
+            ani.start(Harmonic, filename, accuracy=accuracy, plot_psi_sol=plot_psi_sol, plot_V=plot_V)
     else:
         # mayavi for 3D
         may = MayaviAnimation.MayaviAnimation(dim=3)
@@ -98,7 +176,7 @@ def simulate_case(resolution, max_timesteps, L, dt, g, g_qf, imag_time=False, s=
         # print(f"{Harmonic.t}, {Harmonic.dt * Harmonic.max_timesteps}")
         # if Harmonic.t >= Harmonic.dt * Harmonic.max_timesteps:
         #     mlab.close()
-        may.create_movie(input_data_file_pattern="*.png", filename=file_name, delete_input=delete_input)
+        may.create_movie(input_data_file_pattern="*.png", filename=filename, delete_input=delete_input)
 
 
 # Script runs, if script is run as main script (called by python *.py)
@@ -112,14 +190,16 @@ if __name__ == "__main__":
 
     # constants needed for the Schroedinger equation
     L = 4
-    dt: float = 0.0001
+    dt: float = 0.1
     N: int = 10 ** 2
     m: float = 164.0 * constants.u_in_kg
     a_s: float = 90.0 * constants.a_0
     a_dd: float = 130.0 * constants.a_0
-    w_x: float = 2.0 * np.pi * 30.0
-    w_y: float = 2.0 * np.pi * 30.0
-    w_z: float = 2.0 * np.pi * 30.0
+
+    w: float = 2.0 * np.pi * 30.0
+    w_x: float = w
+    w_y: float = w
+    w_z: float = w
 
     alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
     g, g_qf, epsilon_dd = functions.get_parameters(N=N, m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
@@ -147,27 +227,27 @@ if __name__ == "__main__":
     # 3D works in single core mode
     simulate_case(resolution, max_timesteps=800, L=L, dt=dt, g=g, g_qf=g_qf, imag_time=True,
                   s=1.1, E=1.0,
-                  accuracy=10 ** -8,
                   dim=3,
                   psi_0=psi_0_3d,
                   V=V_3d,
                   V_interaction=V_3d_ddi,
-                  psi_sol=None,
+                  psi_sol=psi_sol_3d,
                   mu_sol=functions.mu_3d,
                   plot_psi_sol=False,
                   plot_V=False,
                   alpha_psi=0.8,
                   alpha_psi_sol=0.5,
                   alpha_V=0.3,
-                  file_name="anim.mp4",
+                  accuracy=10 ** -10,
+                  filename="anim.mp4",
                   x_lim=(-2.0, 2.0), y_lim=(-2.0, 2.0), z_lim=(0, 0.5),
                   slice_x_index=resolution // 3, slice_y_index=resolution // 3,  # just for mayavi (3D)
-                  r_func=functools.partial(functions.camera_func_r, r_0=10.0, r_per_frame=0.0),  # from here just 2D
-                  phi_func=functools.partial(functions.camera_func_phi, phi_0=45.0, phi_per_frame=10.0),
-                  z_func=functools.partial(functions.camera_func_r, r_0=20.0, r_per_frame=0.0),
-                  camera_r=10.0,
-                  camera_phi=45.0,
-                  camera_z=20.0,
+                  camera_r_func=functools.partial(functions.camera_func_r, r_0=10.0, r_per_frame=0.0),  # camera just 2D
+                  camera_phi_func=functools.partial(functions.camera_func_phi, phi_0=45.0, phi_per_frame=10.0),
+                  camera_z_func=functools.partial(functions.camera_func_r, r_0=20.0, r_per_frame=0.0),
+                  camera_r_0=10.0,
+                  camera_phi_0=45.0,
+                  camera_z_0=20.0,
                   delete_input=True
                   )
     print("Single core done")
@@ -197,10 +277,10 @@ if __name__ == "__main__":
     #                         V=V_2d,
     #                         psi_sol=psi_sol_2d,
     #                         mu_sol=functions.mu_2d,
-    #                         accuracy=10 ** -6,
     #                         alpha_psi=0.8,
     #                         alpha_V=0.3,
     #                         file_name=file_name,
+    #                         accuracy=10 ** -6,
     #                         x_lim=(-2.0, 2.0), y_lim=(-2.0, 2.0), z_lim=(0, 0.5),
     #                         slice_x_index=resolution // 2, slice_y_index=resolution // 2,  # just for mayavi (3D)
     #                         r_func=functools.partial(functions.camera_func_r, r_0=10.0, r_per_frame=0.0),

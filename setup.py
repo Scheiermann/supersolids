@@ -8,16 +8,15 @@ from setuptools import setup
 
 setup(
     name="supersolids",
-    version="0.1.17",
+    version="0.1.20",
     packages=["", "supersolids"],
-    package_data={"supersolids": ["results/anim.mp4",
-                                  ]},
+    package_data={"supersolids": []},
     url="https://github.com/Scheiermann/supersolids",
     license="MIT",
     author="Scheiermann",
     author_email="daniel.scheiermann@stud.uni-hannover.de",
     install_requires=["apptools", "envisage", "ffmpeg-python", "matplotlib", "mayavi", "numpy", "psutil", "PyQt5",
-                      "scipy", "sympy", "traits", "traitsui", "vtk"],
+                      "scipy", "traits", "traitsui", "vtk"],
     # ext_modules=cythonize("*.pyx", language_level=3),
     python_requires=">=3.8",
     description="Notes and script to supersolids"

@@ -43,8 +43,8 @@ def get_parameters(N: int = 10 ** 4,
                    a_dd: float = 130.0 * constants.a_0,
                    w_x: float = 2.0 * np.pi * 30.0):
     a_s_l_ho_ratio, epsilon_dd = g_qf_helper(m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
-    g = get_g(N, a_s_l_ho_ratio)
     g_qf = get_g_qf(N, a_s_l_ho_ratio, epsilon_dd)
+    g = get_g(N, a_s_l_ho_ratio)
 
     return g, g_qf, epsilon_dd
 
@@ -95,14 +95,17 @@ def psi_gauss_2d_pdf(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.
 
     Parameters
     ----------
-    pos : 3D array, stacked meshgrid of an x (1D) and y (1D)
-    mu : mean of gauss
-    var : var of gauss
+    pos : np.ndarray 3D
+        stacked meshgrid of an x (1D) and y (1D)
+    mu : np.ndarray 2D
+        Mean of gauss
+    var : np.ndarray 2D
+        Variance of gauss
 
     Returns
     -------
     z_mesh : meshgrid, 2D surface values
-             values according to gaus dirstribution (2D) with meshgrid of x,y as input
+        values according to gaus dirstribution (2D) with meshgrid of x,y as input
 
     """
     cov = np.diag(var ** 2)
@@ -116,25 +119,25 @@ def psi_gauss_2d(x, y, a: float = 1.0, x_0: float = 0.0, y_0: float = 0.0, k_0: 
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
-     Parameters
-     ----------
-     x : sympy.symbol
-         mathematical variable
+    Parameters
+    ----------
+    x : sympy.symbol
+        mathematical variable
 
-     y : sympy.symbol
-         mathematical variable
+    y : sympy.symbol
+        mathematical variable
 
-     a : float
+    a : float
         Amplitude of pulse
 
-     x_0 : float
-           Mean spatial x of pulse
+    x_0 : float
+        Mean spatial x of pulse
 
-     y_0 : float
-           Mean spatial y of pulse
+    y_0 : float
+        Mean spatial y of pulse
 
-     k_0 : float
-           Group velocity of pulse
+    k_0 : float
+        Group velocity of pulse
     """
 
     return ((a * np.sqrt(np.pi)) ** (-0.5)
@@ -146,31 +149,31 @@ def psi_gauss_3d(x, y, z, a: float = 1.0, x_0: float = 0.0, y_0: float = 0.0, z_
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
-     Parameters
-     ----------
-     x : sympy.symbol
-         mathematical variable
+    Parameters
+    ----------
+    x : sympy.symbol
+        mathematical variable
 
-     y : sympy.symbol
-         mathematical variable
+    y : sympy.symbol
+        mathematical variable
 
-     z : sympy.symbol
-         mathematical variable
+    z : sympy.symbol
+        mathematical variable
 
-     a : float
+    a : float
         Amplitude of pulse
 
-     x_0 : float
-           Mean spatial x of pulse
+    x_0 : float
+        Mean spatial x of pulse
 
-     y_0 : float
-           Mean spatial y of pulse
+    y_0 : float
+        Mean spatial y of pulse
 
-     z_0 : float
-           Mean spatial z of pulse
+    z_0 : float
+        Mean spatial z of pulse
 
-     k_0 : float
-           Group velocity of pulse
+    k_0 : float
+        Group velocity of pulse
     """
 
     return ((a * np.sqrt(np.pi)) ** (-0.5)
@@ -183,19 +186,19 @@ def psi_gauss_1d(x, a: float = 1.0, x_0: float = 0.0, k_0: float = 0.0):
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
-     Parameters
-     ----------
-     x : sympy.symbol
-         mathematical variable
+    Parameters
+    ----------
+    x : sympy.symbol
+        mathematical variable
 
-     a : float
+    a : float
         Amplitude of pulse
 
-     x_0 : float
-           Mean spatial x of pulse
+    x_0 : float
+        Mean spatial x of pulse
 
-     k_0 : float
-           Group velocity of pulse
+    k_0 : float
+        Group velocity of pulse
     """
 
     return ((a * np.sqrt(np.pi)) ** (-0.5)
@@ -261,14 +264,14 @@ def psi_gauss_solution(x):
 
 def thomas_fermi_1d(x, g: float = 0.0):
     """
-     Mathematical function of Thomas-Fermi distribution with coupling constant g
+    Mathematical function of Thomas-Fermi distribution with coupling constant g
 
-     Parameters
-     ----------
-     x : sympy.symbol
-         mathematical variable
+    Parameters
+    ----------
+    x : sympy.symbol
+        mathematical variable
 
-     g : float
+    g : float
         coupling constant
     """
 
@@ -287,15 +290,15 @@ def thomas_fermi_1d(x, g: float = 0.0):
 
 def thomas_fermi_2d(x, y, g: float = 0.0):
     """
-     Mathematical function of Thomas-Fermi distribution with coupling constant g
+    Mathematical function of Thomas-Fermi distribution with coupling constant g
 
-     Parameters
-     ----------
-     x : sympy.symbol
-         mathematical variable
+    Parameters
+    ----------
+    x : sympy.symbol
+        mathematical variable
 
-     g : float
-        coupling constant
+    g : float
+       coupling constant
     """
 
     if g != 0:
@@ -320,15 +323,15 @@ def thomas_fermi_2d_pos(pos, g: float = 0.0):
 
 def thomas_fermi_3d(x, y, z, g: float = 0.0):
     """
-     Mathematical function of Thomas-Fermi distribution with coupling constant g
+    Mathematical function of Thomas-Fermi distribution with coupling constant g
 
-     Parameters
-     ----------
-     x : sympy.symbol
-         mathematical variable
+    Parameters
+    ----------
+    x : sympy.symbol
+        mathematical variable
 
-     g : float
-        coupling constant
+    g : float
+       coupling constant
     """
 
     if g != 0:
@@ -388,10 +391,11 @@ def dipol_dipol_interaction(kx_mesh: float, ky_mesh: float, kz_mesh: float,
                             g: float = 1.0, d: float = 1.0, epsilon_dd: float = 1.0):
     k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
     factor = 3.0 * (kz_mesh ** 2.0)
-    # singularity = np.where(k_squared == 0.0, factor, k_squared)
-    V_k_val = epsilon_dd * g * (4.0 * np.pi / 3.0) * d ** 2.0 * ((factor / k_squared) - 1.0)
+    # for [0, 0, 0] there is a singularity and factor/k_squared is 0/0, so we arbitrary set the divisor to 1.0
+    k_squared_singular_free = np.where(k_squared == 0.0, 1.0, k_squared)
+    V_k_val = epsilon_dd * g * (4.0 * np.pi / 3.0) * d ** 2.0 * ((factor / k_squared_singular_free) - 1.0)
 
-    # Remove singularity
+    # Remove singularities (at this point there should not be any)
     V_k_val[np.isnan(V_k_val)] = 0.0
 
     return V_k_val
@@ -399,6 +403,8 @@ def dipol_dipol_interaction(kx_mesh: float, ky_mesh: float, kz_mesh: float,
 
 def camera_func_r(frame: int,
                   r_0: float = 10.0,
+                  phi_0: float = 45.0,
+                  z_0: float = 20.0,
                   r_per_frame: float = 10.0) -> float:
     r = r_0 + r_per_frame * frame
     return r

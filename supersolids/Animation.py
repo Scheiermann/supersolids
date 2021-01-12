@@ -19,8 +19,41 @@ from typing import Callable, Tuple
 from supersolids import Schroedinger, functions
 
 
-def camera_3d_trajectory(frame, r_func: Callable = None, phi_func: Callable = None, z_func: Callable = None,
+def camera_3d_trajectory(frame: int, r_func: Callable = None, phi_func: Callable = None, z_func: Callable = None,
                          r_0: float = 10.0, phi_0: float = 45.0, z_0: float = 20.0) -> Tuple[float, float, float]:
+    """
+    Computes r, phi, z as the components of the camera position in the animation for the given frame.
+    Depending on, if a callable function is given for the components, it is applied to the parameters
+    or the start values are used.
+
+    Parameters
+    ----------
+    frame : int, index
+        Index of the frame in the animation
+
+    r_func : Callable or None
+        r component of the movement of the camera.
+
+    phi_func : Callable or None
+        phi component of the movement of the camera.
+
+    z_func : Callable or None
+        z component of the movement of the camera.
+
+    r_0 : float
+        r component of the starting point of the camera movement.
+
+    phi_0 : float
+        phi component of the starting point of the camera movement.
+
+    z_0 : float
+        z component of the starting point of the camera movement.
+
+    Returns
+    -------
+    r, phi, z as the components of the camera position in the animation for the given frame.
+
+    """
     if r_func is None:
         r = r_0
     else:
@@ -40,18 +73,44 @@ def camera_3d_trajectory(frame, r_func: Callable = None, phi_func: Callable = No
 class Animation:
     def __init__(self,
                  dim=2,
-                 r_func=None,
-                 phi_func=functions.camera_func_phi,
-                 z_func=None,
-                 camera_r: float = 10.0,
-                 camera_phi: float = 45.0,
-                 camera_z: float = 20.0,
-                ):
+                 camera_r_func=None,
+                 camera_phi_func=functions.camera_func_phi,
+                 camera_z_func=None,
+                 camera_r_0: float = 10.0,
+                 camera_phi_0: float = 45.0,
+                 camera_z_0: float = 20.0,
+                 ):
         """
-        Creates an Animation for a Schroedinger equation
+        Creates an Animation for a Schroedinger equation for the 1D or 2D case.
         Methods need the object Schroedinger with the parameters of the equation
+
+        Parameters
+        ----------
+        dim : int
+            Dimension of the underlying Schroedinger to animate.
+
+        camera_r_func : Callable, function
+            r component of the movement of the camera.
+
+        camera_phi_func : Callable, function
+            phi component of the movement of the camera.
+
+        camera_z_func : Callable, function
+            z component of the movement of the camera.
+
+        camera_r_0 : float
+            r component of the starting point of the camera movement.
+
+        camera_phi_0 : float
+            phi component of the starting point of the camera movement.
+
+        camera_z_0 : float
+            z component of the starting point of the camera movement.
+
         """
         self.dim = dim
+        assert 1 <= self.dim <= 2, ("Spatial dimension needs to be 1 or 2, but it is {}."
+                                    "This is not implemented.".format(self.dim))
 
         # matplotlib
         if self.dim == 1:
@@ -78,14 +137,14 @@ class Animation:
             self.ax.set_zlabel(r'$z$')
             self.ax.grid()
 
-            self.camera_r, self.camera_phi, self.camera_z = camera_r, camera_phi, camera_z
-            self.r_func = r_func
-            self.phi_func = phi_func
-            self.z_func = z_func
+            self.camera_r, self.camera_phi, self.camera_z = camera_r_0, camera_phi_0, camera_z_0
+            self.r_func = camera_r_func
+            self.phi_func = camera_phi_func
+            self.z_func = camera_z_func
 
-            self.ax.dist = camera_r
-            self.ax.azim = camera_phi
-            self.ax.elev = camera_z
+            self.ax.dist = camera_r_0
+            self.ax.azim = camera_phi_0
+            self.ax.elev = camera_z_0
 
     def set_limits(self, row: int, col: int, x_min: float, x_max: float, y_min: float, y_max: float):
         """
@@ -94,22 +153,22 @@ class Animation:
         Parameters
         ----------
         row : int, index
-              row of the subplot for the animation
+            row of the subplot for the animation
 
         col : int, index
-              column of the subplot for the animation
+            column of the subplot for the animation
 
         x_min : float, index
-               minimum x value of subplot
+            minimum x value of subplot
 
         x_max : float, index
-               maximum x value of subplot
+            maximum x value of subplot
 
         y_min : float, index
-               minimum y value of subplot
+            minimum y value of subplot
 
         y_max : float, index
-               maximum y value of subplot
+            maximum y value of subplot
         """
 
         y_lim = (y_min - 0.2 * (y_max - y_min), y_max + 0.2 * (y_max - y_min))
@@ -129,12 +188,15 @@ class Animation:
             column of the subplot for the animation
 
         System: Schroedinger, object
-                Defines the Schroedinger equation for a given problem
+            Defines the Schroedinger equation for a given problem
         """
 
         assert type(System) is Schroedinger.Schroedinger, ("System"
                                                            "needs to be {}, but it is {}".format(
             Schroedinger.Schroedinger, type(System)))
+        assert self.dim == System.dim, ("Spatial dimension Animation and Schroedinger needs to be equal,"
+                                        "but Animation.dim is {} and Schroedinger.dim is {}.".format(
+            self.dim, System.dim))
 
         x_min = -System.L
         x_max = System.L
@@ -176,21 +238,40 @@ class Animation:
 
         return V_pos, V_plot_val
 
-    def animate(self, frame_index: int, System: Schroedinger.Schroedinger, plot_V=True, plot_psi_sol=False):
+    def animate(self, frame_index: int,
+                System: Schroedinger.Schroedinger,
+                accuracy: float = 10 ** -6,
+                plot_psi_sol: bool = False,
+                plot_V: bool = True,
+                ):
         """
         Sets the plot limits appropriate even if the initial wave function psi_0 is not normalized
 
         Parameters
         ----------
         frame_index: int, index
-                     Current index of frame
+            Current index of frame
 
         System: Schroedinger, object
-                Defines the Schroedinger equation for a given problem
+            Defines the Schroedinger equation for a given problem
+
+        accuracy : float
+            Convergence is reached when relative error of s ios smaller than accuracy,
+            where s is System.s = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+
+        plot_psi_sol :
+            Condition if psi_sol should be plotted.
+
+        plot_V : bool
+            Condition if V should be plotted.
+
         """
         assert type(System) is Schroedinger.Schroedinger, ("System"
                                                            "needs to be {}, but it is {}".format(
             Schroedinger.Schroedinger, type(System)))
+        assert self.dim == System.dim, ("Spatial dimension Animation and Schroedinger needs to be equal,"
+                                        "but Animation.dim is {} and Schroedinger.dim is {}.".format(
+            self.dim, System.dim))
 
         # As V is constant, calculate and plot it just one time (at first frame)
         if frame_index == 0:
@@ -231,7 +312,14 @@ class Animation:
                     contour.remove()
 
             # print(f"prob max: {np.abs(System.psi_val.max().max()) ** 2}")
+
+            mu_old = System.mu
             System.time_step()
+            mu_rel = np.abs((System.mu - mu_old) / System.mu)
+            print(f"mu_rel: {mu_rel}")
+            if mu_rel < accuracy:
+                print(f"accuracy reached: {mu_rel}")
+                self.anim.event_source.stop()
 
         if frame_index % 10 == 0:
             print(f"Round {frame_index}")
@@ -272,64 +360,83 @@ class Animation:
                 levels = 20
 
                 self.psi_x_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
-                                                     zdir='x', offset=self.ax.get_xlim()[0], cmap=cmap, levels=levels)
+                                                   zdir='x', offset=self.ax.get_xlim()[0], cmap=cmap, levels=levels)
                 self.psi_y_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
-                                                     zdir='y', offset=self.ax.get_ylim()[0], cmap=cmap, levels=levels)
+                                                   zdir='y', offset=self.ax.get_ylim()[0], cmap=cmap, levels=levels)
                 self.psi_z_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
-                                                     zdir='z', offset=self.ax.get_zlim()[0],
-                                                     cmap=cmap, levels=levels,
-                                                     )
+                                                   zdir='z', offset=self.ax.get_zlim()[0],
+                                                   cmap=cmap, levels=levels,
+                                                   )
                 if frame_index == 1:
                     color_bar_axes = self.fig.add_axes([0.85, 0.1, 0.03, 0.8])
                     self.fig.colorbar(self.psi_x_line, cax=color_bar_axes)
 
         self.title.set_text(("g = {:.2}, dt = {:.6}, max_timesteps = {:d}, imag_time = {},\n"
                              "t = {:02.05f}").format(System.g,
-                                                     System.dt,
-                                                     System.max_timesteps,
-                                                     System.imag_time,
-                                                     System.t,
-                                                     ))
+                                           System.dt,
+                                           System.max_timesteps,
+                                           System.imag_time,
+                                           System.t,
+                                           ))
 
         if System.dim == 1:
             return self.psi_line, self.V_line, self.psi_sol_line, self.title
         else:
-            if frame_index == 0:
-                return self.V_line, self.title
+            if plot_V:
+                if frame_index == 0:
+                    return self.V_line, self.title
+                else:
+                    return self.psi_line, self.V_line, self.title
             else:
-                return self.psi_line, self.V_line, self.title
+                if frame_index == 0:
+                    return self.title,
+                else:
+                    return self.psi_line, self.title
 
-    def start(self, System: Schroedinger.Schroedinger, file_name, plot_V=True, plot_psi_sol=False):
+    def start(self, System: Schroedinger.Schroedinger,
+              filename: str = "anim.mp4",
+              accuracy: float = 10 ** -6,
+              plot_psi_sol: bool = False,
+              plot_V: bool = True
+              ):
         """
         Sets the plot limits appropriate even if the initial wave function psi_0 is not normalized
 
         Parameters
         ----------
-        file_name : String
-                    Name of file including file type to save the animation to (tested with mp4)
+        filename : String
+            Name of file including file type to save the animation to (tested with mp4)
+
+        accuracy : float
+            Convergence is reached when relative error of s ios smaller than accuracy,
+            where s is System.s = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
 
         System: Schroedinger, object
-                Defines the Schroedinger equation for a given problem
-
-        plot_V : bool
-                 Condition if V should be plotted.
+            Defines the Schroedinger equation for a given problem
 
         plot_psi_sol :
-                 Condition if psi_sol should be plotted.
+            Condition if psi_sol should be plotted.
+
+        plot_V : bool
+            Condition if V should be plotted.
 
         """
 
         assert type(System) is Schroedinger.Schroedinger, ("System"
                                                            "needs to be {}, but it is {}".format(
             Schroedinger.Schroedinger, type(System)))
+        assert self.dim == System.dim, ("Spatial dimension Animation and Schroedinger needs to be equal,"
+                                        "but Animation.dim is {} and Schroedinger.dim is {}.".format(
+            self.dim, System.dim))
 
         # blit=True means only re-draw the parts that have changed.
-        anim = animation.FuncAnimation(self.fig, self.animate,
-                                       fargs=(System, plot_V, plot_psi_sol), frames=System.max_timesteps, interval=30,
-                                       blit=True, cache_frame_data=False)
+        self.anim = animation.FuncAnimation(self.fig, self.animate,
+                                            fargs=(System, accuracy, plot_psi_sol, plot_V),
+                                            frames=System.max_timesteps, interval=30,
+                                            blit=True, cache_frame_data=False)
 
         # requires either mencoder or ffmpeg to be installed on your system
-        anim.save("results" + sep + file_name, fps=15, dpi=300, extra_args=['-vcodec', 'libx264'])
+        self.anim.save("results" + sep + filename, fps=15, dpi=300, extra_args=['-vcodec', 'libx264'])
 
 
 def plot_2d(resolution=32,
@@ -342,17 +449,20 @@ def plot_2d(resolution=32,
 
     Parameters
     ----------
-    alpha :
-    x_lim : pair of float
-            limits of plot in x direction
-    y_lim : pair of float
-            limits of plot in y direction
-    z_lim : pair of float
-            limits of plot in z direction
     resolution : int
-                 number of grid points in one direction
+        number of grid points in one direction
+
+    x_lim : Tuple[float, float]
+        Limits of plot in x direction
+
+    y_lim : Tuple[float, float]
+        Limits of plot in y direction
+
+    z_lim : Tuple[float, float]
+        Limits of plot in z direction
+
     alpha : float
-            alpha value for plot transparency
+        alpha value for plot transparency
 
     Returns
     -------

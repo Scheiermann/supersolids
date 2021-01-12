@@ -27,11 +27,11 @@ def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str
     Parameters
     ----------
     dir_path : Path
-               Path where to look for old directories (movie data)
+        Path where to look for old directories (movie data)
     dir_name : str
-               General name of the directories without the counter
+        General name of the directories without the counter
     counting_format : str
-                      Format of counter of the directories
+        Format of counter of the directories
 
     Returns
     -------
@@ -49,7 +49,8 @@ def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str
 
 
 @mlab.animate(delay=10, ui=True)
-def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
+def animate(System: Schroedinger.Schroedinger,
+            accuracy: float = 10 ** -6,
             plot_psi_sol: bool = False,
             plot_V: bool = True,
             x_lim: Tuple[float, float] = (-1, 1),
@@ -64,24 +65,35 @@ def animate(System: Schroedinger.Schroedinger, accuracy: float = 10 ** -6,
 
     Parameters
     ----------
-    System : Schroedinger.Schoredinger
-             Schrödinger equations for the specified system
+    System : Schroedinger.Schroedinger
+        Schrödinger equations for the specified system
 
     accuracy : float
-               Convergence is reached when relative error of s ios smaller than accuracy,
-               where s is System.s = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+        Convergence is reached when relative error of s ios smaller than accuracy,
+        where s is System.s = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+
+    plot_psi_sol :
+        Condition if psi_sol should be plotted.
+
+    plot_V : bool
+        Condition if V should be plotted.
 
     x_lim : Tuple[float, float]
+        Limits of plot in x direction
+
     y_lim : Tuple[float, float]
+        Limits of plot in y direction
+
     z_lim : Tuple[float, float]
+        Limits of plot in z direction
+
     slice_x_index : int
-                    Index of projection in terms of indexes of System.x
+        Index of grid point in x direction (in terms of System.x) to produce a slice/plane in mayavi,
+        where psi_prob = |psi| ** 2 is used for the slice
+
     slice_y_index : int
-                    Index of projection in terms of indexes of System.y
-    plot_V : bool
-             Condition if V should be plotted.
-    plot_psi_sol :
-             Condition if psi_sol should be plotted.
+        Index of grid point in y  (in terms of System.y) direction to produce a slice/plane in mayavi,
+        where psi_prob = |psi| ** 2 is used for the slice
 
     Returns
     -------
@@ -166,16 +178,17 @@ class MayaviAnimation:
 
         Parameters
         ----------
-        delete_input : bool
-                       Flag to delete input_data after creation of movie
         dir_path : Path
-                   Path where to look for old directories (movie data)
+            Path where to look for old directories (movie data)
 
         input_data_file_pattern : str
-                                  regex pattern to find all input data
+            Regex pattern to find all input data
 
         filename : str
-                  filename with filetype to save the movie to
+            Filename with filetype to save the movie to
+
+        delete_input : bool
+            Condition if the input pictures should be deleted, after creation the creation of the animation as e.g. mp4
 
         Returns
         -------

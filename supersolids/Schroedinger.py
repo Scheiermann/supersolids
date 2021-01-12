@@ -19,21 +19,22 @@ from supersolids import functions
 
 class Schroedinger(object):
     """
-    Implements a numerical solution of the time-dependent
-    non-linear Schrodinger equation for an arbitrary potential:
-    i \hbar \frac{\partial}{\partial t} \psi(r,t) = \left(\frac{-\hbar^{2}}{2 m} \nabla^{2}
-                                                    + V(r) + g |\psi(x,t)|^{2} \right) \psi(x,t)
+    Implements a numerical solution of the dimensionless time-dependent
+    non-linear Schrodinger equation for an arbitrary potential, where D[., t] is a partial derivative to t:
+    i D(psi, t) = [-0.5 * (D[., x] ** 2 + D[., y] ** 2 + D[., z] ** 2)
+                   + 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2)
+                   + g |psi| ** 2
+                   + g_qf * |psi| ** 3
+                   + U_dd] psi
 
-    For the moment we aim to solve:
-    \mu \phi_{0}(x) = \left(\frac{-1}{2} \frac{\partial^{2}}{\partial x^{2}}
-                      + \frac{1}{2} x^{2} + \tilde{g} |\phi_{0}(x)|^{2} \right) \phi_{0}(x)
+    With U_dd = iFFT( FFT(|psi| ** 2) * e_dd * g * ((3 * k_z / k ** 2) - 1.0) )
 
     We will first implement the split operator without commutator relation ($H = H_{pot} + H_{kin}$)
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
 
-    def __init__(self, resolution: int, max_timesteps: int, L: float, dt: float, g: float = 0.0,
-                 g_qf: float = 0.0, imag_time: bool = True, s: float = 1.1, E: float = 1.0,
+    def __init__(self, resolution: int, max_timesteps: int, L: float, dt: float, g: float = 0.0, g_qf: float = 0.0,
+                 imag_time: bool = True, s: float = 1.1, E: float = 1.0,
                  dim: int = 3,
                  psi_0: Callable = functions.psi_gauss_3d,
                  V: Callable = functions.v_harmonic_3d,
@@ -45,10 +46,24 @@ class Schroedinger(object):
                  alpha_V: float = 0.3,
                  ):
         """
+        Schrödinger equations for the specified system.
+
         Parameters
         ----------
-        x: array_like, float
-            description
+        resolution : int
+            number of grid points in one direction
+
+        max_timesteps : int
+            Maximum timesteps  with length dt for the animation.
+
+        alpha_psi : float
+            Alpha value for plot transparency of psi
+
+        alpha_psi_sol : float
+            Alpha value for plot transparency of psi_sol
+
+        alpha_V : float
+            Alpha value for plot transparency of V
 
         """
         self.resolution = int(resolution)
@@ -114,6 +129,10 @@ class Schroedinger(object):
             self.k_squared = self.kx ** 2.0
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 
+            if V_interaction is None:
+                # For no interaction the identity is needed with respect to 2D * 2D (array with 1.0 everywhere)
+                self.V_k_val = np.full(self.psi_val.shape, 1.0)
+
         elif dim == 2:
             self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
             self.psi_val = self.psi(self.pos)
@@ -127,6 +146,12 @@ class Schroedinger(object):
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0
             # here a number (U) is multiplied elementwise with an (1D, 2D or 3D) array (k_squared)
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
+
+            if V_interaction is None:
+                # For no interaction the identity is needed with respect to 2D * 2D (array with 1.0 everywhere)
+                self.V_k_val = np.full(self.psi_val.shape, 1.0)
+            else:
+                self.V_k_val = V_interaction(kx_mesh, ky_mesh, g=self.g)
 
         elif dim == 3:
             self.x_mesh, self.y_mesh, self.z_mesh = np.mgrid[self.x[0]:self.x[-1]:complex(0, self.resolution),
@@ -152,11 +177,6 @@ class Schroedinger(object):
             else:
                 self.V_k_val = V_interaction(kx_mesh, ky_mesh, kz_mesh, g=self.g)
 
-        density = np.abs(self.psi_val) ** 2.0
-        density_k = np.fft.fftn(density)
-        density_k_interact = self.V_k_val * density_k
-        U_interaction = np.fft.ifftn(density_k_interact)
-
        # attributes for animation
         self.t = 0.0
 
@@ -164,9 +184,9 @@ class Schroedinger(object):
         self.alpha_psi_sol = alpha_psi_sol
         self.alpha_V = alpha_V
 
-    def get_density(self, p: float = 2.0) -> float:
+    def get_density(self, p: float = 2.0) -> np.ndarray:
         if self.dim <= 3:
-            psi_density = np.sum(np.abs(self.psi_val) ** p)
+            psi_density = np.abs(self.psi_val) ** p
         else:
             print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
             sys.exit(1)
@@ -175,26 +195,28 @@ class Schroedinger(object):
 
     def get_norm(self, p: float = 2.0) -> float:
         if self.dim == 1:
-            psi_norm = self.get_density(p=p) * self.dx
+            dV = self.dx
         elif self.dim == 2:
-            psi_norm = self.get_density(p=p) * self.dx * self.dy
+            dV = self.dx * self.dy
         elif self.dim == 3:
-            psi_norm = self.get_density(p=p) * self.dx * self.dy * self.dz
+            dV = self.dx * self.dy * self.dz
         else:
             print("Spatial dimension over 3. This is not implemented.", file=sys.stderr)
             sys.exit(1)
+
+        psi_norm = np.sum(self.get_density(p=p)) * dV
 
         return psi_norm
 
     def time_step(self):
         # Here we use half steps in real space, but will use it before and after H_kin with normal steps
 
-        # Calculate the interaction by appling it to the density in k-space (transform back and forth)
-        density = self.get_density(p=2.0)
-        density_3 = self.get_density(p=3.0)
-        U_interaction = np.fft.ifftn(self.V_k_val * np.fft.fftn(density))
+        # Calculate the interaction by appling it to the psi_2 in k-space (transform back and forth)
+        psi_2 = self.get_density(p=2.0)
+        psi_3 = self.get_density(p=3.0)
+        U_interaction = np.fft.ifftn(self.V_k_val * np.fft.fftn(psi_2))
         # update H_pot before use
-        H_pot = np.exp(self.U * (self.V_val + self.g * density + U_interaction + self.g_qf * density_3)
+        H_pot = np.exp(self.U * (self.V_val + self.g * psi_2 + U_interaction + self.g_qf * psi_3)
                        * (0.5 * self.dt))
         # multiply element-wise the (1D, 2D or 3D) arrays with each other
         self.psi_val = H_pot * self.psi_val
@@ -205,11 +227,11 @@ class Schroedinger(object):
         self.psi_val = self.H_kin * self.psi_val
         self.psi_val = np.fft.ifftn(self.psi_val)
 
-        # update H_pot, density, U_interaction before use
-        density = self.get_density(p=2.0)
-        density_3 = self.get_density(p=3.0)
-        U_interaction = np.fft.ifftn(self.V_k_val * np.fft.fftn(density))
-        H_pot = np.exp(self.U * (self.V_val + self.g * density + U_interaction + self.g_qf * density_3)
+        # update H_pot, psi_2, U_interaction before use
+        psi_2 = self.get_density(p=2.0)
+        psi_3 = self.get_density(p=3.0)
+        U_interaction = np.fft.ifftn(self.V_k_val * np.fft.fftn(psi_2))
+        H_pot = np.exp(self.U * (self.V_val + self.g * psi_2 + U_interaction + self.g_qf * psi_3)
                        * (0.5 * self.dt))
         # multiply element-wise the (1D, 2D or 3D) arrays with each other
         self.psi_val = H_pot * self.psi_val
