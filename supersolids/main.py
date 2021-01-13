@@ -47,6 +47,7 @@ def simulate_case(resolution: int, max_timesteps: int, L: float, dt: float, g: f
                   z_lim: Tuple[float, float] = (-1.0, 1.0),
                   slice_x_index: int = 0,
                   slice_y_index: int = 0,
+                  slice_z_index: int = 0,
                   camera_r_func: Callable = None,
                   camera_phi_func: Callable = functools.partial(functions.camera_func_phi, phi_per_frame=20.0),
                   camera_z_func: Callable = None,
@@ -171,7 +172,7 @@ def simulate_case(resolution: int, max_timesteps: int, L: float, dt: float, g: f
         with run_time.run_time():
             may.animate(Harmonic, accuracy=accuracy, plot_V=plot_V, plot_psi_sol=plot_V,
                         x_lim=x_lim, y_lim=y_lim, z_lim=z_lim,
-                        slice_x_index=slice_x_index, slice_y_index=slice_y_index
+                        slice_x_index=slice_x_index, slice_y_index=slice_y_index, slice_z_index=slice_z_index
                         )
         mlab.show()
         # TODO: close window after last frame
@@ -244,7 +245,9 @@ if __name__ == "__main__":
                   accuracy=10 ** -7,
                   filename="anim.mp4",
                   x_lim=(-2.0, 2.0), y_lim=(-2.0, 2.0), z_lim=(0, 0.5),
-                  slice_x_index=resolution // 3, slice_y_index=resolution // 3,  # just for mayavi (3D)
+                  slice_x_index=resolution // 3,  # just for mayavi (3D)
+                  slice_y_index=resolution // 3,
+                  slice_z_index=resolution // 3,
                   camera_r_func=functools.partial(functions.camera_func_r, r_0=10.0, r_per_frame=0.0),  # camera just 2D
                   camera_phi_func=functools.partial(functions.camera_func_phi, phi_0=45.0, phi_per_frame=10.0),
                   camera_z_func=functools.partial(functions.camera_func_r, r_0=20.0, r_per_frame=0.0),

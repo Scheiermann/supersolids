@@ -12,7 +12,7 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 from pathlib import Path
 
 import numpy as np
-import ffmpeg
+from ffmpeg import input
 from mayavi import mlab
 from typing import Tuple
 
@@ -57,7 +57,8 @@ def animate(System: Schroedinger.Schroedinger,
             y_lim: Tuple[float, float] = (-1, 1),
             z_lim: Tuple[float, float] = (-1, 1),
             slice_x_index: int = 0,
-            slice_y_index: int = 0
+            slice_y_index: int = 0,
+            slice_z_index: int = 0
             ):
     """
     Animates solving of the Schroedinger equations of System with mayavi in 3D.
@@ -95,6 +96,10 @@ def animate(System: Schroedinger.Schroedinger,
         Index of grid point in y  (in terms of System.y) direction to produce a slice/plane in mayavi,
         where psi_prob = |psi| ** 2 is used for the slice
 
+    slice_z_index : int
+        Index of grid point in z  (in terms of System.z) direction to produce a slice/plane in mayavi,
+        where psi_prob = |psi| ** 2 is used for the slice
+
     Returns
     -------
 
@@ -107,9 +112,15 @@ def animate(System: Schroedinger.Schroedinger,
                                 plane_orientation="x_axes",
                                 slice_index=slice_x_index,
                                 extent=[*x_lim, *y_lim, *z_lim])
+
     slice_y_plot = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
                                 plane_orientation="y_axes",
                                 slice_index=slice_y_index,
+                                extent=[*x_lim, *y_lim, *z_lim])
+
+    slice_z_plot = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
+                                plane_orientation="z_axes",
+                                slice_index=slice_z_index,
                                 extent=[*x_lim, *y_lim, *z_lim])
 
     if plot_V:
@@ -132,6 +143,7 @@ def animate(System: Schroedinger.Schroedinger,
         prob_3d = np.abs(System.psi_val) ** 2
         slice_x_plot.mlab_source.trait_set(scalars=prob_3d)
         slice_y_plot.mlab_source.trait_set(scalars=prob_3d)
+        slice_z_plot.mlab_source.trait_set(scalars=prob_3d)
         prob_plot.mlab_source.trait_set(scalars=prob_3d)
         yield
 
@@ -206,7 +218,7 @@ class MayaviAnimation:
         # requires either mencoder or ffmpeg to be installed on your system
         # from command line:
         # ffmpeg -f image2 -r 10 -i anim%05d.png -qscale 0 anim.mp4 -pass 2
-        ffmpeg.input(input_data, pattern_type="glob", framerate=25).output(str(output_path)).run()
+        input(input_data, pattern_type="glob", framerate=25).output(str(output_path)).run()
 
         if delete_input:
             # remove all input files (pictures), after animation is created and saved
