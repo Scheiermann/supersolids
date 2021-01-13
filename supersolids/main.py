@@ -131,7 +131,7 @@ def simulate_case(resolution: int, max_timesteps: int, L: float, dt: float, g: f
     """
     with run_time.run_time():
         Harmonic = Schroedinger.Schroedinger(resolution, max_timesteps, L, dt, g=g, g_qf=g_qf, imag_time=imag_time,
-                                             s=s, E=E,
+                                             mu=s, E=E,
                                              dim=dim,
                                              psi_0=psi_0,
                                              V=V,

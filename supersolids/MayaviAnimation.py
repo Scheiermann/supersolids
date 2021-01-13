@@ -218,7 +218,7 @@ class MayaviAnimation:
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     Harmonic = Schroedinger.Schroedinger(resolution=2 ** 6, max_timesteps=100, L=3, dt=1.0, g=1.0, imag_time=True,
-                                         s=1.1, E=1.0,
+                                         mu=1.1, E=1.0,
                                          dim=3,
                                          psi_0=functions.psi_gauss_3d,
                                          V=functions.v_harmonic_3d,

@@ -35,7 +35,7 @@ class Schroedinger(object):
     """
 
     def __init__(self, resolution: int, max_timesteps: int, L: float, dt: float, g: float = 0.0, g_qf: float = 0.0,
-                 imag_time: bool = True, s: float = 1.1, E: float = 1.0,
+                 imag_time: bool = True, mu: float = 1.1, E: float = 1.0,
                  dim: int = 3,
                  psi_0: Callable = functions.psi_gauss_3d,
                  V: Callable = functions.v_harmonic_3d,
@@ -79,7 +79,7 @@ class Schroedinger(object):
         self.dim = dim
 
         # mu = - ln(N) / (2 * dtau), where N is the norm of the psi
-        self.mu = s
+        self.mu = mu
 
         # E = mu - 0.5 * g * int psi_val ** 2
         self.E = E
