@@ -71,8 +71,8 @@ def animate(System: Schroedinger.Schroedinger,
         Schrödinger equations for the specified system
 
     accuracy : float
-        Convergence is reached when relative error of s ios smaller than accuracy,
-        where s is System.s = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+        Convergence is reached when relative error of mu ios smaller than accuracy,
+        where mu is System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
 
     plot_psi_sol :
         Condition if psi_sol should be plotted.
@@ -237,7 +237,7 @@ if __name__ == "__main__":
     Harmonic = Schroedinger.Schroedinger(box=box,
                                          resolution=resolution,
                                          max_timesteps=100, dt=1.0, g=1.0, g_qf=0.0,
-                                         epsilon_dd=1.0, imag_time=True, mu=1.1, E=1.0,
+                                         e_dd=1.0, imag_time=True, mu=1.1, E=1.0,
                                          dim=3,
                                          psi_0=functions.psi_gauss_3d,
                                          V=functions.v_harmonic_3d,

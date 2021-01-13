@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 """
-Animation for the numerical solver for non-linear time-dependent Schrodinger's equation.
+Animation for the numerical solver for the non-linear
+time-dependent Schrodinger equation.
 
 author: Daniel Scheiermann
 email: daniel.scheiermann@stud.uni-hannover.de
@@ -26,9 +27,16 @@ from supersolids import run_time
 from supersolids import Schroedinger
 
 
-def simulate_case(box: Dict[str, float], resolution: Dict[str, int],
-                  max_timesteps: int, dt: float, g: float = 0.0, g_qf: float = 0.0,
-                  epsilon_dd: float = 1.0, imag_time: bool = False, s: float = 1.1, E: float = 1.0,
+def simulate_case(box: Dict[str, float],
+                  resolution: Dict[str, int],
+                  max_timesteps: int,
+                  dt: float,
+                  g: float = 0.0,
+                  g_qf: float = 0.0,
+                  epsilon_dd: float = 1.0,
+                  imag_time: bool = False,
+                  mu: float = 1.1,
+                  E: float = 1.0,
                   dim: int = 1,
                   psi_0: Callable = functions.psi_gauss_3d,
                   V: Callable = functions.v_harmonic_3d,
@@ -50,35 +58,38 @@ def simulate_case(box: Dict[str, float], resolution: Dict[str, int],
                   slice_y_index: int = 0,
                   slice_z_index: int = 0,
                   camera_r_func: Callable = None,
-                  camera_phi_func: Callable = functools.partial(functions.camera_func_phi, phi_per_frame=20.0),
+                  camera_phi_func: Callable = functools.partial(
+                      functions.camera_func_phi, phi_per_frame=20.0),
                   camera_z_func: Callable = None,
                   camera_r_0: float = 10.0,
                   camera_phi_0: float = 75.0,
                   camera_z_0: float = 20.0,
                   delete_input: bool = True) -> None:
     """
-    Wrapper for Animation and Schroedinger to get a working Animation of a System
-    through the equations given by Schroedinger.
+    Wrapper for Animation and Schroedinger to get a working Animation
+    of a System through the equations given by Schroedinger.
 
     Parameters
     ----------
     box : Dict[str, float]
-        Endpoints of box where to simulate the Schoredinger equation. Keyword x0 is minimum in x direction and
-        x1 is maximum. Same for y and z. For 1D just use x0, x1.
+        Endpoints of box where to simulate the Schoredinger equation.
+        Keyword x0 is minimum in x direction and x1 is maximum.
+        Same for y and z. For 1D just use x0, x1.
         For 2D x0, x1, y0, y1.
         For 3D x0, x1, y0, y1, z0, z1.
         Dimension of simulation is constructed from this dictionary.
 
     resolution : Dict[str, int]
-        Dictionary for the number of grid points in x, y, z direction. Needs to have half size of box dictionary.
+        Dictionary for the number of grid points in x, y, z direction.
+        Needs to have half size of box dictionary.
         Keywords x, y z are used.
 
     max_timesteps : int
         Maximum timesteps  with length dt for the animation.
 
     accuracy : float
-        Convergence is reached when relative error of s ios smaller than accuracy,
-        where s is System.s = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+        Convergence is reached when relative error of mu ios smaller than accuracy,
+        where mu is System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
 
     plot_psi_sol :
         Condition if psi_sol should be plotted.
@@ -134,15 +145,16 @@ def simulate_case(box: Dict[str, float], resolution: Dict[str, int],
         z component of the starting point of the camera movement.
 
     delete_input : bool
-        Condition if the input pictures should be deleted, after creation the creation of the animation as e.g. mp4
+        Condition if the input pictures should be deleted,
+        after creation the creation of the animation as e.g. mp4
 
     Returns
     -------
     """
     with run_time.run_time():
-        Harmonic = Schroedinger.Schroedinger(box, resolution, max_timesteps, dt, g=g, g_qf=g_qf, epsilon_dd=epsilon_dd,
+        Harmonic = Schroedinger.Schroedinger(box, resolution, max_timesteps, dt, g=g, g_qf=g_qf, e_dd=epsilon_dd,
                                              imag_time=imag_time,
-                                             mu=s, E=E,
+                                             mu=mu, E=E,
                                              dim=dim,
                                              psi_0=psi_0,
                                              V=V,
@@ -175,7 +187,12 @@ def simulate_case(box: Dict[str, float], resolution: Dict[str, int],
         # ani.set_limits_smart(0, Harmonic)
 
         with run_time.run_time():
-            ani.start(Harmonic, filename, accuracy=accuracy, plot_psi_sol=plot_psi_sol, plot_V=plot_V)
+            ani.start(
+                Harmonic,
+                filename,
+                accuracy=accuracy,
+                plot_psi_sol=plot_psi_sol,
+                plot_V=plot_V)
     else:
         # mayavi for 3D
         may = MayaviAnimation.MayaviAnimation(dim=3)
@@ -189,7 +206,10 @@ def simulate_case(box: Dict[str, float], resolution: Dict[str, int],
         # print(f"{Harmonic.t}, {Harmonic.dt * Harmonic.max_timesteps}")
         # if Harmonic.t >= Harmonic.dt * Harmonic.max_timesteps:
         #     mlab.close()
-        may.create_movie(input_data_file_pattern="*.png", filename=filename, delete_input=delete_input)
+        may.create_movie(
+            input_data_file_pattern="*.png",
+            filename=filename,
+            delete_input=delete_input)
 
 
 # Script runs, if script is run as main script (called by python *.py)
@@ -198,9 +218,11 @@ if __name__ == "__main__":
     max_workers = psutil.cpu_count(logical=False)
 
     # constants needed for the Schroedinger equation
-    box: Dict[str, float] = {"x0": -5, "x1": 5, "y0": -5, "y1": 5, "z0": -5, "z1": 5}
+    box: Dict[str, float] = {"x0": -5, "x1": 5,
+                             "y0": -5, "y1": 5, "z0": -5, "z1": 5}
 
-    # due to fft of the points the resolution needs to be 2 ** resolution_exponent
+    # due to fft of the points the resolution needs to be 2 **
+    # resolution_exponent
     resolution: Dict[str, int] = {"x": 2 ** 6, "y": 2 ** 6, "z": 2 ** 6}
 
     dt: float = 0.01
@@ -214,25 +236,42 @@ if __name__ == "__main__":
     w_z: float = 2.0 * np.pi * 140.0
 
     alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
-    g, g_qf, epsilon_dd = functions.get_parameters(N=N, m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
-    print(f"g, g_qf, epsilon_dd, alpha_y, alpha_z: {g, g_qf, epsilon_dd, alpha_y, alpha_z}")
+    g, g_qf, epsilon_dd = functions.get_parameters(
+        N=N, m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
+    print(
+        f"g, g_qf, epsilon_dd, alpha_y, alpha_z: {g, g_qf, epsilon_dd, alpha_y, alpha_z}")
 
-    # functions needed for the Schroedinger equation (e.g. potential: V, initial wave function: psi_0)
+    # functions needed for the Schroedinger equation (e.g. potential: V,
+    # initial wave function: psi_0)
     V_1d = functions.v_harmonic_1d
     V_2d = functools.partial(functions.v_harmonic_2d, alpha_y=alpha_y)
-    V_3d = functools.partial(functions.v_harmonic_3d, alpha_y=alpha_y, alpha_z=alpha_z)
+    V_3d = functools.partial(
+        functions.v_harmonic_3d,
+        alpha_y=alpha_y,
+        alpha_z=alpha_z)
 
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction)
 
     # functools.partial sets all arguments except x, y, z, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
-    psi_0_1d = functools.partial(functions.psi_gauss_1d, a=3.0, x_0=2.0, k_0=0.0)
-    psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
-    psi_0_3d = functools.partial(functions.psi_gauss_3d, a=3.0, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0)
+    psi_0_1d = functools.partial(
+        functions.psi_gauss_1d, a=3.0, x_0=2.0, k_0=0.0)
+    psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[
+                                 0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
+    psi_0_3d = functools.partial(
+        functions.psi_gauss_3d,
+        a=3.0,
+        x_0=0.0,
+        y_0=0.0,
+        z_0=0.0,
+        k_0=0.0)
 
-    psi_0_noise_3d = functions.noise_mesh(min=0.8, max=1.4, shape=(resolution["x"], resolution["y"], resolution["z"]))
+    psi_0_noise_3d = functions.noise_mesh(
+        min=0.8, max=1.4, shape=(
+            resolution["x"], resolution["y"], resolution["z"]))
 
-    # Used to remember that 2D need the special pos function (g is set inside of Schoerdinger for convenicence)
+    # Used to remember that 2D need the special pos function (g is set inside
+    # of Schoerdinger for convenicence)
     psi_sol_1d = functions.thomas_fermi_1d
     psi_sol_2d = functions.thomas_fermi_2d_pos
     psi_sol_3d = functions.thomas_fermi_3d
@@ -240,7 +279,7 @@ if __name__ == "__main__":
     # TODO: get mayavi lim to work
     # 3D works in single core mode
     simulate_case(box, resolution, max_timesteps=800, dt=dt, g=g, g_qf=g_qf, epsilon_dd=epsilon_dd, imag_time=True,
-                  s=1.1, E=1.0,
+                  mu=1.1, E=1.0,
                   dim=3,
                   psi_0=psi_0_3d,
                   V=V_3d,
@@ -259,9 +298,12 @@ if __name__ == "__main__":
                   slice_x_index=resolution["x"] // 10,  # just for mayavi (3D)
                   slice_y_index=resolution["y"] // 10,
                   slice_z_index=resolution["z"] // 2,
-                  camera_r_func=functools.partial(functions.camera_func_r, r_0=10.0, r_per_frame=0.0),  # camera just 2D
-                  camera_phi_func=functools.partial(functions.camera_func_phi, phi_0=45.0, phi_per_frame=10.0),
-                  camera_z_func=functools.partial(functions.camera_func_r, r_0=20.0, r_per_frame=0.0),
+                  camera_r_func=functools.partial(
+                      functions.camera_func_r, r_0=10.0, r_per_frame=0.0),  # camera just 2D
+                  camera_phi_func=functools.partial(
+                      functions.camera_func_phi, phi_0=45.0, phi_per_frame=10.0),
+                  camera_z_func=functools.partial(
+                      functions.camera_func_r, r_0=20.0, r_per_frame=0.0),
                   camera_r_0=10.0,
                   camera_phi_0=45.0,
                   camera_z_0=20.0,
@@ -288,7 +330,7 @@ if __name__ == "__main__":
     #         print(f"i={i}, L={L}, g={g}, dt={dt}")
     #         file_name = f"split_{i:03}.mp4"
     #         executor.submit(simulate_case, resolution, max_timesteps=30, L=L, g=g, dt=dt, imag_time=True,
-    #                         s=1.1, E=1.0,
+    #                         mu=1.1, E=1.0,
     #                         dim=2,
     #                         psi_0=psi_0_2d,
     #                         V=V_2d,

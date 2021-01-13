@@ -1,19 +1,18 @@
 #!/usr/bin/env python
 
 """
-Numerical solver for non-linear time-dependent Schrodinger's equation.
+Numerical solver for non-linear time-dependent Schrodinger equation.
 
 author: Daniel Scheiermann
 email: daniel.scheiermann@stud.uni-hannover.de
 license: MIT
 Please feel free to use and modify this, but keep the above information. Thanks!
 """
-import sys
-
 import functools
+import sys
+from typing import Callable, Dict, Union, Optional
 
 import numpy as np
-from typing import Callable, List, Dict, Union, Optional
 
 from supersolids import functions
 
@@ -34,9 +33,17 @@ class Schroedinger(object):
     WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
     """
 
-    def __init__(self, box: Dict[str, float], resolution: Dict[str, int],
-                 max_timesteps: int, dt: float, g: float = 0.0, g_qf: float = 0.0,
-                 epsilon_dd: float = 1.0, imag_time: bool = True, mu: float = 1.1, E: float = 1.0,
+    def __init__(self,
+                 box: Dict[str, float],
+                 resolution: Dict[str, int],
+                 max_timesteps: int,
+                 dt: float,
+                 g: float = 0.0,
+                 g_qf: float = 0.0,
+                 e_dd: float = 1.0,
+                 imag_time: bool = True,
+                 mu: float = 1.1,
+                 E: float = 1.0,
                  dim: int = 3,
                  psi_0: Callable = functions.psi_gauss_3d,
                  V: Optional[Callable] = functions.v_harmonic_3d,
@@ -54,14 +61,16 @@ class Schroedinger(object):
         Parameters
         ----------
         box : Dict[str, float]
-            Endpoints of box where to simulate the Schoredinger equation. Keyword x0 is minimum in x direction and
+            Endpoints of box where to simulate the Schoredinger equation.
+            Keyword x0 is minimum in x direction and
             x1 is maximum. Same for y and z. For 1D just use x0, x1.
             For 2D x0, x1, y0, y1.
             For 3D x0, x1, y0, y1, z0, z1.
             Dimension of simulation is constructed from this dictionary.
 
         resolution : Dict[str, int]
-            Dictionary for the number of grid points in x, y, z direction. Needs to have half size of box dictionary.
+            Dictionary for the number of grid points in x, y, z direction.
+            Needs to have half size of box dictionary.
             Keywords x, y z are used.
 
         resolution : int
@@ -87,7 +96,7 @@ class Schroedinger(object):
         self.dt: float = dt
         self.g: float = g
         self.g_qf: float = g_qf
-        self.epsilon_dd: float = epsilon_dd
+        self.e_dd: float = e_dd
         self.imag_time: float = imag_time
         self.dim: int = dim
 
@@ -109,13 +118,20 @@ class Schroedinger(object):
             self.mu_sol: Callable = mu_sol(self.g)
 
         try:
-            self.x: np.ndarray = np.linspace(self.box["x0"], self.box["x1"], self.resolution["x"])
-            self.dx: float = ((box["x1"] - box["x0"]) / self.resolution["x"])
-            self.dkx: float = np.pi / ((self.box["x1"] - self.box["x0"]) / 2.0)
-            self.kx: np.ndarray = np.fft.fftfreq(self.resolution["x"], d=1.0 / (self.dkx * self.resolution["x"]))
+            box_x_len = (box["x1"] - box["x0"])
+            self.x: np.ndarray = np.linspace(self.box["x0"], self.box["x1"],
+                                             self.resolution["x"])
+            self.dx: float = (box_x_len / self.resolution["x"])
+            self.dkx: float = np.pi / (box_x_len / 2.0)
+            self.kx: np.ndarray = np.fft.fftfreq(self.resolution["x"],
+                d=1.0 / (self.dkx * self.resolution["x"]))
+
         except KeyError:
-            sys.exit(f"Key x0 and x1 of box needed, but it has the keys: {self.box.keys()}, "
-                     f"Key x of resolution needed, but it has the keys: {self.resolution.keys()}")
+            sys.exit(
+                f"Keys x0, x1 of box needed, "
+                f"but it has the keys: {self.box.keys()}, "
+                f"Key x of resolution needed, "
+                f"but it has the keys: {self.resolution.keys()}")
 
         if imag_time:
             # Convention: $e^{-iH} = e^{UH}$
@@ -123,26 +139,43 @@ class Schroedinger(object):
         else:
             self.U = -1.0j
 
-        # Add attributes as soon as they are needed (e.g. for dimension 3, all besides the error are needed)
+        # Add attributes as soon as they are needed (e.g. for dimension 3, all
+        # besides the error are needed)
         if dim >= 2:
             try:
-                self.y: np.ndarray = np.linspace(self.box["y0"], self.box["y1"], self.resolution["y"])
-                self.dy: float = ((box["y1"] - box["y0"]) / self.resolution["y"])
-                self.dky: float = np.pi / ((self.box["y1"] - self.box["y0"]) / 2.0)
-                self.ky: np.ndarray = np.fft.fftfreq(self.resolution["y"], d=1.0 / (self.dky * self.resolution["y"]))
+                box_y_len = box["y1"] - box["y0"]
+                self.y: np.ndarray = np.linspace(self.box["y0"],
+                                                 self.box["y1"],
+                                                 self.resolution["y"])
+                self.dy: float = box_y_len / self.resolution["y"]
+                self.dky: float = np.pi / (box_y_len / 2.0)
+                self.ky: np.ndarray = np.fft.fftfreq(self.resolution["y"],
+                    d=1.0 / (self.dky * self.resolution["y"]))
+
             except KeyError:
-                sys.exit(f"Key y0 and y1 of box needed, but it has the keys: {self.box.keys()}, "
-                         f"Key y of resolution needed, but it has the keys: {self.resolution.keys()}")
+                sys.exit(
+                    f"Keys y0, y1 of box needed, "
+                    f"but it has the keys: {self.box.keys()}, "
+                    f"Key y of resolution needed, "
+                    f"but it has the keys: {self.resolution.keys()}")
 
         if dim >= 3:
             try:
-                self.z: np.ndarray = np.linspace(self.box["z0"], self.box["z1"], self.resolution["z"])
-                self.dz: float = ((box["z1"] - box["z0"]) / self.resolution["z"])
-                self.dkz: float = np.pi / ((self.box["z1"] - self.box["z0"]) / 2.0)
-                self.kz: np.ndarray = np.fft.fftfreq(self.resolution["z"], d=1.0 / (self.dkz * self.resolution["z"]))
+                box_z_len = box["z1"] - box["z0"]
+                self.z: np.ndarray = np.linspace(self.box["z0"],
+                                                 self.box["z1"],
+                                                 self.resolution["z"])
+                self.dz: float = box_z_len / self.resolution["z"]
+                self.dkz: float = np.pi / (box_z_len / 2.0)
+                self.kz: np.ndarray = np.fft.fftfreq(self.resolution["z"],
+                    d=1.0 / (self.dkz * self.resolution["z"]))
+
             except KeyError:
-                sys.exit(f"Key z0 and z1 of box needed, but it has the keys: {self.box.keys()}, "
-                         f"Key z of resolution needed, but it has the keys: {self.resolution.keys()}")
+                sys.exit(
+                    f"Keys z0, z1 of box needed, "
+                    f"but it has the keys: {self.box.keys()}, "
+                    f"Key z of resolution needed, "
+                    f"but it has the keys: {self.resolution.keys()}")
 
         if dim > 3:
             sys.exit("Spatial dimension over 3. This is not implemented.")
@@ -162,14 +195,17 @@ class Schroedinger(object):
                 self.psi_sol_val: np.ndarray = self.psi_sol(self.x)
 
             self.k_squared: np.ndarray = self.kx ** 2.0
-            self.H_kin: np.ndarray = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
+            self.H_kin: np.ndarray = np.exp(
+                self.U * (0.5 * self.k_squared) * self.dt)
 
             if V_interaction is None:
-                # For no interaction the identity is needed with respect to 2D * 2D (array with 1.0 everywhere)
+                # For no interaction the identity is needed with respect to 2D
+                # * 2D (array with 1.0 everywhere)
                 self.V_k_val: np.ndarray = np.full(self.psi_val.shape, 1.0)
 
         elif dim == 2:
-            self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
+            self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x,
+                                                                        self.y)
 
             if psi_0_noise is None:
                 self.psi_val = psi_0_noise * self.psi(self.pos)
@@ -186,11 +222,13 @@ class Schroedinger(object):
 
             kx_mesh, ky_mesh, _ = functions.get_meshgrid(self.kx, self.ky)
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0
-            # here a number (U) is multiplied elementwise with an (1D, 2D or 3D) array (k_squared)
+            # here a number (U) is multiplied elementwise with an (1D, 2D or
+            # 3D) array (k_squared)
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 
             if V_interaction is None:
-                # For no interaction the identity is needed with respect to 2D * 2D (array with 1.0 everywhere)
+                # For no interaction the identity is needed with respect to 2D
+                # * 2D (array with 1.0 everywhere)
                 self.V_k_val = np.full(self.psi_val.shape, 1.0)
             else:
                 self.V_k_val = V_interaction(kx_mesh, ky_mesh, g=self.g)
@@ -198,18 +236,26 @@ class Schroedinger(object):
         elif dim == 3:
             try:
                 self.x_mesh, self.y_mesh, self.z_mesh = np.mgrid[
-                                                        self.box["x0"]:self.box["x1"]:complex(0, self.resolution["x"]),
-                                                        self.box["y0"]:self.box["y1"]:complex(0, self.resolution["y"]),
-                                                        self.box["z0"]:self.box["z1"]:complex(0, self.resolution["z"])
-                                                        ]
+                    self.box["x0"]: self.box["x1"]:
+                    complex(0, self.resolution["x"]),
+                    self.box["y0"]: self.box["y1"]:
+                    complex(0, self.resolution["y"]),
+                    self.box["z0"]: self.box["z1"]:
+                    complex(0, self.resolution["z"])
+                ]
             except KeyError:
-                sys.exit(f"Key x0, y0, z0, x1, y1, z1 of box needed, but it has the keys: {self.box.keys()}, "
-                         f"Key x, y, z of resolution needed, but it has the keys: {self.resolution.keys()}")
+                sys.exit(
+                    f"Keys x0, x1, y0, y1, z0, z1 of box needed, "
+                    f"but it has the keys: {self.box.keys()}, "
+                    f"Keys x, y, z of resolution needed, "
+                    f"but it has the keys: {self.resolution.keys()}")
 
             if psi_0_noise is None:
                 self.psi_val = self.psi(self.x_mesh, self.y_mesh, self.z_mesh)
             else:
-                self.psi_val = psi_0_noise * self.psi(self.x_mesh, self.y_mesh, self.z_mesh)
+                self.psi_val = psi_0_noise * self.psi(self.x_mesh,
+                                                      self.y_mesh,
+                                                      self.z_mesh)
 
             if V is None:
                 self.V_val = 0.0
@@ -217,19 +263,27 @@ class Schroedinger(object):
                 self.V_val = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
 
             if self.psi_sol is not None:
-                self.psi_sol_val = self.psi_sol(self.x_mesh, self.y_mesh, self.z_mesh)
+                self.psi_sol_val = self.psi_sol(self.x_mesh,
+                                                self.y_mesh,
+                                                self.z_mesh)
 
-            kx_mesh, ky_mesh, kz_mesh = np.mgrid[self.kx[0]:self.kx[-1]:complex(0, self.resolution["x"]),
-                                                 self.ky[0]:self.ky[-1]:complex(0, self.resolution["y"]),
-                                                 self.kz[0]:self.kz[-1]:complex(0, self.resolution["z"])
-                                                 ]
+            kx_mesh, ky_mesh, kz_mesh = np.mgrid[
+                self.kx[0]:self.kx[-1]:
+                complex(0, self.resolution["x"]),
+                self.ky[0]:self.ky[-1]:
+                complex(0, self.resolution["y"]),
+                self.kz[0]:self.kz[-1]:
+                complex(0, self.resolution["z"])
+                ]
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
 
-            # here a number (U) is multiplied elementwise with an (1D, 2D or 3D) array (k_squared)
+            # here a number (U) is multiplied elementwise with an (1D, 2D or
+            # 3D) array (k_squared)
             self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 
             if V_interaction is None:
-                # For no interaction the identity is needed with respect to 2D * 2D (array with 1.0 everywhere)
+                # For no interaction the identity is needed with respect to 2D
+                # * 2D (array with 1.0 everywhere)
                 self.V_k_val = np.full(self.psi_val.shape, 1.0)
             else:
                 self.V_k_val = V_interaction(kx_mesh, ky_mesh, kz_mesh)
@@ -291,53 +345,65 @@ class Schroedinger(object):
         return psi_norm
 
     def time_step(self) -> None:
-        # Here we use half steps in real space, but will use it before and after H_kin with normal steps
+        # Here we use half steps in real space, but will use it before and
+        # after H_kin with normal steps
 
-        # Calculate the interaction by applying it to the psi_2 in k-space (transform back and forth)
+        # Calculate the interaction by applying it to the psi_2 in k-space
+        # (transform back and forth)
         psi_2: np.ndarray = self.get_density(p=2.0)
         psi_3: np.ndarray = self.get_density(p=3.0)
-        U_interaction: np.ndarray = np.fft.ifftn(self.V_k_val * np.fft.fftn(psi_2))
+        U_dd: np.ndarray = np.fft.ifftn(
+            self.V_k_val * np.fft.fftn(psi_2))
         # update H_pot before use
-        H_pot: np.ndarray = np.exp(self.U * (0.5 * self.dt) * (self.V_val
-                                                               + self.g * psi_2
-                                                               + self.g_qf * psi_3
-                                                               + self.g * self.epsilon_dd * U_interaction))
+        H_pot: np.ndarray = np.exp(self.U
+                                   * (0.5 * self.dt)
+                                   * (self.V_val
+                                      + self.g * psi_2
+                                      + self.g_qf * psi_3
+                                      + self.g * self.e_dd * U_dd))
         # multiply element-wise the (1D, 2D or 3D) arrays with each other
         self.psi_val = H_pot * self.psi_val
 
         self.psi_val = np.fft.fftn(self.psi_val)
-        # H_kin is just dependent on U and the grid-points, which are constants, so it does not need to be recalculated
-        # multiply element-wise the (1D, 2D or 3D) array (H_kin) with psi_val (1D, 2D or 3D)
+        # H_kin is just dependent on U and the grid-points, which are constants,
+        # so it does not need to be recalculated
+        # multiply element-wise the (1D, 2D or 3D) array (H_kin) with psi_val
+        # (1D, 2D or 3D)
         self.psi_val = self.H_kin * self.psi_val
         self.psi_val = np.fft.ifftn(self.psi_val)
 
-        # update H_pot, psi_2, U_interaction before use
+        # update H_pot, psi_2, U_dd before use
         psi_2 = self.get_density(p=2.0)
         psi_3 = self.get_density(p=3.0)
-        U_interaction = np.fft.ifftn(self.V_k_val * np.fft.fftn(psi_2))
-        H_pot = np.exp(self.U * (0.5 * self.dt) * (self.V_val
-                                                   + self.g * psi_2
-                                                   + self.g_qf * psi_3
-                                                   + self.g * self.epsilon_dd * U_interaction))
+        U_dd = np.fft.ifftn(self.V_k_val * np.fft.fftn(psi_2))
+        H_pot = np.exp(self.U
+                       * (0.5 * self.dt)
+                       * (self.V_val
+                          + self.g * psi_2
+                          + self.g_qf * psi_3
+                          + self.g * self.e_dd * U_dd))
+
         # multiply element-wise the (1D, 2D or 3D) arrays with each other
         self.psi_val = H_pot * self.psi_val
 
         self.t = self.t + self.dt
 
-        # for self.imag_time=False, renormalization should be preserved, but we play safe here (regardless of speedup)
+        # for self.imag_time=False, renormalization should be preserved,
+        # but we play safe here (regardless of speedup)
         # if self.imag_time:
         psi_norm_after_evolution: float = self.get_norm(p=2.0)
         self.psi_val = self.psi_val / np.sqrt(psi_norm_after_evolution)
 
-        psi_quadratic_integral = self.get_norm(p=4.0)
+        psi_quadratic_int = self.get_norm(p=4.0)
 
         # TODO: adjust for DDI
         self.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
-        self.E = self.mu - 0.5 * self.g * psi_quadratic_integral
+        self.E = self.mu - 0.5 * self.g * psi_quadratic_int
 
         # TODO: These formulas for mu.sol and E are not for all cases correct
         # print(f"mu: {self.mu}")
         # if self.g != 0:
-        #     print(f"E: {self.E}, E_sol: {self.mu_sol - 0.5 * self.g * psi_quadratic_integral}")
+        #     print(f"E: {self.E}, "
+        #           f"E_sol: {self.mu_sol - 0.5 * self.g * psi_quadratic_int}")
         # else:
         #     print(f"E: {self.E}")

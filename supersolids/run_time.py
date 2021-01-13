@@ -22,6 +22,6 @@ def run_time() -> Iterator:
         yield
     finally:
         time_measured: float = time.perf_counter() - start
-        print("Runtime: {:.8f} s".format(time_measured))
+        print("Runtime: {:.8f} mu".format(time_measured))
 
     return time_measured

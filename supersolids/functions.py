@@ -76,7 +76,8 @@ def get_g_qf(N: int, a_s_l_ho_ratio: float, epsilon_dd: float):
     return g_qf
 
 
-def get_l_ho(m: float = 164.0 * constants.u_in_kg, w_x: float = 2.0 * np.pi * 30.0):
+def get_l_ho(m: float = 164.0 * constants.u_in_kg,
+             w_x: float = 2.0 * np.pi * 30.0):
     l_ho = np.sqrt(constants.hbar / (m * w_x))
     return l_ho
 
@@ -90,9 +91,11 @@ def get_alphas(w_x: float = 2.0 * np.pi * 30.0,
     return alpha_y, alpha_z
 
 
-def psi_gauss_2d_pdf(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]])):
+def psi_gauss_2d_pdf(pos, mu=np.array(
+    [0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]])):
     """
-    Gives values according to gaus dirstribution (2D) with meshgrid of x,y as input
+    Gives values according to gaus dirstribution (2D)
+    with meshgrid of x,y as input
 
     Parameters
     ----------
@@ -106,7 +109,8 @@ def psi_gauss_2d_pdf(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.
     Returns
     -------
     z_mesh : meshgrid, 2D surface values
-        values according to gaus dirstribution (2D) with meshgrid of x,y as input
+        values according to gaus dirstribution (2D)
+        with meshgrid of x,y as input
 
     """
     cov = np.diag(var ** 2)
@@ -116,7 +120,8 @@ def psi_gauss_2d_pdf(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.
     return z_mesh
 
 
-def psi_gauss_2d(x, y, a: float = 1.0, x_0: float = 0.0, y_0: float = 0.0, k_0: float = 0.0):
+def psi_gauss_2d(x, y, a: float = 1.0, x_0: float = 0.0,
+                 y_0: float = 0.0, k_0: float = 0.0):
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
@@ -141,12 +146,14 @@ def psi_gauss_2d(x, y, a: float = 1.0, x_0: float = 0.0, y_0: float = 0.0, k_0: 
         Group velocity of pulse
     """
 
-    return ((a * np.sqrt(np.pi)) ** (-0.5)
-            * np.exp(-0.5 * (((x - x_0) * 1.0) ** 2
-                             + ((y - y_0) * 1.0) ** 2) / (a ** 2) + 1j * x * k_0))
+    return (a * np.sqrt(np.pi) ** (-0.5)
+            * np.exp(-0.5 * (((x - x_0) ** 2 + (y - y_0) ** 2) / (a ** 2))
+                     + 1j * x * k_0)
+            )
 
 
-def psi_gauss_3d(x, y, z, a: float = 1.0, x_0: float = 0.0, y_0: float = 0.0, z_0: float = 0.0, k_0: float = 0.0):
+def psi_gauss_3d(x, y, z, a: float = 1.0, x_0: float = 0.0,
+                 y_0: float = 0.0, z_0: float = 0.0, k_0: float = 0.0):
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
@@ -180,7 +187,8 @@ def psi_gauss_3d(x, y, z, a: float = 1.0, x_0: float = 0.0, y_0: float = 0.0, z_
     return ((a * np.sqrt(np.pi)) ** (-0.5)
             * np.exp(-0.5 * (((x - x_0) * 1.0) ** 2
                              + ((y - y_0) * 1.0) ** 2
-                             + ((z - z_0) * 1.0) ** 2) / (a ** 2) + 1j * x * k_0))
+                             + ((z - z_0) * 1.0) ** 2) / (
+                             a ** 2) + 1j * x * k_0))
 
 
 def psi_gauss_1d(x, a: float = 1.0, x_0: float = 0.0, k_0: float = 0.0):
@@ -226,7 +234,8 @@ def psi_pdf(x, loc: float = 0.0, scale: float = 1.0):
 
 def psi_rect(x, x_min: float = -0.5, x_max: float = 0.5, a: float = 1.0):
     """
-    Mathematical function of rectengular pulse between x_min and x_max with amplitude a
+    Mathematical function of rectangular pulse
+    between x_min and x_max with amplitude a
 
     Parameters
     ----------
@@ -245,7 +254,8 @@ def psi_rect(x, x_min: float = -0.5, x_max: float = 0.5, a: float = 1.0):
 
     pulse = np.select([x < x_min, x < x_max, x_max < x], [0, a, 0])
     assert pulse.any(), ("Pulse is completely 0. Resolution is too small. "
-                         "Resolution needs to be set as fft is used onto the pulse.")
+                         "Resolution needs to be set, "
+                         "as fft is used onto the pulse.")
 
     return pulse
 
@@ -391,7 +401,8 @@ def v_harmonic_3d(x, y, z, alpha_y: float = 1.0, alpha_z: float = 1.0):
 def dipol_dipol_interaction(kx_mesh: float, ky_mesh: float, kz_mesh: float):
     k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
     factor = 3.0 * (kz_mesh ** 2.0)
-    # for [0, 0, 0] there is a singularity and factor/k_squared is 0/0, so we arbitrary set the divisor to 1.0
+    # for [0, 0, 0] there is a singularity and factor/k_squared is 0/0, so we
+    # arbitrary set the divisor to 1.0
     k_squared_singular_free = np.where(k_squared == 0.0, 1.0, k_squared)
     V_k_val = ((factor / k_squared_singular_free) - 1.0)
 
@@ -422,14 +433,15 @@ def camera_func_phi(frame: int,
 def noise_mesh(min: float = 0.8,
                max: float = 1.2,
                shape: Tuple[int, int, int] = (64, 64, 64)) -> np.ndarray:
-
     noise = min + (max - min) * np.random.rand(*shape)
 
     return noise
 
+
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == '__main__':
-    # due to fft of the points the resolution needs to be 2 ** resolution_exponent
+    # due to fft of the points the resolution needs to be 2 **
+    # resolution_exponent
     datapoints_exponent: int = 6
     resolution: int = 2 ** datapoints_exponent
 
@@ -437,15 +449,17 @@ if __name__ == '__main__':
     max_timesteps = 10
     dt = 0.05
 
-    # functions needed for the Schroedinger equation (e.g. potential: V, initial wave function: psi_0)
+    # functions needed for the Schroedinger equation (e.g. potential: V,
+    # initial wave function: psi_0)
     V_1d = v_harmonic_1d
     V_2d = v_harmonic_2d
     V_3d = v_harmonic_3d
 
-    # functools.partial sets all arguments except x, as multiple arguments for Schroedinger aren't implement yet
-    # psi_0 = functools.partial(functions.psi_0_rect, x_min=-1.00, x_max=-0.50, a=2)
+    # functools.partial sets all arguments except x,
+    # as multiple arguments for Schroedinger aren't implement yet
     psi_0_1d = functools.partial(psi_gauss_1d, a=1, x_0=0, k_0=0)
-    psi_0_2d = functools.partial(psi_gauss_2d_pdf, mu=np.array([0.0, 0.0]), var=np.array([1.0, 1.0]))
+    psi_0_2d = functools.partial(psi_gauss_2d_pdf, mu=np.array(
+        [0.0, 0.0]), var=np.array([1.0, 1.0]))
     psi_0_3d = functools.partial(psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
 
     # testing for 2d plot
@@ -455,4 +469,5 @@ if __name__ == '__main__':
     x_mesh, y_mesh, pos = get_meshgrid(x, y)
     Animation.plot_2d(L=L, resolution=resolution,
                       x_lim=(-2, 2), y_lim=(-2, 2), z_lim=(0.0, 0.040),
-                      alpha=[0.6, 0.8], pos=[pos, pos], func=[lambda pos: np.abs(psi_0_2d(pos)) ** 2, V_2d])
+                      alpha=[0.6, 0.8], pos=[pos, pos],
+                      func=[lambda pos: np.abs(psi_0_2d(pos)) ** 2, V_2d])
