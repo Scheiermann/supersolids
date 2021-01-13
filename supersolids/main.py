@@ -16,7 +16,7 @@ import psutil
 
 import numpy as np
 from mayavi import mlab
-from typing import Callable, Tuple
+from typing import Callable, Tuple, List, Dict
 
 from supersolids import Animation
 from supersolids import constants
@@ -26,7 +26,8 @@ from supersolids import run_time
 from supersolids import Schroedinger
 
 
-def simulate_case(resolution: int, max_timesteps: int, L: float, dt: float, g: float = 0.0, g_qf: float = 0.0,
+def simulate_case(box: Dict[str, float], resolution: Dict[str, int],
+                  max_timesteps: int, dt: float, g: float = 0.0, g_qf: float = 0.0,
                   epsilon_dd: float = 1.0, imag_time: bool = False, s: float = 1.1, E: float = 1.0,
                   dim: int = 1,
                   psi_0: Callable = functions.psi_gauss_3d,
@@ -61,8 +62,16 @@ def simulate_case(resolution: int, max_timesteps: int, L: float, dt: float, g: f
 
     Parameters
     ----------
-    resolution : int
-                 number of grid points in one direction
+    box : Dict[str, float]
+        Endpoints of box where to simulate the Schoredinger equation. Keyword x0 is minimum in x direction and
+        x1 is maximum. Same for y and z. For 1D just use x0, x1.
+        For 2D x0, x1, y0, y1.
+        For 3D x0, x1, y0, y1, z0, z1.
+        Dimension of simulation is constructed from this dictionary.
+
+    resolution : Dict[str, int]
+        Dictionary for the number of grid points in x, y, z direction. Needs to have half size of box dictionary.
+        Keywords x, y z are used.
 
     max_timesteps : int
         Maximum timesteps  with length dt for the animation.
@@ -131,7 +140,7 @@ def simulate_case(resolution: int, max_timesteps: int, L: float, dt: float, g: f
     -------
     """
     with run_time.run_time():
-        Harmonic = Schroedinger.Schroedinger(resolution, max_timesteps, L, dt, g=g, g_qf=g_qf, epsilon_dd=epsilon_dd,
+        Harmonic = Schroedinger.Schroedinger(box, resolution, max_timesteps, dt, g=g, g_qf=g_qf, epsilon_dd=epsilon_dd,
                                              imag_time=imag_time,
                                              mu=s, E=E,
                                              dim=dim,
@@ -188,14 +197,13 @@ if __name__ == "__main__":
     # for parallelization (use all cores)
     max_workers = psutil.cpu_count(logical=False)
 
-    # due to fft of the points the resolution needs to be 2 ** datapoints_exponent
-    datapoints_exponent: int = 6
-    resolution: int = 2 ** datapoints_exponent
-
     # constants needed for the Schroedinger equation
-    # box length in 1D: [-L,L], in 2D: [-L,L, -L,L], , in 3D: [-L,L, -L,L, -L,L]
-    L = 8
-    dt: float = 0.001
+    box: Dict[str, float] = {"x0": -5, "x1": 5, "y0": -5, "y1": 5, "z0": -5, "z1": 5}
+
+    # due to fft of the points the resolution needs to be 2 ** resolution_exponent
+    resolution: Dict[str, int] = {"x": 2 ** 6, "y": 2 ** 6, "z": 2 ** 6}
+
+    dt: float = 0.01
     N: int = 4 * 10 ** 4
     m: float = 164.0 * constants.u_in_kg
     a_s: float = 85.0 * constants.a_0
@@ -222,6 +230,8 @@ if __name__ == "__main__":
     psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=3.0, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0)
 
+    psi_0_noise_3d = functions.noise_mesh(min=0.8, max=1.4, shape=(resolution["x"], resolution["y"], resolution["z"]))
+
     # Used to remember that 2D need the special pos function (g is set inside of Schoerdinger for convenicence)
     psi_sol_1d = functions.thomas_fermi_1d
     psi_sol_2d = functions.thomas_fermi_2d_pos
@@ -229,7 +239,7 @@ if __name__ == "__main__":
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    simulate_case(resolution, max_timesteps=800, L=L, dt=dt, g=g, g_qf=g_qf, epsilon_dd=epsilon_dd, imag_time=True,
+    simulate_case(box, resolution, max_timesteps=800, dt=dt, g=g, g_qf=g_qf, epsilon_dd=epsilon_dd, imag_time=True,
                   s=1.1, E=1.0,
                   dim=3,
                   psi_0=psi_0_3d,
@@ -239,16 +249,16 @@ if __name__ == "__main__":
                   mu_sol=functions.mu_3d,
                   plot_psi_sol=False,
                   plot_V=False,
-                  psi_0_noise=functions.noise_mesh(min=0.8, max=1.4, shape=(resolution, resolution, resolution)),
+                  psi_0_noise=psi_0_noise_3d,
                   alpha_psi=0.8,
                   alpha_psi_sol=0.5,
                   alpha_V=0.3,
-                  accuracy=10 ** -7,
+                  accuracy=10 ** -8,
                   filename="anim.mp4",
                   x_lim=(-2.0, 2.0), y_lim=(-2.0, 2.0), z_lim=(0, 0.5),
-                  slice_x_index=resolution // 3,  # just for mayavi (3D)
-                  slice_y_index=resolution // 3,
-                  slice_z_index=resolution // 3,
+                  slice_x_index=resolution["x"] // 10,  # just for mayavi (3D)
+                  slice_y_index=resolution["y"] // 10,
+                  slice_z_index=resolution["z"] // 2,
                   camera_r_func=functools.partial(functions.camera_func_r, r_0=10.0, r_per_frame=0.0),  # camera just 2D
                   camera_phi_func=functools.partial(functions.camera_func_phi, phi_0=45.0, phi_per_frame=10.0),
                   camera_z_func=functools.partial(functions.camera_func_r, r_0=20.0, r_per_frame=0.0),

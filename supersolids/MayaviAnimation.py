@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 from ffmpeg import input
 from mayavi import mlab
-from typing import Tuple
+from typing import Tuple, Dict
 
 from supersolids import Animation, functions, Schroedinger
 
@@ -42,7 +42,7 @@ def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str
     existing = sorted([x for x in dir_path.glob(dir_name + "*") if x.is_dir()])
     try:
         last_index = int(existing[-1].name.split(dir_name)[1])
-    except Exception as e:
+    except IndexError as e:
         assert last_index is not None, ("Extracting last index from dir_path failed")
     input_path = Path(dir_path, dir_name + counting_format % last_index)
 
@@ -230,14 +230,30 @@ class MayaviAnimation:
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    Harmonic = Schroedinger.Schroedinger(resolution=2 ** 6, max_timesteps=100, L=3, dt=1.0, g=1.0, imag_time=True,
-                                         mu=1.1, E=1.0,
+    box: Dict[str, float] = {"x0": -5, "x1": 5, "y0": -5, "y1": 5, "z0": -5, "z1": 5}
+    resolution: Dict[str, int] = {"x": 2 ** 6, "y": 2 ** 6, "z": 2 ** 6}
+    psi_0_noise_3d = functions.noise_mesh(min=0.8, max=1.4, shape=(resolution["x"], resolution["y"], resolution["z"]))
+
+    Harmonic = Schroedinger.Schroedinger(box=box,
+                                         resolution=resolution,
+                                         max_timesteps=100, dt=1.0, g=1.0, g_qf=0.0,
+                                         epsilon_dd=1.0, imag_time=True, mu=1.1, E=1.0,
                                          dim=3,
                                          psi_0=functions.psi_gauss_3d,
                                          V=functions.v_harmonic_3d,
-                                         psi_sol=functions.thomas_fermi_3d
+                                         V_interaction=None,
+                                         psi_sol=functions.thomas_fermi_3d,
+                                         mu_sol=functions.mu_3d,
+                                         psi_0_noise=psi_0_noise_3d,
+                                         alpha_psi=0.8,
+                                         alpha_psi_sol=0.53,
+                                         alpha_V=0.3
                                          )
+
     may = MayaviAnimation(dim=Harmonic.dim, dir_path=Path(__file__).parent.joinpath("results"))
-    may.animate(Harmonic, x_lim=(-10, 5), y_lim=(-1, 1), z_lim=(-1, 1))
+    may.animate(Harmonic, accuracy=10**-6, plot_psi_sol=False, plot_V=True,
+                x_lim=(-10, 5), y_lim=(-1, 1), z_lim=(-1, 1),
+                slice_x_index=0, slice_y_index=0, slice_z_index=0
+                )
     mlab.show()
     may.create_movie(dir_path=None, input_data_file_pattern="*.png", filename="anim.mp4")

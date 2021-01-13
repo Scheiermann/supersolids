@@ -429,7 +429,7 @@ def noise_mesh(min: float = 0.8,
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == '__main__':
-    # due to fft of the points the resolution needs to be 2 ** datapoints_exponent
+    # due to fft of the points the resolution needs to be 2 ** resolution_exponent
     datapoints_exponent: int = 6
     resolution: int = 2 ** datapoints_exponent
 
