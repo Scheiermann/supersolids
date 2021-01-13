@@ -20,7 +20,8 @@ from supersolids import functions
 class Schroedinger(object):
     """
     Implements a numerical solution of the dimensionless time-dependent
-    non-linear Schrodinger equation for an arbitrary potential, where D[., t] is a partial derivative to t:
+    non-linear Schrodinger equation for an arbitrary potential,
+    where D[., t] is a partial derivative to t:
     i D(psi, t) = [-0.5 * (D[., x] ** 2 + D[., y] ** 2 + D[., z] ** 2)
                    + 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2)
                    + g |psi| ** 2
@@ -29,8 +30,10 @@ class Schroedinger(object):
 
     With U_dd = iFFT( FFT(|psi| ** 2) * e_dd * g * ((3 * k_z / k ** 2) - 1.0) )
 
-    We will first implement the split operator without commutator relation ($H = H_{pot} + H_{kin}$)
-    WARNING: We don't use Baker-Campell-Hausdorff formula, hence the accuracy is small. This is just a draft.
+    The split operator method with the Trotter-Suzuki approximation
+    for the commutator relation ($H = H_{pot} + H_{kin}$) is used.
+    Hence the accuracy is proportional to dt ** 4
+    The approximation is needed because of the Baker-Campell-Hausdorff formula.
     """
 
     def __init__(self,

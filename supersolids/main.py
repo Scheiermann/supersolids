@@ -72,7 +72,7 @@ def simulate_case(box: Dict[str, float],
     Parameters
     ----------
     box : Dict[str, float]
-        Endpoints of box where to simulate the Schoredinger equation.
+        Endpoints of box where to simulate the Schroedinger equation.
         Keyword x0 is minimum in x direction and x1 is maximum.
         Same for y and z. For 1D just use x0, x1.
         For 2D x0, x1, y0, y1.
