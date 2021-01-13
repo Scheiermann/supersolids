@@ -14,7 +14,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
 from matplotlib import cm
-from typing import Callable, Tuple
+from typing import Callable, Tuple, List
 
 from supersolids import Schroedinger, functions
 
@@ -359,13 +359,18 @@ class Animation:
                 cmap = cm.coolwarm
                 levels = 20
 
-                self.psi_x_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
-                                                   zdir='x', offset=self.ax.get_xlim()[0], cmap=cmap, levels=levels)
-                self.psi_y_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
-                                                   zdir='y', offset=self.ax.get_ylim()[0], cmap=cmap, levels=levels)
-                self.psi_z_line = self.ax.contourf(psi_pos[:, :, 0], psi_pos[:, :, 1], psi_prob,
+                self.psi_x_line = self.ax.contourf(psi_pos[:, :, 0],
+                                                   psi_pos[:, :, 1], psi_prob,
+                                                   zdir='x', offset=self.ax.get_xlim()[0],
+                                                   cmap=cmap, levels=levels)
+                self.psi_y_line = self.ax.contourf(psi_pos[:, :, 0],
+                                                   psi_pos[:, :, 1], psi_prob,
+                                                   zdir='y', offset=self.ax.get_ylim()[0],
+                                                   cmap=cmap, levels=levels)
+                self.psi_z_line = self.ax.contourf(psi_pos[:, :, 0],
+                                                   psi_pos[:, :, 1], psi_prob,
                                                    zdir='z', offset=self.ax.get_zlim()[0],
-                                                   cmap=cmap, levels=levels,
+                                                   cmap=cmap, levels=levels
                                                    )
                 if frame_index == 1:
                     color_bar_axes = self.fig.add_axes([0.85, 0.1, 0.03, 0.8])
@@ -443,7 +448,7 @@ def plot_2d(resolution=32,
             x_lim: Tuple[float, float] = (-1, 1),
             y_lim: Tuple[float, float] = (-1, 1),
             z_lim: Tuple[float, float] = (0, 1),
-            alpha: float = 0.6,
+            alpha: List[float] = [0.6],
             **kwargs):
     """
 

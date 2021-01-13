@@ -27,7 +27,7 @@ from supersolids import Schroedinger
 
 
 def simulate_case(resolution: int, max_timesteps: int, L: float, dt: float, g: float = 0.0, g_qf: float = 0.0,
-                  imag_time: bool = False, s: float = 1.1, E: float = 1.0,
+                  epsilon_dd: float = 1.0, imag_time: bool = False, s: float = 1.1, E: float = 1.0,
                   dim: int = 1,
                   psi_0: Callable = functions.psi_gauss_3d,
                   V: Callable = functions.v_harmonic_3d,
@@ -54,7 +54,7 @@ def simulate_case(resolution: int, max_timesteps: int, L: float, dt: float, g: f
                   camera_r_0: float = 10.0,
                   camera_phi_0: float = 75.0,
                   camera_z_0: float = 20.0,
-                  delete_input: bool = True):
+                  delete_input: bool = True) -> None:
     """
     Wrapper for Animation and Schroedinger to get a working Animation of a System
     through the equations given by Schroedinger.
@@ -131,7 +131,8 @@ def simulate_case(resolution: int, max_timesteps: int, L: float, dt: float, g: f
     -------
     """
     with run_time.run_time():
-        Harmonic = Schroedinger.Schroedinger(resolution, max_timesteps, L, dt, g=g, g_qf=g_qf, imag_time=imag_time,
+        Harmonic = Schroedinger.Schroedinger(resolution, max_timesteps, L, dt, g=g, g_qf=g_qf, epsilon_dd=epsilon_dd,
+                                             imag_time=imag_time,
                                              mu=s, E=E,
                                              dim=dim,
                                              psi_0=psi_0,
@@ -195,7 +196,7 @@ if __name__ == "__main__":
     # box length in 1D: [-L,L], in 2D: [-L,L, -L,L], , in 3D: [-L,L, -L,L, -L,L]
     L = 8
     dt: float = 0.001
-    N: int = 4.0 * 10 ** 4
+    N: int = 4 * 10 ** 4
     m: float = 164.0 * constants.u_in_kg
     a_s: float = 85.0 * constants.a_0
     a_dd: float = 130.0 * constants.a_0
@@ -213,12 +214,12 @@ if __name__ == "__main__":
     V_2d = functools.partial(functions.v_harmonic_2d, alpha_y=alpha_y)
     V_3d = functools.partial(functions.v_harmonic_3d, alpha_y=alpha_y, alpha_z=alpha_z)
 
-    V_3d_ddi = functools.partial(functions.dipol_dipol_interaction, epsilon_dd=epsilon_dd)
+    V_3d_ddi = functools.partial(functions.dipol_dipol_interaction)
 
     # functools.partial sets all arguments except x, y, z, as multiple arguments for Schroedinger aren't implement yet
     # psi_0 = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
     psi_0_1d = functools.partial(functions.psi_gauss_1d, a=3.0, x_0=2.0, k_0=0.0)
-    psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[1.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
+    psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
     psi_0_3d = functools.partial(functions.psi_gauss_3d, a=3.0, x_0=0.0, y_0=0.0, z_0=0.0, k_0=0.0)
 
     # Used to remember that 2D need the special pos function (g is set inside of Schoerdinger for convenicence)
@@ -228,11 +229,11 @@ if __name__ == "__main__":
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    simulate_case(resolution, max_timesteps=800, L=L, dt=dt, g=g, g_qf=g_qf, imag_time=True,
+    simulate_case(resolution, max_timesteps=800, L=L, dt=dt, g=g, g_qf=g_qf, epsilon_dd=epsilon_dd, imag_time=True,
                   s=1.1, E=1.0,
                   dim=3,
                   psi_0=psi_0_3d,
-                  V=None,
+                  V=V_3d,
                   V_interaction=V_3d_ddi,
                   psi_sol=psi_sol_3d,
                   mu_sol=functions.mu_3d,

@@ -19,7 +19,7 @@ from typing import Tuple
 from supersolids import Animation, functions, Schroedinger
 
 
-def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str = "%03d"):
+def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str = "%03d") -> Path:
     """
     Looks up all directories with matching dir_name and counting format in dir_path.
     Gets the highest number and returns a path with dir_name counted one up (prevents colliding with old data).
@@ -35,6 +35,7 @@ def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str
 
     Returns
     -------
+    input_path : Path
     Path for the new directory (not colliding with old data)
     """
     # "movie" and "%03d" strings are hardcoded in mayavi movie_maker _update_subdir
@@ -183,7 +184,7 @@ class MayaviAnimation:
                      dir_path: Path = None,
                      input_data_file_pattern: str = "*.png",
                      filename: str = "anim.mp4",
-                     delete_input: bool = True):
+                     delete_input: bool = True) -> None:
         """
         Creates movie filename with all matching pictures from input_data_file_pattern.
         By default deletes all input pictures after creation of movie to save disk space.
