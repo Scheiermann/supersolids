@@ -88,8 +88,9 @@ def simulate_case(box: Dict[str, float],
         Maximum timesteps  with length dt for the animation.
 
     accuracy : float
-        Convergence is reached when relative error of mu ios smaller than accuracy,
-        where mu is System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+        Convergence is reached when relative error of mu is smaller
+        than accuracy, where mu is
+        System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
 
     plot_psi_sol :
         Condition if psi_sol should be plotted.
@@ -152,7 +153,13 @@ def simulate_case(box: Dict[str, float],
     -------
     """
     with run_time.run_time():
-        Harmonic = Schroedinger.Schroedinger(box, resolution, max_timesteps, dt, g=g, g_qf=g_qf, e_dd=epsilon_dd,
+        Harmonic = Schroedinger.Schroedinger(box,
+                                             resolution,
+                                             max_timesteps,
+                                             dt,
+                                             g=g,
+                                             g_qf=g_qf,
+                                             e_dd=epsilon_dd,
                                              imag_time=imag_time,
                                              mu=mu, E=E,
                                              dim=dim,
@@ -197,9 +204,16 @@ def simulate_case(box: Dict[str, float],
         # mayavi for 3D
         may = MayaviAnimation.MayaviAnimation(dim=3)
         with run_time.run_time():
-            may.animate(Harmonic, accuracy=accuracy, plot_V=plot_V, plot_psi_sol=plot_V,
-                        x_lim=x_lim, y_lim=y_lim, z_lim=z_lim,
-                        slice_x_index=slice_x_index, slice_y_index=slice_y_index, slice_z_index=slice_z_index
+            may.animate(Harmonic,
+                        accuracy=accuracy,
+                        plot_V=plot_V,
+                        plot_psi_sol=plot_V,
+                        x_lim=x_lim,
+                        y_lim=y_lim,
+                        z_lim=z_lim,
+                        slice_x_index=slice_x_index,
+                        slice_y_index=slice_y_index,
+                        slice_z_index=slice_z_index
                         )
         mlab.show()
         # TODO: close window after last frame
@@ -238,8 +252,8 @@ if __name__ == "__main__":
     alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
     g, g_qf, epsilon_dd = functions.get_parameters(
         N=N, m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
-    print(
-        f"g, g_qf, epsilon_dd, alpha_y, alpha_z: {g, g_qf, epsilon_dd, alpha_y, alpha_z}")
+    print(f"g, g_qf, epsilon_dd, alpha_y, alpha_z: "
+          f"{g, g_qf, epsilon_dd, alpha_y, alpha_z}")
 
     # functions needed for the Schroedinger equation (e.g. potential: V,
     # initial wave function: psi_0)
@@ -252,12 +266,17 @@ if __name__ == "__main__":
 
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction)
 
-    # functools.partial sets all arguments except x, y, z, as multiple arguments for Schroedinger aren't implement yet
-    # psi_0 = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
+    # functools.partial sets all arguments except x, y, z,
+    # as multiple arguments for Schroedinger aren't implement yet
+    # psi_0_1d = functools.partial(
+    #     functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
     psi_0_1d = functools.partial(
         functions.psi_gauss_1d, a=3.0, x_0=2.0, k_0=0.0)
-    psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf, mu=[
-                                 0.0, 0.0], var=np.array([[1.0, 0.0], [0.0, 1.0]]))
+    psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf,
+                                 mu=[0.0, 0.0],
+                                 var=np.array([[1.0, 0.0], [0.0, 1.0]])
+                                 )
+
     psi_0_3d = functools.partial(
         functions.psi_gauss_3d,
         a=3.0,
@@ -278,8 +297,16 @@ if __name__ == "__main__":
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    simulate_case(box, resolution, max_timesteps=800, dt=dt, g=g, g_qf=g_qf, epsilon_dd=epsilon_dd, imag_time=True,
-                  mu=1.1, E=1.0,
+    simulate_case(box,
+                  resolution,
+                  max_timesteps=800,
+                  dt=dt,
+                  g=g,
+                  g_qf=g_qf,
+                  epsilon_dd=epsilon_dd,
+                  imag_time=True,
+                  mu=1.1,
+                  E=1.0,
                   dim=3,
                   psi_0=psi_0_3d,
                   V=V_3d,
@@ -294,16 +321,21 @@ if __name__ == "__main__":
                   alpha_V=0.3,
                   accuracy=10 ** -8,
                   filename="anim.mp4",
-                  x_lim=(-2.0, 2.0), y_lim=(-2.0, 2.0), z_lim=(0, 0.5),
+                  x_lim=(-2.0, 2.0),
+                  y_lim=(-2.0, 2.0),
+                  z_lim=(0, 0.5),
                   slice_x_index=resolution["x"] // 10,  # just for mayavi (3D)
                   slice_y_index=resolution["y"] // 10,
                   slice_z_index=resolution["z"] // 2,
                   camera_r_func=functools.partial(
-                      functions.camera_func_r, r_0=10.0, r_per_frame=0.0),  # camera just 2D
+                      functions.camera_func_r,
+                      r_0=10.0, r_per_frame=0.0),  # camera just 2D
                   camera_phi_func=functools.partial(
-                      functions.camera_func_phi, phi_0=45.0, phi_per_frame=10.0),
+                      functions.camera_func_phi,
+                      phi_0=45.0, phi_per_frame=10.0),
                   camera_z_func=functools.partial(
-                      functions.camera_func_r, r_0=20.0, r_per_frame=0.0),
+                      functions.camera_func_r,
+                      r_0=20.0, r_per_frame=0.0),
                   camera_r_0=10.0,
                   camera_phi_0=45.0,
                   camera_z_0=20.0,
@@ -311,9 +343,10 @@ if __name__ == "__main__":
                   )
     print("Single core done")
 
-    # # TODO: As g is proportional to N * a_s/w_x, changing g, means V, g_qf are different (maybe other variables too)
-    # # Creating multiple cases (Schroedinger with different parameters) for multi-core
-    # # box length in 1D: [-L,L], in 2D: [-L,L, -L,L], , in 3D: [-L,L, -L,L, -L,L]
+    # # TODO: As g is proportional to N * a_s/w_x,
+    # # changing g, V, g_qf are different (maybe other variables too)
+    # # Multi-core: multiple cases (Schroedinger with different parameters)
+    # # box length in 1D: [-L,L], in 2D: [-L,L, -L,L], in 3D: [-L,L, -L,L, -L,L]
     # # generators for L, g, dt to compute for different parameters
     # g_step = 10
     # L_generator = (4,)
@@ -329,24 +362,48 @@ if __name__ == "__main__":
     #         i = i + 1
     #         print(f"i={i}, L={L}, g={g}, dt={dt}")
     #         file_name = f"split_{i:03}.mp4"
-    #         executor.submit(simulate_case, resolution, max_timesteps=30, L=L, g=g, dt=dt, imag_time=True,
-    #                         mu=1.1, E=1.0,
-    #                         dim=2,
-    #                         psi_0=psi_0_2d,
-    #                         V=V_2d,
-    #                         psi_sol=psi_sol_2d,
-    #                         mu_sol=functions.mu_2d,
+    #         executor.submit(simulate_case,
+    #                         box,
+    #                         resolution,
+    #                         max_timesteps=800,
+    #                         dt=dt,
+    #                         g=g,
+    #                         g_qf=g_qf,
+    #                         epsilon_dd=epsilon_dd,
+    #                         imag_time=True,
+    #                         mu=1.1,
+    #                         E=1.0,
+    #                         dim=3,
+    #                         psi_0=psi_0_3d,
+    #                         V=V_3d,
+    #                         V_interaction=V_3d_ddi,
+    #                         psi_sol=psi_sol_3d,
+    #                         mu_sol=functions.mu_3d,
+    #                         plot_psi_sol=False,
+    #                         plot_V=False,
+    #                         psi_0_noise=psi_0_noise_3d,
     #                         alpha_psi=0.8,
+    #                         alpha_psi_sol=0.5,
     #                         alpha_V=0.3,
-    #                         file_name=file_name,
-    #                         accuracy=10 ** -6,
-    #                         x_lim=(-2.0, 2.0), y_lim=(-2.0, 2.0), z_lim=(0, 0.5),
-    #                         slice_x_index=resolution // 2, slice_y_index=resolution // 2,  # just for mayavi (3D)
-    #                         r_func=functools.partial(functions.camera_func_r, r_0=10.0, r_per_frame=0.0),
-    #                         phi_func=functools.partial(functions.camera_func_phi, phi_0=45.0, phi_per_frame=10.0),
-    #                         z_func=functools.partial(functions.camera_func_r, r_0=20.0, r_per_frame=0.0),
-    #                         camera_r=10.0,
-    #                         camera_phi=45.0,
-    #                         camera_z=20.0,
+    #                         accuracy=10 ** -8,
+    #                         filename="anim.mp4",
+    #                         x_lim=(-2.0, 2.0),
+    #                         y_lim=(-2.0, 2.0),
+    #                         z_lim=(0, 0.5),
+    #                         slice_x_index=resolution["x"] // 10,
+    #                         slice_y_index=resolution["y"] // 10,
+    #                         slice_z_index=resolution["z"] // 2,
+    #                         camera_r_func=functools.partial(
+    #                             functions.camera_func_r,
+    #                             r_0=10.0, r_per_frame=0.0),
+    #                         camera_phi_func=functools.partial(
+    #                             functions.camera_func_phi,
+    #                             phi_0=45.0, phi_per_frame=10.0),
+    #                         camera_z_func=functools.partial(
+    #                             functions.camera_func_r,
+    #                             r_0=20.0, r_per_frame=0.0),
+    #                         camera_r_0=10.0,
+    #                         camera_phi_0=45.0,
+    #                         camera_z_0=20.0,
     #                         delete_input=True
     #                         )
