@@ -10,10 +10,10 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 """
 
 import functools
-import numpy as np
-import random
 
+import numpy as np
 from scipy import stats
+from typing import Tuple
 
 from supersolids import Animation
 from supersolids import constants
@@ -420,9 +420,9 @@ def camera_func_phi(frame: int,
     return phi
 
 
-def noise(min: float = 0.8, max: float = 1.2):
+def noise_mesh(min: float = 0.8, max: float = 1.2, shape: Tuple[int, int, int] = (64, 64, 64)):
 
-    noise = min + (max - min) * np.random.rand(64, 64, 64)
+    noise = min + (max - min) * np.random.rand(*shape)
 
     return noise
 

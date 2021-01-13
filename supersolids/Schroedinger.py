@@ -42,7 +42,7 @@ class Schroedinger(object):
                  V_interaction: Callable = None,
                  psi_sol: Callable = functions.thomas_fermi_3d,
                  mu_sol: Callable = functions.mu_3d,
-                 psi_0_noise: Callable = functions.noise,
+                 psi_0_noise: Callable = functions.noise_mesh,
                  alpha_psi: float = 0.8,
                  alpha_psi_sol: float = 0.53,
                  alpha_V: float = 0.3,
