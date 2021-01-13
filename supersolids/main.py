@@ -232,7 +232,7 @@ if __name__ == "__main__":
                   s=1.1, E=1.0,
                   dim=3,
                   psi_0=psi_0_3d,
-                  V=V_3d,
+                  V=None,
                   V_interaction=V_3d_ddi,
                   psi_sol=psi_sol_3d,
                   mu_sol=functions.mu_3d,

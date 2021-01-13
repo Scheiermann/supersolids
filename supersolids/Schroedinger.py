@@ -85,7 +85,10 @@ class Schroedinger(object):
         self.E = E
 
         self.psi = psi_0
-        self.V = V
+
+        if V is not None:
+            self.V = V
+
         if psi_sol is not None:
             self.psi_sol = functools.partial(psi_sol, g=self.g)
             self.mu_sol = mu_sol(self.g)
@@ -122,7 +125,12 @@ class Schroedinger(object):
 
         if dim == 1:
             self.psi_val = self.psi(self.x)
-            self.V_val = self.V(self.x)
+
+            if V is not None:
+                self.V_val = self.V(self.x)
+            else:
+                self.V_val = 0.0
+
             if self.psi_sol is not None:
                 self.psi_sol_val = self.psi_sol(self.x)
             else:
@@ -138,7 +146,12 @@ class Schroedinger(object):
         elif dim == 2:
             self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
             self.psi_val = self.psi(self.pos)
-            self.V_val = self.V(self.pos)
+
+            if V is not None:
+                self.V_val = self.V(self.pos)
+            else:
+                self.V_val = 0.0
+
             if self.psi_sol is not None:
                 self.psi_sol_val = self.psi_sol(self.pos)
             else:
@@ -163,7 +176,10 @@ class Schroedinger(object):
 
             self.psi_val = psi_0_noise * self.psi(self.x_mesh, self.y_mesh, self.z_mesh)
 
-            self.V_val = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
+            if V is not None:
+                self.V_val = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
+            else:
+                self.V_val = 0.0
 
             if self.psi_sol is not None:
                 self.psi_sol_val = self.psi_sol(self.x_mesh, self.y_mesh, self.z_mesh)
@@ -253,6 +269,7 @@ class Schroedinger(object):
         self.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
         self.E = self.mu - 0.5 * self.g * psi_quadratic_integral
 
+        # TODO: These formulas for mu.sol and E are not for all cases correct
         # print(f"mu: {self.mu}")
         # if self.g != 0:
         #     print(f"E: {self.E}, E_sol: {self.mu_sol - 0.5 * self.g * psi_quadratic_integral}")

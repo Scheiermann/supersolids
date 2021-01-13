@@ -420,7 +420,9 @@ def camera_func_phi(frame: int,
     return phi
 
 
-def noise_mesh(min: float = 0.8, max: float = 1.2, shape: Tuple[int, int, int] = (64, 64, 64)):
+def noise_mesh(min: float = 0.8,
+               max: float = 1.2,
+               shape: Tuple[int, int, int] = (64, 64, 64)) -> np.ndarray:
 
     noise = min + (max - min) * np.random.rand(*shape)
 
