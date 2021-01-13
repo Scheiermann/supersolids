@@ -19,10 +19,14 @@ from typing import Tuple, Dict
 from supersolids import Animation, functions, Schroedinger
 
 
-def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str = "%03d") -> Path:
+def get_image_path(dir_path: Path,
+                   dir_name: str = "movie",
+                   counting_format: str = "%03d") -> Path:
     """
-    Looks up all directories with matching dir_name and counting format in dir_path.
-    Gets the highest number and returns a path with dir_name counted one up (prevents colliding with old data).
+    Looks up all directories with matching dir_name
+    and counting format in dir_path.
+    Gets the highest number and returns a path with dir_name counted one up
+    (prevents colliding with old data).
 
     Parameters
     ----------
@@ -38,12 +42,15 @@ def get_image_path(dir_path: Path, dir_name: str = "movie", counting_format: str
     input_path : Path
     Path for the new directory (not colliding with old data)
     """
-    # "movie" and "%03d" strings are hardcoded in mayavi movie_maker _update_subdir
+    # "movie" and "%03d" strings are hardcoded
+    # in mayavi movie_maker _update_subdir
     existing = sorted([x for x in dir_path.glob(dir_name + "*") if x.is_dir()])
     try:
         last_index = int(existing[-1].name.split(dir_name)[1])
     except IndexError as e:
-        assert last_index is not None, ("Extracting last index from dir_path failed")
+        assert last_index is not None, (
+            "Extracting last index from dir_path failed")
+
     input_path = Path(dir_path, dir_name + counting_format % last_index)
 
     return input_path
@@ -63,7 +70,8 @@ def animate(System: Schroedinger.Schroedinger,
             ):
     """
     Animates solving of the Schroedinger equations of System with mayavi in 3D.
-    Animation is limited to System.max_timesteps or the convergence according to accuracy.
+    Animation is limited to System.max_timesteps or
+    the convergence according to accuracy.
 
     Parameters
     ----------
@@ -71,8 +79,9 @@ def animate(System: Schroedinger.Schroedinger,
         Schrödinger equations for the specified system
 
     accuracy : float
-        Convergence is reached when relative error of mu ios smaller than accuracy,
-        where mu is System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+        Convergence is reached when relative error of mu is smaller
+        than accuracy, where mu is
+        System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
 
     plot_psi_sol :
         Condition if psi_sol should be plotted.
@@ -90,15 +99,18 @@ def animate(System: Schroedinger.Schroedinger,
         Limits of plot in z direction
 
     slice_x_index : int
-        Index of grid point in x direction (in terms of System.x) to produce a slice/plane in mayavi,
+        Index of grid point in x direction (in terms of System.x)
+        to produce a slice/plane in mayavi,
         where psi_prob = |psi| ** 2 is used for the slice
 
     slice_y_index : int
-        Index of grid point in y  (in terms of System.y) direction to produce a slice/plane in mayavi,
+        Index of grid point in y  (in terms of System.y) direction
+        to produce a slice/plane in mayavi,
         where psi_prob = |psi| ** 2 is used for the slice
 
     slice_z_index : int
-        Index of grid point in z  (in terms of System.z) direction to produce a slice/plane in mayavi,
+        Index of grid point in z  (in terms of System.z) direction
+        to produce a slice/plane in mayavi,
         where psi_prob = |psi| ** 2 is used for the slice
 
     Returns
@@ -106,32 +118,59 @@ def animate(System: Schroedinger.Schroedinger,
 
     """
     prob_3d = np.abs(System.psi_val) ** 2
-    prob_plot = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d,
-                               colormap="spectral", opacity=System.alpha_psi, transparent=True)
+    prob_plot = mlab.contour3d(System.x_mesh,
+                               System.y_mesh,
+                               System.z_mesh,
+                               prob_3d,
+                               colormap="spectral",
+                               opacity=System.alpha_psi,
+                               transparent=True)
 
-    slice_x_plot = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
-                                plane_orientation="x_axes",
-                                slice_index=slice_x_index,
-                                extent=[*x_lim, *y_lim, *z_lim])
+    slice_x_plot = mlab.volume_slice(System.x_mesh,
+                                     System.y_mesh,
+                                     System.z_mesh,
+                                     prob_3d,
+                                     colormap="spectral",
+                                     plane_orientation="x_axes",
+                                     slice_index=slice_x_index,
+                                     extent=[*x_lim, *y_lim, *z_lim])
 
-    slice_y_plot = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
-                                plane_orientation="y_axes",
-                                slice_index=slice_y_index,
-                                extent=[*x_lim, *y_lim, *z_lim])
+    slice_y_plot = mlab.volume_slice(System.x_mesh,
+                                     System.y_mesh,
+                                     System.z_mesh,
+                                     prob_3d,
+                                     colormap="spectral",
+                                     plane_orientation="y_axes",
+                                     slice_index=slice_y_index,
+                                     extent=[*x_lim, *y_lim, *z_lim])
 
-    slice_z_plot = mlab.volume_slice(System.x_mesh, System.y_mesh, System.z_mesh, prob_3d, colormap="spectral",
+    slice_z_plot = mlab.volume_slice(System.x_mesh,
+                                System.y_mesh,
+                                System.z_mesh,
+                                prob_3d,
+                                colormap="spectral",
                                 plane_orientation="z_axes",
                                 slice_index=slice_z_index,
                                 extent=[*x_lim, *y_lim, *z_lim])
 
     if plot_V:
-        V_plot = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, System.V_val,
-                                colormap="hot", opacity=System.alpha_V, transparent=True)
+        V_plot = mlab.contour3d(System.x_mesh,
+                                System.y_mesh,
+                                System.z_mesh,
+                                System.V_val,
+                                colormap="hot",
+                                opacity=System.alpha_V,
+                                transparent=True)
 
     if System.psi_sol_val is not None:
         if plot_psi_sol:
-            psi_sol_plot = mlab.contour3d(System.x_mesh, System.y_mesh, System.z_mesh, System.psi_sol_val,
-                                          colormap="cool", opacity=System.alpha_psi_sol, transparent=True)
+            psi_sol_plot = mlab.contour3d(System.x_mesh,
+                                          System.y_mesh,
+                                          System.z_mesh,
+                                          System.psi_sol_val,
+                                          colormap="cool",
+                                          opacity=System.alpha_psi_sol,
+                                          transparent=True)
 
     for i in range(0, System.max_timesteps):
         mu_old = System.mu
@@ -153,7 +192,9 @@ class MayaviAnimation:
     mayavi_counter: int = 0
     animate = staticmethod(animate)
 
-    def __init__(self, dim: float = 3, dir_path: Path = Path(__file__).parent.joinpath("results")):
+    def __init__(self,
+                 dim: float = 3,
+                 dir_path: Path = Path(__file__).parent.joinpath("results")):
         """
         Creates an Animation with mayavi for a Schroedinger equation
         Methods need the object Schroedinger with the parameters of the equation
@@ -173,7 +214,8 @@ class MayaviAnimation:
         self.dir_path = dir_path
 
         self.fig.scene.disable_render = False
-        # anti_aliasing default is 8, and removes resolution issues when downscaling, but takes longer
+        # anti_aliasing default is 8,
+        # and removes resolution issues when downscaling, but takes longer
         self.fig.scene.anti_aliasing_frames = 8
         self.fig.scene.movie_maker.record = True
         # set dir_path to save images to
@@ -219,25 +261,43 @@ class MayaviAnimation:
         # requires either mencoder or ffmpeg to be installed on your system
         # from command line:
         # ffmpeg -f image2 -r 10 -i anim%05d.png -qscale 0 anim.mp4 -pass 2
-        input(input_data, pattern_type="glob", framerate=25).output(str(output_path)).run()
+        input(input_data,
+              pattern_type="glob",
+              framerate=25).output(str(output_path)).run()
 
         if delete_input:
-            # remove all input files (pictures), after animation is created and saved
-            input_data_used = [x for x in input_path.glob(input_data_file_pattern) if x.is_file()]
+            # remove all input files (pictures),
+            # after animation is created and saved
+            input_data_used = [x
+                               for x in input_path.glob(input_data_file_pattern)
+                               if x.is_file()]
             for trash_file in input_data_used:
                 trash_file.unlink()
 
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    box: Dict[str, float] = {"x0": -5, "x1": 5, "y0": -5, "y1": 5, "z0": -5, "z1": 5}
-    resolution: Dict[str, int] = {"x": 2 ** 6, "y": 2 ** 6, "z": 2 ** 6}
-    psi_0_noise_3d = functions.noise_mesh(min=0.8, max=1.4, shape=(resolution["x"], resolution["y"], resolution["z"]))
+    box: Dict[str, float] = {"x0": -5, "x1": 5,
+                             "y0": -5, "y1": 5,
+                             "z0": -5, "z1": 5}
+    resolution: Dict[str, int] = {"x": 2 ** 6,
+                                  "y": 2 ** 6,
+                                  "z": 2 ** 6}
+    psi_0_noise_3d = functions.noise_mesh(min=0.8,
+                                          max=1.4,
+                                          shape=(resolution["x"],
+                                                 resolution["y"],
+                                                 resolution["z"]))
 
     Harmonic = Schroedinger.Schroedinger(box=box,
                                          resolution=resolution,
-                                         max_timesteps=100, dt=1.0, g=1.0, g_qf=0.0,
-                                         e_dd=1.0, imag_time=True, mu=1.1, E=1.0,
+                                         max_timesteps=100,
+                                         dt=1.0,
+                                         g=1.0,
+                                         g_qf=0.0,
+                                         e_dd=1.0,
+                                         imag_time=True,
+                                         mu=1.1, E=1.0,
                                          dim=3,
                                          psi_0=functions.psi_gauss_3d,
                                          V=functions.v_harmonic_3d,
@@ -250,10 +310,13 @@ if __name__ == "__main__":
                                          alpha_V=0.3
                                          )
 
-    may = MayaviAnimation(dim=Harmonic.dim, dir_path=Path(__file__).parent.joinpath("results"))
+    may = MayaviAnimation(dim=Harmonic.dim,
+                          dir_path=Path(__file__).parent.joinpath("results"))
     may.animate(Harmonic, accuracy=10**-6, plot_psi_sol=False, plot_V=True,
                 x_lim=(-10, 5), y_lim=(-1, 1), z_lim=(-1, 1),
                 slice_x_index=0, slice_y_index=0, slice_z_index=0
                 )
     mlab.show()
-    may.create_movie(dir_path=None, input_data_file_pattern="*.png", filename="anim.mp4")
+    may.create_movie(dir_path=None,
+                     input_data_file_pattern="*.png",
+                     filename="anim.mp4")

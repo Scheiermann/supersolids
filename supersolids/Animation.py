@@ -59,7 +59,8 @@ def camera_3d_trajectory(frame: int,
 
     Returns
     -------
-    r, phi, z as the components of the camera position in the animation for the given frame.
+    r, phi, z as the components of the camera position
+    in the animation for the given frame.
 
     """
     if r_func is None:
