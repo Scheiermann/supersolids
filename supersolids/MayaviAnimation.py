@@ -182,7 +182,7 @@ def animate(System: Schroedinger.Schroedinger,
                                      colormap="spectral",
                                      plane_orientation="z_axes",
                                      slice_index=slice_z_index,
-                                     extent=[*x_lim, *y_lim, *z_lim]
+                                     # extent=[*x_lim, *y_lim, *z_lim]
                                      )
 
     if plot_V:
@@ -229,12 +229,11 @@ def animate(System: Schroedinger.Schroedinger,
                       azimuth=camera_phi,
                       elevation=camera_z)
 
-        # Update plot functions
-        mu_old = System.mu
 
         # The initial plot needs to be shown first,
         # also a timestep is needed for mu_rel
-        if i >= 0:
+        if i > 0:
+            mu_old = System.mu
             System.time_step()
 
             mu_rel = np.abs((System.mu - mu_old) / System.mu)
@@ -246,17 +245,17 @@ def animate(System: Schroedinger.Schroedinger,
                 yield None
                 break
 
+        if i == (System.max_timesteps - 1):
+            print(f"Maximum timesteps are reached. Animation is stopped.")
+
+        # Update plot functions
         prob_3d = np.abs(System.psi_val) ** 2
         slice_x_plot.mlab_source.trait_set(scalars=prob_3d)
         slice_y_plot.mlab_source.trait_set(scalars=prob_3d)
         slice_z_plot.mlab_source.trait_set(scalars=prob_3d)
         prob_plot.mlab_source.trait_set(scalars=prob_3d)
 
-    # Check if next will be the last frame
-    if i == (System.m0x_timesteps - 1):
-        print(f"Maximum timesteps are reached. Animation is stopped.")
-
-    yield
+        yield
 
 
 class MayaviAnimation:
