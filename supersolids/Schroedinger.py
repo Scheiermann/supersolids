@@ -187,7 +187,7 @@ class Schroedinger(object):
             if psi_0_noise is None:
                 self.psi_val: np.ndarray = self.psi(self.x)
             else:
-                self.psi_val: np.ndarray = psi_0_noise * self.psi(self.x)
+                self.psi_val = psi_0_noise * self.psi(self.x)
 
             if V is None:
                 self.V_val: Union[float, np.ndarray] = 0.0
@@ -211,9 +211,9 @@ class Schroedinger(object):
                                                                         self.y)
 
             if psi_0_noise is None:
-                self.psi_val = psi_0_noise * self.psi(self.pos)
-            else:
                 self.psi_val = self.psi(self.pos)
+            else:
+                self.psi_val = psi_0_noise * self.psi(self.pos)
 
             if V is None:
                 self.V_val = 0.0

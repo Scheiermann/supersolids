@@ -20,74 +20,13 @@ from matplotlib import pyplot as plt
 from supersolids import Schroedinger, functions
 
 
-def camera_3d_trajectory(frame: int,
-                         r_func: Callable = None,
-                         phi_func: Callable = None,
-                         z_func: Callable = None,
-                         r_0: float = 10.0,
-                         phi_0: float = 45.0,
-                         z_0: float = 20.0) -> Tuple[float, float, float]:
-    """
-    Computes r, phi, z as the components of the camera position
-    in the animation for the given frame.
-    Depending on, if a callable function is given for the components,
-    it is applied to the parameters
-    or the start values are used.
-
-    Parameters
-    ----------
-    frame : int, index
-        Index of the frame in the animation
-
-    r_func : Callable or None
-        r component of the movement of the camera.
-
-    phi_func : Callable or None
-        phi component of the movement of the camera.
-
-    z_func : Callable or None
-        z component of the movement of the camera.
-
-    r_0 : float
-        r component of the starting point of the camera movement.
-
-    phi_0 : float
-        phi component of the starting point of the camera movement.
-
-    z_0 : float
-        z component of the starting point of the camera movement.
-
-    Returns
-    -------
-    r, phi, z as the components of the camera position
-    in the animation for the given frame.
-
-    """
-    if r_func is None:
-        r = r_0
-    else:
-        r = r_func(frame, r_0=r_0, phi_0=phi_0, z_0=z_0)
-    if phi_func is None:
-        phi = phi_0
-    else:
-        phi = phi_func(frame, r_0=r_0, phi_0=phi_0, z_0=z_0)
-    if z_func is None:
-        z = z_0
-    else:
-        z = z_func(frame, r_0=r_0, phi_0=phi_0, z_0=z_0)
-
-    return r, phi, z
-
 
 class Animation:
     def __init__(self,
                  dim=2,
                  camera_r_func=None,
-                 camera_phi_func=functions.camera_func_phi,
+                 camera_phi_func=None,
                  camera_z_func=None,
-                 camera_r_0: float = 10.0,
-                 camera_phi_0: float = 45.0,
-                 camera_z_0: float = 20.0,
                  ):
         """
         Creates an Animation for a Schroedinger equation for the 1D or 2D case.
@@ -151,12 +90,15 @@ class Animation:
             self.ax.set_zlabel(r'$z$')
             self.ax.grid()
 
-            self.camera_r = camera_r_0
-            self.camera_phi = camera_phi_0
-            self.camera_z = camera_z_0
             self.r_func = camera_r_func
             self.phi_func = camera_phi_func
             self.z_func = camera_z_func
+
+            camera_r_0, camera_phi_0, camera_z_0 = functions.camera_3d_trajectory(
+                0,
+                r_func=self.r_func,
+                phi_func=self.phi_func,
+                z_func=self.z_func)
 
             self.ax.dist = camera_r_0
             self.ax.azim = camera_phi_0
@@ -385,14 +327,12 @@ class Animation:
         elif System.dim == 2:
             if frame_index >= 1:
                 # rotate camera
-                camera_r, camera_phi, camera_z = camera_3d_trajectory(
+                camera_r, camera_phi, camera_z = functions.camera_3d_trajectory(
                     frame_index,
                     r_func=self.r_func,
                     phi_func=self.phi_func,
                     z_func=self.z_func,
-                    r_0=self.camera_r,
-                    phi_0=self.camera_phi,
-                    z_0=self.camera_z)
+                    )
 
                 self.ax.dist = camera_r
                 self.ax.azim = camera_phi
@@ -451,7 +391,7 @@ class Animation:
         self.title.set_text(f"g = {System.g:.2}, dt = {System.dt:.6}, "
                             f"max_timesteps = {System.max_timesteps:d}, "
                             f"imag_time = {System.imag_time},\n"
-                            "t = {System.t:02.05f}")
+                            f"t = {System.t:02.05f}")
 
         if System.dim == 1:
             return self.psi_line, self.V_line, self.psi_sol_line, self.title

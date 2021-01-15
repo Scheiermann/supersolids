@@ -56,6 +56,17 @@ def get_image_path(dir_path: Path,
     return input_path
 
 
+def axes_style():
+    ax = mlab.axes(line_width=2, nb_labels=5)
+    ax.axes.visibility = True
+    ax.label_text_property.font_size = 8
+    ax.label_text_property.color = (0.0, 0.0, 0.0)
+    ax.title_text_property.color = (0.0, 0.0, 0.0)
+    ax.property.color = (0.0, 0.0, 0.0)
+    ax.property.line_width = 2.5
+
+
+
 @mlab.animate(delay=10, ui=True)
 def animate(System: Schroedinger.Schroedinger,
             accuracy: float = 10 ** -6,
@@ -66,8 +77,11 @@ def animate(System: Schroedinger.Schroedinger,
             z_lim: Tuple[float, float] = (-1, 1),
             slice_x_index: int = 0,
             slice_y_index: int = 0,
-            slice_z_index: int = 0
-            ):
+            slice_z_index: int = 0,
+            camera_r_func=None,
+            camera_phi_func=None,
+            camera_z_func=None,
+           ):
     """
     Animates solving of the Schroedinger equations of System with mayavi in 3D.
     Animation is limited to System.max_timesteps or
@@ -113,6 +127,15 @@ def animate(System: Schroedinger.Schroedinger,
         to produce a slice/plane in mayavi,
         where psi_prob = |psi| ** 2 is used for the slice
 
+    camera_r_func : Callable, function
+        r component of the movement of the camera.
+
+    camera_phi_func : Callable, function
+        phi component of the movement of the camera.
+
+    camera_z_func : Callable, function
+        z component of the movement of the camera.
+
     Returns
     -------
 
@@ -133,7 +156,8 @@ def animate(System: Schroedinger.Schroedinger,
                                      colormap="spectral",
                                      plane_orientation="x_axes",
                                      slice_index=slice_x_index,
-                                     extent=[*x_lim, *y_lim, *z_lim])
+                                     extent=[*x_lim, *y_lim, *z_lim]
+                                     )
 
     slice_y_plot = mlab.volume_slice(System.x_mesh,
                                      System.y_mesh,
@@ -142,16 +166,18 @@ def animate(System: Schroedinger.Schroedinger,
                                      colormap="spectral",
                                      plane_orientation="y_axes",
                                      slice_index=slice_y_index,
-                                     extent=[*x_lim, *y_lim, *z_lim])
+                                     extent=[*x_lim, *y_lim, *z_lim]
+                                     )
 
     slice_z_plot = mlab.volume_slice(System.x_mesh,
-                                System.y_mesh,
-                                System.z_mesh,
-                                prob_3d,
-                                colormap="spectral",
-                                plane_orientation="z_axes",
-                                slice_index=slice_z_index,
-                                extent=[*x_lim, *y_lim, *z_lim])
+                                     System.y_mesh,
+                                     System.z_mesh,
+                                     prob_3d,
+                                     colormap="spectral",
+                                     plane_orientation="z_axes",
+                                     slice_index=slice_z_index,
+                                     extent=[*x_lim, *y_lim, *z_lim]
+                                     )
 
     if plot_V:
         V_plot = mlab.contour3d(System.x_mesh,
@@ -172,6 +198,7 @@ def animate(System: Schroedinger.Schroedinger,
                                           opacity=System.alpha_psi_sol,
                                           transparent=True)
 
+    axes_style()
     for i in range(0, System.max_timesteps):
         mu_old = System.mu
         System.time_step()
@@ -185,6 +212,19 @@ def animate(System: Schroedinger.Schroedinger,
         slice_y_plot.mlab_source.trait_set(scalars=prob_3d)
         slice_z_plot.mlab_source.trait_set(scalars=prob_3d)
         prob_plot.mlab_source.trait_set(scalars=prob_3d)
+
+        # rotate camera
+        camera_r, camera_phi, camera_z = functions.camera_3d_trajectory(
+            i,
+            r_func=camera_r_func,
+            phi_func=camera_phi_func,
+            z_func=camera_z_func
+            )
+
+        mlab.view(distance=camera_r,
+                  azimuth=camera_phi,
+                  elevation=camera_z
+                  )
         yield
 
 
@@ -207,8 +247,6 @@ class MayaviAnimation:
 
         self.fig = mlab.figure(f"{MayaviAnimation.mayavi_counter:02d}")
         mlab.title(f"{MayaviAnimation.mayavi_counter:02d}")
-        self.ax = mlab.axes(line_width=2, nb_labels=5)
-        self.ax.axes.visibility = True
 
         # dir_path need to be saved to access it after the figure closed
         self.dir_path = dir_path

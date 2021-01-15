@@ -17,7 +17,7 @@ import psutil
 
 import numpy as np
 from mayavi import mlab
-from typing import Callable, Tuple, List, Dict
+from typing import Callable, Tuple, Dict
 
 from supersolids import Animation
 from supersolids import constants
@@ -37,7 +37,7 @@ def simulate_case(box: Dict[str, float],
                   imag_time: bool = False,
                   mu: float = 1.1,
                   E: float = 1.0,
-                  dim: int = 1,
+                  dim: int = 3,
                   psi_0: Callable = functions.psi_gauss_3d,
                   V: Callable = functions.v_harmonic_3d,
                   V_interaction: Callable = None,
@@ -61,9 +61,6 @@ def simulate_case(box: Dict[str, float],
                   camera_phi_func: Callable = functools.partial(
                       functions.camera_func_phi, phi_per_frame=20.0),
                   camera_z_func: Callable = None,
-                  camera_r_0: float = 10.0,
-                  camera_phi_0: float = 75.0,
-                  camera_z_0: float = 20.0,
                   delete_input: bool = True) -> None:
     """
     Wrapper for Animation and Schroedinger to get a working Animation
@@ -136,15 +133,6 @@ def simulate_case(box: Dict[str, float],
     camera_z_func : Callable or None
         z component of the movement of the camera.
 
-    camera_r_0 : float
-        r component of the starting point of the camera movement.
-
-    camera_phi_0 :
-        phi component of the starting point of the camera movement.
-
-    camera_z_0 :
-        z component of the starting point of the camera movement.
-
     delete_input : bool
         Condition if the input pictures should be deleted,
         after creation the creation of the animation as e.g. mp4
@@ -179,9 +167,6 @@ def simulate_case(box: Dict[str, float],
                                   camera_r_func=camera_r_func,
                                   camera_phi_func=camera_phi_func,
                                   camera_z_func=camera_z_func,
-                                  camera_r_0=camera_r_0,
-                                  camera_phi_0=camera_phi_0,
-                                  camera_z_0=camera_z_0
                                   )
 
         if ani.dim == 1:
@@ -213,7 +198,10 @@ def simulate_case(box: Dict[str, float],
                         z_lim=z_lim,
                         slice_x_index=slice_x_index,
                         slice_y_index=slice_y_index,
-                        slice_z_index=slice_z_index
+                        slice_z_index=slice_z_index,
+                        camera_r_func=camera_r_func,
+                        camera_phi_func=camera_phi_func,
+                        camera_z_func=camera_z_func,
                         )
         mlab.show()
         # TODO: close window after last frame
@@ -299,7 +287,7 @@ if __name__ == "__main__":
     # 3D works in single core mode
     simulate_case(box,
                   resolution,
-                  max_timesteps=800,
+                  max_timesteps=50,
                   dt=dt,
                   g=g,
                   g_qf=g_qf,
@@ -329,16 +317,13 @@ if __name__ == "__main__":
                   slice_z_index=resolution["z"] // 2,
                   camera_r_func=functools.partial(
                       functions.camera_func_r,
-                      r_0=10.0, r_per_frame=0.0),  # camera just 2D
+                      r_0=40.0, phi_0=45.0, z_0=50.0, r_per_frame=0.0),
                   camera_phi_func=functools.partial(
                       functions.camera_func_phi,
-                      phi_0=45.0, phi_per_frame=10.0),
+                      r_0=40.0, phi_0=45.0, z_0=50.0, phi_per_frame=5.0),
                   camera_z_func=functools.partial(
-                      functions.camera_func_r,
-                      r_0=20.0, r_per_frame=0.0),
-                  camera_r_0=10.0,
-                  camera_phi_0=45.0,
-                  camera_z_0=20.0,
+                      functions.camera_func_z,
+                      r_0=40.0, phi_0=45.0, z_0=50.0, z_per_frame=0.0),
                   delete_input=True
                   )
     print("Single core done")
@@ -393,17 +378,17 @@ if __name__ == "__main__":
     #                         slice_x_index=resolution["x"] // 10,
     #                         slice_y_index=resolution["y"] // 10,
     #                         slice_z_index=resolution["z"] // 2,
-    #                         camera_r_func=functools.partial(
+    #                         camera_r_func = functools.partial(
     #                             functions.camera_func_r,
-    #                             r_0=10.0, r_per_frame=0.0),
-    #                         camera_phi_func=functools.partial(
+    #                             r_0=40.0, phi_0=45.0, z_0=50.0,
+    #                             r_per_frame=0.0),
+    #                         camera_phi_func = functools.partial(
     #                             functions.camera_func_phi,
-    #                             phi_0=45.0, phi_per_frame=10.0),
-    #                         camera_z_func=functools.partial(
-    #                             functions.camera_func_r,
-    #                             r_0=20.0, r_per_frame=0.0),
-    #                         camera_r_0=10.0,
-    #                         camera_phi_0=45.0,
-    #                         camera_z_0=20.0,
-    #                         delete_input=True
+    #                             r_0=40.0, phi_0=45.0, z_0=50.0,
+    #                             phi_per_frame=5.0),
+    #                         camera_z_func = functools.partial(
+    #                             functions.camera_func_z,
+    #                             r_0=40.0, phi_0=45.0, z_0=50.0,
+    #                             z_per_frame=0.0),
+    #                        delete_input=True
     #                         )

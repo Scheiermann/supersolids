@@ -13,7 +13,7 @@ import functools
 
 import numpy as np
 from scipy import stats
-from typing import Tuple
+from typing import Tuple, Callable
 
 from supersolids import Animation
 from supersolids import constants
@@ -428,6 +428,74 @@ def camera_func_phi(frame: int,
                     phi_per_frame: float = 10.0) -> float:
     phi = phi_0 + (2.0 * np.pi / 360.0) * phi_per_frame * frame
     return phi
+
+
+def camera_func_z(frame: int,
+                  r_0: float = 10.0,
+                  phi_0: float = 45.0,
+                  z_0: float = 20.0,
+                  z_per_frame: float = 10.0) -> float:
+    z = z_0 + z_per_frame * frame
+    return z
+
+
+def camera_3d_trajectory(frame: int,
+                         r_func: Callable = None,
+                         phi_func: Callable = None,
+                         z_func: Callable = None,
+                         r_0: float = 10.0,
+                         phi_0: float = 45.0,
+                         z_0: float = 20.0) -> Tuple[float, float, float]:
+    """
+    Computes r, phi, z as the components of the camera position
+    in the animation for the given frame.
+    Depending on, if a callable function is given for the components,
+    it is applied to the parameters
+    or the start values are used.
+
+    Parameters
+    ----------
+    frame : int, index
+        Index of the frame in the animation
+
+    r_func : Callable or None
+        r component of the movement of the camera.
+
+    phi_func : Callable or None
+        phi component of the movement of the camera.
+
+    z_func : Callable or None
+        z component of the movement of the camera.
+
+    r_0 : float
+        r component of the starting point of the camera movement.
+
+    phi_0 : float
+        phi component of the starting point of the camera movement.
+
+    z_0 : float
+        z component of the starting point of the camera movement.
+
+    Returns
+    -------
+    r, phi, z as the components of the camera position
+    in the animation for the given frame.
+
+    """
+    if r_func is None:
+        r = r_0
+    else:
+        r = r_func(frame)
+    if phi_func is None:
+        phi = phi_0
+    else:
+        phi = phi_func(frame)
+    if z_func is None:
+        z = z_0
+    else:
+        z = z_func(frame)
+
+    return r, phi, z
 
 
 def noise_mesh(min: float = 0.8,
