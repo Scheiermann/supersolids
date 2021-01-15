@@ -17,7 +17,7 @@ import psutil
 
 import numpy as np
 from mayavi import mlab
-from typing import Callable, Tuple, Dict
+from typing import Callable, Tuple, Dict, NamedTuple
 
 from supersolids import Animation
 from supersolids import constants
@@ -33,7 +33,7 @@ def simulate_case(box: Dict[str, float],
                   dt: float,
                   g: float = 0.0,
                   g_qf: float = 0.0,
-                  epsilon_dd: float = 1.0,
+                  e_dd: float = 1.0,
                   imag_time: bool = False,
                   mu: float = 1.1,
                   E: float = 1.0,
@@ -153,7 +153,7 @@ def simulate_case(box: Dict[str, float],
                                              dt,
                                              g=g,
                                              g_qf=g_qf,
-                                             e_dd=epsilon_dd,
+                                             e_dd=e_dd,
                                              imag_time=imag_time,
                                              mu=mu, E=E,
                                              dim=dim,
@@ -228,14 +228,14 @@ if __name__ == "__main__":
 
     # constants needed for the Schroedinger equation
     box: Dict[str, float] = {"x0": -8, "x1": 8,
-                             "y0": -8, "y1": 8,
-                             "z0": -8, "z1": 8}
+                             "y0": -4, "y1": 4,
+                             "z0": -3, "z1": 3}
 
-    # due to fft of the points the resolution needs to be 2 **
-    # resolution_exponent
-    resolution: Dict[str, int] = {"x": 2 ** 6, "y": 2 ** 6, "z": 2 ** 6}
+    # due to fft of the points the resolution
+    # needs to be 2 ** resolution_exponent
+    resolution: Dict[str, int] = {"x": 2 ** 8, "y": 2 ** 8, "z": 2 ** 6}
 
-    dt: float = 0.01
+    dt: float = 0.02
     N: int = 4 * 10 ** 4
     m: float = 164.0 * constants.u_in_kg
     a_s: float = 85.0 * constants.a_0
@@ -246,10 +246,10 @@ if __name__ == "__main__":
     w_z: float = 2.0 * np.pi * 140.0
 
     alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
-    g, g_qf, epsilon_dd = functions.get_parameters(
+    g, g_qf, e_dd = functions.get_parameters(
         N=N, m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
     print(f"g, g_qf, epsilon_dd, alpha_y, alpha_z: "
-          f"{g, g_qf, epsilon_dd, alpha_y, alpha_z}")
+          f"{g, g_qf, e_dd, alpha_y, alpha_z}")
 
     # functions needed for the Schroedinger equation (e.g. potential: V,
     # initial wave function: psi_0)
@@ -267,7 +267,7 @@ if __name__ == "__main__":
                  ]
 
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
-                                 R=min(box_lenth)/2.0)
+                                 R=1000 * min(box_lenth)/2.0)
 
     # functools.partial sets all arguments except x, y, z,
     # as multiple arguments for Schroedinger aren't implement yet
@@ -282,7 +282,9 @@ if __name__ == "__main__":
 
     psi_0_3d = functools.partial(
         functions.psi_gauss_3d,
-        a=1.0,
+        a_x=3.0,
+        a_y=2.0,
+        a_z=1.0,
         x_0=0.0,
         y_0=0.0,
         z_0=0.0,
@@ -306,7 +308,7 @@ if __name__ == "__main__":
                   dt=dt,
                   g=g,
                   g_qf=g_qf,
-                  epsilon_dd=epsilon_dd,
+                  e_dd=e_dd,
                   imag_time=True,
                   mu=1.1,
                   E=1.0,
@@ -370,7 +372,7 @@ if __name__ == "__main__":
     #                         dt=dt,
     #                         g=g,
     #                         g_qf=g_qf,
-    #                         epsilon_dd=epsilon_dd,
+    #                         e_dd=e_dd,
     #                         imag_time=True,
     #                         mu=1.1,
     #                         E=1.0,

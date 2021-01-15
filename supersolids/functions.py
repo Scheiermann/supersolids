@@ -152,8 +152,10 @@ def psi_gauss_2d(x, y, a: float = 1.0, x_0: float = 0.0,
             )
 
 
-def psi_gauss_3d(x, y, z, a: float = 1.0, x_0: float = 0.0,
-                 y_0: float = 0.0, z_0: float = 0.0, k_0: float = 0.0):
+def psi_gauss_3d(x, y, z,
+                 a_x: float = 1.0, a_y: float = 1.0, a_z: float = 1.0,
+                 x_0: float = 0.0, y_0: float = 0.0, z_0: float = 0.0,
+                 k_0: float = 0.0):
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
@@ -184,11 +186,12 @@ def psi_gauss_3d(x, y, z, a: float = 1.0, x_0: float = 0.0,
         Group velocity of pulse
     """
 
-    return ((a * np.sqrt(np.pi)) ** (-0.5)
-            * np.exp(-0.5 * (((x - x_0) * 1.0) ** 2
-                             + ((y - y_0) * 1.0) ** 2
-                             + ((z - z_0) * 1.0) ** 2) / (
-                             a ** 2) + 1j * x * k_0))
+    return ((a_x * a_y * a_z * np.pi ** (3.0 / 2.0)) ** (-0.5)
+            * np.exp(-0.5 * (
+                    ((x - x_0) / a_x) ** 2
+                    + ((y - y_0) / a_y) ** 2
+                    + ((z - z_0) / a_z) ** 2)
+                     + 1j * x * k_0))
 
 
 def psi_gauss_1d(x, a: float = 1.0, x_0: float = 0.0, k_0: float = 0.0):
