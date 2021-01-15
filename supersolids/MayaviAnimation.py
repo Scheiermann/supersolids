@@ -78,6 +78,7 @@ def animate(System: Schroedinger.Schroedinger,
             slice_x_index: int = 0,
             slice_y_index: int = 0,
             slice_z_index: int = 0,
+            interactive: bool = True,
             camera_r_func=None,
             camera_phi_func=None,
             camera_z_func=None,
@@ -127,6 +128,11 @@ def animate(System: Schroedinger.Schroedinger,
         to produce a slice/plane in mayavi,
         where psi_prob = |psi| ** 2 is used for the slice
 
+    interactive : bool
+        Condition for interactive mode. When camera functions are used,
+        then interaction is not possible. So interactive=True turn the usage
+        of camera functions off.
+
     camera_r_func : Callable, function
         r component of the movement of the camera.
 
@@ -156,7 +162,7 @@ def animate(System: Schroedinger.Schroedinger,
                                      colormap="spectral",
                                      plane_orientation="x_axes",
                                      slice_index=slice_x_index,
-                                     extent=[*x_lim, *y_lim, *z_lim]
+                                     # extent=[*x_lim, *y_lim, *z_lim]
                                      )
 
     slice_y_plot = mlab.volume_slice(System.x_mesh,
@@ -166,7 +172,7 @@ def animate(System: Schroedinger.Schroedinger,
                                      colormap="spectral",
                                      plane_orientation="y_axes",
                                      slice_index=slice_y_index,
-                                     extent=[*x_lim, *y_lim, *z_lim]
+                                     # extent=[*x_lim, *y_lim, *z_lim]
                                      )
 
     slice_z_plot = mlab.volume_slice(System.x_mesh,
@@ -200,32 +206,57 @@ def animate(System: Schroedinger.Schroedinger,
 
     axes_style()
     for i in range(0, System.max_timesteps):
+        # Update legend (especially time)
+        mlab.title(f"g = {System.g:.2}, dt = {System.dt:.6}, "
+                   f"max_timesteps = {System.max_timesteps:d}, "
+                   f"imag_time = {System.imag_time}, "
+                   f"t = {System.t:02.05f}",
+                   height=0.95,
+                   line_width=1.0,
+                   size=0.3,
+                   color=(0, 0, 0))
+
+        if not interactive:
+            # rotate camera
+            camera_r, camera_phi, camera_z = functions.camera_3d_trajectory(
+                i,
+                r_func=camera_r_func,
+                phi_func=camera_phi_func,
+                z_func=camera_z_func
+                )
+
+            mlab.view(distance=camera_r,
+                      azimuth=camera_phi,
+                      elevation=camera_z)
+
+        # Update plot functions
         mu_old = System.mu
-        System.time_step()
-        mu_rel = np.abs((System.mu - mu_old) / System.mu)
-        print(f"mu_rel: {mu_rel}")
-        if mu_rel < accuracy:
-            print(f"accuracy reached: {mu_rel}")
-            break
+
+        # The initial plot needs to be shown first,
+        # also a timestep is needed for mu_rel
+        if i >= 0:
+            System.time_step()
+
+            mu_rel = np.abs((System.mu - mu_old) / System.mu)
+            print(f"mu_rel: {mu_rel}")
+
+            # Stop animation when accuracy is reached
+            if mu_rel < accuracy:
+                print(f"accuracy reached: {mu_rel}")
+                yield None
+                break
+
         prob_3d = np.abs(System.psi_val) ** 2
         slice_x_plot.mlab_source.trait_set(scalars=prob_3d)
         slice_y_plot.mlab_source.trait_set(scalars=prob_3d)
         slice_z_plot.mlab_source.trait_set(scalars=prob_3d)
         prob_plot.mlab_source.trait_set(scalars=prob_3d)
 
-        # rotate camera
-        camera_r, camera_phi, camera_z = functions.camera_3d_trajectory(
-            i,
-            r_func=camera_r_func,
-            phi_func=camera_phi_func,
-            z_func=camera_z_func
-            )
+    # Check if next will be the last frame
+    if i == (System.m0x_timesteps - 1):
+        print(f"Maximum timesteps are reached. Animation is stopped.")
 
-        mlab.view(distance=camera_r,
-                  azimuth=camera_phi,
-                  elevation=camera_z
-                  )
-        yield
+    yield
 
 
 class MayaviAnimation:
@@ -246,7 +277,6 @@ class MayaviAnimation:
         self.dim = dim
 
         self.fig = mlab.figure(f"{MayaviAnimation.mayavi_counter:02d}")
-        mlab.title(f"{MayaviAnimation.mayavi_counter:02d}")
 
         # dir_path need to be saved to access it after the figure closed
         self.dir_path = dir_path

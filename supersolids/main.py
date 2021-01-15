@@ -57,6 +57,7 @@ def simulate_case(box: Dict[str, float],
                   slice_x_index: int = 0,
                   slice_y_index: int = 0,
                   slice_z_index: int = 0,
+                  interactive: bool = True,
                   camera_r_func: Callable = None,
                   camera_phi_func: Callable = functools.partial(
                       functions.camera_func_phi, phi_per_frame=20.0),
@@ -123,6 +124,11 @@ def simulate_case(box: Dict[str, float],
     slice_y_index : int
         Index of grid point in y direction to produce a slice/plane in mayavi,
         where psi_prob = |psi| ** 2 is used for the slice
+
+    interactive : bool
+        Condition for interactive mode. When camera functions are used,
+        then interaction is not possible. So interactive=True turn the usage
+        of camera functions off.
 
     camera_r_func : Callable or None
         r component of the movement of the camera.
@@ -199,6 +205,7 @@ def simulate_case(box: Dict[str, float],
                         slice_x_index=slice_x_index,
                         slice_y_index=slice_y_index,
                         slice_z_index=slice_z_index,
+                        interactive=interactive,
                         camera_r_func=camera_r_func,
                         camera_phi_func=camera_phi_func,
                         camera_z_func=camera_z_func,
@@ -221,7 +228,8 @@ if __name__ == "__main__":
 
     # constants needed for the Schroedinger equation
     box: Dict[str, float] = {"x0": -5, "x1": 5,
-                             "y0": -5, "y1": 5, "z0": -5, "z1": 5}
+                             "y0": -5, "y1": 5,
+                             "z0": -5, "z1": 5}
 
     # due to fft of the points the resolution needs to be 2 **
     # resolution_exponent
@@ -303,11 +311,11 @@ if __name__ == "__main__":
                   mu_sol=functions.mu_3d,
                   plot_psi_sol=False,
                   plot_V=False,
-                  psi_0_noise=psi_0_noise_3d,
+                  psi_0_noise=None,
                   alpha_psi=0.8,
                   alpha_psi_sol=0.5,
                   alpha_V=0.3,
-                  accuracy=10 ** -8,
+                  accuracy=10 ** -7,
                   filename="anim.mp4",
                   x_lim=(-2.0, 2.0),
                   y_lim=(-2.0, 2.0),
@@ -315,6 +323,7 @@ if __name__ == "__main__":
                   slice_x_index=resolution["x"] // 10,  # just for mayavi (3D)
                   slice_y_index=resolution["y"] // 10,
                   slice_z_index=resolution["z"] // 2,
+                  interactive=True,
                   camera_r_func=functools.partial(
                       functions.camera_func_r,
                       r_0=40.0, phi_0=45.0, z_0=50.0, r_per_frame=0.0),
