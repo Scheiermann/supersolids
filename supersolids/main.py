@@ -227,9 +227,9 @@ if __name__ == "__main__":
     max_workers = psutil.cpu_count(logical=False)
 
     # constants needed for the Schroedinger equation
-    box: Dict[str, float] = {"x0": -5, "x1": 5,
-                             "y0": -5, "y1": 5,
-                             "z0": -5, "z1": 5}
+    box: Dict[str, float] = {"x0": -8, "x1": 8,
+                             "y0": -8, "y1": 8,
+                             "z0": -8, "z1": 8}
 
     # due to fft of the points the resolution needs to be 2 **
     # resolution_exponent
@@ -260,7 +260,14 @@ if __name__ == "__main__":
         alpha_y=alpha_y,
         alpha_z=alpha_z)
 
-    V_3d_ddi = functools.partial(functions.dipol_dipol_interaction)
+    # TODO: R is smallest Box.lentgh / 2
+    box_lenth = [(box["x1"] - box["x0"]),
+                 (box["y1"] - box["y0"]),
+                 (box["z1"] - box["z0"])
+                 ]
+
+    V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
+                                 R=min(box_lenth)/2.0)
 
     # functools.partial sets all arguments except x, y, z,
     # as multiple arguments for Schroedinger aren't implement yet
@@ -275,7 +282,7 @@ if __name__ == "__main__":
 
     psi_0_3d = functools.partial(
         functions.psi_gauss_3d,
-        a=3.0,
+        a=1.0,
         x_0=0.0,
         y_0=0.0,
         z_0=0.0,
@@ -295,7 +302,7 @@ if __name__ == "__main__":
     # 3D works in single core mode
     simulate_case(box,
                   resolution,
-                  max_timesteps=50,
+                  max_timesteps=800,
                   dt=dt,
                   g=g,
                   g_qf=g_qf,
@@ -311,7 +318,7 @@ if __name__ == "__main__":
                   mu_sol=functions.mu_3d,
                   plot_psi_sol=False,
                   plot_V=False,
-                  psi_0_noise=None,
+                  psi_0_noise=psi_0_noise_3d,
                   alpha_psi=0.8,
                   alpha_psi_sol=0.5,
                   alpha_V=0.3,

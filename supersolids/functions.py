@@ -398,13 +398,34 @@ def v_harmonic_3d(x, y, z, alpha_y: float = 1.0, alpha_z: float = 1.0):
     return 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2)
 
 
-def dipol_dipol_interaction(kx_mesh: float, ky_mesh: float, kz_mesh: float):
+def get_r_cut(k_mesh: np.ndarray, R: float = 1.0):
+    kr_singular = k_mesh * R
+    kr = np.where(kr_singular == 0.0, 10 ** -8, kr_singular)
+
+    r_cut = (1.0
+             + (3.0 / kr ** 2.0) * np.cos(kr)
+             - (3.0 / kr ** 3.0) * np.sin(kr)
+             )
+
+    return r_cut
+
+
+def dipol_dipol_interaction(kx_mesh: float,
+                            ky_mesh: float,
+                            kz_mesh: float,
+                            R: float = 1.0):
     k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
     factor = 3.0 * (kz_mesh ** 2.0)
     # for [0, 0, 0] there is a singularity and factor/k_squared is 0/0, so we
     # arbitrary set the divisor to 1.0
     k_squared_singular_free = np.where(k_squared == 0.0, 1.0, k_squared)
-    V_k_val = ((factor / k_squared_singular_free) - 1.0)
+
+    k_mesh: np.ndarray = np.sqrt(k_squared)
+    r_cut: np.ndarray = get_r_cut(k_mesh, R=R)
+
+    r_cut[np.isnan(r_cut)] = 0.0
+
+    V_k_val = r_cut * ((factor / k_squared_singular_free) - 1.0)
 
     # Remove singularities (at this point there should not be any)
     V_k_val[np.isnan(V_k_val)] = 0.0
