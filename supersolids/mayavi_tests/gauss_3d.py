@@ -68,7 +68,7 @@ def anim(x, y, z, func, R=3):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    # due to fft of the points the resolution needs to be 2 **
+    # due to fft of the points the res needs to be 2 **
     # resolution_exponent
     datapoints_exponent: int = 6
     resolution: int = 2 ** datapoints_exponent
@@ -92,7 +92,7 @@ if __name__ == "__main__":
 
     dir_path = Path(__file__).parent
     fig.scene.disable_render = False
-    # anti_aliasing default is 8, and removes resolution issues when
+    # anti_aliasing default is 8, and removes res issues when
     # downscaling, but takes longer
     fig.scene.anti_aliasing_frames = 8
     fig.scene.movie_maker.directory = dir_path

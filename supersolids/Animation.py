@@ -197,7 +197,7 @@ class Animation:
 
             V_pos = np.linspace(range_in_box[0],
                                 range_in_box[-1],
-                                System.resolution["x"])
+                                System.res["x"])
             V_plot_val = System.V(V_pos)
 
         elif System.dim == 2:
@@ -210,10 +210,10 @@ class Animation:
 
             x = np.linspace(range_in_box[:, 0].min(),
                             range_in_box[:, 0].max(),
-                            System.resolution["x"])
+                            System.res["x"])
             y = np.linspace(range_in_box[:, 1].min(),
                             range_in_box[:, 1].max(),
-                            System.resolution["y"])
+                            System.res["y"])
             _, _, V_pos = functions.get_meshgrid(x, y)
             V_plot_val = System.V(V_pos)
 

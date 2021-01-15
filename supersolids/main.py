@@ -27,8 +27,8 @@ from supersolids import run_time
 from supersolids import Schroedinger
 
 
-def simulate_case(box: Dict[str, float],
-                  resolution: Dict[str, int],
+def simulate_case(box: NamedTuple,
+                  res: NamedTuple,
                   max_timesteps: int,
                   dt: float,
                   g: float = 0.0,
@@ -69,7 +69,7 @@ def simulate_case(box: Dict[str, float],
 
     Parameters
     ----------
-    box : Dict[str, float]
+    box : NamedTuple
         Endpoints of box where to simulate the Schroedinger equation.
         Keyword x0 is minimum in x direction and x1 is maximum.
         Same for y and z. For 1D just use x0, x1.
@@ -77,8 +77,8 @@ def simulate_case(box: Dict[str, float],
         For 3D x0, x1, y0, y1, z0, z1.
         Dimension of simulation is constructed from this dictionary.
 
-    resolution : Dict[str, int]
-        Dictionary for the number of grid points in x, y, z direction.
+    res : NamedTuple
+        NamedTuple for the number of grid points in x, y, z direction.
         Needs to have half size of box dictionary.
         Keywords x, y z are used.
 
@@ -125,6 +125,10 @@ def simulate_case(box: Dict[str, float],
         Index of grid point in y direction to produce a slice/plane in mayavi,
         where psi_prob = |psi| ** 2 is used for the slice
 
+    slice_z_index : int
+        Index of grid point in z direction to produce a slice/plane in mayavi,
+        where psi_prob = |psi| ** 2 is used for the slice
+
     interactive : bool
         Condition for interactive mode. When camera functions are used,
         then interaction is not possible. So interactive=True turn the usage
@@ -148,7 +152,7 @@ def simulate_case(box: Dict[str, float],
     """
     with run_time.run_time():
         Harmonic = Schroedinger.Schroedinger(box,
-                                             resolution,
+                                             res,
                                              max_timesteps,
                                              dt,
                                              g=g,
@@ -227,13 +231,14 @@ if __name__ == "__main__":
     max_workers = psutil.cpu_count(logical=False)
 
     # constants needed for the Schroedinger equation
-    box: Dict[str, float] = {"x0": -8, "x1": 8,
-                             "y0": -4, "y1": 4,
-                             "z0": -3, "z1": 3}
 
-    # due to fft of the points the resolution
+    # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
-    resolution: Dict[str, int] = {"x": 2 ** 8, "y": 2 ** 8, "z": 2 ** 6}
+    res = functions.Resolution(x=2 ** 6, y=2 ** 6, z=2 ** 6)
+
+    box = functions.Box(x0=-8.0, x1=8.0,
+                        y0=-4.0, y1=4.0,
+                        z0=-3.0, z1=3.0)
 
     dt: float = 0.02
     N: int = 4 * 10 ** 4
@@ -260,14 +265,9 @@ if __name__ == "__main__":
         alpha_y=alpha_y,
         alpha_z=alpha_z)
 
-    # TODO: R is smallest Box.lentgh / 2
-    box_lenth = [(box["x1"] - box["x0"]),
-                 (box["y1"] - box["y0"]),
-                 (box["z1"] - box["z0"])
-                 ]
-
+    box_length = [(box.x1 - box.x0), (box.y1 - box.y0), (box.z1 - box.z0)]
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
-                                 R=1000 * min(box_lenth)/2.0)
+                                 R=1000 * min(box_length) / 2.0)
 
     # functools.partial sets all arguments except x, y, z,
     # as multiple arguments for Schroedinger aren't implement yet
@@ -291,8 +291,7 @@ if __name__ == "__main__":
         k_0=0.0)
 
     psi_0_noise_3d = functions.noise_mesh(
-        min=0.8, max=1.4, shape=(
-            resolution["x"], resolution["y"], resolution["z"]))
+        min=0.8, max=1.4, shape=(res.x, res.y, res.z))
 
     # Used to remember that 2D need the special pos function (g is set inside
     # of Schoerdinger for convenicence)
@@ -303,7 +302,7 @@ if __name__ == "__main__":
     # TODO: get mayavi lim to work
     # 3D works in single core mode
     simulate_case(box,
-                  resolution,
+                  res,
                   max_timesteps=800,
                   dt=dt,
                   g=g,
@@ -329,9 +328,9 @@ if __name__ == "__main__":
                   x_lim=(-2.0, 2.0),
                   y_lim=(-2.0, 2.0),
                   z_lim=(0, 0.5),
-                  slice_x_index=resolution["x"] // 10,  # just for mayavi (3D)
-                  slice_y_index=resolution["y"] // 10,
-                  slice_z_index=resolution["z"] // 2,
+                  slice_x_index=res.x // 10,  # just for mayavi (3D)
+                  slice_y_index=res.y // 10,
+                  slice_z_index=res.z // 2,
                   interactive=True,
                   camera_r_func=functools.partial(
                       functions.camera_func_r,
@@ -367,7 +366,7 @@ if __name__ == "__main__":
     #         file_name = f"split_{i:03}.mp4"
     #         executor.submit(simulate_case,
     #                         box,
-    #                         resolution,
+    #                         res,
     #                         max_timesteps=800,
     #                         dt=dt,
     #                         g=g,
@@ -393,9 +392,9 @@ if __name__ == "__main__":
     #                         x_lim=(-2.0, 2.0),
     #                         y_lim=(-2.0, 2.0),
     #                         z_lim=(0, 0.5),
-    #                         slice_x_index=resolution["x"] // 10,
-    #                         slice_y_index=resolution["y"] // 10,
-    #                         slice_z_index=resolution["z"] // 2,
+    #                         slice_x_index=res["x"] // 10,
+    #                         slice_y_index=res["y"] // 10,
+    #                         slice_z_index=res["z"] // 2,
     #                         camera_r_func = functools.partial(
     #                             functions.camera_func_r,
     #                             r_0=40.0, phi_0=45.0, z_0=50.0,

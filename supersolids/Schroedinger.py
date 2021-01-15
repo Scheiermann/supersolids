@@ -10,7 +10,7 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 """
 import functools
 import sys
-from typing import Callable, Dict, Union, Optional
+from typing import Callable, Dict, Union, Optional, NamedTuple
 
 import numpy as np
 
@@ -37,8 +37,8 @@ class Schroedinger(object):
     """
 
     def __init__(self,
-                 box: Dict[str, float],
-                 resolution: Dict[str, int],
+                 box: NamedTuple,
+                 res: NamedTuple,
                  max_timesteps: int,
                  dt: float,
                  g: float = 0.0,
@@ -63,21 +63,17 @@ class Schroedinger(object):
 
         Parameters
         ----------
-        box : Dict[str, float]
-            Endpoints of box where to simulate the Schoredinger equation.
+        box : NamedTuple
             Keyword x0 is minimum in x direction and
             x1 is maximum. Same for y and z. For 1D just use x0, x1.
             For 2D x0, x1, y0, y1.
             For 3D x0, x1, y0, y1, z0, z1.
             Dimension of simulation is constructed from this dictionary.
 
-        resolution : Dict[str, int]
-            Dictionary for the number of grid points in x, y, z direction.
+        res : NamedTuple
+            NamedTuple for the number of grid points in x, y, z direction.
             Needs to have half size of box dictionary.
             Keywords x, y z are used.
-
-        resolution : int
-            number of grid points in one direction
 
         max_timesteps : int
             Maximum timesteps  with length dt for the animation.
@@ -92,10 +88,16 @@ class Schroedinger(object):
             Alpha value for plot transparency of V
 
         """
-        self.resolution: Dict[str, int] = resolution
+        assert isinstance(res, functions.Resolution), (
+            f"box: {type(res)} is not type {type(functions.Resolution)}")
+
+        self.res: NamedTuple = res
         self.max_timesteps: int = max_timesteps
 
-        self.box: Dict[str, float] = box
+        assert isinstance(box, functions.Box), (
+            f"box: {type(box)} is not type {type(functions.Box)}")
+
+        self.box: NamedTuple = box
         self.dt: float = dt
         self.g: float = g
         self.g_qf: float = g_qf
@@ -121,20 +123,21 @@ class Schroedinger(object):
             self.mu_sol: Callable = mu_sol(self.g)
 
         try:
-            box_x_len = (box["x1"] - box["x0"])
-            self.x: np.ndarray = np.linspace(self.box["x0"], self.box["x1"],
-                                             self.resolution["x"])
-            self.dx: float = (box_x_len / self.resolution["x"])
+            box_x_len = (box.x1 - box.x0)
+            self.x: np.ndarray = np.linspace(self.box.x0, self.box.x1,
+                                             self.res.x)
+            self.dx: float = (box_x_len / self.res.x)
             self.dkx: float = np.pi / (box_x_len / 2.0)
-            self.kx: np.ndarray = np.fft.fftfreq(self.resolution["x"],
-                d=1.0 / (self.dkx * self.resolution["x"]))
+            self.kx: np.ndarray = np.fft.fftfreq(self.res.x,
+                                                 d=1.0 / (
+                                                         self.dkx * self.res.x))
 
         except KeyError:
             sys.exit(
                 f"Keys x0, x1 of box needed, "
                 f"but it has the keys: {self.box.keys()}, "
-                f"Key x of resolution needed, "
-                f"but it has the keys: {self.resolution.keys()}")
+                f"Key x of res needed, "
+                f"but it has the keys: {self.res.keys()}")
 
         if imag_time:
             # Convention: $e^{-iH} = e^{UH}$
@@ -146,39 +149,41 @@ class Schroedinger(object):
         # besides the error are needed)
         if dim >= 2:
             try:
-                box_y_len = box["y1"] - box["y0"]
-                self.y: np.ndarray = np.linspace(self.box["y0"],
-                                                 self.box["y1"],
-                                                 self.resolution["y"])
-                self.dy: float = box_y_len / self.resolution["y"]
+                box_y_len = box.y1 - box.y0
+                self.y: np.ndarray = np.linspace(self.box.y0,
+                                                 self.box.y1,
+                                                 self.res.y)
+                self.dy: float = box_y_len / self.res.y
                 self.dky: float = np.pi / (box_y_len / 2.0)
-                self.ky: np.ndarray = np.fft.fftfreq(self.resolution["y"],
-                    d=1.0 / (self.dky * self.resolution["y"]))
+                self.ky: np.ndarray = np.fft.fftfreq(self.res.y,
+                                                     d=1.0 / (
+                                                             self.dky * self.res.y))
 
             except KeyError:
                 sys.exit(
                     f"Keys y0, y1 of box needed, "
                     f"but it has the keys: {self.box.keys()}, "
-                    f"Key y of resolution needed, "
-                    f"but it has the keys: {self.resolution.keys()}")
+                    f"Key y of res needed, "
+                    f"but it has the keys: {self.res.keys()}")
 
         if dim >= 3:
             try:
-                box_z_len = box["z1"] - box["z0"]
-                self.z: np.ndarray = np.linspace(self.box["z0"],
-                                                 self.box["z1"],
-                                                 self.resolution["z"])
-                self.dz: float = box_z_len / self.resolution["z"]
+                box_z_len = box.z1 - box.z0
+                self.z: np.ndarray = np.linspace(self.box.z0,
+                                                 self.box.z1,
+                                                 self.res.z)
+                self.dz: float = box_z_len / self.res.z
                 self.dkz: float = np.pi / (box_z_len / 2.0)
-                self.kz: np.ndarray = np.fft.fftfreq(self.resolution["z"],
-                    d=1.0 / (self.dkz * self.resolution["z"]))
+                self.kz: np.ndarray = np.fft.fftfreq(self.res.z,
+                                                     d=1.0 / (
+                                                             self.dkz * self.res.z))
 
             except KeyError:
                 sys.exit(
                     f"Keys z0, z1 of box needed, "
                     f"but it has the keys: {self.box.keys()}, "
-                    f"Key z of resolution needed, "
-                    f"but it has the keys: {self.resolution.keys()}")
+                    f"Key z of res needed, "
+                    f"but it has the keys: {self.res.keys()}")
 
         if dim > 3:
             sys.exit("Spatial dimension over 3. This is not implemented.")
@@ -239,19 +244,19 @@ class Schroedinger(object):
         elif dim == 3:
             try:
                 self.x_mesh, self.y_mesh, self.z_mesh = np.mgrid[
-                    self.box["x0"]: self.box["x1"]:
-                    complex(0, self.resolution["x"]),
-                    self.box["y0"]: self.box["y1"]:
-                    complex(0, self.resolution["y"]),
-                    self.box["z0"]: self.box["z1"]:
-                    complex(0, self.resolution["z"])
-                ]
+                                                        self.box.x0: self.box.x1:
+                                                        complex(0, self.res.x),
+                                                        self.box.y0: self.box.y1:
+                                                        complex(0, self.res.y),
+                                                        self.box.z0: self.box.z1:
+                                                        complex(0, self.res.z)
+                                                        ]
             except KeyError:
                 sys.exit(
                     f"Keys x0, x1, y0, y1, z0, z1 of box needed, "
                     f"but it has the keys: {self.box.keys()}, "
-                    f"Keys x, y, z of resolution needed, "
-                    f"but it has the keys: {self.resolution.keys()}")
+                    f"Keys x, y, z of res needed, "
+                    f"but it has the keys: {self.res.keys()}")
 
             if psi_0_noise is None:
                 self.psi_val = self.psi(self.x_mesh, self.y_mesh, self.z_mesh)
@@ -271,13 +276,13 @@ class Schroedinger(object):
                                                 self.z_mesh)
 
             kx_mesh, ky_mesh, kz_mesh = np.mgrid[
-                self.kx[0]:self.kx[-1]:
-                complex(0, self.resolution["x"]),
-                self.ky[0]:self.ky[-1]:
-                complex(0, self.resolution["y"]),
-                self.kz[0]:self.kz[-1]:
-                complex(0, self.resolution["z"])
-                ]
+                                        self.kx[0]:self.kx[-1]:
+                                        complex(0, self.res.x),
+                                        self.ky[0]:self.ky[-1]:
+                                        complex(0, self.res.y),
+                                        self.kz[0]:self.kz[-1]:
+                                        complex(0, self.res.z)
+                                        ]
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
 
             # here a number (U) is multiplied elementwise with an (1D, 2D or

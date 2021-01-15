@@ -282,7 +282,7 @@ class MayaviAnimation:
 
         self.fig.scene.disable_render = False
         # anti_aliasing default is 8,
-        # and removes resolution issues when downscaling, but takes longer
+        # and removes res issues when downscaling, but takes longer
         self.fig.scene.anti_aliasing_frames = 8
         self.fig.scene.movie_maker.record = True
         # set dir_path to save images to
@@ -357,7 +357,7 @@ if __name__ == "__main__":
                                                  resolution["z"]))
 
     Harmonic = Schroedinger.Schroedinger(box=box,
-                                         resolution=resolution,
+                                         res=resolution,
                                          max_timesteps=100,
                                          dt=1.0,
                                          g=1.0,

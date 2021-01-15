@@ -35,7 +35,7 @@ def anim(x, y, func, R=3):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    # due to fft of the points the resolution
+    # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
     datapoints_exponent: int = 6
     resolution: int = 2 ** datapoints_exponent
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     fig = mlab.figure()
     fig.scene.disable_render = False
     # anti_aliasing default is 8,
-    # and removes resolution issues when downscaling, but takes longer
+    # and removes res issues when downscaling, but takes longer
     fig.scene.anti_aliasing_frames = 8
     fig.scene.movie_maker.directory = "."
     fig.scene.movie_maker.record = True

@@ -13,10 +13,20 @@ import functools
 
 import numpy as np
 from scipy import stats
-from typing import Tuple, Callable
+from typing import Tuple, Callable, NamedTuple
 
 from supersolids import Animation
 from supersolids import constants
+
+Resolution = NamedTuple("Resolution",
+                        [("x", float), ("y", float), ("z", float)])
+
+
+Box = NamedTuple("Box",
+                 [("x0", float), ("x1", float),
+                  ("y0", float), ("y1", float),
+                  ("z0", float), ("z1", float),
+                  ])
 
 
 def get_meshgrid(x, y):
@@ -532,7 +542,7 @@ def noise_mesh(min: float = 0.8,
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == '__main__':
-    # due to fft of the points the resolution needs to be 2 **
+    # due to fft of the points the res needs to be 2 **
     # resolution_exponent
     datapoints_exponent: int = 6
     resolution: int = 2 ** datapoints_exponent
