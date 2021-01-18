@@ -301,7 +301,7 @@ if __name__ == "__main__":
     # 3D works in single core mode
     simulate_case(box,
                   res,
-                  max_timesteps=800,
+                  max_timesteps=101,
                   dt=dt,
                   g=g,
                   g_qf=g_qf,
@@ -338,7 +338,7 @@ if __name__ == "__main__":
                   camera_z_func=functools.partial(
                       functions.camera_func_z,
                       r_0=40.0, phi_0=45.0, z_0=50.0, z_per_frame=0.0),
-                  delete_input=True
+                  delete_input=False
                   )
     print("Single core done")
 

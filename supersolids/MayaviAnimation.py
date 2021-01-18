@@ -206,16 +206,6 @@ def animate(System: Schroedinger.Schroedinger,
 
     axes_style()
     for i in range(0, System.max_timesteps):
-        # Update legend (especially time)
-        mlab.title(f"g = {System.g:.2}, dt = {System.dt:.6}, "
-                   f"max_timesteps = {System.max_timesteps:d}, "
-                   f"imag_time = {System.imag_time}, "
-                   f"t = {System.t:02.05f}",
-                   height=0.95,
-                   line_width=1.0,
-                   size=0.3,
-                   color=(0, 0, 0))
-
         if not interactive:
             # rotate camera
             camera_r, camera_phi, camera_z = functions.camera_3d_trajectory(
@@ -254,6 +244,16 @@ def animate(System: Schroedinger.Schroedinger,
         slice_y_plot.mlab_source.trait_set(scalars=prob_3d)
         slice_z_plot.mlab_source.trait_set(scalars=prob_3d)
         prob_plot.mlab_source.trait_set(scalars=prob_3d)
+
+        # Update legend (especially time)
+        mlab.title(f"g = {System.g:.2}, dt = {System.dt:.6}, "
+                   f"max_timesteps = {System.max_timesteps:d}, "
+                   f"imag_time = {System.imag_time}, "
+                   f"t = {System.t:02.05f}",
+                   height=0.95,
+                   line_width=1.0,
+                   size=0.3,
+                   color=(0, 0, 0))
 
         yield
 
@@ -358,7 +358,7 @@ if __name__ == "__main__":
 
     Harmonic = Schroedinger.Schroedinger(box=box,
                                          res=resolution,
-                                         max_timesteps=100,
+                                         max_timesteps=101,
                                          dt=1.0,
                                          g=1.0,
                                          g_qf=0.0,
