@@ -47,7 +47,6 @@ class Schroedinger(object):
                  imag_time: bool = True,
                  mu: float = 1.1,
                  E: float = 1.0,
-                 dim: int = 3,
                  psi_0: Callable = functions.psi_gauss_3d,
                  V: Optional[Callable] = functions.v_harmonic_3d,
                  V_interaction: Optional[Callable] = None,
@@ -103,7 +102,12 @@ class Schroedinger(object):
         self.g_qf: float = g_qf
         self.e_dd: float = e_dd
         self.imag_time: float = imag_time
-        self.dim: int = dim
+
+        box_dim = int(len(self.box) / 2.0)
+        res_dim = len(self.res)
+        assert box_dim == res_dim, (f"Dimension of box ({box_dim}) and "
+                                    f"res ({res_dim}) needs to be equal.")
+        self.dim: int = box_dim
 
         # mu = - ln(N) / (2 * dtau), where N is the norm of the psi
         self.mu: float = mu
@@ -147,7 +151,7 @@ class Schroedinger(object):
 
         # Add attributes as soon as they are needed (e.g. for dimension 3, all
         # besides the error are needed)
-        if dim >= 2:
+        if self.dim >= 2:
             try:
                 box_y_len = box.y1 - box.y0
                 self.y: np.ndarray = np.linspace(self.box.y0,
@@ -166,7 +170,7 @@ class Schroedinger(object):
                     f"Key y of res needed, "
                     f"but it has the keys: {self.res.keys()}")
 
-        if dim >= 3:
+        if self.dim >= 3:
             try:
                 box_z_len = box.z1 - box.z0
                 self.z: np.ndarray = np.linspace(self.box.z0,
@@ -185,10 +189,10 @@ class Schroedinger(object):
                     f"Key z of res needed, "
                     f"but it has the keys: {self.res.keys()}")
 
-        if dim > 3:
+        if self.dim > 3:
             sys.exit("Spatial dimension over 3. This is not implemented.")
 
-        if dim == 1:
+        if self.dim == 1:
             if psi_0_noise is None:
                 self.psi_val: np.ndarray = self.psi(self.x)
             else:
@@ -211,7 +215,7 @@ class Schroedinger(object):
                 # * 2D (array with 1.0 everywhere)
                 self.V_k_val: np.ndarray = np.full(self.psi_val.shape, 1.0)
 
-        elif dim == 2:
+        elif self.dim == 2:
             self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x,
                                                                         self.y)
 
@@ -241,7 +245,7 @@ class Schroedinger(object):
             else:
                 self.V_k_val = V_interaction(kx_mesh, ky_mesh, g=self.g)
 
-        elif dim == 3:
+        elif self.dim == 3:
             try:
                 self.x_mesh, self.y_mesh, self.z_mesh = np.mgrid[
                                                         self.box.x0: self.box.x1:

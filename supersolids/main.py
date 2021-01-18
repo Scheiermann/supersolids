@@ -37,7 +37,6 @@ def simulate_case(box: NamedTuple,
                   imag_time: bool = False,
                   mu: float = 1.1,
                   E: float = 1.0,
-                  dim: int = 3,
                   psi_0: Callable = functions.psi_gauss_3d,
                   V: Callable = functions.v_harmonic_3d,
                   V_interaction: Callable = None,
@@ -160,7 +159,6 @@ def simulate_case(box: NamedTuple,
                                              e_dd=e_dd,
                                              imag_time=imag_time,
                                              mu=mu, E=E,
-                                             dim=dim,
                                              psi_0=psi_0,
                                              V=V,
                                              V_interaction=V_interaction,
@@ -171,9 +169,9 @@ def simulate_case(box: NamedTuple,
                                              alpha_psi_sol=alpha_psi_sol,
                                              alpha_V=alpha_V
                                              )
-    if dim < 3:
+    if Harmonic.dim < 3:
         # matplotlib for 1D and 2D
-        ani = Animation.Animation(dim=dim,
+        ani = Animation.Animation(dim=Harmonic.dim,
                                   camera_r_func=camera_r_func,
                                   camera_phi_func=camera_phi_func,
                                   camera_z_func=camera_z_func,
@@ -197,7 +195,7 @@ def simulate_case(box: NamedTuple,
                 plot_V=plot_V)
     else:
         # mayavi for 3D
-        may = MayaviAnimation.MayaviAnimation(dim=3)
+        may = MayaviAnimation.MayaviAnimation(dim=Harmonic.dim)
         with run_time.run_time():
             may.animate(Harmonic,
                         accuracy=accuracy,
@@ -311,7 +309,6 @@ if __name__ == "__main__":
                   imag_time=True,
                   mu=1.1,
                   E=1.0,
-                  dim=3,
                   psi_0=psi_0_3d,
                   V=V_3d,
                   V_interaction=V_3d_ddi,
@@ -375,7 +372,6 @@ if __name__ == "__main__":
     #                         imag_time=True,
     #                         mu=1.1,
     #                         E=1.0,
-    #                         dim=3,
     #                         psi_0=psi_0_3d,
     #                         V=V_3d,
     #                         V_interaction=V_3d_ddi,
