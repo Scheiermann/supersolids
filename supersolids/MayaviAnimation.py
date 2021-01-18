@@ -220,6 +220,9 @@ def animate(System: Schroedinger.Schroedinger,
                       elevation=camera_z)
 
 
+        # Initialize mu_rel
+        mu_rel = System.mu
+
         # The initial plot needs to be shown first,
         # also a timestep is needed for mu_rel
         if i > 0:
@@ -249,6 +252,7 @@ def animate(System: Schroedinger.Schroedinger,
         mlab.title(f"g = {System.g:.2}, dt = {System.dt:.6}, "
                    f"max_timesteps = {System.max_timesteps:d}, "
                    f"imag_time = {System.imag_time}, "
+                   f"mu_rel = {mu_rel:02.05e}, "
                    f"t = {System.t:02.05f}",
                    height=0.95,
                    line_width=1.0,
