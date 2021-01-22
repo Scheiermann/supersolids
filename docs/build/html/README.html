@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Supersolids &#8212; supersolids 0.1.20 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="How to contribute" href="CONTRIBUTING.html" />
+    <link rel="prev" title="Welcome to supersolids’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="supersolids">
+<h1>Supersolids<a class="headerlink" href="#supersolids" title="Permalink to this headline">¶</a></h1>
+<p>Notes and script to supersolids</p>
+<div class="section" id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
+<p>Please read the <strong>CONTRIBUTING.md</strong>.</p>
+</div>
+<div class="section" id="installing">
+<h2>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h2>
+<p>For the animation to work, ffmpeg needs to be installed on your system.</p>
+<p>For <strong>python3.9</strong> currently there is no vtk wheel for python3.9, so you need to build it from source or use my build:<br />git clone https://github.com/Scheiermann/vtk_python39_wheel. Go to the directory vtk_python39_wheel/,
+where the wheel lies (*.whl).<br />Use this wheel to install, e.g:<br />pip install vtk-9.0.20210105-cp39-cp39-linux_x86_64.whl
+Then install mayavi (pip install mayavi or also build it from source, as there could be incapabilities with vtk9).</p>
+<div class="section" id="arch-based-systems">
+<h3>Arch based systems<a class="headerlink" href="#arch-based-systems" title="Permalink to this headline">¶</a></h3>
+<p>For <strong>python3.9</strong> follow the instructions above, then continue with (else do the following):<br />Go to the directory, where you build your AUR packages.<br />Run the following in console:<br />”mkdir python-supersolids”<br />”cd python-supersolids”<br />Download the PKGBUILD and place it there.<br />Run “makepkg -sic” in console, where the PKGBUILD lies.<br />This downloads the packages, extract it, gets the dependencies and installs it automatically<br />(you can do it manually for example with “sudo pacman -U python-supersolids-0.1.15-1-any.pkg.tar.zst”)</p>
+</div>
+<div class="section" id="with-pip">
+<h3>With pip<a class="headerlink" href="#with-pip" title="Permalink to this headline">¶</a></h3>
+<p>For <strong>python3.9</strong> follow the instructions above, then continue with (else do the following):<br />Go to the directory supersolids/dist/, where the wheel lies (*.whl).<br />Use this wheel to install, e.g:<br />pip install supersolids-0.1.15-py3-none-any.whl</p>
+</div>
+<div class="section" id="with-setup-py">
+<h3>With setup.py<a class="headerlink" href="#with-setup-py" title="Permalink to this headline">¶</a></h3>
+<p>Go to the directory, where the “setup.py” lies.</p>
+<p>For <strong>Linux</strong> use “python setup.py install –user” from console to <strong>build</strong> and <strong>install</strong> the package</p>
+<p>For <strong>Windows</strong>:<br />You need to add python to your path (if you didn’t do it, when installing python/anaconda).</p>
+<ol class="simple">
+<li><p>Open Anaconda Prompt. Use commands “where python”, “where pip”, “where conda”.</p></li>
+<li><p>Use the output path (without *.exe, we call the output here AX, BX, CX) in the following command:<br />SETX PATH “%PATH%; AX; BX; CX”<br />For example, where the user is dr-angry:<br />SETX PATH “%PATH%; C:\Users\dr-angry\anaconda3\Scripts; C:\Users\dr-angry\anaconda3”</p></li>
+<li><p>Now restart/open gitbash.</p></li>
+<li><p>Use “python setup.py install” in gitbash from the path where “setup.py” lies.</p></li>
+</ol>
+<p>Or you can follow the guide here:<br />https://www.magicmathmandarin.org/2017/12/07/setting-up-python-after-installing-or-re-installing-anaconda/</p>
+</div>
+</div>
+<div class="section" id="issues">
+<h2>Issues<a class="headerlink" href="#issues" title="Permalink to this headline">¶</a></h2>
+<ol class="simple">
+<li><p>Please read the <strong>README.md</strong> closely.</p></li>
+<li><p>If you have please check every step again.</p></li>
+<li><p>If the issue persist please <strong>open a “Issue” in git</strong>:<br />a) Click on “New Issue” on https://github.com/Scheiermann/supersolids/issues.<br />b) Assign a suitable label.<br />c) Follow the steps on git the to create the issue.<br />Please <strong>describe your issue closely</strong> (what are your configurations, did it work before,<br />what have you changed, what is the result, what have you expected as a result?).<br />d) Try to include screenshots (to the question in 3b).<br />e) Describe what you think causes the issue and if you have <strong>suggestions how to solve</strong> it,<br />mention it! (to the question in 3b).<br />f) <strong>Close the issue</strong>, if you accidentally did something wrong (but mention that before closing).</p></li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">supersolids</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Supersolids</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing">Installing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#issues">Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">How to contribute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">LICENSE</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to supersolids’s documentation!</a></li>
+      <li>Next: <a href="CONTRIBUTING.html" title="next chapter">How to contribute</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Daniel Scheiermann.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/README.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

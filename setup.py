@@ -8,9 +8,9 @@ from setuptools import setup
 
 setup(
     name="supersolids",
-    version="0.1.20",
-    packages=["", "supersolids"],
-    package_data={"supersolids": []},
+    version="0.1.21",
+    packages=["", "src"],
+    package_data={"src": []},
     url="https://github.com/Scheiermann/supersolids",
     license="MIT",
     author="Scheiermann",
