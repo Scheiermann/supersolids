@@ -1,0 +1,625 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>supersolids.Schroedinger &mdash; supersolids 0.1.22 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> supersolids
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LICENSE.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">supersolids</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>supersolids.Schroedinger</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for supersolids.Schroedinger</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># author: Daniel Scheiermann</span>
+<span class="c1"># email: daniel.scheiermann@stud.uni-hannover.de</span>
+<span class="c1"># license: MIT</span>
+<span class="c1"># Please feel free to use and modify this, but keep the above information. Thanks!</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Numerical solver for non-linear time-dependent Schrodinger equation.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">NamedTuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">supersolids</span> <span class="kn">import</span> <span class="n">functions</span>
+
+
+<div class="viewcode-block" id="Schroedinger"><a class="viewcode-back" href="../../Schroedinger.html#supersolids.Schroedinger.Schroedinger">[docs]</a><span class="k">class</span> <span class="nc">Schroedinger</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implements a numerical solution of the dimensionless time-dependent</span>
+<span class="sd">    non-linear Schrodinger equation for an arbitrary potential,</span>
+<span class="sd">    where D[., t] is a partial derivative to t:</span>
+<span class="sd">    i D(psi, t) = [-0.5 * (D[., x] ** 2 + D[., y] ** 2 + D[., z] ** 2)</span>
+<span class="sd">                   + 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2)</span>
+<span class="sd">                   + g |psi| ** 2</span>
+<span class="sd">                   + g_qf * |psi| ** 3</span>
+<span class="sd">                   + U_dd] psi</span>
+
+<span class="sd">    With U_dd = iFFT( FFT(|psi| ** 2) * e_dd * g * ((3 * k_z / k ** 2) - 1.0) )</span>
+
+<span class="sd">    The split operator method with the Trotter-Suzuki approximation</span>
+<span class="sd">    for the commutator relation ($H = H_{pot} + H_{kin}$) is used.</span>
+<span class="sd">    Hence the accuracy is proportional to dt ** 4</span>
+<span class="sd">    The approximation is needed because of the Baker-Campell-Hausdorff formula.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">box</span><span class="p">:</span> <span class="n">NamedTuple</span><span class="p">,</span>
+                 <span class="n">res</span><span class="p">:</span> <span class="n">NamedTuple</span><span class="p">,</span>
+                 <span class="n">max_timesteps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                 <span class="n">g</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">g_qf</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">e_dd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+                 <span class="n">imag_time</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.1</span><span class="p">,</span>
+                 <span class="n">E</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+                 <span class="n">psi_0</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">psi_gauss_3d</span><span class="p">,</span>
+                 <span class="n">V</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">v_harmonic_3d</span><span class="p">,</span>
+                 <span class="n">V_interaction</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">psi_sol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">thomas_fermi_3d</span><span class="p">,</span>
+                 <span class="n">mu_sol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">mu_3d</span><span class="p">,</span>
+                 <span class="n">psi_0_noise</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">noise_mesh</span><span class="p">,</span>
+                 <span class="n">alpha_psi</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+                 <span class="n">alpha_psi_sol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.53</span><span class="p">,</span>
+                 <span class="n">alpha_V</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
+                 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Schrödinger equations for the specified system.</span>
+
+<span class="sd">        Parameters</span>
+
+<span class="sd">        box : NamedTuple</span>
+<span class="sd">            Keyword x0 is minimum in x direction and</span>
+<span class="sd">            x1 is maximum. Same for y and z. For 1D just use x0, x1.</span>
+<span class="sd">            For 2D x0, x1, y0, y1.</span>
+<span class="sd">            For 3D x0, x1, y0, y1, z0, z1.</span>
+<span class="sd">            Dimension of simulation is constructed from this dictionary.</span>
+
+<span class="sd">        res : NamedTuple</span>
+<span class="sd">            NamedTuple for the number of grid points in x, y, z direction.</span>
+<span class="sd">            Needs to have half size of box dictionary.</span>
+<span class="sd">            Keywords x, y z are used.</span>
+
+<span class="sd">        max_timesteps : int</span>
+<span class="sd">            Maximum timesteps  with length dt for the animation.</span>
+
+<span class="sd">        alpha_psi : float</span>
+<span class="sd">            Alpha value for plot transparency of psi</span>
+
+<span class="sd">        alpha_psi_sol : float</span>
+<span class="sd">            Alpha value for plot transparency of psi_sol</span>
+
+<span class="sd">        alpha_V : float</span>
+<span class="sd">            Alpha value for plot transparency of V</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">functions</span><span class="o">.</span><span class="n">Resolution</span><span class="p">),</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;box: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span class="si">}</span><span class="s2"> is not type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">Resolution</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">:</span> <span class="n">NamedTuple</span> <span class="o">=</span> <span class="n">res</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_timesteps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">max_timesteps</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">box</span><span class="p">,</span> <span class="n">functions</span><span class="o">.</span><span class="n">Box</span><span class="p">),</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;box: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">box</span><span class="p">)</span><span class="si">}</span><span class="s2"> is not type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">Box</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">:</span> <span class="n">NamedTuple</span> <span class="o">=</span> <span class="n">box</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_qf</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">g_qf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e_dd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">e_dd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imag_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">imag_time</span>
+
+        <span class="n">box_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">res_dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">box_dim</span> <span class="o">==</span> <span class="n">res_dim</span><span class="p">,</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dimension of box (</span><span class="si">{</span><span class="n">box_dim</span><span class="si">}</span><span class="s2">) and &quot;</span>
+                                    <span class="sa">f</span><span class="s2">&quot;res (</span><span class="si">{</span><span class="n">res_dim</span><span class="si">}</span><span class="s2">) needs to be equal.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">box_dim</span>
+
+        <span class="c1"># mu = - ln(N) / (2 * dtau), where N is the norm of the psi</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">mu</span>
+
+        <span class="c1"># E = mu - 0.5 * g * int psi_val ** 2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">E</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">psi_0</span>
+
+        <span class="k">if</span> <span class="n">V</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">V</span>
+
+        <span class="k">if</span> <span class="n">psi_sol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psi_sol</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">psi_sol</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mu_sol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mu_sol</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">mu_sol</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">box_x_len</span> <span class="o">=</span> <span class="p">(</span><span class="n">box</span><span class="o">.</span><span class="n">x1</span> <span class="o">-</span> <span class="n">box</span><span class="o">.</span><span class="n">x0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">x0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">x1</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="p">(</span><span class="n">box_x_len</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dkx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="n">box_x_len</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kx</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                                                 <span class="n">d</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span>
+                                                         <span class="bp">self</span><span class="o">.</span><span class="n">dkx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">))</span>
+
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Keys x0, x1 of box needed, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;but it has the keys: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Key x of res needed, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;but it has the keys: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">imag_time</span><span class="p">:</span>
+            <span class="c1"># Convention: $e^{-iH} = e^{UH}$</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">:</span> <span class="nb">complex</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="n">j</span>
+
+        <span class="c1"># Add attributes as soon as they are needed (e.g. for dimension 3, all</span>
+        <span class="c1"># besides the error are needed)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">box_y_len</span> <span class="o">=</span> <span class="n">box</span><span class="o">.</span><span class="n">y1</span> <span class="o">-</span> <span class="n">box</span><span class="o">.</span><span class="n">y0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">y0</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">y1</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">box_y_len</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">y</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dky</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="n">box_y_len</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ky</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                                                     <span class="n">d</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span>
+                                                             <span class="bp">self</span><span class="o">.</span><span class="n">dky</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
+
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Keys y0, y1 of box needed, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;but it has the keys: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Key y of res needed, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;but it has the keys: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">box_z_len</span> <span class="o">=</span> <span class="n">box</span><span class="o">.</span><span class="n">z1</span> <span class="o">-</span> <span class="n">box</span><span class="o">.</span><span class="n">z0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">z0</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">z1</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">box_z_len</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">z</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dkz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="n">box_z_len</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">kz</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">z</span><span class="p">,</span>
+                                                     <span class="n">d</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span>
+                                                             <span class="bp">self</span><span class="o">.</span><span class="n">dkz</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">z</span><span class="p">))</span>
+
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Keys z0, z1 of box needed, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;but it has the keys: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Key z of res needed, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;but it has the keys: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Spatial dimension over 3. This is not implemented.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">psi_0_noise</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">=</span> <span class="n">psi_0_noise</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">V</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">V_val</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">V_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_sol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">psi_sol_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_sol</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">k_squared</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kx</span> <span class="o">**</span> <span class="mf">2.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">H_kin</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_squared</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">V_interaction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># For no interaction the identity is needed with respect to 2D</span>
+                <span class="c1"># * 2D (array with 1.0 everywhere)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">V_k_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">get_meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                                                                        <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">psi_0_noise</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">=</span> <span class="n">psi_0_noise</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">V</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">V_val</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">V_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_sol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">psi_sol_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_sol</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
+
+            <span class="n">kx_mesh</span><span class="p">,</span> <span class="n">ky_mesh</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">get_meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ky</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">k_squared</span> <span class="o">=</span> <span class="n">kx_mesh</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="n">ky_mesh</span> <span class="o">**</span> <span class="mf">2.0</span>
+            <span class="c1"># here a number (U) is multiplied elementwise with an (1D, 2D or</span>
+            <span class="c1"># 3D) array (k_squared)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">H_kin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_squared</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">V_interaction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># For no interaction the identity is needed with respect to 2D</span>
+                <span class="c1"># * 2D (array with 1.0 everywhere)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">V_k_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">V_k_val</span> <span class="o">=</span> <span class="n">V_interaction</span><span class="p">(</span><span class="n">kx_mesh</span><span class="p">,</span> <span class="n">ky_mesh</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x_mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span>
+                                                        <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">x0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">x1</span><span class="p">:</span>
+                                                        <span class="nb">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">),</span>
+                                                        <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">y0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">y1</span><span class="p">:</span>
+                                                        <span class="nb">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">y</span><span class="p">),</span>
+                                                        <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">z0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">z1</span><span class="p">:</span>
+                                                        <span class="nb">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+                                                        <span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Keys x0, x1, y0, y1, z0, z1 of box needed, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;but it has the keys: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Keys x, y, z of res needed, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;but it has the keys: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">psi_0_noise</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_mesh</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">=</span> <span class="n">psi_0_noise</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_mesh</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">y_mesh</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">z_mesh</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">V</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">V_val</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">V_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_mesh</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_sol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">psi_sol_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_sol</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_mesh</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">y_mesh</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">z_mesh</span><span class="p">)</span>
+
+            <span class="n">kx_mesh</span><span class="p">,</span> <span class="n">ky_mesh</span><span class="p">,</span> <span class="n">kz_mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">kx</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">kx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                                        <span class="nb">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">),</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">ky</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">ky</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                                        <span class="nb">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">y</span><span class="p">),</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">kz</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">kz</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                                        <span class="nb">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+                                        <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">k_squared</span> <span class="o">=</span> <span class="n">kx_mesh</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="n">ky_mesh</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="n">kz_mesh</span> <span class="o">**</span> <span class="mf">2.0</span>
+
+            <span class="c1"># here a number (U) is multiplied elementwise with an (1D, 2D or</span>
+            <span class="c1"># 3D) array (k_squared)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">H_kin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_squared</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">V_interaction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># For no interaction the identity is needed with respect to 2D</span>
+                <span class="c1"># * 2D (array with 1.0 everywhere)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">V_k_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">V_k_val</span> <span class="o">=</span> <span class="n">V_interaction</span><span class="p">(</span><span class="n">kx_mesh</span><span class="p">,</span> <span class="n">ky_mesh</span><span class="p">,</span> <span class="n">kz_mesh</span><span class="p">)</span>
+
+        <span class="c1"># attributes for animation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha_psi</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">alpha_psi</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha_psi_sol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">alpha_psi_sol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha_V</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">alpha_V</span>
+
+<div class="viewcode-block" id="Schroedinger.get_density"><a class="viewcode-back" href="../../Schroedinger.html#supersolids.Schroedinger.Schroedinger.get_density">[docs]</a>    <span class="k">def</span> <span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates |psi| ** p for 1D, 2D or 3D.</span>
+
+<span class="sd">        Parameters</span>
+
+<span class="sd">        p : float</span>
+<span class="sd">            Exponent of |psi|. Use p=2.0 for density.</span>
+
+<span class="sd">        Returns</span>
+
+<span class="sd">        psi_density : np.ndarray</span>
+<span class="sd">            |psi| ** 2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">psi_density</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span><span class="p">)</span> <span class="o">**</span> <span class="n">p</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Spatial dimension over 3. This is not implemented.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">psi_density</span></div>
+
+<div class="viewcode-block" id="Schroedinger.get_norm"><a class="viewcode-back" href="../../Schroedinger.html#supersolids.Schroedinger.Schroedinger.get_norm">[docs]</a>    <span class="k">def</span> <span class="nf">get_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates p-norm of psi for 1D, 2D or 3D.</span>
+
+<span class="sd">        Parameters</span>
+
+<span class="sd">        p : float</span>
+<span class="sd">            Exponent of |psi|. Use p=2.0 for density.</span>
+
+<span class="sd">        Returns</span>
+
+<span class="sd">        psi_norm : float</span>
+<span class="sd">            p-norm of self.psi</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">dV</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">dV</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">dV</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dz</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Spatial dimension over 3. This is not implemented.&quot;</span><span class="p">)</span>
+
+        <span class="n">psi_norm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_density</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">))</span> <span class="o">*</span> <span class="n">dV</span>
+
+        <span class="k">return</span> <span class="n">psi_norm</span></div>
+
+    <span class="k">def</span> <span class="nf">time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Here we use half steps in real space, but will use it before and</span>
+        <span class="c1"># after H_kin with normal steps</span>
+
+        <span class="c1"># Calculate the interaction by applying it to the psi_2 in k-space</span>
+        <span class="c1"># (transform back and forth)</span>
+        <span class="n">psi_2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_density</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">psi_3</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_density</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
+        <span class="n">U_dd</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">V_k_val</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">psi_2</span><span class="p">))</span>
+        <span class="c1"># update H_pot before use</span>
+        <span class="n">H_pot</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span>
+                                   <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+                                   <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V_val</span>
+                                      <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">*</span> <span class="n">psi_2</span>
+                                      <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_qf</span> <span class="o">*</span> <span class="n">psi_3</span>
+                                      <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">e_dd</span> <span class="o">*</span> <span class="n">U_dd</span><span class="p">))</span>
+        <span class="c1"># multiply element-wise the (1D, 2D or 3D) arrays with each other</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">=</span> <span class="n">H_pot</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span><span class="p">)</span>
+        <span class="c1"># H_kin is just dependent on U and the grid-points, which are constants,</span>
+        <span class="c1"># so it does not need to be recalculated</span>
+        <span class="c1"># multiply element-wise the (1D, 2D or 3D) array (H_kin) with psi_val</span>
+        <span class="c1"># (1D, 2D or 3D)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">H_kin</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span><span class="p">)</span>
+
+        <span class="c1"># update H_pot, psi_2, U_dd before use</span>
+        <span class="n">psi_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_density</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">psi_3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_density</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
+        <span class="n">U_dd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V_k_val</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">psi_2</span><span class="p">))</span>
+        <span class="n">H_pot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span>
+                       <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+                       <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V_val</span>
+                          <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">*</span> <span class="n">psi_2</span>
+                          <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_qf</span> <span class="o">*</span> <span class="n">psi_3</span>
+                          <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">e_dd</span> <span class="o">*</span> <span class="n">U_dd</span><span class="p">))</span>
+
+        <span class="c1"># multiply element-wise the (1D, 2D or 3D) arrays with each other</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">=</span> <span class="n">H_pot</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
+
+        <span class="c1"># for self.imag_time=False, renormalization should be preserved,</span>
+        <span class="c1"># but we play safe here (regardless of speedup)</span>
+        <span class="c1"># if self.imag_time:</span>
+        <span class="n">psi_norm_after_evolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_norm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">psi_norm_after_evolution</span><span class="p">)</span>
+
+        <span class="n">psi_quadratic_int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_norm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">4.0</span><span class="p">)</span>
+
+        <span class="c1"># TODO: adjust for DDI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">=</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">psi_norm_after_evolution</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">*</span> <span class="n">psi_quadratic_int</span></div>
+
+        <span class="c1"># TODO: These formulas for mu.sol and E are not for all cases correct</span>
+        <span class="c1"># print(f&quot;mu: {self.mu}&quot;)</span>
+        <span class="c1"># if self.g != 0:</span>
+        <span class="c1">#     print(f&quot;E: {self.E}, &quot;</span>
+        <span class="c1">#           f&quot;E_sol: {self.mu_sol - 0.5 * self.g * psi_quadratic_int}&quot;)</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     print(f&quot;E: {self.E}&quot;)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Daniel Scheiermann.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

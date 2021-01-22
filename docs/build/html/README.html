@@ -1,0 +1,263 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>README &mdash; supersolids 0.1.22 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API" href="API.html" />
+    <link rel="prev" title="Welcome to supersolids’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> supersolids
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">README</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing">Installing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#arch-based-systems">Arch based systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-pip">With pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-setup-py">With setup.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#issues">Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="API.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">supersolids</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>README</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/README.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="readme">
+<h1>README<a class="headerlink" href="#readme" title="Permalink to this headline">¶</a></h1>
+<p>Notes and script to supersolids</p>
+<div class="section" id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
+<p>Please read the <strong>CONTRIBUTING.md</strong>.</p>
+</div>
+<div class="section" id="installing">
+<h2>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h2>
+<p>For the animation to work, ffmpeg needs to be installed on your system.</p>
+<p>For <strong>python3.9</strong> currently there is no vtk wheel for python3.9, so you need to build it from source or use my build:<br />git clone https://github.com/Scheiermann/vtk_python39_wheel. Go to the directory vtk_python39_wheel/,
+where the wheel lies (*.whl).<br />Use this wheel to install, e.g:<br />pip install vtk-9.0.20210105-cp39-cp39-linux_x86_64.whl
+Then install mayavi (pip install mayavi or also build it from source, as there could be incapabilities with vtk9).</p>
+<div class="section" id="arch-based-systems">
+<h3>Arch based systems<a class="headerlink" href="#arch-based-systems" title="Permalink to this headline">¶</a></h3>
+<p>For <strong>python3.9</strong> follow the instructions above, then continue with (else do the following):<br />Go to the directory, where you build your AUR packages.<br />Run the following in console:<br />”mkdir python-supersolids”<br />”cd python-supersolids”<br />Download the PKGBUILD and place it there.<br />Run “makepkg -sic” in console, where the PKGBUILD lies.<br />This downloads the packages, extract it, gets the dependencies and installs it automatically<br />(you can do it manually for example with “sudo pacman -U python-supersolids-0.1.15-1-any.pkg.tar.zst”)</p>
+</div>
+<div class="section" id="with-pip">
+<h3>With pip<a class="headerlink" href="#with-pip" title="Permalink to this headline">¶</a></h3>
+<p>For <strong>python3.9</strong> follow the instructions above, then continue with (else do the following):<br />Go to the directory supersolids/dist/, where the wheel lies (*.whl).<br />Use this wheel to install, e.g:<br />pip install supersolids-0.1.15-py3-none-any.whl</p>
+</div>
+<div class="section" id="with-setup-py">
+<h3>With setup.py<a class="headerlink" href="#with-setup-py" title="Permalink to this headline">¶</a></h3>
+<p>Go to the directory, where the “setup.py” lies.</p>
+<p>For <strong>Linux</strong> use “python setup.py install –user” from console to <strong>build</strong> and <strong>install</strong> the package</p>
+<p>For <strong>Windows</strong>:<br />You need to add python to your path (if you didn’t do it, when installing python/anaconda).</p>
+<ol class="simple">
+<li><p>Open Anaconda Prompt. Use commands “where python”, “where pip”, “where conda”.</p></li>
+<li><p>Use the output path (without *.exe, we call the output here AX, BX, CX) in the following command:<br />SETX PATH “%PATH%; AX; BX; CX”<br />For example, where the user is dr-angry:<br />SETX PATH “%PATH%; C:\Users\dr-angry\anaconda3\Scripts; C:\Users\dr-angry\anaconda3”</p></li>
+<li><p>Now restart/open gitbash.</p></li>
+<li><p>Use “python setup.py install” in gitbash from the path where “setup.py” lies.</p></li>
+</ol>
+<p>Or you can follow the guide here:<br />https://www.magicmathmandarin.org/2017/12/07/setting-up-python-after-installing-or-re-installing-anaconda/</p>
+</div>
+</div>
+<div class="section" id="issues">
+<h2>Issues<a class="headerlink" href="#issues" title="Permalink to this headline">¶</a></h2>
+<ol class="simple">
+<li><p>Please read the <strong>README.md</strong> closely.</p></li>
+<li><p>If you have please check every step again.</p></li>
+<li><p>If the issue persist please <strong>open a “Issue” in git</strong>:<br />a) Click on “New Issue” on https://github.com/Scheiermann/supersolids/issues.<br />b) Assign a suitable label.<br />c) Follow the steps on git the to create the issue.<br />Please <strong>describe your issue closely</strong> (what are your configurations, did it work before,<br />what have you changed, what is the result, what have you expected as a result?).<br />d) Try to include screenshots (to the question in 3b).<br />e) Describe what you think causes the issue and if you have <strong>suggestions how to solve</strong> it,<br />mention it! (to the question in 3b).<br />f) <strong>Close the issue</strong>, if you accidentally did something wrong (but mention that before closing).</p></li>
+</ol>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="API.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to supersolids’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Daniel Scheiermann.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

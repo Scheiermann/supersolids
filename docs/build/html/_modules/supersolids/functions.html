@@ -1,0 +1,842 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>supersolids.functions &mdash; supersolids 0.1.22 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> supersolids
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LICENSE.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">supersolids</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>supersolids.functions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for supersolids.functions</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># author: Daniel Scheiermann</span>
+<span class="c1"># email: daniel.scheiermann@stud.uni-hannover.de</span>
+<span class="c1"># license: MIT</span>
+<span class="c1"># Please feel free to use and modify this, but keep the above information. Thanks!</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Functions for Potential and initial wave function psi_0</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">NamedTuple</span>
+
+<span class="kn">from</span> <span class="nn">supersolids</span> <span class="kn">import</span> <span class="n">constants</span>
+
+<span class="n">Resolution</span> <span class="o">=</span> <span class="n">NamedTuple</span><span class="p">(</span><span class="s2">&quot;Resolution&quot;</span><span class="p">,</span>
+                        <span class="p">[(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">)])</span>
+
+<span class="n">Box</span> <span class="o">=</span> <span class="n">NamedTuple</span><span class="p">(</span><span class="s2">&quot;Box&quot;</span><span class="p">,</span>
+                 <span class="p">[(</span><span class="s2">&quot;x0&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;x1&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+                  <span class="p">(</span><span class="s2">&quot;y0&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;y1&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+                  <span class="p">(</span><span class="s2">&quot;z0&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;z1&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+                  <span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">get_meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">x_mesh</span><span class="p">,</span> <span class="n">y_mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">x_mesh</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
+    <span class="n">pos</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_mesh</span>
+    <span class="n">pos</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_mesh</span>
+
+    <span class="k">return</span> <span class="n">x_mesh</span><span class="p">,</span> <span class="n">y_mesh</span><span class="p">,</span> <span class="n">pos</span>
+
+
+<span class="k">def</span> <span class="nf">get_meshgrid_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="n">x_mesh</span><span class="p">,</span> <span class="n">y_mesh</span><span class="p">,</span> <span class="n">z_mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">x_mesh</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
+    <span class="n">pos</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_mesh</span>
+    <span class="n">pos</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_mesh</span>
+    <span class="n">pos</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">z_mesh</span>
+
+    <span class="k">return</span> <span class="n">x_mesh</span><span class="p">,</span> <span class="n">y_mesh</span><span class="p">,</span> <span class="n">z_mesh</span><span class="p">,</span> <span class="n">pos</span>
+
+
+<span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="n">N</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="mi">4</span><span class="p">,</span>
+                   <span class="n">m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">164</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">u_in_kg</span><span class="p">,</span>
+                   <span class="n">a_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">90.0</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">a_0</span><span class="p">,</span>
+                   <span class="n">a_dd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">130.0</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">a_0</span><span class="p">,</span>
+                   <span class="n">w_x</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">30.0</span><span class="p">):</span>
+    <span class="n">a_s_l_ho_ratio</span><span class="p">,</span> <span class="n">epsilon_dd</span> <span class="o">=</span> <span class="n">g_qf_helper</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">a_s</span><span class="o">=</span><span class="n">a_s</span><span class="p">,</span> <span class="n">a_dd</span><span class="o">=</span><span class="n">a_dd</span><span class="p">,</span> <span class="n">w_x</span><span class="o">=</span><span class="n">w_x</span><span class="p">)</span>
+    <span class="n">g_qf</span> <span class="o">=</span> <span class="n">get_g_qf</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">a_s_l_ho_ratio</span><span class="p">,</span> <span class="n">epsilon_dd</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">get_g</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">a_s_l_ho_ratio</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">g</span><span class="p">,</span> <span class="n">g_qf</span><span class="p">,</span> <span class="n">epsilon_dd</span><span class="p">,</span> <span class="n">a_s_l_ho_ratio</span>
+
+
+<span class="k">def</span> <span class="nf">get_g</span><span class="p">(</span><span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">a_s_l_ho_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">a_s_l_ho_ratio</span> <span class="o">*</span> <span class="n">N</span>
+
+    <span class="k">return</span> <span class="n">g</span>
+
+
+<span class="k">def</span> <span class="nf">g_qf_helper</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">164</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">u_in_kg</span><span class="p">,</span>
+                <span class="n">a_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">90.0</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">a_0</span><span class="p">,</span>
+                <span class="n">a_dd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">130.0</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">a_0</span><span class="p">,</span>
+                <span class="n">w_x</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">30.0</span><span class="p">):</span>
+    <span class="n">l_ho</span> <span class="o">=</span> <span class="n">get_l_ho</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">w_x</span><span class="p">)</span>
+    <span class="n">epsilon_dd</span> <span class="o">=</span> <span class="n">a_dd</span> <span class="o">/</span> <span class="n">a_s</span>
+    <span class="n">a_s_l_ho_ratio</span> <span class="o">=</span> <span class="n">a_s</span> <span class="o">/</span> <span class="n">l_ho</span>
+
+    <span class="k">return</span> <span class="n">a_s_l_ho_ratio</span><span class="p">,</span> <span class="n">epsilon_dd</span>
+
+
+<span class="k">def</span> <span class="nf">get_g_qf</span><span class="p">(</span><span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">a_s_l_ho_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">epsilon_dd</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="n">g_qf</span> <span class="o">=</span> <span class="p">(</span><span class="mf">32.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+            <span class="o">*</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">a_s_l_ho_ratio</span> <span class="o">**</span> <span class="p">(</span><span class="mf">5.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">N</span> <span class="o">**</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+            <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">epsilon_dd</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">g_qf</span>
+
+
+<span class="k">def</span> <span class="nf">get_l_ho</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">164.0</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">u_in_kg</span><span class="p">,</span>
+             <span class="n">w_x</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">30.0</span><span class="p">):</span>
+    <span class="n">l_ho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">hbar</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">w_x</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">l_ho</span>
+
+
+<span class="k">def</span> <span class="nf">get_alphas</span><span class="p">(</span><span class="n">w_x</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">30.0</span><span class="p">,</span>
+               <span class="n">w_y</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">30.0</span><span class="p">,</span>
+               <span class="n">w_z</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">30.0</span><span class="p">):</span>
+    <span class="n">alpha_y</span> <span class="o">=</span> <span class="n">w_y</span> <span class="o">/</span> <span class="n">w_x</span>
+    <span class="n">alpha_z</span> <span class="o">=</span> <span class="n">w_z</span> <span class="o">/</span> <span class="n">w_x</span>
+
+    <span class="k">return</span> <span class="n">alpha_y</span><span class="p">,</span> <span class="n">alpha_z</span>
+
+
+<div class="viewcode-block" id="psi_gauss_2d_pdf"><a class="viewcode-back" href="../../functions.html#supersolids.functions.psi_gauss_2d_pdf">[docs]</a><span class="k">def</span> <span class="nf">psi_gauss_2d_pdf</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="n">var</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gives values according to gaus dirstribution (2D)</span>
+<span class="sd">    with meshgrid of x,y as input</span>
+
+<span class="sd">    Parameters</span>
+
+<span class="sd">    pos : np.ndarray 3D</span>
+<span class="sd">        stacked meshgrid of an x (1D) and y (1D)</span>
+<span class="sd">    mu : np.ndarray 2D</span>
+<span class="sd">        Mean of gauss</span>
+<span class="sd">    var : np.ndarray 2D</span>
+<span class="sd">        Variance of gauss</span>
+
+<span class="sd">    Returns</span>
+
+<span class="sd">    z_mesh : meshgrid, 2D surface values</span>
+<span class="sd">        values according to gaus dirstribution (2D)</span>
+<span class="sd">        with meshgrid of x,y as input</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">var</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">rv</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov</span><span class="p">)</span>
+    <span class="n">z_mesh</span> <span class="o">=</span> <span class="n">rv</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">z_mesh</span></div>
+
+
+<div class="viewcode-block" id="psi_gauss_2d"><a class="viewcode-back" href="../../functions.html#supersolids.functions.psi_gauss_2d">[docs]</a><span class="k">def</span> <span class="nf">psi_gauss_2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">x_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">y_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">k_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gaussian wave packet of width a and momentum k_0, centered at x_0</span>
+
+<span class="sd">    Parameters</span>
+
+<span class="sd">    x : sympy.symbol</span>
+<span class="sd">        mathematical variable</span>
+
+<span class="sd">    y : sympy.symbol</span>
+<span class="sd">        mathematical variable</span>
+
+<span class="sd">    a : float</span>
+<span class="sd">        Amplitude of pulse</span>
+
+<span class="sd">    x_0 : float</span>
+<span class="sd">        Mean spatial x of pulse</span>
+
+<span class="sd">    y_0 : float</span>
+<span class="sd">        Mean spatial y of pulse</span>
+
+<span class="sd">    k_0 : float</span>
+<span class="sd">        Group velocity of pulse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(((</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+                     <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="n">k_0</span><span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="psi_gauss_3d"><a class="viewcode-back" href="../../functions.html#supersolids.functions.psi_gauss_3d">[docs]</a><span class="k">def</span> <span class="nf">psi_gauss_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
+                 <span class="n">a_x</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">a_y</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">a_z</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+                 <span class="n">x_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">y_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">z_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">k_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gaussian wave packet of width a and momentum k_0, centered at x_0</span>
+
+<span class="sd">    Parameters</span>
+
+<span class="sd">    x : sympy.symbol</span>
+<span class="sd">        mathematical variable</span>
+
+<span class="sd">    y : sympy.symbol</span>
+<span class="sd">        mathematical variable</span>
+
+<span class="sd">    z : sympy.symbol</span>
+<span class="sd">        mathematical variable</span>
+
+<span class="sd">    a : float</span>
+<span class="sd">        Amplitude of pulse</span>
+
+<span class="sd">    x_0 : float</span>
+<span class="sd">        Mean spatial x of pulse</span>
+
+<span class="sd">    y_0 : float</span>
+<span class="sd">        Mean spatial y of pulse</span>
+
+<span class="sd">    z_0 : float</span>
+<span class="sd">        Mean spatial z of pulse</span>
+
+<span class="sd">    k_0 : float</span>
+<span class="sd">        Group velocity of pulse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">((</span><span class="n">a_x</span> <span class="o">*</span> <span class="n">a_y</span> <span class="o">*</span> <span class="n">a_z</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">**</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">))</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span>
+                    <span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_0</span><span class="p">)</span> <span class="o">/</span> <span class="n">a_x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+                    <span class="o">+</span> <span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_0</span><span class="p">)</span> <span class="o">/</span> <span class="n">a_y</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+                    <span class="o">+</span> <span class="p">((</span><span class="n">z</span> <span class="o">-</span> <span class="n">z_0</span><span class="p">)</span> <span class="o">/</span> <span class="n">a_z</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+                     <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="n">k_0</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="psi_gauss_1d"><a class="viewcode-back" href="../../functions.html#supersolids.functions.psi_gauss_1d">[docs]</a><span class="k">def</span> <span class="nf">psi_gauss_1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">x_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">k_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gaussian wave packet of width a and momentum k_0, centered at x_0</span>
+
+<span class="sd">    Parameters</span>
+
+<span class="sd">    x : sympy.symbol</span>
+<span class="sd">        mathematical variable</span>
+
+<span class="sd">    a : float</span>
+<span class="sd">        Amplitude of pulse</span>
+
+<span class="sd">    x_0 : float</span>
+<span class="sd">        Mean spatial x of pulse</span>
+
+<span class="sd">    k_0 : float</span>
+<span class="sd">        Group velocity of pulse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">((</span><span class="n">a</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">a</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="n">k_0</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="psi_pdf"><a class="viewcode-back" href="../../functions.html#supersolids.functions.psi_pdf">[docs]</a><span class="k">def</span> <span class="nf">psi_pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mathematical function of gauss pulse</span>
+
+<span class="sd">    Parameters</span>
+
+<span class="sd">    x: sympy.symbol</span>
+<span class="sd">        mathematical variable</span>
+
+<span class="sd">    loc: float</span>
+<span class="sd">        Localization of pulse centre</span>
+
+<span class="sd">    scale: float</span>
+<span class="sd">        Scale of pulse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">loc</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="psi_rect"><a class="viewcode-back" href="../../functions.html#supersolids.functions.psi_rect">[docs]</a><span class="k">def</span> <span class="nf">psi_rect</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">x_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mathematical function of rectangular pulse</span>
+<span class="sd">    between x_min and x_max with amplitude a</span>
+
+<span class="sd">    Parameters</span>
+
+<span class="sd">    x: sympy.symbol</span>
+<span class="sd">        mathematical variable</span>
+
+<span class="sd">    x_min: float</span>
+<span class="sd">        Minimum x value of pulse (spatial)</span>
+
+<span class="sd">    x_max: float</span>
+<span class="sd">        Maximum x value of pulse (spatial)</span>
+
+<span class="sd">    a: float</span>
+<span class="sd">        Amplitude of pulse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">pulse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">&lt;</span> <span class="n">x</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="n">pulse</span><span class="o">.</span><span class="n">any</span><span class="p">(),</span> <span class="p">(</span><span class="s2">&quot;Pulse is completely 0. Resolution is too small. &quot;</span>
+                         <span class="s2">&quot;Resolution needs to be set, &quot;</span>
+                         <span class="s2">&quot;as fft is used onto the pulse.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pulse</span></div>
+
+
+<div class="viewcode-block" id="psi_gauss_solution"><a class="viewcode-back" href="../../functions.html#supersolids.functions.psi_gauss_solution">[docs]</a><span class="k">def</span> <span class="nf">psi_gauss_solution</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Mathematical function of solution of non-linear Schroedinger for g=0</span>
+
+<span class="sd">     Parameters</span>
+
+<span class="sd">     x: sympy.symbol</span>
+<span class="sd">        mathematical variable</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="thomas_fermi_1d"><a class="viewcode-back" href="../../functions.html#supersolids.functions.thomas_fermi_1d">[docs]</a><span class="k">def</span> <span class="nf">thomas_fermi_1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mathematical function of Thomas-Fermi distribution with coupling constant g</span>
+
+<span class="sd">    Parameters</span>
+
+<span class="sd">    x : sympy.symbol</span>
+<span class="sd">        mathematical variable</span>
+
+<span class="sd">    g : float</span>
+<span class="sd">        coupling constant</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">g</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># mu is the chemical potential</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">mu_1d</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+        <span class="c1"># this needs to be &gt;&gt; 1, e.g 5.3</span>
+        <span class="c1"># print(np.sqrt(2 * mu))</span>
+
+        <span class="k">return</span> <span class="n">mu</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">((</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">mu</span><span class="p">)))</span> <span class="o">/</span> <span class="n">g</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="thomas_fermi_2d"><a class="viewcode-back" href="../../functions.html#supersolids.functions.thomas_fermi_2d">[docs]</a><span class="k">def</span> <span class="nf">thomas_fermi_2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mathematical function of Thomas-Fermi distribution with coupling constant g</span>
+
+<span class="sd">    Parameters</span>
+
+<span class="sd">    x : sympy.symbol</span>
+<span class="sd">        mathematical variable</span>
+
+<span class="sd">    g : float</span>
+<span class="sd">       coupling constant</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">g</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># mu is the chemical potential</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">mu_2d</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+        <span class="c1"># this needs to be &gt;&gt; 1, e.g 5.3</span>
+        <span class="c1"># print(np.sqrt(2 * mu))</span>
+
+        <span class="k">return</span> <span class="n">mu</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">((</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">mu</span><span class="p">)))</span> <span class="o">/</span> <span class="n">g</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<span class="k">def</span> <span class="nf">thomas_fermi_2d_pos</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">thomas_fermi_2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="thomas_fermi_3d"><a class="viewcode-back" href="../../functions.html#supersolids.functions.thomas_fermi_3d">[docs]</a><span class="k">def</span> <span class="nf">thomas_fermi_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mathematical function of Thomas-Fermi distribution with coupling constant g</span>
+
+<span class="sd">    Parameters</span>
+
+<span class="sd">    x : sympy.symbol</span>
+<span class="sd">        mathematical variable</span>
+
+<span class="sd">    g : float</span>
+<span class="sd">       coupling constant</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">g</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># mu is the chemical potential</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">mu_3d</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+        <span class="c1"># this needs to be &gt;&gt; 1, e.g 5.3</span>
+        <span class="c1"># print(np.sqrt(2 * mu))</span>
+
+        <span class="k">return</span> <span class="n">mu</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">((</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">z</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">mu</span><span class="p">)))</span> <span class="o">/</span> <span class="n">g</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<span class="k">def</span> <span class="nf">mu_1d</span><span class="p">(</span><span class="n">g</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+    <span class="c1"># mu is the chemical potential</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="p">((</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">g</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)))</span> <span class="o">**</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mu</span>
+
+
+<span class="k">def</span> <span class="nf">mu_2d</span><span class="p">(</span><span class="n">g</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+    <span class="c1"># mu is the chemical potential</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">g</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mu</span>
+
+
+<span class="k">def</span> <span class="nf">mu_3d</span><span class="p">(</span><span class="n">g</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+    <span class="c1"># mu is the chemical potential</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="p">((</span><span class="mi">15</span> <span class="o">*</span> <span class="n">g</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="o">**</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">5</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mu</span>
+
+
+<span class="k">def</span> <span class="nf">v_harmonic_1d</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span>
+
+
+<span class="k">def</span> <span class="nf">v_harmonic_2d</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">alpha_y</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">v_2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">alpha_y</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">v_2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">alpha_y</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">v_harmonic_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">alpha_y</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">alpha_z</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">alpha_y</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">alpha_z</span> <span class="o">*</span> <span class="n">z</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_r_cut</span><span class="p">(</span><span class="n">k_mesh</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+    <span class="n">kr_singular</span> <span class="o">=</span> <span class="n">k_mesh</span> <span class="o">*</span> <span class="n">R</span>
+    <span class="n">kr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">kr_singular</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="n">kr_singular</span><span class="p">)</span>
+
+    <span class="n">r_cut</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span>
+             <span class="o">+</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="n">kr</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">kr</span><span class="p">)</span>
+             <span class="o">-</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="n">kr</span> <span class="o">**</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">kr</span><span class="p">)</span>
+             <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">r_cut</span>
+
+
+<span class="k">def</span> <span class="nf">dipol_dipol_interaction</span><span class="p">(</span><span class="n">kx_mesh</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                            <span class="n">ky_mesh</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                            <span class="n">kz_mesh</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                            <span class="n">R</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+    <span class="n">k_squared</span> <span class="o">=</span> <span class="n">kx_mesh</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="n">ky_mesh</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="n">kz_mesh</span> <span class="o">**</span> <span class="mf">2.0</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">kz_mesh</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="c1"># for [0, 0, 0] there is a singularity and factor/k_squared is 0/0, so we</span>
+    <span class="c1"># arbitrary set the divisor to 1.0</span>
+    <span class="n">k_squared_singular_free</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">k_squared</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">k_squared</span><span class="p">)</span>
+
+    <span class="n">k_mesh</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">k_squared</span><span class="p">)</span>
+    <span class="n">r_cut</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">get_r_cut</span><span class="p">(</span><span class="n">k_mesh</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">R</span><span class="p">)</span>
+
+    <span class="n">r_cut</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">r_cut</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="n">V_k_val</span> <span class="o">=</span> <span class="n">r_cut</span> <span class="o">*</span> <span class="p">((</span><span class="n">factor</span> <span class="o">/</span> <span class="n">k_squared_singular_free</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="c1"># Remove singularities (at this point there should not be any)</span>
+    <span class="n">V_k_val</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">V_k_val</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">return</span> <span class="n">V_k_val</span>
+
+
+<span class="k">def</span> <span class="nf">f_kappa</span><span class="p">(</span><span class="n">kappa</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="n">k2_1</span> <span class="o">=</span> <span class="p">(</span><span class="n">kappa</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">kappa</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">k2_1</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">kappa</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="n">k2_1</span><span class="p">[</span><span class="n">k2_1</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">k2_1</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">k2_1</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="k">else</span> <span class="n">k2_1</span>
+
+    <span class="n">b</span> <span class="o">=</span> <span class="o">-</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">kappa</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">k2_1</span> <span class="o">**</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">))</span>
+    <span class="n">atan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">k2_1</span><span class="p">))</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">atan</span>
+    <span class="c1"># when f_kappa would be complex, we replace with 0.0</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">kappa</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">k2_1</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span> <span class="nf">func_125</span><span class="p">(</span><span class="n">kappa</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">alpha_z</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">e_dd</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="n">k2_1</span> <span class="o">=</span> <span class="p">(</span><span class="n">kappa</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">kappa</span> <span class="o">*</span> <span class="p">((</span><span class="n">alpha_z</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
+                       <span class="o">*</span> <span class="p">(</span><span class="n">f_kappa</span><span class="p">(</span><span class="n">kappa</span><span class="p">)</span> <span class="o">/</span> <span class="n">k2_1</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">e_dd</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">kappa</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="n">alpha_z</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+
+
+<span class="k">def</span> <span class="nf">func_124</span><span class="p">(</span><span class="n">kappa</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">e_dd</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a_s_l_ho_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="p">(</span><span class="mf">15.0</span> <span class="o">*</span> <span class="n">N</span> <span class="o">*</span> <span class="n">kappa</span> <span class="o">*</span> <span class="n">a_s_l_ho_ratio</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">kappa</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">f_kappa</span><span class="p">(</span><span class="n">kappa</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">kappa</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))</span> <span class="o">-</span> <span class="mf">1.0</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">e_dd</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">R_r</span> <span class="o">=</span> <span class="p">(</span><span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">e_dd</span> <span class="o">*</span> <span class="n">b</span><span class="p">))</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">R_r</span>
+
+
+<span class="k">def</span> <span class="nf">get_R_rz</span><span class="p">(</span><span class="n">kappa</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">e_dd</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">a_s_l_ho_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="n">R_r</span> <span class="o">=</span> <span class="n">func_124</span><span class="p">(</span><span class="n">kappa</span><span class="o">=</span><span class="n">kappa</span><span class="p">,</span> <span class="n">e_dd</span><span class="o">=</span><span class="n">e_dd</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">a_s_l_ho_ratio</span><span class="o">=</span><span class="n">a_s_l_ho_ratio</span><span class="p">)</span>
+    <span class="n">R_z</span> <span class="o">=</span> <span class="n">R_r</span> <span class="o">/</span> <span class="n">kappa</span>
+
+    <span class="k">return</span> <span class="n">R_r</span><span class="p">,</span> <span class="n">R_z</span>
+
+
+<span class="k">def</span> <span class="nf">get_kappa</span><span class="p">(</span><span class="n">alpha_z</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">e_dd</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+              <span class="n">x_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">3.0</span><span class="p">,</span> <span class="n">x_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">):</span>
+    <span class="n">kappa_array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">func_125</span><span class="p">(</span><span class="n">kappa_array</span><span class="p">,</span> <span class="n">alpha_z</span><span class="p">,</span> <span class="n">e_dd</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">y</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">kappa_root</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">kappa_array</span><span class="p">[</span><span class="n">y</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">kappa_root</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">kappa_array</span><span class="p">[</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">kappa_root</span>
+
+
+<span class="k">def</span> <span class="nf">density_in_trap</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                    <span class="n">R_r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">R_z</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">n_0</span> <span class="o">=</span> <span class="mf">15.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">8.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">R_z</span> <span class="o">*</span> <span class="n">R_r</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span> <span class="o">/</span> <span class="n">R_r</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">z</span> <span class="o">/</span> <span class="n">R_z</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span>
+
+    <span class="n">n_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">a</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">n_0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">a</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">n_r</span>
+
+
+<span class="k">def</span> <span class="nf">density_in_trap_r</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">R_r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">R_z</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                      <span class="n">g</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+    <span class="n">n_0</span> <span class="o">=</span> <span class="mf">15.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">8.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">R_r</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">R_z</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">n_0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">r</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">R_r</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">z</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">R_z</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">camera_func_r</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                  <span class="n">r_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+                  <span class="n">phi_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">45.0</span><span class="p">,</span>
+                  <span class="n">z_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
+                  <span class="n">r_per_frame</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">r_0</span> <span class="o">+</span> <span class="n">r_per_frame</span> <span class="o">*</span> <span class="n">frame</span>
+    <span class="k">return</span> <span class="n">r</span>
+
+
+<span class="k">def</span> <span class="nf">camera_func_phi</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                    <span class="n">r_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+                    <span class="n">phi_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">45.0</span><span class="p">,</span>
+                    <span class="n">z_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
+                    <span class="n">phi_per_frame</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">phi_0</span> <span class="o">+</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">360.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">phi_per_frame</span> <span class="o">*</span> <span class="n">frame</span>
+    <span class="k">return</span> <span class="n">phi</span>
+
+
+<span class="k">def</span> <span class="nf">camera_func_z</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                  <span class="n">r_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+                  <span class="n">phi_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">45.0</span><span class="p">,</span>
+                  <span class="n">z_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
+                  <span class="n">z_per_frame</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z_0</span> <span class="o">+</span> <span class="n">z_per_frame</span> <span class="o">*</span> <span class="n">frame</span>
+    <span class="k">return</span> <span class="n">z</span>
+
+
+<div class="viewcode-block" id="camera_3d_trajectory"><a class="viewcode-back" href="../../functions.html#supersolids.functions.camera_3d_trajectory">[docs]</a><span class="k">def</span> <span class="nf">camera_3d_trajectory</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                         <span class="n">r_func</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">phi_func</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">z_func</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">r_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+                         <span class="n">phi_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">45.0</span><span class="p">,</span>
+                         <span class="n">z_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes r, phi, z as the components of the camera position</span>
+<span class="sd">    in the animation for the given frame.</span>
+<span class="sd">    Depending on, if a callable function is given for the components,</span>
+<span class="sd">    it is applied to the parameters</span>
+<span class="sd">    or the start values are used.</span>
+
+<span class="sd">    Parameters</span>
+
+<span class="sd">    frame : int, index</span>
+<span class="sd">        Index of the frame in the animation</span>
+
+<span class="sd">    r_func : Callable or None</span>
+<span class="sd">        r component of the movement of the camera.</span>
+
+<span class="sd">    phi_func : Callable or None</span>
+<span class="sd">        phi component of the movement of the camera.</span>
+
+<span class="sd">    z_func : Callable or None</span>
+<span class="sd">        z component of the movement of the camera.</span>
+
+<span class="sd">    r_0 : float</span>
+<span class="sd">        r component of the starting point of the camera movement.</span>
+
+<span class="sd">    phi_0 : float</span>
+<span class="sd">        phi component of the starting point of the camera movement.</span>
+
+<span class="sd">    z_0 : float</span>
+<span class="sd">        z component of the starting point of the camera movement.</span>
+
+<span class="sd">    Returns</span>
+
+<span class="sd">    r, phi, z as the components of the camera position</span>
+<span class="sd">    in the animation for the given frame.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">r_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r_0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r_func</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">phi_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">phi_0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">phi_func</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">z_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">z_0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">z_func</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">r</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">z</span></div>
+
+
+<span class="k">def</span> <span class="nf">noise_mesh</span><span class="p">(</span><span class="nb">min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+               <span class="nb">max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.2</span><span class="p">,</span>
+               <span class="n">shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="nb">min</span> <span class="o">+</span> <span class="p">(</span><span class="nb">max</span> <span class="o">-</span> <span class="nb">min</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="o">*</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">noise</span>
+
+
+<span class="c1"># Script runs, if script is run as main script (called by python *.py)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># due to fft of the points the res needs to be 2 **</span>
+    <span class="c1"># resolution_exponent</span>
+    <span class="n">datapoints_exponent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">resolution</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">datapoints_exponent</span>
+
+    <span class="c1"># constants needed for the Schroedinger equation</span>
+    <span class="n">max_timesteps</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.05</span>
+
+    <span class="c1"># functions needed for the Schroedinger equation (e.g. potential: V,</span>
+    <span class="c1"># initial wave function: psi_0)</span>
+    <span class="n">V_1d</span> <span class="o">=</span> <span class="n">v_harmonic_1d</span>
+    <span class="n">V_2d</span> <span class="o">=</span> <span class="n">v_harmonic_2d</span>
+    <span class="n">V_3d</span> <span class="o">=</span> <span class="n">v_harmonic_3d</span>
+
+    <span class="c1"># functools.partial sets all arguments except x,</span>
+    <span class="c1"># as multiple arguments for Schroedinger aren&#39;t implement yet</span>
+    <span class="n">psi_0_1d</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">psi_gauss_1d</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">k_0</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">psi_0_2d</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">psi_gauss_2d_pdf</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="n">var</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]))</span>
+    <span class="n">psi_0_3d</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">psi_gauss_3d</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">z_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">k_0</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># testing for 2d plot</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">resolution</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">resolution</span><span class="p">)</span>
+    <span class="n">x_mesh</span><span class="p">,</span> <span class="n">y_mesh</span><span class="p">,</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">get_meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Daniel Scheiermann.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
