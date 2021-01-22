@@ -414,6 +414,27 @@ class Schroedinger(object):
         self.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
         self.E = self.mu - 0.5 * self.g * psi_quadratic_int
 
+        prob_mitte = np.abs(
+            self.psi_val[self.res.x // 2][self.res.y // 2][self.res.z // 2])
+        print(f"prob_mitte: {prob_mitte}")
+        print(f"Norm: {self.get_norm(p=2.0)}")
+        # print(f"mu: {self.mu}")
+        sol_val = functions.density_in_trap(self.x_mesh,
+                                            self.y_mesh,
+                                            self.z_mesh,
+                                            R_r=8.951053202619295,
+                                            R_z=2.2632503541930338)
+
+        sol_mitte = np.abs(
+            sol_val[self.res.x // 2][self.res.y // 2][self.res.z // 2])
+        print(f"sol mitte: {sol_mitte}")
+        dV = self.dx * self.dy * self.dz
+        sol_norm = np.sum(sol_val) * dV
+        psi_norm = np.sum(np.abs(self.psi_val) ** 2.0) * dV
+        print(f"psi_norm: {psi_norm}")
+        print(f"psi_sol norm: {sol_norm}\n")
+
+
         # TODO: These formulas for mu.sol and E are not for all cases correct
         # print(f"mu: {self.mu}")
         # if self.g != 0:
