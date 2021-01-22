@@ -1,10 +1,10 @@
 # Supersolids  
 Notes and script to supersolids  
 
-## How to contribute  
+## Contributing  
 Please read the **CONTRIBUTING.md**.  
 
-## How to install  
+## Installing 
 
 For the animation to work, ffmpeg needs to be installed on your system.
 
@@ -30,7 +30,7 @@ This downloads the packages, extract it, gets the dependencies and installs it a
 For **python3.9** follow the instructions above, then continue with (else do the following):  
 Go to the directory supersolids/dist/, where the wheel lies (*.whl).  
 Use this wheel to install, e.g:  
-pip install supersolids-0.1.15-py3-none-any.whl  
+pip install supersolids-0.1.21-py3-none-any.whl  
 
 
 ### With setup.py  
@@ -51,7 +51,7 @@ You need to add python to your path (if you didn't do it, when installing python
 Or you can follow the guide here:  
 https://www.magicmathmandarin.org/2017/12/07/setting-up-python-after-installing-or-re-installing-anaconda/  
 
-## Somethings does not work (Issues)  
+## Issues  
 1. Please read the **README.md** closely.  
 2. If you have please check every step again.  
 3. If the issue persist please **open a "Issue" in git**:  
