@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 
+# author: Daniel Scheiermann
+# email: daniel.scheiermann@stud.uni-hannover.de
+# license: MIT
+# Please feel free to use and modify this, but keep the above information. Thanks!
+
 """
 Numerical solver for non-linear time-dependent Schrodinger equation.
 
-author: Daniel Scheiermann
-email: daniel.scheiermann@stud.uni-hannover.de
-license: MIT
-Please feel free to use and modify this, but keep the above information. Thanks!
 """
+
 import functools
 import sys
 from typing import Callable, Dict, Union, Optional, NamedTuple
@@ -61,7 +63,7 @@ class Schroedinger(object):
         Schrödinger equations for the specified system.
 
         Parameters
-        ----------
+
         box : NamedTuple
             Keyword x0 is minimum in x direction and
             x1 is maximum. Same for y and z. For 1D just use x0, x1.
@@ -312,12 +314,12 @@ class Schroedinger(object):
         Calculates |psi| ** p for 1D, 2D or 3D.
 
         Parameters
-        ----------
+
         p : float
             Exponent of |psi|. Use p=2.0 for density.
 
         Returns
-        -------
+
         psi_density : np.ndarray
             |psi| ** 2
         """
@@ -333,12 +335,12 @@ class Schroedinger(object):
         Calculates p-norm of psi for 1D, 2D or 3D.
 
         Parameters
-        ----------
+
         p : float
             Exponent of |psi|. Use p=2.0 for density.
 
         Returns
-        -------
+
         psi_norm : float
             p-norm of self.psi
         """
@@ -411,9 +413,6 @@ class Schroedinger(object):
         # TODO: adjust for DDI
         self.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
         self.E = self.mu - 0.5 * self.g * psi_quadratic_int
-
-        prob_mitte = np.abs(self.psi_val[self.res.x // 2][self.res.y // 2][self.res.z // 2]) ** 2.0
-        print(f"prob_mitte: {prob_mitte}")
 
         # TODO: These formulas for mu.sol and E are not for all cases correct
         # print(f"mu: {self.mu}")

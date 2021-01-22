@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
+# author: Daniel Scheiermann
+# email: daniel.scheiermann@stud.uni-hannover.de
+# license: MIT
+# Please feel free to use and modify this, but keep the above information. Thanks!
+
 """
 Functions for Potential and initial wave function psi_0
 
-author: Daniel Scheiermann
-email: daniel.scheiermann@stud.uni-hannover.de
-license: MIT
-Please feel free to use and modify this, but keep the above information. Thanks!
 """
 
 import functools
@@ -106,7 +107,7 @@ def psi_gauss_2d_pdf(pos, mu=np.array(
     with meshgrid of x,y as input
 
     Parameters
-    ----------
+
     pos : np.ndarray 3D
         stacked meshgrid of an x (1D) and y (1D)
     mu : np.ndarray 2D
@@ -115,7 +116,7 @@ def psi_gauss_2d_pdf(pos, mu=np.array(
         Variance of gauss
 
     Returns
-    -------
+
     z_mesh : meshgrid, 2D surface values
         values according to gaus dirstribution (2D)
         with meshgrid of x,y as input
@@ -134,7 +135,7 @@ def psi_gauss_2d(x, y, a: float = 1.0, x_0: float = 0.0,
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
     Parameters
-    ----------
+
     x : sympy.symbol
         mathematical variable
 
@@ -168,7 +169,7 @@ def psi_gauss_3d(x, y, z,
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
     Parameters
-    ----------
+
     x : sympy.symbol
         mathematical variable
 
@@ -207,7 +208,7 @@ def psi_gauss_1d(x, a: float = 1.0, x_0: float = 0.0, k_0: float = 0.0):
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
     Parameters
-    ----------
+
     x : sympy.symbol
         mathematical variable
 
@@ -230,7 +231,7 @@ def psi_pdf(x, loc: float = 0.0, scale: float = 1.0):
     Mathematical function of gauss pulse
 
     Parameters
-    ----------
+
     x: sympy.symbol
         mathematical variable
 
@@ -249,7 +250,7 @@ def psi_rect(x, x_min: float = -0.5, x_max: float = 0.5, a: float = 1.0):
     between x_min and x_max with amplitude a
 
     Parameters
-    ----------
+
     x: sympy.symbol
         mathematical variable
 
@@ -276,7 +277,7 @@ def psi_gauss_solution(x):
      Mathematical function of solution of non-linear Schroedinger for g=0
 
      Parameters
-     ----------
+
      x: sympy.symbol
         mathematical variable
     """
@@ -289,7 +290,7 @@ def thomas_fermi_1d(x, g: float = 0.0):
     Mathematical function of Thomas-Fermi distribution with coupling constant g
 
     Parameters
-    ----------
+
     x : sympy.symbol
         mathematical variable
 
@@ -315,7 +316,7 @@ def thomas_fermi_2d(x, y, g: float = 0.0):
     Mathematical function of Thomas-Fermi distribution with coupling constant g
 
     Parameters
-    ----------
+
     x : sympy.symbol
         mathematical variable
 
@@ -348,7 +349,7 @@ def thomas_fermi_3d(x, y, z, g: float = 0.0):
     Mathematical function of Thomas-Fermi distribution with coupling constant g
 
     Parameters
-    ----------
+
     x : sympy.symbol
         mathematical variable
 
@@ -501,11 +502,15 @@ def density_in_trap(x: float, y: float, z: float,
                     R_r: float, R_z: float, g: float = 0.0):
     r = np.sqrt(x ** 2 + y ** 2)
     n_0 = 15.0 / (8.0 * np.pi * R_z * R_r ** 2.0)
-    n_r = n_0 * (1.0 - (r / R_r) ** 2.0 - (z / R_z) ** 2.0)
+    a = (r / R_r) ** 2.0 + (z / R_z) ** 2.0
+
+    n_r = np.where(a > 1, 0.0, n_0 * (1.0 - a))
+
     return n_r
 
 
-def density_in_trap_r(r: float, z: float, R_r: float, R_z: float, g: float = 0.0):
+def density_in_trap_r(r: float, z: float, R_r: float, R_z: float,
+                      g: float = 0.0):
     n_0 = 15.0 / (8.0 * np.pi * R_r ** 2.0 * R_z)
     return n_0 * (1.0 - (r ** 2.0 / R_r ** 2.0) - (z ** 2.0 / R_z ** 2.0))
 
@@ -552,7 +557,7 @@ def camera_3d_trajectory(frame: int,
     or the start values are used.
 
     Parameters
-    ----------
+
     frame : int, index
         Index of the frame in the animation
 
@@ -575,7 +580,7 @@ def camera_3d_trajectory(frame: int,
         z component of the starting point of the camera movement.
 
     Returns
-    -------
+
     r, phi, z as the components of the camera position
     in the animation for the given frame.
 

@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
+# author: Daniel Scheiermann
+# email: daniel.scheiermann@stud.uni-hannover.de
+# license: MIT
+# Please feel free to use and modify this, but keep the above information. Thanks!
+
 """
 Functions for Potential and initial wave function psi_0
 
-author: Daniel Scheiermann
-email: daniel.scheiermann@stud.uni-hannover.de
-license: MIT
-Please feel free to use and modify this, but keep the above information. Thanks!
 """
 
 from pathlib import Path
@@ -29,7 +30,7 @@ def get_image_path(dir_path: Path,
     (prevents colliding with old data).
 
     Parameters
-    ----------
+
     dir_path : Path
         Path where to look for old directories (movie data)
     dir_name : str
@@ -38,7 +39,7 @@ def get_image_path(dir_path: Path,
         Format of counter of the directories
 
     Returns
-    -------
+
     input_path : Path
     Path for the new directory (not colliding with old data)
     """
@@ -89,7 +90,7 @@ def animate(System: Schroedinger.Schroedinger,
     the convergence according to accuracy.
 
     Parameters
-    ----------
+
     System : Schroedinger.Schroedinger
         Schrödinger equations for the specified system
 
@@ -143,7 +144,7 @@ def animate(System: Schroedinger.Schroedinger,
         z component of the movement of the camera.
 
     Returns
-    -------
+
 
     """
     prob_3d = np.abs(System.psi_val) ** 2
@@ -303,7 +304,7 @@ class MayaviAnimation:
         By default deletes all input pictures after creation of movie to save disk space.
 
         Parameters
-        ----------
+
         dir_path : Path
             Path where to look for old directories (movie data)
 
@@ -317,7 +318,7 @@ class MayaviAnimation:
             Condition if the input pictures should be deleted, after creation the creation of the animation as e.g. mp4
 
         Returns
-        -------
+
 
         """
         if dir_path is None:

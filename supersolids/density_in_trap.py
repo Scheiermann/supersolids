@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
+# author: Daniel Scheiermann
+# email: daniel.scheiermann@stud.uni-hannover.de
+# license: MIT
+# Please feel free to use and modify this, but keep the above information. Thanks!
+
 """
 Calculates the density functions for a quantum droplet in a trap.
 
-author: Daniel Scheiermann
-email: daniel.scheiermann@stud.uni-hannover.de
-license: MIT
-Please feel free to use and modify this, but keep the above information. Thanks!
 """
 
 import numpy as np

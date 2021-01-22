@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
+# author: Daniel Scheiermann
+# email: daniel.scheiermann@stud.uni-hannover.de
+# license: MIT
+# Please feel free to use and modify this, but keep the above information. Thanks!
+
 """
 Animation for the numerical solver for the non-linear
 time-dependent Schrodinger equation.
 
-author: Daniel Scheiermann
-email: daniel.scheiermann@stud.uni-hannover.de
-license: MIT
-Please feel free to use and modify this, but keep the above information. Thanks!
 """
 
 import itertools
@@ -17,7 +18,7 @@ import psutil
 
 import numpy as np
 from mayavi import mlab
-from typing import Callable, Tuple, Dict, NamedTuple
+from typing import Callable, Tuple, NamedTuple
 from matplotlib import pyplot as plt
 
 from supersolids import Animation
@@ -70,7 +71,7 @@ def simulate_case(box: NamedTuple,
     of a System through the equations given by Schroedinger.
 
     Parameters
-    ----------
+
     box : NamedTuple
         Endpoints of box where to simulate the Schroedinger equation.
         Keyword x0 is minimum in x direction and x1 is maximum.
@@ -150,7 +151,7 @@ def simulate_case(box: NamedTuple,
         after creation the creation of the animation as e.g. mp4
 
     Returns
-    -------
+
     """
     with run_time.run_time():
         Harmonic = Schroedinger.Schroedinger(box,
@@ -337,7 +338,7 @@ if __name__ == "__main__":
     # 3D works in single core mode
     simulate_case(box,
                   res,
-                  max_timesteps=1001,
+                  max_timesteps=101,
                   dt=dt,
                   g=g,
                   g_qf=g_qf,

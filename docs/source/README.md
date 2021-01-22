@@ -1,4 +1,4 @@
-# Supersolids  
+# README  
 Notes and script to supersolids  
 
 ## Contributing  

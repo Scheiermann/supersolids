@@ -14,10 +14,9 @@ Welcome to supersolids's documentation!
    :caption: Contents
 
    README
+   API
    CONTRIBUTING
    LICENSE
-
-
 
 
 Indices and tables

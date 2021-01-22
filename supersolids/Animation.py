@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
+# author: Daniel Scheiermann
+# email: daniel.scheiermann@stud.uni-hannover.de
+# license: MIT
+# Please feel free to use and modify this, but keep the above information. Thanks!
+
 """
 Implements animation
 
-author: Daniel Scheiermann
-email: daniel.scheiermann@stud.uni-hannover.de
-license: MIT
-Please feel free to use and modify this, but keep the above information. Thanks!
 """
 import sys
 from os import sep
@@ -33,7 +34,7 @@ class Animation:
         Methods need the object Schroedinger with the parameters of the equation
 
         Parameters
-        ----------
+
         dim : int
             Dimension of the underlying Schroedinger to animate.
 
@@ -112,7 +113,7 @@ class Animation:
         even if the initial wave function psi_0 is not normalized.
 
         Parameters
-        ----------
+
         row : int, index
             row of the subplot for the animation
 
@@ -143,7 +144,7 @@ class Animation:
         even if the initial wave function psi_0 is not normalized.
 
         Parameters
-        ----------
+
         row: int, index
             row of the subplot for the animation
 
@@ -230,7 +231,7 @@ class Animation:
         even if the initial wave function psi_0 is not normalized.
 
         Parameters
-        ----------
+
         frame_index: int, index
             Current index of frame
 
@@ -418,7 +419,7 @@ class Animation:
         even if the initial wave function psi_0 is not normalized
 
         Parameters
-        ----------
+
         filename : String
             Name of file including file type to save the animation to
             (tested with mp4)
@@ -471,7 +472,7 @@ def plot_2d(resolution=32,
     """
 
     Parameters
-    ----------
+
     resolution : int
         number of grid points in one direction
 
@@ -488,7 +489,7 @@ def plot_2d(resolution=32,
         alpha value for plot transparency
 
     Returns
-    -------
+
 
     """
     fig = plt.figure()
