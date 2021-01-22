@@ -4,8 +4,8 @@ This is done by solving the dimensionless time-dependent
 non-linear Schrodinger equation for an arbitrary potential.  
 The split operator method with the Trotter-Suzuki approximation is used.  
 
-## Contributing  
-Please read the **CONTRIBUTING.md**.  
+## Documentation
+https://supersolids.readthedocs.io/en/latest/
 
 ## Installing 
 
@@ -67,3 +67,6 @@ d) Try to include screenshots (to the question in 3b).
 e) Describe what you think causes the issue and if you have **suggestions how to solve** it,  
 mention it! (to the question in 3b).  
 f) **Close the issue**, if you accidentally did something wrong (but mention that before closing).  
+
+## Contributing  
+Please read the **CONTRIBUTING.md**.  
