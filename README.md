@@ -1,8 +1,8 @@
 # Supersolids  
- Package to simulate and animate supersolids. 
- This is done by solving the dimensionless time-dependent
- non-linear Schrodinger equation for an arbitrary potential.
- The split operator method with the Trotter-Suzuki approximation is used.
+Package to simulate and animate supersolids.  
+This is done by solving the dimensionless time-dependent  
+non-linear Schrodinger equation for an arbitrary potential.  
+The split operator method with the Trotter-Suzuki approximation is used.  
 
 ## Contributing  
 Please read the **CONTRIBUTING.md**.  
