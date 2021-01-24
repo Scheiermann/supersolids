@@ -33,14 +33,13 @@ release = "0.1.22"
 # ones.
 extensions = ["recommonmark",
               "sphinx.ext.autodoc",
+              "autoapi.extension",
               "sphinx.ext.intersphinx",
               "sphinx.ext.mathjax",
               "sphinx.ext.viewcode",
               "sphinx_rtd_theme",
               ]
 
-# configure autoapi
-extensions.append('autoapi.extension')
 autoapi_type = 'python'
 autoapi_dirs = [sys.path[0]]
 

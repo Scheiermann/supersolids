@@ -248,10 +248,11 @@
 
 <span class="sd">    accuracy : float</span>
 <span class="sd">        Convergence is reached when relative error of mu is smaller</span>
-<span class="sd">        than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`</span>
+<span class="sd">        than accuracy, where mu is</span>
+<span class="sd">        System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)</span>
 
 <span class="sd">    plot_psi_sol :</span>
-<span class="sd">        Condition if :math:`\psi_{sol}` should be plotted.</span>
+<span class="sd">        Condition if psi_sol should be plotted.</span>
 
 <span class="sd">    plot_V : bool</span>
 <span class="sd">        Condition if V should be plotted.</span>
@@ -266,10 +267,10 @@
 <span class="sd">        Limits of plot in z direction</span>
 
 <span class="sd">    alpha_psi : float</span>
-<span class="sd">        Alpha value for plot transparency of :math:`\psi`</span>
+<span class="sd">        Alpha value for plot transparency of psi</span>
 
 <span class="sd">    alpha_psi_sol : float</span>
-<span class="sd">        Alpha value for plot transparency of :math:`\psi_sol`</span>
+<span class="sd">        Alpha value for plot transparency of psi_sol</span>
 
 <span class="sd">    alpha_V : float</span>
 <span class="sd">        Alpha value for plot transparency of V</span>
@@ -279,15 +280,15 @@
 
 <span class="sd">    slice_x_index : int</span>
 <span class="sd">        Index of grid point in x direction to produce a slice/plane in mayavi,</span>
-<span class="sd">        where :math:`\psi_{prob} = |\psi|^2` is used for the slice</span>
+<span class="sd">        where psi_prob = |psi| ** 2 is used for the slice</span>
 
 <span class="sd">    slice_y_index : int</span>
 <span class="sd">        Index of grid point in y direction to produce a slice/plane in mayavi,</span>
-<span class="sd">        where :math:`\psi_{prob} = |\psi|^2` is used for the slice</span>
+<span class="sd">        where psi_prob = |psi| ** 2 is used for the slice</span>
 
 <span class="sd">    slice_z_index : int</span>
 <span class="sd">        Index of grid point in z direction to produce a slice/plane in mayavi,</span>
-<span class="sd">        where :math:`\psi_{prob} = |\psi|^2` is used for the slice</span>
+<span class="sd">        where psi_prob = |psi| ** 2 is used for the slice</span>
 
 <span class="sd">    interactive : bool</span>
 <span class="sd">        Condition for interactive mode. When camera functions are used,</span>
@@ -406,7 +407,7 @@
 <span class="c1"># Script runs, if script is run as main script (called by python *.py)</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="c1"># for parallelization (use all cores)</span>
-<div class="viewcode-block" id="max_workers"><a class="viewcode-back" href="../../autoapi/supersolids/main/index.html#supersolids.main.max_workers">[docs]</a>    <span class="n">max_workers</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="n">logical</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+    <span class="n">max_workers</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="n">logical</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># constants needed for the Schroedinger equation</span>
 

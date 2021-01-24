@@ -164,7 +164,7 @@
 <span class="c1"># Please feel free to use and modify this, but keep the above information. Thanks!</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Functions for Potential and initial wave function :math:`\psi_0`</span>
+<span class="sd">Functions for Potential and initial wave function psi_0</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -226,8 +226,8 @@
 
 
 
-<span class="nd">@mlab</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">delay</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ui</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<div class="viewcode-block" id="animate"><a class="viewcode-back" href="../../autoapi/supersolids/MayaviAnimation/index.html#supersolids.MayaviAnimation.animate">[docs]</a><span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span><span class="o">.</span><span class="n">Schroedinger</span><span class="p">,</span>
+<div class="viewcode-block" id="animate"><a class="viewcode-back" href="../../autoapi/supersolids/MayaviAnimation/index.html#supersolids.MayaviAnimation.animate">[docs]</a><span class="nd">@mlab</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">delay</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ui</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span><span class="o">.</span><span class="n">Schroedinger</span><span class="p">,</span>
             <span class="n">accuracy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span>
             <span class="n">plot_psi_sol</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
             <span class="n">plot_V</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -254,10 +254,11 @@
 
 <span class="sd">    accuracy : float</span>
 <span class="sd">        Convergence is reached when relative error of mu is smaller</span>
-<span class="sd">        than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`</span>
+<span class="sd">        than accuracy, where mu is</span>
+<span class="sd">        System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)</span>
 
 <span class="sd">    plot_psi_sol :</span>
-<span class="sd">        Condition if :math:`\psi_sol` should be plotted.</span>
+<span class="sd">        Condition if psi_sol should be plotted.</span>
 
 <span class="sd">    plot_V : bool</span>
 <span class="sd">        Condition if V should be plotted.</span>
@@ -274,17 +275,17 @@
 <span class="sd">    slice_x_index : int</span>
 <span class="sd">        Index of grid point in x direction (in terms of System.x)</span>
 <span class="sd">        to produce a slice/plane in mayavi,</span>
-<span class="sd">        where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice</span>
+<span class="sd">        where psi_prob = |psi| ** 2 is used for the slice</span>
 
 <span class="sd">    slice_y_index : int</span>
 <span class="sd">        Index of grid point in y  (in terms of System.y) direction</span>
 <span class="sd">        to produce a slice/plane in mayavi,</span>
-<span class="sd">        where :math:`\psi_{prob} = |\psi|^2` is used for the slice</span>
+<span class="sd">        where psi_prob = |psi| ** 2 is used for the slice</span>
 
 <span class="sd">    slice_z_index : int</span>
 <span class="sd">        Index of grid point in z  (in terms of System.z) direction</span>
 <span class="sd">        to produce a slice/plane in mayavi,</span>
-<span class="sd">        where :math:`\psi_{prob} = |\psi|^2` is used for the slice</span>
+<span class="sd">        where psi_prob = |psi| ** 2 is used for the slice</span>
 
 <span class="sd">    interactive : bool</span>
 <span class="sd">        Condition for interactive mode. When camera functions are used,</span>
@@ -377,6 +378,7 @@
                       <span class="n">azimuth</span><span class="o">=</span><span class="n">camera_phi</span><span class="p">,</span>
                       <span class="n">elevation</span><span class="o">=</span><span class="n">camera_z</span><span class="p">)</span>
 
+
         <span class="c1"># Initialize mu_rel</span>
         <span class="n">mu_rel</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">mu</span>
 
@@ -420,8 +422,8 @@
 
 
 <div class="viewcode-block" id="MayaviAnimation"><a class="viewcode-back" href="../../autoapi/supersolids/MayaviAnimation/index.html#supersolids.MayaviAnimation.MayaviAnimation">[docs]</a><span class="k">class</span> <span class="nc">MayaviAnimation</span><span class="p">:</span>
-<div class="viewcode-block" id="MayaviAnimation.mayavi_counter"><a class="viewcode-back" href="../../autoapi/supersolids/MayaviAnimation/index.html#supersolids.MayaviAnimation.MayaviAnimation.mayavi_counter">[docs]</a>    <span class="n">mayavi_counter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span></div>
-<div class="viewcode-block" id="MayaviAnimation.animate"><a class="viewcode-back" href="../../autoapi/supersolids/MayaviAnimation/index.html#supersolids.MayaviAnimation.MayaviAnimation.animate">[docs]</a>    <span class="n">animate</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">animate</span><span class="p">)</span></div>
+    <span class="n">mayavi_counter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">animate</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">animate</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">dim</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
@@ -456,10 +458,8 @@
                      <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;anim.mp4&quot;</span><span class="p">,</span>
                      <span class="n">delete_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates movie filename with all matching pictures from</span>
-<span class="sd">        input_data_file_pattern.</span>
-<span class="sd">        By default deletes all input pictures after creation of movie</span>
-<span class="sd">        to save disk space.</span>
+<span class="sd">        Creates movie filename with all matching pictures from input_data_file_pattern.</span>
+<span class="sd">        By default deletes all input pictures after creation of movie to save disk space.</span>
 
 <span class="sd">        Parameters</span>
 
@@ -473,8 +473,7 @@
 <span class="sd">            Filename with filetype to save the movie to</span>
 
 <span class="sd">        delete_input : bool</span>
-<span class="sd">            Condition if the input pictures should be deleted,</span>
-<span class="sd">            after creation the creation of the animation as e.g. mp4</span>
+<span class="sd">            Condition if the input pictures should be deleted, after creation the creation of the animation as e.g. mp4</span>
 
 <span class="sd">        Returns</span>
 
@@ -508,9 +507,9 @@
 
 <span class="c1"># Script runs, if script is run as main script (called by python *.py)</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-<div class="viewcode-block" id="box"><a class="viewcode-back" href="../../autoapi/supersolids/MayaviAnimation/index.html#supersolids.MayaviAnimation.box">[docs]</a>    <span class="n">box</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;x0&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">box</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;x0&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
                              <span class="s2">&quot;y0&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;y1&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-                             <span class="s2">&quot;z0&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;z1&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span></div>
+                             <span class="s2">&quot;z0&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;z1&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
     <span class="n">resolution</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">6</span><span class="p">,</span>
                                   <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">6</span><span class="p">,</span>
                                   <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">6</span><span class="p">}</span>

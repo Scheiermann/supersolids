@@ -164,7 +164,7 @@
 <span class="c1"># Please feel free to use and modify this, but keep the above information. Thanks!</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Functions for Potential and initial wave function :math:`\psi_0`</span>
+<span class="sd">Functions for Potential and initial wave function psi_0</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -176,13 +176,13 @@
 
 <span class="kn">from</span> <span class="nn">supersolids</span> <span class="kn">import</span> <span class="n">constants</span>
 
-<div class="viewcode-block" id="Resolution"><a class="viewcode-back" href="../../autoapi/supersolids/functions/index.html#supersolids.functions.Resolution">[docs]</a><span class="n">Resolution</span> <span class="o">=</span> <span class="n">NamedTuple</span><span class="p">(</span><span class="s2">&quot;Resolution&quot;</span><span class="p">,</span>
-                        <span class="p">[(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">)])</span></div>
+<span class="n">Resolution</span> <span class="o">=</span> <span class="n">NamedTuple</span><span class="p">(</span><span class="s2">&quot;Resolution&quot;</span><span class="p">,</span>
+                        <span class="p">[(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">)])</span>
 
-<div class="viewcode-block" id="Box"><a class="viewcode-back" href="../../autoapi/supersolids/functions/index.html#supersolids.functions.Box">[docs]</a><span class="n">Box</span> <span class="o">=</span> <span class="n">NamedTuple</span><span class="p">(</span><span class="s2">&quot;Box&quot;</span><span class="p">,</span>
+<span class="n">Box</span> <span class="o">=</span> <span class="n">NamedTuple</span><span class="p">(</span><span class="s2">&quot;Box&quot;</span><span class="p">,</span>
                  <span class="p">[(</span><span class="s2">&quot;x0&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;x1&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
                   <span class="p">(</span><span class="s2">&quot;y0&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;y1&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
-                  <span class="p">(</span><span class="s2">&quot;z0&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;z1&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span></div>
+                  <span class="p">(</span><span class="s2">&quot;z0&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;z1&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
                   <span class="p">])</span>
 
 
@@ -315,8 +315,8 @@
 
     <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span>
             <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(((</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
-                     <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="n">k_0</span><span class="p">)</span></div>
-            <span class="p">)</span>
+                     <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="n">k_0</span><span class="p">)</span>
+            <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="psi_gauss_3d"><a class="viewcode-back" href="../../autoapi/supersolids/functions/index.html#supersolids.functions.psi_gauss_3d">[docs]</a><span class="k">def</span> <span class="nf">psi_gauss_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
@@ -771,7 +771,7 @@
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="c1"># due to fft of the points the res needs to be 2 **</span>
     <span class="c1"># resolution_exponent</span>
-<div class="viewcode-block" id="datapoints_exponent"><a class="viewcode-back" href="../../autoapi/supersolids/functions/index.html#supersolids.functions.datapoints_exponent">[docs]</a>    <span class="n">datapoints_exponent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span></div>
+    <span class="n">datapoints_exponent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span>
     <span class="n">resolution</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">datapoints_exponent</span>
 
     <span class="c1"># constants needed for the Schroedinger equation</span>
