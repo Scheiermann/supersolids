@@ -20,7 +20,7 @@ build() {
   python setup.py build
 }
 
-check_disabled() { #ERROR: TypeError None is not callable
+check_disabled() {
   cd "$srcdir/${_name}-$pkgver"
   python setup.py test
 }
@@ -29,11 +29,11 @@ package() {
   cd "$srcdir/${_name}-$pkgver"
   # alternatively install dependencies with pip
   # for python3.8
-#   python -m pip install -U apptools envisage ffmpeg-python mayavi matplotlib numpy sphinx-rtd-theme traits traitsui vtk
+  # python -m pip install -U apptools envisage ffmpeg-python mayavi matplotlib numpy sphinx-rtd-theme traits traitsui vtk
   # for python3.9
   # (watch out: currently there is no vtk wheel for python3.9, so you need to build it from source
   #  or take a unofficial build (provided by the project creator of this package), then install mayavi)
-#   python -m pip install -U apptools envisage ffmpeg-python matplotlib numpy scipy sympy traits traitsui
+  # python -m pip install -U apptools envisage ffmpeg-python matplotlib numpy scipy sympy traits traitsui
   python setup.py install --skip-build --root="$pkgdir" --optimize=1
 
 }

@@ -15,7 +15,7 @@ For **python3.9** currently there is no vtk wheel for python3.9, so you need to 
 git clone https://github.com/Scheiermann/vtk_python39_wheel. Go to the directory vtk_python39_wheel/,
 where the wheel lies (*.whl).  
 Use this wheel to install, e.g:  
-pip install vtk-9.0.20210105-cp39-cp39-linux_x86_64.whl
+pip install vtk-9.0.20210105-cp39-cp39-linux_x86_64.whl  
 Then install mayavi (pip install mayavi or also build it from source, as there could be incapabilities with vtk9).  
 
 ### Arch based systems  
