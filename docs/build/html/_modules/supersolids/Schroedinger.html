@@ -13,6 +13,7 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
 
   
   
@@ -32,6 +33,7 @@
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -85,9 +87,9 @@
               <p class="caption"><span class="caption-text">Contents</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../README.html">README</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../API.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../CONTRIBUTING.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
 </ul>
 
             
@@ -175,22 +177,18 @@
 <span class="kn">from</span> <span class="nn">supersolids</span> <span class="kn">import</span> <span class="n">functions</span>
 
 
-<div class="viewcode-block" id="Schroedinger"><a class="viewcode-back" href="../../Schroedinger.html#supersolids.Schroedinger.Schroedinger">[docs]</a><span class="k">class</span> <span class="nc">Schroedinger</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Schroedinger"><a class="viewcode-back" href="../../autoapi/supersolids/Schroedinger/index.html#supersolids.Schroedinger.Schroedinger">[docs]</a><span class="k">class</span> <span class="nc">Schroedinger</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implements a numerical solution of the dimensionless time-dependent</span>
-<span class="sd">    non-linear Schrodinger equation for an arbitrary potential,</span>
-<span class="sd">    where D[., t] is a partial derivative to t:</span>
-<span class="sd">    i D(psi, t) = [-0.5 * (D[., x] ** 2 + D[., y] ** 2 + D[., z] ** 2)</span>
-<span class="sd">                   + 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2)</span>
-<span class="sd">                   + g |psi| ** 2</span>
-<span class="sd">                   + g_qf * |psi| ** 3</span>
-<span class="sd">                   + U_dd] psi</span>
+<span class="sd">    non-linear Schrodinger equation for an arbitrary potential:</span>
 
-<span class="sd">    With U_dd = iFFT( FFT(|psi| ** 2) * e_dd * g * ((3 * k_z / k ** 2) - 1.0) )</span>
+<span class="sd">    With :math:`U_{dd} =  iFFT(FFT(H_{pot} \psi) \epsilon_{dd} g ((3 k_z / k^2) - 1))`</span>
+
+<span class="sd">    :math:`i \\partial_t \psi = [-0.5 \\nabla ^2 + 0.5 (x^2 + (y \\alpha_y)^2 + (z \\alpha_z)^2) + g |\psi|^2 + g_{qf} |\psi|^3 + U_{dd}] \psi`</span>
 
 <span class="sd">    The split operator method with the Trotter-Suzuki approximation</span>
-<span class="sd">    for the commutator relation ($H = H_{pot} + H_{kin}$) is used.</span>
-<span class="sd">    Hence the accuracy is proportional to dt ** 4</span>
+<span class="sd">    for the commutator relation (:math:`H = H_{pot} + H_{kin}`) is used.</span>
+<span class="sd">    Hence the accuracy is proportional to :math:`dt^4`</span>
 <span class="sd">    The approximation is needed because of the Baker-Campell-Hausdorff formula.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -236,10 +234,10 @@
 <span class="sd">            Maximum timesteps  with length dt for the animation.</span>
 
 <span class="sd">        alpha_psi : float</span>
-<span class="sd">            Alpha value for plot transparency of psi</span>
+<span class="sd">            Alpha value for plot transparency of :math:`\psi`</span>
 
 <span class="sd">        alpha_psi_sol : float</span>
-<span class="sd">            Alpha value for plot transparency of psi_sol</span>
+<span class="sd">            Alpha value for plot transparency of :math:`\psi_{sol}`</span>
 
 <span class="sd">        alpha_V : float</span>
 <span class="sd">            Alpha value for plot transparency of V</span>
@@ -267,10 +265,10 @@
                                     <span class="sa">f</span><span class="s2">&quot;res (</span><span class="si">{</span><span class="n">res_dim</span><span class="si">}</span><span class="s2">) needs to be equal.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">box_dim</span>
 
-        <span class="c1"># mu = - ln(N) / (2 * dtau), where N is the norm of the psi</span>
+        <span class="c1"># mu = - ln(N) / (2 * dtau), where N is the norm of the :math:`\psi`</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">mu</span>
 
-        <span class="c1"># E = mu - 0.5 * g * int psi_val ** 2</span>
+        <span class="c1"># E = mu - 0.5 * g * integral psi_val ** 2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">E</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">psi_0</span>
@@ -465,19 +463,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha_psi_sol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">alpha_psi_sol</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha_V</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">alpha_V</span>
 
-<div class="viewcode-block" id="Schroedinger.get_density"><a class="viewcode-back" href="../../Schroedinger.html#supersolids.Schroedinger.Schroedinger.get_density">[docs]</a>    <span class="k">def</span> <span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<div class="viewcode-block" id="Schroedinger.get_density"><a class="viewcode-back" href="../../autoapi/supersolids/Schroedinger/index.html#supersolids.Schroedinger.Schroedinger.get_density">[docs]</a>    <span class="k">def</span> <span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates |psi| ** p for 1D, 2D or 3D.</span>
+<span class="sd">        Calculates :math:`|\psi|^p` for 1D, 2D or 3D.</span>
 
 <span class="sd">        Parameters</span>
 
 <span class="sd">        p : float</span>
-<span class="sd">            Exponent of |psi|. Use p=2.0 for density.</span>
+<span class="sd">            Exponent of :math:`|\psi|`. Use p=2.0 for density.</span>
 
 <span class="sd">        Returns</span>
 
 <span class="sd">        psi_density : np.ndarray</span>
-<span class="sd">            |psi| ** 2</span>
+<span class="sd">            :math:`|\psi|^p`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">:</span>
             <span class="n">psi_density</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span><span class="p">)</span> <span class="o">**</span> <span class="n">p</span>
@@ -486,19 +484,19 @@
 
         <span class="k">return</span> <span class="n">psi_density</span></div>
 
-<div class="viewcode-block" id="Schroedinger.get_norm"><a class="viewcode-back" href="../../Schroedinger.html#supersolids.Schroedinger.Schroedinger.get_norm">[docs]</a>    <span class="k">def</span> <span class="nf">get_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="Schroedinger.get_norm"><a class="viewcode-back" href="../../autoapi/supersolids/Schroedinger/index.html#supersolids.Schroedinger.Schroedinger.get_norm">[docs]</a>    <span class="k">def</span> <span class="nf">get_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates p-norm of psi for 1D, 2D or 3D.</span>
+<span class="sd">        Calculates p-norm of :math:`\psi` for 1D, 2D or 3D.</span>
 
 <span class="sd">        Parameters</span>
 
 <span class="sd">        p : float</span>
-<span class="sd">            Exponent of |psi|. Use p=2.0 for density.</span>
+<span class="sd">            Exponent of :math:`|\psi|`. Use p=2.0 for density.</span>
 
 <span class="sd">        Returns</span>
 
 <span class="sd">        psi_norm : float</span>
-<span class="sd">            p-norm of self.psi</span>
+<span class="sd">            p-norm of :math:`\psi`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -514,7 +512,7 @@
 
         <span class="k">return</span> <span class="n">psi_norm</span></div>
 
-    <span class="k">def</span> <span class="nf">time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="Schroedinger.time_step"><a class="viewcode-back" href="../../autoapi/supersolids/Schroedinger/index.html#supersolids.Schroedinger.Schroedinger.time_step">[docs]</a>    <span class="k">def</span> <span class="nf">time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Here we use half steps in real space, but will use it before and</span>
         <span class="c1"># after H_kin with normal steps</span>
 
@@ -568,7 +566,28 @@
 
         <span class="c1"># TODO: adjust for DDI</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">=</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">psi_norm_after_evolution</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">*</span> <span class="n">psi_quadratic_int</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">*</span> <span class="n">psi_quadratic_int</span>
+
+        <span class="n">prob_mitte</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">x</span> <span class="o">//</span> <span class="mi">2</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">y</span> <span class="o">//</span> <span class="mi">2</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">z</span> <span class="o">//</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;prob_mitte: </span><span class="si">{</span><span class="n">prob_mitte</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Norm: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_norm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># print(f&quot;mu: {self.mu}&quot;)</span>
+        <span class="n">sol_val</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">density_in_trap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_mesh</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">y_mesh</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">z_mesh</span><span class="p">,</span>
+                                            <span class="n">R_r</span><span class="o">=</span><span class="mf">8.951053202619295</span><span class="p">,</span>
+                                            <span class="n">R_z</span><span class="o">=</span><span class="mf">2.2632503541930338</span><span class="p">)</span>
+
+        <span class="n">sol_mitte</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+            <span class="n">sol_val</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">x</span> <span class="o">//</span> <span class="mi">2</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">y</span> <span class="o">//</span> <span class="mi">2</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">z</span> <span class="o">//</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sol mitte: </span><span class="si">{</span><span class="n">sol_mitte</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">dV</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dz</span>
+        <span class="n">sol_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sol_val</span><span class="p">)</span> <span class="o">*</span> <span class="n">dV</span>
+        <span class="n">psi_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psi_val</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">dV</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;psi_norm: </span><span class="si">{</span><span class="n">psi_norm</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;psi_sol norm: </span><span class="si">{</span><span class="n">sol_norm</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
+
 
         <span class="c1"># TODO: These formulas for mu.sol and E are not for all cases correct</span>
         <span class="c1"># print(f&quot;mu: {self.mu}&quot;)</span>

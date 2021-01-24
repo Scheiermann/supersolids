@@ -1,0 +1,73 @@
+:mod:`supersolids.Schroedinger`
+===============================
+
+.. py:module:: supersolids.Schroedinger
+
+.. autoapi-nested-parse::
+
+   Numerical solver for non-linear time-dependent Schrodinger equation.
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.Schroedinger.Schroedinger
+
+
+
+.. py:class:: Schroedinger(box: NamedTuple, res: NamedTuple, max_timesteps: int, dt: float, g: float = 0.0, g_qf: float = 0.0, e_dd: float = 1.0, imag_time: bool = True, mu: float = 1.1, E: float = 1.0, psi_0: Callable = functions.psi_gauss_3d, V: Optional[Callable] = functions.v_harmonic_3d, V_interaction: Optional[Callable] = None, psi_sol: Optional[Callable] = functions.thomas_fermi_3d, mu_sol: Optional[Callable] = functions.mu_3d, psi_0_noise: Optional[Callable] = functions.noise_mesh, alpha_psi: float = 0.8, alpha_psi_sol: float = 0.53, alpha_V: float = 0.3)
+
+   Bases: :class:`object`
+
+   Implements a numerical solution of the dimensionless time-dependent
+   non-linear Schrodinger equation for an arbitrary potential:
+
+   With :math:`U_{dd} =  iFFT(FFT(H_{pot} \psi) \epsilon_{dd} g ((3 k_z / k^2) - 1))`
+
+   :math:`i \partial_t \psi = [-0.5 \nabla ^2 + 0.5 (x^2 + (y \alpha_y)^2 + (z \alpha_z)^2) + g |\psi|^2 + g_{qf} |\psi|^3 + U_{dd}] \psi`
+
+   The split operator method with the Trotter-Suzuki approximation
+   for the commutator relation (:math:`H = H_{pot} + H_{kin}`) is used.
+   Hence the accuracy is proportional to :math:`dt^4`
+   The approximation is needed because of the Baker-Campell-Hausdorff formula.
+
+   .. method:: get_density(self, p: float = 2.0) -> np.ndarray
+
+      Calculates :math:`|\psi|^p` for 1D, 2D or 3D.
+
+      Parameters
+
+      p : float
+          Exponent of :math:`|\psi|`. Use p=2.0 for density.
+
+      Returns
+
+      psi_density : np.ndarray
+          :math:`|\psi|^p`
+
+
+   .. method:: get_norm(self, p: float = 2.0) -> float
+
+      Calculates p-norm of :math:`\psi` for 1D, 2D or 3D.
+
+      Parameters
+
+      p : float
+          Exponent of :math:`|\psi|`. Use p=2.0 for density.
+
+      Returns
+
+      psi_norm : float
+          p-norm of :math:`\psi`
+
+
+   .. method:: time_step(self) -> None
+
+
+

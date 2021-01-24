@@ -1,0 +1,164 @@
+:mod:`supersolids.Animation`
+============================
+
+.. py:module:: supersolids.Animation
+
+.. autoapi-nested-parse::
+
+   Implements animation
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.Animation.Animation
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.Animation.plot_2d
+   supersolids.Animation.round_z_to_0
+   supersolids.Animation.crop_pos_to_limits
+   supersolids.Animation.get_V_plot_values
+
+
+.. py:class:: Animation(dim=2, camera_r_func=None, camera_phi_func=None, camera_z_func=None)
+
+   .. method:: set_limits(self, row: int, col: int, x_min: float, x_max: float, y_min: float, y_max: float)
+
+      Sets the plot limits appropriate,
+      even if the initial wave function :math:`\psi_0` is not normalized.
+
+      Parameters
+
+      row : int, index
+          row of the subplot for the animation
+
+      col : int, index
+          column of the subplot for the animation
+
+      x_min : float, index
+          minimum x value of subplot
+
+      x_max : float, index
+          maximum x value of subplot
+
+      y_min : float, index
+          minimum y value of subplot
+
+      y_max : float, index
+          maximum y value of subplot
+
+
+   .. method:: set_limits_smart(self, row: int, col: int, System: Schroedinger.Schroedinger)
+
+      Sets the plot limits appropriate,
+      even if the initial wave function :math:`\psi_0` is not normalized.
+
+      Parameters
+
+      row: int, index
+          row of the subplot for the animation
+
+      col: int, index
+          column of the subplot for the animation
+
+      System: Schroedinger, object
+          Defines the Schroedinger equation for a given problem
+
+
+   .. method:: get_V_plot_values(self, i: int, j: int, System: Schroedinger.Schroedinger, reserve: float = 1.0)
+
+
+   .. method:: animate(self, frame_index: int, System: Schroedinger.Schroedinger, accuracy: float = 10**(-6), plot_psi_sol: bool = False, plot_V: bool = True)
+
+      Sets the plot limits appropriate,
+      even if the initial wave function :math:`\psi_0` is not normalized.
+
+      Parameters
+
+      frame_index: int, index
+          Current index of frame
+
+      System: Schroedinger, object
+          Defines the Schroedinger equation for a given problem
+
+      accuracy : float
+          Convergence is reached when relative error of mu is smaller
+          than accuracy, where :math:`\mu = - \log(\psi_{normed}) / (2 dt)`
+
+      plot_psi_sol : bool
+          Condition if :math:`\psi_{sol}` should be plotted.
+
+      plot_V : bool
+          Condition if V should be plotted.
+
+
+   .. method:: start(self, System: Schroedinger.Schroedinger, filename: str = 'anim.mp4', accuracy: float = 10**(-6), plot_psi_sol: bool = False, plot_V: bool = True)
+
+      Sets the plot limits appropriate,
+      even if the initial wave function :math:`\psi_0` is not normalized
+
+      Parameters
+
+      filename : String
+          Name of file including file type to save the animation to
+          (tested with mp4)
+
+      accuracy : float
+          Convergence is reached when relative error of mu is smaller
+          than accuracy, where :math:`\mu = - \log(\psi_{normed}) / (2 dt)`
+
+      System: Schroedinger, object
+          Defines the Schroedinger equation for a given problem
+
+      plot_psi_sol :
+          Condition if :math:`\psi_{sol}` should be plotted.
+
+      plot_V : bool
+          Condition if V should be plotted.
+
+
+
+.. function:: plot_2d(resolution=32, x_lim: Tuple[float, float] = (-1, 1), y_lim: Tuple[float, float] = (-1, 1), z_lim: Tuple[float, float] = (0, 1), alpha: List[float] = [0.6], **kwargs)
+
+   Parameters
+
+   resolution : int
+       number of grid points in one direction
+
+   x_lim : Tuple[float, float]
+       Limits of plot in x direction
+
+   y_lim : Tuple[float, float]
+       Limits of plot in y direction
+
+   z_lim : Tuple[float, float]
+       Limits of plot in z direction
+
+   alpha : float
+       alpha value for plot transparency
+
+   Returns
+
+
+
+.. function:: round_z_to_0(pos, func, tol: float = 1e-05)
+
+
+.. function:: crop_pos_to_limits(ax, pos, func, func_val=None)
+
+
+.. function:: get_V_plot_values(ax, pos, V, resolution: int, reserve: float = 1.0)
+
+

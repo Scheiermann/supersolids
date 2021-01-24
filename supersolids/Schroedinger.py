@@ -22,19 +22,15 @@ from supersolids import functions
 class Schroedinger(object):
     """
     Implements a numerical solution of the dimensionless time-dependent
-    non-linear Schrodinger equation for an arbitrary potential,
-    where D[., t] is a partial derivative to t:
-    i D(psi, t) = [-0.5 * (D[., x] ** 2 + D[., y] ** 2 + D[., z] ** 2)
-                   + 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2)
-                   + g |psi| ** 2
-                   + g_qf * |psi| ** 3
-                   + U_dd] psi
+    non-linear Schrodinger equation for an arbitrary potential:
 
-    With U_dd = iFFT( FFT(|psi| ** 2) * e_dd * g * ((3 * k_z / k ** 2) - 1.0) )
+    With :math:`U_{dd} =  iFFT(FFT(H_{pot} \psi) \epsilon_{dd} g ((3 k_z / k^2) - 1))`
+
+    :math:`i \\partial_t \psi = [-0.5 \\nabla ^2 + 0.5 (x^2 + (y \\alpha_y)^2 + (z \\alpha_z)^2) + g |\psi|^2 + g_{qf} |\psi|^3 + U_{dd}] \psi`
 
     The split operator method with the Trotter-Suzuki approximation
-    for the commutator relation ($H = H_{pot} + H_{kin}$) is used.
-    Hence the accuracy is proportional to dt ** 4
+    for the commutator relation (:math:`H = H_{pot} + H_{kin}`) is used.
+    Hence the accuracy is proportional to :math:`dt^4`
     The approximation is needed because of the Baker-Campell-Hausdorff formula.
     """
 
@@ -80,10 +76,10 @@ class Schroedinger(object):
             Maximum timesteps  with length dt for the animation.
 
         alpha_psi : float
-            Alpha value for plot transparency of psi
+            Alpha value for plot transparency of :math:`\psi`
 
         alpha_psi_sol : float
-            Alpha value for plot transparency of psi_sol
+            Alpha value for plot transparency of :math:`\psi_{sol}`
 
         alpha_V : float
             Alpha value for plot transparency of V
@@ -111,10 +107,10 @@ class Schroedinger(object):
                                     f"res ({res_dim}) needs to be equal.")
         self.dim: int = box_dim
 
-        # mu = - ln(N) / (2 * dtau), where N is the norm of the psi
+        # mu = - ln(N) / (2 * dtau), where N is the norm of the :math:`\psi`
         self.mu: float = mu
 
-        # E = mu - 0.5 * g * int psi_val ** 2
+        # E = mu - 0.5 * g * integral psi_val ** 2
         self.E: float = E
 
         self.psi: Callable = psi_0
@@ -311,17 +307,17 @@ class Schroedinger(object):
 
     def get_density(self, p: float = 2.0) -> np.ndarray:
         """
-        Calculates |psi| ** p for 1D, 2D or 3D.
+        Calculates :math:`|\psi|^p` for 1D, 2D or 3D.
 
         Parameters
 
         p : float
-            Exponent of |psi|. Use p=2.0 for density.
+            Exponent of :math:`|\psi|`. Use p=2.0 for density.
 
         Returns
 
         psi_density : np.ndarray
-            |psi| ** 2
+            :math:`|\psi|^p`
         """
         if self.dim <= 3:
             psi_density: np.ndarray = np.abs(self.psi_val) ** p
@@ -332,17 +328,17 @@ class Schroedinger(object):
 
     def get_norm(self, p: float = 2.0) -> float:
         """
-        Calculates p-norm of psi for 1D, 2D or 3D.
+        Calculates p-norm of :math:`\psi` for 1D, 2D or 3D.
 
         Parameters
 
         p : float
-            Exponent of |psi|. Use p=2.0 for density.
+            Exponent of :math:`|\psi|`. Use p=2.0 for density.
 
         Returns
 
         psi_norm : float
-            p-norm of self.psi
+            p-norm of :math:`\psi`
         """
 
         if self.dim == 1:

@@ -7,7 +7,7 @@
 
 """
 Script to check a calculation in a paper
-
+and import :math:`a_0` and :math:`u` in kg
 """
 
 from scipy.constants import hbar

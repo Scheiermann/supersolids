@@ -14,7 +14,6 @@ Welcome to supersolids's documentation!
    :caption: Contents
 
    README
-   API
    CONTRIBUTING
    LICENSE
 

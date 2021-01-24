@@ -90,11 +90,10 @@ def simulate_case(box: NamedTuple,
 
     accuracy : float
         Convergence is reached when relative error of mu is smaller
-        than accuracy, where mu is
-        System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+        than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
     plot_psi_sol :
-        Condition if psi_sol should be plotted.
+        Condition if :math:`\psi_{sol}` should be plotted.
 
     plot_V : bool
         Condition if V should be plotted.
@@ -109,10 +108,10 @@ def simulate_case(box: NamedTuple,
         Limits of plot in z direction
 
     alpha_psi : float
-        Alpha value for plot transparency of psi
+        Alpha value for plot transparency of :math:`\psi`
 
     alpha_psi_sol : float
-        Alpha value for plot transparency of psi_sol
+        Alpha value for plot transparency of :math:`\psi_sol`
 
     alpha_V : float
         Alpha value for plot transparency of V
@@ -122,15 +121,15 @@ def simulate_case(box: NamedTuple,
 
     slice_x_index : int
         Index of grid point in x direction to produce a slice/plane in mayavi,
-        where psi_prob = |psi| ** 2 is used for the slice
+        where :math:`\psi_{prob} = |\psi|^2` is used for the slice
 
     slice_y_index : int
         Index of grid point in y direction to produce a slice/plane in mayavi,
-        where psi_prob = |psi| ** 2 is used for the slice
+        where :math:`\psi_{prob} = |\psi|^2` is used for the slice
 
     slice_z_index : int
         Index of grid point in z direction to produce a slice/plane in mayavi,
-        where psi_prob = |psi| ** 2 is used for the slice
+        where :math:`\psi_{prob} = |\psi|^2` is used for the slice
 
     interactive : bool
         Condition for interactive mode. When camera functions are used,

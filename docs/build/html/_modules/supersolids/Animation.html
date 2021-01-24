@@ -13,6 +13,7 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
 
   
   
@@ -32,6 +33,7 @@
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -85,9 +87,9 @@
               <p class="caption"><span class="caption-text">Contents</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../README.html">README</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../API.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../CONTRIBUTING.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
 </ul>
 
             
@@ -178,7 +180,7 @@
 
 
 
-<span class="k">class</span> <span class="nc">Animation</span><span class="p">:</span>
+<div class="viewcode-block" id="Animation"><a class="viewcode-back" href="../../autoapi/supersolids/Animation/index.html#supersolids.Animation.Animation">[docs]</a><span class="k">class</span> <span class="nc">Animation</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                  <span class="n">camera_r_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -261,12 +263,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">azim</span> <span class="o">=</span> <span class="n">camera_phi_0</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">elev</span> <span class="o">=</span> <span class="n">camera_z_0</span>
 
-    <span class="k">def</span> <span class="nf">set_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<div class="viewcode-block" id="Animation.set_limits"><a class="viewcode-back" href="../../autoapi/supersolids/Animation/index.html#supersolids.Animation.Animation.set_limits">[docs]</a>    <span class="k">def</span> <span class="nf">set_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                    <span class="n">x_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">x_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
                    <span class="n">y_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the plot limits appropriate,</span>
-<span class="sd">        even if the initial wave function psi_0 is not normalized.</span>
+<span class="sd">        even if the initial wave function :math:`\psi_0` is not normalized.</span>
 
 <span class="sd">        Parameters</span>
 
@@ -291,13 +293,13 @@
 
         <span class="n">y_lim</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_min</span> <span class="o">-</span> <span class="mf">0.2</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">),</span> <span class="n">y_max</span> <span class="o">+</span> <span class="mf">0.2</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">axs</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">axs</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">y_lim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axs</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">y_lim</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">set_limits_smart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<div class="viewcode-block" id="Animation.set_limits_smart"><a class="viewcode-back" href="../../autoapi/supersolids/Animation/index.html#supersolids.Animation.Animation.set_limits_smart">[docs]</a>    <span class="k">def</span> <span class="nf">set_limits_smart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                          <span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span><span class="o">.</span><span class="n">Schroedinger</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the plot limits appropriate,</span>
-<span class="sd">        even if the initial wave function psi_0 is not normalized.</span>
+<span class="sd">        even if the initial wave function :math:`\psi_0` is not normalized.</span>
 
 <span class="sd">        Parameters</span>
 
@@ -340,9 +342,9 @@
             <span class="n">y_min</span> <span class="o">=</span> <span class="n">psi_prob</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
             <span class="n">y_max</span> <span class="o">=</span> <span class="n">psi_prob_max</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_limits</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_limits</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">get_V_plot_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<div class="viewcode-block" id="Animation.get_V_plot_values"><a class="viewcode-back" href="../../autoapi/supersolids/Animation/index.html#supersolids.Animation.Animation.get_V_plot_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_V_plot_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                           <span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span><span class="o">.</span><span class="n">Schroedinger</span><span class="p">,</span>
                           <span class="n">reserve</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">System</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -374,9 +376,9 @@
             <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">V_pos</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">get_meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
             <span class="n">V_plot_val</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">V</span><span class="p">(</span><span class="n">V_pos</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">V_pos</span><span class="p">,</span> <span class="n">V_plot_val</span>
+        <span class="k">return</span> <span class="n">V_pos</span><span class="p">,</span> <span class="n">V_plot_val</span></div>
 
-    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<div class="viewcode-block" id="Animation.animate"><a class="viewcode-back" href="../../autoapi/supersolids/Animation/index.html#supersolids.Animation.Animation.animate">[docs]</a>    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                 <span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span><span class="o">.</span><span class="n">Schroedinger</span><span class="p">,</span>
                 <span class="n">accuracy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span>
                 <span class="n">plot_psi_sol</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -384,7 +386,7 @@
                 <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the plot limits appropriate,</span>
-<span class="sd">        even if the initial wave function psi_0 is not normalized.</span>
+<span class="sd">        even if the initial wave function :math:`\psi_0` is not normalized.</span>
 
 <span class="sd">        Parameters</span>
 
@@ -396,11 +398,10 @@
 
 <span class="sd">        accuracy : float</span>
 <span class="sd">            Convergence is reached when relative error of mu is smaller</span>
-<span class="sd">            than accuracy, where mu is</span>
-<span class="sd">            System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)</span>
+<span class="sd">            than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`</span>
 
 <span class="sd">        plot_psi_sol : bool</span>
-<span class="sd">            Condition if psi_sol should be plotted.</span>
+<span class="sd">            Condition if :math:`\psi_{sol}` should be plotted.</span>
 
 <span class="sd">        plot_V : bool</span>
 <span class="sd">            Condition if V should be plotted.</span>
@@ -562,9 +563,9 @@
                 <span class="k">if</span> <span class="n">frame_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_line</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_line</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span></div>
 
-    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span><span class="o">.</span><span class="n">Schroedinger</span><span class="p">,</span>
+<div class="viewcode-block" id="Animation.start"><a class="viewcode-back" href="../../autoapi/supersolids/Animation/index.html#supersolids.Animation.Animation.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span><span class="o">.</span><span class="n">Schroedinger</span><span class="p">,</span>
               <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;anim.mp4&quot;</span><span class="p">,</span>
               <span class="n">accuracy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span>
               <span class="n">plot_psi_sol</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -572,7 +573,7 @@
               <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the plot limits appropriate,</span>
-<span class="sd">        even if the initial wave function psi_0 is not normalized</span>
+<span class="sd">        even if the initial wave function :math:`\psi_0` is not normalized</span>
 
 <span class="sd">        Parameters</span>
 
@@ -582,14 +583,13 @@
 
 <span class="sd">        accuracy : float</span>
 <span class="sd">            Convergence is reached when relative error of mu is smaller</span>
-<span class="sd">            than accuracy, where mu is</span>
-<span class="sd">            System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)</span>
+<span class="sd">            than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`</span>
 
 <span class="sd">        System: Schroedinger, object</span>
 <span class="sd">            Defines the Schroedinger equation for a given problem</span>
 
 <span class="sd">        plot_psi_sol :</span>
-<span class="sd">            Condition if psi_sol should be plotted.</span>
+<span class="sd">            Condition if :math:`\psi_{sol}` should be plotted.</span>
 
 <span class="sd">        plot_V : bool</span>
 <span class="sd">            Condition if V should be plotted.</span>
@@ -616,10 +616,10 @@
 
         <span class="c1"># requires either mencoder or ffmpeg to be installed on your system</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">anim</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;results&quot;</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="n">filename</span><span class="p">,</span>
-                       <span class="n">fps</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">extra_args</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;-vcodec&#39;</span><span class="p">,</span> <span class="s1">&#39;libx264&#39;</span><span class="p">])</span>
+                       <span class="n">fps</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">extra_args</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;-vcodec&#39;</span><span class="p">,</span> <span class="s1">&#39;libx264&#39;</span><span class="p">])</span></div></div>
 
 
-<div class="viewcode-block" id="plot_2d"><a class="viewcode-back" href="../../Animation.html#supersolids.Animation.plot_2d">[docs]</a><span class="k">def</span> <span class="nf">plot_2d</span><span class="p">(</span><span class="n">resolution</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_2d"><a class="viewcode-back" href="../../autoapi/supersolids/Animation/index.html#supersolids.Animation.plot_2d">[docs]</a><span class="k">def</span> <span class="nf">plot_2d</span><span class="p">(</span><span class="n">resolution</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
             <span class="n">x_lim</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="n">y_lim</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="n">z_lim</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
@@ -735,14 +735,14 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
 
-<span class="k">def</span> <span class="nf">round_z_to_0</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e-5</span><span class="p">):</span>
+<div class="viewcode-block" id="round_z_to_0"><a class="viewcode-back" href="../../autoapi/supersolids/Animation/index.html#supersolids.Animation.round_z_to_0">[docs]</a><span class="k">def</span> <span class="nf">round_z_to_0</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e-5</span><span class="p">):</span>
     <span class="n">z</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
     <span class="n">z</span><span class="o">.</span><span class="n">real</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">real</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-    <span class="k">return</span> <span class="n">pos</span><span class="p">,</span> <span class="n">z</span>
+    <span class="k">return</span> <span class="n">pos</span><span class="p">,</span> <span class="n">z</span></div>
 
 
-<span class="k">def</span> <span class="nf">crop_pos_to_limits</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">func_val</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="crop_pos_to_limits"><a class="viewcode-back" href="../../autoapi/supersolids/Animation/index.html#supersolids.Animation.crop_pos_to_limits">[docs]</a><span class="k">def</span> <span class="nf">crop_pos_to_limits</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">func_val</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">x_lim</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()</span>
     <span class="n">y_lim</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
 
@@ -768,10 +768,10 @@
         <span class="c1"># Reshape is needed as func_val[xx_bol &amp; yy_bol] is a 1D array (flat)</span>
         <span class="n">z_cropped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">func_val</span><span class="p">[</span><span class="n">xx_bol</span> <span class="o">&amp;</span> <span class="n">yy_bol</span><span class="p">],</span> <span class="n">xx_cropped</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">pos_cropped</span><span class="p">,</span> <span class="n">z_cropped</span>
+    <span class="k">return</span> <span class="n">pos_cropped</span><span class="p">,</span> <span class="n">z_cropped</span></div>
 
 
-<span class="k">def</span> <span class="nf">get_V_plot_values</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">resolution</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">reserve</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+<div class="viewcode-block" id="get_V_plot_values"><a class="viewcode-back" href="../../autoapi/supersolids/Animation/index.html#supersolids.Animation.get_V_plot_values">[docs]</a><span class="k">def</span> <span class="nf">get_V_plot_values</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">resolution</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">reserve</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
     <span class="n">Z</span> <span class="o">=</span> <span class="n">V</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
     <span class="n">zlim</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_zlim</span><span class="p">()</span>
 
@@ -788,7 +788,7 @@
     <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">V_pos</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">get_meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
     <span class="n">V_plot_val</span> <span class="o">=</span> <span class="n">V</span><span class="p">(</span><span class="n">V_pos</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">V_pos</span><span class="p">,</span> <span class="n">V_plot_val</span>
+    <span class="k">return</span> <span class="n">V_pos</span><span class="p">,</span> <span class="n">V_plot_val</span></div>
 </pre></div>
 
            </div>

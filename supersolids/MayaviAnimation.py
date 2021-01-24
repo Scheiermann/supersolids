@@ -6,7 +6,7 @@
 # Please feel free to use and modify this, but keep the above information. Thanks!
 
 """
-Functions for Potential and initial wave function psi_0
+Functions for Potential and initial wave function :math:`\psi_0`
 
 """
 
@@ -96,11 +96,10 @@ def animate(System: Schroedinger.Schroedinger,
 
     accuracy : float
         Convergence is reached when relative error of mu is smaller
-        than accuracy, where mu is
-        System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+        than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
     plot_psi_sol :
-        Condition if psi_sol should be plotted.
+        Condition if :math:`\psi_sol` should be plotted.
 
     plot_V : bool
         Condition if V should be plotted.
@@ -117,17 +116,17 @@ def animate(System: Schroedinger.Schroedinger,
     slice_x_index : int
         Index of grid point in x direction (in terms of System.x)
         to produce a slice/plane in mayavi,
-        where psi_prob = |psi| ** 2 is used for the slice
+        where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice
 
     slice_y_index : int
         Index of grid point in y  (in terms of System.y) direction
         to produce a slice/plane in mayavi,
-        where psi_prob = |psi| ** 2 is used for the slice
+        where :math:`\psi_{prob} = |\psi|^2` is used for the slice
 
     slice_z_index : int
         Index of grid point in z  (in terms of System.z) direction
         to produce a slice/plane in mayavi,
-        where psi_prob = |psi| ** 2 is used for the slice
+        where :math:`\psi_{prob} = |\psi|^2` is used for the slice
 
     interactive : bool
         Condition for interactive mode. When camera functions are used,
@@ -220,7 +219,6 @@ def animate(System: Schroedinger.Schroedinger,
                       azimuth=camera_phi,
                       elevation=camera_z)
 
-
         # Initialize mu_rel
         mu_rel = System.mu
 
@@ -300,8 +298,10 @@ class MayaviAnimation:
                      filename: str = "anim.mp4",
                      delete_input: bool = True) -> None:
         """
-        Creates movie filename with all matching pictures from input_data_file_pattern.
-        By default deletes all input pictures after creation of movie to save disk space.
+        Creates movie filename with all matching pictures from
+        input_data_file_pattern.
+        By default deletes all input pictures after creation of movie
+        to save disk space.
 
         Parameters
 
@@ -315,7 +315,8 @@ class MayaviAnimation:
             Filename with filetype to save the movie to
 
         delete_input : bool
-            Condition if the input pictures should be deleted, after creation the creation of the animation as e.g. mp4
+            Condition if the input pictures should be deleted,
+            after creation the creation of the animation as e.g. mp4
 
         Returns
 

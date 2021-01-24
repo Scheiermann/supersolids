@@ -39,6 +39,11 @@ extensions = ["recommonmark",
               "sphinx_rtd_theme",
               ]
 
+# configure autoapi
+extensions.append('autoapi.extension')
+autoapi_type = 'python'
+autoapi_dirs = [sys.path[0]]
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 

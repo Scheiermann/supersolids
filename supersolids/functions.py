@@ -6,7 +6,7 @@
 # Please feel free to use and modify this, but keep the above information. Thanks!
 
 """
-Functions for Potential and initial wave function psi_0
+Functions for Potential and initial wave function :math:`\psi_0`
 
 """
 

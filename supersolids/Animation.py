@@ -110,7 +110,7 @@ class Animation:
                    y_min: float, y_max: float):
         """
         Sets the plot limits appropriate,
-        even if the initial wave function psi_0 is not normalized.
+        even if the initial wave function :math:`\psi_0` is not normalized.
 
         Parameters
 
@@ -141,7 +141,7 @@ class Animation:
                          System: Schroedinger.Schroedinger):
         """
         Sets the plot limits appropriate,
-        even if the initial wave function psi_0 is not normalized.
+        even if the initial wave function :math:`\psi_0` is not normalized.
 
         Parameters
 
@@ -228,7 +228,7 @@ class Animation:
                 ):
         """
         Sets the plot limits appropriate,
-        even if the initial wave function psi_0 is not normalized.
+        even if the initial wave function :math:`\psi_0` is not normalized.
 
         Parameters
 
@@ -240,11 +240,10 @@ class Animation:
 
         accuracy : float
             Convergence is reached when relative error of mu is smaller
-            than accuracy, where mu is
-            System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+            than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
         plot_psi_sol : bool
-            Condition if psi_sol should be plotted.
+            Condition if :math:`\psi_{sol}` should be plotted.
 
         plot_V : bool
             Condition if V should be plotted.
@@ -416,7 +415,7 @@ class Animation:
               ):
         """
         Sets the plot limits appropriate,
-        even if the initial wave function psi_0 is not normalized
+        even if the initial wave function :math:`\psi_0` is not normalized
 
         Parameters
 
@@ -426,14 +425,13 @@ class Animation:
 
         accuracy : float
             Convergence is reached when relative error of mu is smaller
-            than accuracy, where mu is
-            System.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+            than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
         System: Schroedinger, object
             Defines the Schroedinger equation for a given problem
 
         plot_psi_sol :
-            Condition if psi_sol should be plotted.
+            Condition if :math:`\psi_{sol}` should be plotted.
 
         plot_V : bool
             Condition if V should be plotted.
