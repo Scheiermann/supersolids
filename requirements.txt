@@ -2,7 +2,5 @@ sphinx-autoapi
 setuptools~=51.1.2
 psutil~=5.8.0
 numpy~=1.19.5
-mayavi~=4.7.3.dev0
 matplotlib~=3.3.3
-supersolids~=0.1.22
 scipy~=1.6.0
