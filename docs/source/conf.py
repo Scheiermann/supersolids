@@ -12,10 +12,9 @@
 #
 import os
 import sys
-from supersolids import __version__
-
 sys.path.insert(0, os.path.abspath("../../supersolids"))
 print("", sys.path[0], "", sep="\n" + "-" * 80 + "\n")
+
 
 # -- Project information -----------------------------------------------------
 
@@ -23,10 +22,8 @@ project = 'supersolids'
 copyright = '2021, Daniel Scheiermann'
 author = 'Daniel Scheiermann'
 
-# The short X.Y version.
-version = __version__
-# The full version, including alpha/beta/rc tags.
-release = version
+# The full version, including alpha/beta/rc tags
+release = "0.1.23.1"
 
 
 # -- General configuration ---------------------------------------------------
