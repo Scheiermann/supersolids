@@ -13,7 +13,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="supersolids",
-    version="0.1.23.1",
+    version="0.1.24",
     packages=["", "supersolids"],
     package_data={"supersolids": []},
     url="https://github.com/Scheiermann/supersolids",
