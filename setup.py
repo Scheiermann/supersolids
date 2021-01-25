@@ -27,7 +27,7 @@ setup(
                       "sphinx-rtd-theme",
                       "traits", "traitsui", "vtk"],
     # ext_modules=cythonize("*.pyx", language_level=3),
-    python_requires=">=3.8",
+    python_requires=">=3.7",
     description="simulate and animate supersolids.",
     long_description=long_description,
     long_description_content_type="text/markdown"
