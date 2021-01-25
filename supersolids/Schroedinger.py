@@ -328,7 +328,8 @@ class Schroedinger(object):
 
     def get_norm(self, p: float = 2.0) -> float:
         """
-        Calculates p-norm of :math:`\psi` for 1D, 2D or 3D.
+        Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D.
+        For p=2 it is the 2-norm.
 
         Parameters
 
@@ -338,7 +339,7 @@ class Schroedinger(object):
         Returns
 
         psi_norm : float
-            p-norm of :math:`\psi`
+            p-norm of :math:`\int |\psi|^p \\mathrm{dV}`
         """
 
         if self.dim == 1:
