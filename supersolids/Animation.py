@@ -174,26 +174,19 @@ class Animation:
         psi_abs = np.abs(System.psi_val)
         psi_prob = psi_abs ** 2
 
+        # No Assignment expressions for versions < python3.8
+        # (readthedocs can't parse them)
+
         # checks if the initial wave function is normalized,
         # if not it ensures to display the whole function
-        if sys.version_info >= (3, 8):
-            # Assignment expressions (python3.8) to shortcut calculations
-            if (psi_prob_max := psi_prob.max()) < (psi_abs_max := psi_abs.max()):
-                y_min = psi_abs.min()
-                y_max = psi_abs_max
-            else:
-                y_min = psi_prob.min()
-                y_max = psi_prob_max
+        psi_prob_max = psi_prob.max()
+        psi_abs_max = psi_abs.max()
+        if psi_prob_max < psi_abs_max:
+            y_min = psi_abs.min()
+            y_max = psi_abs_max
         else:
-            # No Assignment expressions for versions < python3.8
-            psi_prob_max = psi_prob.max()
-            psi_abs_max = psi_abs.max()
-            if psi_prob_max < psi_abs_max:
-                y_min = psi_abs.min()
-                y_max = psi_abs_max
-            else:
-                y_min = psi_prob.min()
-                y_max = psi_prob_max
+            y_min = psi_prob.min()
+            y_max = psi_prob_max
 
         self.set_limits(row, col, x_min, x_max, y_min, y_max)
 
