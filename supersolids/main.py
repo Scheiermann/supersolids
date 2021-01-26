@@ -221,20 +221,21 @@ def simulate_case(box: NamedTuple,
         # if Harmonic.t >= Harmonic.dt * Harmonic.max_timesteps:
         #     mlab.close()
         cut_x = np.linspace(Harmonic.box.x0, Harmonic.box.x1, Harmonic.res.x)
+        cut_y = np.linspace(Harmonic.box.y0, Harmonic.box.y1, Harmonic.res.y)
         cut_z = np.linspace(Harmonic.box.z0, Harmonic.box.z1, Harmonic.res.z)
-        prob_mitte_x = np.abs(Harmonic.psi_val[:]
-                              [Harmonic.res.y // 2]
-                              [Harmonic.res.z // 2]) ** 2.0
-        prob_mitte_z = np.abs(Harmonic.psi_val[Harmonic.res.x // 2]
-                                              [Harmonic.res.y // 2][:]) ** 2.0
+
+        prob_mitte_x = np.abs(Harmonic.psi_val[:, Harmonic.res.y // 2, Harmonic.res.z // 2]) ** 2.0
+        prob_mitte_y = np.abs(Harmonic.psi_val[Harmonic.res.x // 2, :, Harmonic.res.z // 2]) ** 2.0
+        prob_mitte_z = np.abs(Harmonic.psi_val[Harmonic.res.x // 2, Harmonic.res.y // 2, :]) ** 2.0
 
         plt.plot(cut_x, prob_mitte_x, "x-", color="tab:blue", label="x cut")
-        plt.plot(cut_z, prob_mitte_z, "--", color="tab:orange", label="z cut")
-        plt.plot(cut_x, psi_sol_3d_cut_x(cut_x), ".-", color="tab:cyan",
+        plt.plot(cut_y, prob_mitte_y, "x-", color="tab:grey", label="y cut")
+        plt.plot(cut_z, prob_mitte_z, "x-", color="tab:orange", label="z cut")
+        plt.plot(cut_x, psi_sol_3d_cut_x(cut_x), "x-", color="tab:cyan",
                  label="x cut sol")
-        plt.plot(cut_z, psi_sol_3d_cut_z(z=cut_z), "o-", color="tab:olive",
+        plt.plot(cut_z, psi_sol_3d_cut_z(z=cut_z), "x-", color="tab:olive",
                  label="z cut sol")
-        plt.ylim([0.0, 0.01])
+        plt.ylim([0.0, 0.005])
         plt.legend()
         plt.grid()
         plt.show()
@@ -254,27 +255,36 @@ if __name__ == "__main__":
 
     # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
-    res = functions.Resolution(x=2 ** 6, y=2 ** 6, z=2 ** 6)
+    res = functions.Resolution(x=2 ** 8, y=2 ** 8, z=2 ** 6)
 
-    box = functions.Box(x0=-12.0, x1=12.0,
-                        y0=-12.0, y1=12.0,
-                        z0=-3.0, z1=3.0)
+    box = functions.Box(x0=-15, x1=15,
+                        y0=-15, y1=15,
+                        z0=-7, z1=7)
 
-    dt: float = 0.02
-    N: int = 10 ** 5
+    dt: float = 2 * 10 ** -3 # 0.001
+    N: int = 3.8 * 10 ** 4 # 38000
     m: float = 164.0 * constants.u_in_kg
     a_dd: float = 130.0 * constants.a_0
-    a_s: float = (130.0 / 0.8) * constants.a_0
+    a_s: float = 85.0 * constants.a_0
 
     w_x: float = 2.0 * np.pi * 30.0
-    w_y: float = w_x
-    w_z: float = 2.0 * np.pi * 140.0
+    w_y: float = 2.0 * np.pi * 60.0
+    w_z: float = 2.0 * np.pi * 160.0
 
     alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
     g, g_qf, e_dd, a_s_l_ho_ratio = functions.get_parameters(
         N=N, m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
     print(f"g, g_qf, epsilon_dd, alpha_y, alpha_z: "
           f"{g, g_qf, e_dd, alpha_y, alpha_z}")
+
+    # psi_sol_3d = functions.thomas_fermi_3d
+    kappa = functions.get_kappa(alpha_z=alpha_z, e_dd=e_dd,
+                                x_min=0.1, x_max=5.0, res=1000)
+    R_r, R_z = functions.get_R_rz(kappa=kappa, e_dd=e_dd, N=N,
+                                  a_s_l_ho_ratio=a_s_l_ho_ratio)
+    psi_sol_3d = functools.partial(functions.density_in_trap,
+                                   R_r=R_r, R_z=R_z)
+    print(f"kappa: {kappa}, R_r: {R_r}, R_z: {R_z}")
 
     # functions needed for the Schroedinger equation (e.g. potential: V,
     # initial wave function: psi_0)
@@ -287,7 +297,7 @@ if __name__ == "__main__":
 
     box_length = [(box.x1 - box.x0), (box.y1 - box.y0), (box.z1 - box.z0)]
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
-                                 R=1000 * min(box_length) / 2.0)
+                                 r_cut=1.0 * min(box_length) / 2.0)
 
     # functools.partial sets all arguments except x, y, z,
     # as multiple arguments for Schroedinger aren't implement yet
@@ -302,13 +312,14 @@ if __name__ == "__main__":
 
     psi_0_3d = functools.partial(
         functions.psi_gauss_3d,
-        a_x=4.0,
+        a_x=8.0,
         a_y=4.0,
-        a_z=4.0,
+        a_z=2.0,
         x_0=0.0,
         y_0=0.0,
         z_0=0.0,
         k_0=0.0)
+    # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
 
     psi_0_noise_3d = functions.noise_mesh(
         min=0.8, max=1.4, shape=(res.x, res.y, res.z))
@@ -317,15 +328,6 @@ if __name__ == "__main__":
     # of Schroedinger for convenience)
     psi_sol_1d = functions.thomas_fermi_1d
     psi_sol_2d = functions.thomas_fermi_2d_pos
-
-    # psi_sol_3d = functions.thomas_fermi_3d
-    kappa = functions.get_kappa(alpha_z=alpha_z, e_dd=e_dd,
-                                x_min=3.0, x_max=5.0, res=1000)
-    R_r, R_z = functions.get_R_rz(kappa=kappa, e_dd=e_dd, N=N,
-                                  a_s_l_ho_ratio=a_s_l_ho_ratio)
-    psi_sol_3d = functools.partial(functions.density_in_trap,
-                                   R_r=R_r, R_z=R_z)
-    print(f"kappa: {kappa}, R_r: {R_r}, R_z: {R_z}")
 
     psi_sol_3d_cut_x = functools.partial(functions.density_in_trap,
                                          y=0, z=0, R_r=R_r, R_z=R_z)
@@ -337,7 +339,7 @@ if __name__ == "__main__":
     # 3D works in single core mode
     simulate_case(box,
                   res,
-                  max_timesteps=101,
+                  max_timesteps=2001,
                   dt=dt,
                   g=g,
                   g_qf=g_qf,
@@ -350,7 +352,7 @@ if __name__ == "__main__":
                   V_interaction=V_3d_ddi,
                   psi_sol=psi_sol_3d,
                   mu_sol=functions.mu_3d,
-                  plot_psi_sol=True,
+                  plot_psi_sol=False,
                   psi_sol_3d_cut_x=psi_sol_3d_cut_x,
                   psi_sol_3d_cut_z=psi_sol_3d_cut_z,
                   plot_V=False,
@@ -358,7 +360,7 @@ if __name__ == "__main__":
                   alpha_psi=0.8,
                   alpha_psi_sol=0.5,
                   alpha_V=0.3,
-                  accuracy=10 ** -7,
+                  accuracy=10 ** -8,
                   filename="anim.mp4",
                   x_lim=(-2.0, 2.0),
                   y_lim=(-2.0, 2.0),

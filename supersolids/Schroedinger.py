@@ -15,6 +15,7 @@ import sys
 from typing import Callable, Dict, Union, Optional, NamedTuple
 
 import numpy as np
+import scipy
 
 from supersolids import functions
 
@@ -125,7 +126,7 @@ class Schroedinger(object):
             self.mu_sol: Callable = mu_sol(self.g)
 
         try:
-            box_x_len = (box.x1 - box.x0)
+            box_x_len = (self.box.x1 - self.box.x0)
             self.x: np.ndarray = np.linspace(self.box.x0, self.box.x1,
                                              self.res.x)
             self.dx: float = (box_x_len / self.res.x)
@@ -151,7 +152,7 @@ class Schroedinger(object):
         # besides the error are needed)
         if self.dim >= 2:
             try:
-                box_y_len = box.y1 - box.y0
+                box_y_len = self.box.y1 - self.box.y0
                 self.y: np.ndarray = np.linspace(self.box.y0,
                                                  self.box.y1,
                                                  self.res.y)
@@ -277,14 +278,9 @@ class Schroedinger(object):
                                                 self.y_mesh,
                                                 self.z_mesh)
 
-            kx_mesh, ky_mesh, kz_mesh = np.mgrid[
-                                        self.kx[0]:self.kx[-1]:
-                                        complex(0, self.res.x),
-                                        self.ky[0]:self.ky[-1]:
-                                        complex(0, self.res.y),
-                                        self.kz[0]:self.kz[-1]:
-                                        complex(0, self.res.z)
-                                        ]
+            kx_mesh, ky_mesh, kz_mesh, _ = functions.get_meshgrid_3d(self.kx,
+                                                                     self.ky,
+                                                                     self.kz)
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
 
             # here a number (U) is multiplied elementwise with an (1D, 2D or
@@ -354,6 +350,37 @@ class Schroedinger(object):
         psi_norm: float = np.sum(self.get_density(p=p)) * dV
 
         return psi_norm
+
+
+    def get_norm_simpson(self, func_val: Callable) -> float:
+        # Gauss Chebyshev integral calculation
+        # x_nodes, w_weights = np.polynomial.chebyshev.chebgauss(100)
+        if self.dim == 1:
+            sol_1d_int = scipy.integrate.simpson(func_val, x=self.y)
+
+            return sol_1d_int
+
+        elif self.dim == 2:
+            single_integrals = np.empty(self.res.y)
+            for i in single_integrals:
+                psi_val_1d_slice = func_val[:, i, self.res.z//2]
+                single_integrals[i] = scipy.integrate.simpson(psi_val_1d_slice, x=self.y)
+
+            return np.sum(single_integrals)
+
+        elif self.dim == 3:
+            single_integrals = np.empty(shape=(self.res.y, self.res.z))
+            for i in single_integrals[0]:
+                for j in single_integrals.shape[1]:
+                    psi_val_1d_slice = func_val[:, i, j]
+                    single_integrals[i, j] = scipy.integrate.simpson(psi_val_1d_slice, x=self.y)
+
+            return np.sum(single_integrals)
+
+        else:
+            print(f"Not implemented yet.")
+
+            pass
 
     def time_step(self) -> None:
         # Here we use half steps in real space, but will use it before and

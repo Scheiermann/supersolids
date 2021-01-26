@@ -19,12 +19,12 @@ from supersolids import functions
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    N: int = 4 * 10 ** 4
+    N: int = 10 ** 5
     m: float = 164.0 * constants.u_in_kg
 
     w_x: float = 2.0 * np.pi * 30.0
     w_y: float = w_x
-    w_z: float = 2.0 * np.pi * 140.0
+    w_z: float = 2.0 * np.pi * 30.0
 
     alpha_z: float = w_z / w_x
 
@@ -39,8 +39,8 @@ if __name__ == "__main__":
 
     y = functions.func_125(kappa, alpha_z, e_dd)
     plt.plot(kappa, y, "x-")
-    plt.xlim([0.0, 5.0])
-    plt.ylim([-10.0, 20.0])
+    plt.xlim([0.0, 1.0])
+    plt.ylim([-1.0, 1.0])
     plt.grid()
     plt.show()
     kappa_root = min(kappa[y >= 0.0]) if y[-1] > 0 else min(kappa[y <= 0.0])

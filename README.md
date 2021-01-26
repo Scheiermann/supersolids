@@ -19,15 +19,11 @@ pip install vtk-9.0.20210105-cp39-cp39-linux_x86_64.whl
 Then install mayavi (pip install mayavi or also build it from source, as there could be incapabilities with vtk9).  
 
 ### Arch based systems  
-For **python3.9** follow the instructions above, then continue with (else do the following):  
-Go to the directory, where you build your AUR packages.  
-Run the following in console:  
-"mkdir python-supersolids"  
-"cd python-supersolids"  
-Download the PKGBUILD and place it there.  
-Run "makepkg -sic" in console, where the PKGBUILD lies.  
-This downloads the packages, extract it, gets the dependencies and installs it automatically  
-(you can do it manually for example with "sudo pacman -U python-supersolids-0.1.15-1-any.pkg.tar.zst")  
+It is provided in the AUR under https://aur.archlinux.org/python-supersolids.git  
+For **python3.9** follow the instructions above,
+then remove mayavi from the dependencies and run "makepkg -sic".  
+For **python3.8** the remove the dependecies in the PKGBUILD and uncomment
+the pip install lines instead.
 
 ### With pip  
 For **python3.9** follow the instructions above, then continue with (else do the following):  

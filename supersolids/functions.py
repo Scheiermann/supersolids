@@ -410,8 +410,8 @@ def v_harmonic_3d(x, y, z, alpha_y: float = 1.0, alpha_z: float = 1.0):
     return 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2)
 
 
-def get_r_cut(k_mesh: np.ndarray, R: float = 1.0):
-    kr_singular = k_mesh * R
+def get_r_cut(k_mesh: np.ndarray, r_cut: float = 1.0):
+    kr_singular = k_mesh * r_cut
     kr = np.where(kr_singular == 0.0, 10 ** -8, kr_singular)
 
     r_cut = (1.0
@@ -425,7 +425,7 @@ def get_r_cut(k_mesh: np.ndarray, R: float = 1.0):
 def dipol_dipol_interaction(kx_mesh: float,
                             ky_mesh: float,
                             kz_mesh: float,
-                            R: float = 1.0):
+                            r_cut: float = 1.0):
     k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
     factor = 3.0 * (kz_mesh ** 2.0)
     # for [0, 0, 0] there is a singularity and factor/k_squared is 0/0, so we
@@ -433,7 +433,7 @@ def dipol_dipol_interaction(kx_mesh: float,
     k_squared_singular_free = np.where(k_squared == 0.0, 1.0, k_squared)
 
     k_mesh: np.ndarray = np.sqrt(k_squared)
-    r_cut: np.ndarray = get_r_cut(k_mesh, R=R)
+    r_cut: np.ndarray = get_r_cut(k_mesh, r_cut=r_cut)
 
     r_cut[np.isnan(r_cut)] = 0.0
 
@@ -445,28 +445,28 @@ def dipol_dipol_interaction(kx_mesh: float,
     return V_k_val
 
 
-def f_kappa(kappa: np.ndarray) -> float:
-    k2_1 = (kappa ** 2.0 - 1.0)
+def f_kappa(kappa: np.ndarray, epsilon: float = 10 ** -10) -> float:
+    k2_1 = (kappa ** 2.0 - 1.0 + epsilon)
+    result = ((2.0 * kappa ** 2.0 + 1.0) - (3.0 * kappa ** 2.0) * atan_special(k2_1)) / k2_1
 
-    a = (2.0 * kappa ** 2.0 + 1.0) / k2_1
-    if type(kappa) == np.ndarray:
-        k2_1[k2_1 < 0.0] = 1.0
-    else:
-        k2_1 = 1.0 if k2_1 < 0.0 else k2_1
-
-    b = - (3.0 * kappa ** 2.0) / (k2_1 ** (3.0 / 2.0))
-    atan = np.arctan(np.sqrt(k2_1))
-    result = a + b * atan
-    # when f_kappa would be complex, we replace with 0.0
-    if type(kappa) == np.ndarray:
-        result[k2_1 < 0.0] = 0.0
     return result
 
 
-def func_125(kappa: float, alpha_z: float, e_dd: float):
-    k2_1 = (kappa ** 2.0 - 1.0)
-    a = 3.0 * kappa * ((alpha_z ** 2.0 / 2.0 + 1.0)
-                       * (f_kappa(kappa) / k2_1) - 1.0)
+@np.vectorize
+def atan_special(x):
+    if x > 0:
+        result = np.arctan(np.sqrt(x)) / np.sqrt(x)
+    elif x == 0:
+       result = 0.0
+    else:
+        result = np.arctanh(np.sqrt(-x)) / np.sqrt(-x)
+
+    return result
+
+
+def func_125(kappa: float, alpha_z: float, e_dd: float, epsilon: float = 10 ** -10):
+    k2_1 = (kappa ** 2.0 - 1.0 + epsilon)
+    a = 3.0 * kappa * e_dd * ((alpha_z ** 2.0 / 2.0 + 1.0) * (f_kappa(kappa) / k2_1) - 1.0)
     b = (e_dd - 1.0) * (kappa ** 2.0 - alpha_z ** 2.0)
     return a + b
 

@@ -1,0 +1,22 @@
+:mod:`supersolids`
+==================
+
+.. py:module:: supersolids
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   Animation/index.rst
+   MayaviAnimation/index.rst
+   Schroedinger/index.rst
+   constants/index.rst
+   density_in_trap/index.rst
+   functions/index.rst
+   main/index.rst
+   run_time/index.rst
+
+

@@ -229,7 +229,6 @@ def animate(System: Schroedinger.Schroedinger,
             System.time_step()
 
             mu_rel = np.abs((System.mu - mu_old) / System.mu)
-            print(f"mu_rel: {mu_rel}")
 
             # Stop animation when accuracy is reached
             if mu_rel < accuracy:
