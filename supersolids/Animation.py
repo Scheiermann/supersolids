@@ -164,11 +164,11 @@ class Animation:
                                         f"and Schroedinger.dim is {System.dim}")
 
         try:
-            x_min = System.box["x0"]
-            x_max = System.box["x1"]
+            x_min = System.Box["x0"]
+            x_max = System.Box["x1"]
         except KeyError:
             sys.exit(f"Keys x0, x1 of box needed, "
-                     f"but it has the keys: {System.box.keys()}.")
+                     f"but it has the keys: {System.Box.keys()}.")
 
         # Save calculations in variable to shortcut repeated calculations
         psi_abs = np.abs(System.psi_val)
@@ -202,7 +202,7 @@ class Animation:
 
             V_pos = np.linspace(range_in_box[0],
                                 range_in_box[-1],
-                                System.res["x"])
+                                System.Res["x"])
             V_plot_val = System.V(V_pos)
 
         elif System.dim == 2:
@@ -215,10 +215,10 @@ class Animation:
 
             x = np.linspace(range_in_box[:, 0].min(),
                             range_in_box[:, 0].max(),
-                            System.res["x"])
+                            System.Res["x"])
             y = np.linspace(range_in_box[:, 1].min(),
                             range_in_box[:, 1].max(),
-                            System.res["y"])
+                            System.Res["y"])
             _, _, V_pos = functions.get_meshgrid(x, y)
             V_plot_val = System.V(V_pos)
 

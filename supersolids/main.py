@@ -26,9 +26,9 @@ if __name__ == "__main__":
 
     # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
-    res = functions.Resolution(x=2 ** 8, y=2 ** 8, z=2 ** 6)
+    Res = functions.Resolution(x=2 ** 8, y=2 ** 8, z=2 ** 6)
 
-    box = functions.Box(x0=-15, x1=15,
+    Box = functions.Box(x0=-15, x1=15,
                         y0=-15, y1=15,
                         z0=-7, z1=7)
 
@@ -66,9 +66,8 @@ if __name__ == "__main__":
         alpha_y=alpha_y,
         alpha_z=alpha_z)
 
-    box_length = [(box.x1 - box.x0), (box.y1 - box.y0), (box.z1 - box.z0)]
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
-                                 r_cut=1.0 * min(box_length) / 2.0)
+                                 r_cut=1.0 * Box.min_length() / 2.0)
 
     # functools.partial sets all arguments except x, y, z,
     # psi_0_1d = functools.partial(
@@ -92,7 +91,7 @@ if __name__ == "__main__":
     # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
 
     psi_0_noise_3d = functions.noise_mesh(
-        min=0.8, max=1.4, shape=(res.x, res.y, res.z))
+        min=0.8, max=1.4, shape=(Res.x, Res.y, Res.z))
 
     # Used to remember that 2D need the special pos function (g is set inside
     # of Schroedinger for convenience)
@@ -107,8 +106,8 @@ if __name__ == "__main__":
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    simulate_case.simulate_case(box,
-                                res,
+    simulate_case.simulate_case(Box,
+                                Res,
                                 max_timesteps=2001,
                                 dt=dt,
                                 g=g,
@@ -135,9 +134,9 @@ if __name__ == "__main__":
                                 x_lim=(-2.0, 2.0),
                                 y_lim=(-2.0, 2.0),
                                 z_lim=(0, 0.5),
-                                slice_x_index=int(res.x / 8),
-                                slice_y_index=int(res.y / 8),
-                                slice_z_index=int(res.z / 2),
+                                slice_x_index=int(Res.x / 8),
+                                slice_y_index=int(Res.y / 8),
+                                slice_z_index=int(Res.z / 2),
                                 interactive=True,
                                 camera_r_func=functools.partial(
                                     functions.camera_func_r,

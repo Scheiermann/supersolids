@@ -361,8 +361,8 @@ if __name__ == "__main__":
                                                  resolution["y"],
                                                  resolution["z"]))
 
-    Harmonic = Schroedinger.Schroedinger(box=box,
-                                         res=resolution,
+    Harmonic = Schroedinger.Schroedinger(Box=box,
+                                         Res=resolution,
                                          max_timesteps=101,
                                          dt=1.0,
                                          g=1.0,

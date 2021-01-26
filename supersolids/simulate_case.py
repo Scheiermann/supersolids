@@ -25,8 +25,8 @@ from supersolids import run_time
 from supersolids import Schroedinger
 
 
-def simulate_case(box: NamedTuple,
-                  res: NamedTuple,
+def simulate_case(Box: functions.Box,
+                  Res: functions.Resolution,
                   max_timesteps: int,
                   dt: float,
                   g: float = 0.0,
@@ -148,8 +148,8 @@ def simulate_case(box: NamedTuple,
     Returns
 
     """
-    Harmonic = Schroedinger.Schroedinger(box,
-                                         res,
+    Harmonic = Schroedinger.Schroedinger(Box,
+                                         Res,
                                          max_timesteps,
                                          dt,
                                          g=g,
@@ -217,13 +217,13 @@ def simulate_case(box: NamedTuple,
         # if Harmonic.t >= Harmonic.dt * Harmonic.max_timesteps:
         #     mlab.close()
 
-        cut_x = np.linspace(Harmonic.box.x0, Harmonic.box.x1, Harmonic.res.x)
-        cut_y = np.linspace(Harmonic.box.y0, Harmonic.box.y1, Harmonic.res.y)
-        cut_z = np.linspace(Harmonic.box.z0, Harmonic.box.z1, Harmonic.res.z)
+        cut_x = np.linspace(Harmonic.Box.x0, Harmonic.Box.x1, Harmonic.Res.x)
+        cut_y = np.linspace(Harmonic.Box.y0, Harmonic.Box.y1, Harmonic.Res.y)
+        cut_z = np.linspace(Harmonic.Box.z0, Harmonic.Box.z1, Harmonic.Res.z)
 
-        prob_mitte_x = np.abs(Harmonic.psi_val[:, Harmonic.res.y // 2, Harmonic.res.z // 2]) ** 2.0
-        prob_mitte_y = np.abs(Harmonic.psi_val[Harmonic.res.x // 2, :, Harmonic.res.z // 2]) ** 2.0
-        prob_mitte_z = np.abs(Harmonic.psi_val[Harmonic.res.x // 2, Harmonic.res.y // 2, :]) ** 2.0
+        prob_mitte_x = np.abs(Harmonic.psi_val[:, Harmonic.Res.y // 2, Harmonic.Res.z // 2]) ** 2.0
+        prob_mitte_y = np.abs(Harmonic.psi_val[Harmonic.Res.x // 2, :, Harmonic.Res.z // 2]) ** 2.0
+        prob_mitte_z = np.abs(Harmonic.psi_val[Harmonic.Res.x // 2, Harmonic.Res.y // 2, :]) ** 2.0
 
         plt.plot(cut_x, prob_mitte_x, "x-", color="tab:blue", label="x cut")
         plt.plot(cut_y, prob_mitte_y, "x-", color="tab:grey", label="y cut")

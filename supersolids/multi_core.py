@@ -31,11 +31,11 @@ if __name__ == "__main__":
 
     # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
-    res = functions.Resolution(x=2 ** 8, y=2 ** 8, z=2 ** 6)
+    Res = functions.Resolution(x=2 ** 6, y=2 ** 6, z=None)
 
-    box = functions.Box(x0=-15, x1=15,
+    Box = functions.Box(x0=-15, x1=15,
                         y0=-15, y1=15,
-                        z0=-7, z1=7)
+                        z0=None, z1=None)
 
     dt: float = 2 * 10 ** -2 # 0.001
     N: int = 3.8 * 10 ** 4 # 38000
@@ -71,9 +71,8 @@ if __name__ == "__main__":
         alpha_y=alpha_y,
         alpha_z=alpha_z)
 
-    box_length = [(box.x1 - box.x0), (box.y1 - box.y0), (box.z1 - box.z0)]
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
-                                 r_cut=1.0 * min(box_length) / 2.0)
+                                 r_cut=1.0 * Box.min_length() / 2.0)
 
     # functools.partial sets all arguments except x, y, z,
     # as multiple arguments for Schroedinger aren't implement yet
@@ -97,8 +96,8 @@ if __name__ == "__main__":
         k_0=0.0)
     # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
 
-    psi_0_noise_3d = functions.noise_mesh(
-        min=0.8, max=1.4, shape=(res.x, res.y, res.z))
+    # psi_0_noise_3d = functions.noise_mesh(
+    #     min=0.8, max=1.4, shape=(Res.x, Res.y, Res.z))
 
     # Used to remember that 2D need the special pos function (g is set inside
     # of Schroedinger for convenience)
@@ -131,8 +130,8 @@ if __name__ == "__main__":
             print(f"i={i}, L={L}, g={g}, dt={dt}")
             file_name = f"split_{i:03}.mp4"
             executor.submit(simulate_case,
-                            box,
-                            res,
+                            Box,
+                            Res,
                             max_timesteps=2001,
                             dt=dt,
                             g=g,
@@ -141,16 +140,16 @@ if __name__ == "__main__":
                             imag_time=True,
                             mu=1.1,
                             E=1.0,
-                            psi_0=psi_0_3d,
-                            V=V_3d,
-                            V_interaction=V_3d_ddi,
-                            psi_sol=psi_sol_3d,
-                            mu_sol=functions.mu_3d,
+                            psi_0=psi_0_2d,
+                            V=V_2d,
+                            V_interaction=None,
+                            psi_sol=psi_sol_2d,
+                            mu_sol=functions.mu_2d,
                             plot_psi_sol=False,
                             psi_sol_3d_cut_x=psi_sol_3d_cut_x,
                             psi_sol_3d_cut_z=psi_sol_3d_cut_z,
                             plot_V=False,
-                            psi_0_noise=psi_0_noise_3d,
+                            psi_0_noise=None,
                             alpha_psi=0.8,
                             alpha_psi_sol=0.5,
                             alpha_V=0.3,
@@ -159,9 +158,9 @@ if __name__ == "__main__":
                             x_lim=(-2.0, 2.0),
                             y_lim=(-2.0, 2.0),
                             z_lim=(0, 0.5),
-                            slice_x_index=int(res.x / 8),
-                            slice_y_index=int(res.y / 8),
-                            slice_z_index=int(res.z / 2),
+                            slice_x_index=int(Res.x / 8),
+                            slice_y_index=int(Res.y / 8),
+                            slice_z_index=0,
                             interactive=True,
                             camera_r_func=functools.partial(
                                 functions.camera_func_r,
