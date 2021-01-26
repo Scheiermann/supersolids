@@ -11,7 +11,9 @@ time-dependent Schrodinger equation.
 
 """
 
+import itertools
 import functools
+from concurrent import futures
 import psutil
 
 import numpy as np
@@ -22,7 +24,10 @@ from supersolids import simulate_case
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    # Define constants (needed for the Schroedinger equation)
+    # for parallelization (use all cores)
+    max_workers = psutil.cpu_count(logical=False)
+
+    # constants needed for the Schroedinger equation
 
     # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
@@ -57,8 +62,8 @@ if __name__ == "__main__":
                                    R_r=R_r, R_z=R_z)
     print(f"kappa: {kappa}, R_r: {R_r}, R_z: {R_z}")
 
-    # Define functions (needed for the Schroedinger equation)
-    # (e.g. potential: V, initial wave function: psi_0)
+    # functions needed for the Schroedinger equation (e.g. potential: V,
+    # initial wave function: psi_0)
     V_1d = functions.v_harmonic_1d
     V_2d = functools.partial(functions.v_harmonic_2d, alpha_y=alpha_y)
     V_3d = functools.partial(
@@ -71,6 +76,7 @@ if __name__ == "__main__":
                                  r_cut=1.0 * min(box_length) / 2.0)
 
     # functools.partial sets all arguments except x, y, z,
+    # as multiple arguments for Schroedinger aren't implement yet
     # psi_0_1d = functools.partial(
     #     functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
     psi_0_1d = functools.partial(
@@ -105,49 +111,71 @@ if __name__ == "__main__":
     psi_sol_3d_cut_z = functools.partial(functions.density_in_trap,
                                          x=0, y=0, R_r=R_r, R_z=R_z)
 
-    # TODO: get mayavi lim to work
-    # 3D works in single core mode
-    simulate_case.simulate_case(box,
-                                res,
-                                max_timesteps=2001,
-                                dt=dt,
-                                g=g,
-                                g_qf=g_qf,
-                                e_dd=e_dd,
-                                imag_time=True,
-                                mu=1.1,
-                                E=1.0,
-                                psi_0=psi_0_3d,
-                                V=V_3d,
-                                V_interaction=V_3d_ddi,
-                                psi_sol=psi_sol_3d,
-                                mu_sol=functions.mu_3d,
-                                plot_psi_sol=False,
-                                psi_sol_3d_cut_x=psi_sol_3d_cut_x,
-                                psi_sol_3d_cut_z=psi_sol_3d_cut_z,
-                                plot_V=False,
-                                psi_0_noise=psi_0_noise_3d,
-                                alpha_psi=0.8,
-                                alpha_psi_sol=0.5,
-                                alpha_V=0.3,
-                                accuracy=10 ** -8,
-                                filename="anim.mp4",
-                                x_lim=(-2.0, 2.0),
-                                y_lim=(-2.0, 2.0),
-                                z_lim=(0, 0.5),
-                                slice_x_index=int(res.x / 8),
-                                slice_y_index=int(res.y / 8),
-                                slice_z_index=int(res.z / 2),
-                                interactive=True,
-                                camera_r_func=functools.partial(
-                                    functions.camera_func_r,
-                                    r_0=40.0, phi_0=45.0, z_0=50.0, r_per_frame=0.0),
-                                camera_phi_func=functools.partial(
-                                    functions.camera_func_phi,
-                                    r_0=40.0, phi_0=45.0, z_0=50.0, phi_per_frame=5.0),
-                                camera_z_func=functools.partial(
-                                    functions.camera_func_z,
-                                    r_0=40.0, phi_0=45.0, z_0=50.0, z_per_frame=0.0),
-                                delete_input=False
-                                )
-    print("Single core done")
+    # TODO: As g is proportional to N * a_s/w_x,
+    # changing g, V, g_qf are different (maybe other variables too)
+    # Multi-core: multiple cases (Schroedinger with different parameters)
+    # box length in 1D: [-L,L], in 2D: [-L,L, -L,L], in 3D: [-L,L, -L,L, -L,L]
+    # generators for L, g, dt to compute for different parameters
+    g_step = 10
+    L_generator = (4,)
+    g_generator = (i for i in np.arange(g, g + g_step, g_step))
+    factors = np.linspace(0.2, 0.3, max_workers)
+    dt_generator = (i * dt for i in factors)
+    cases = itertools.product(L_generator, g_generator, dt_generator)
+
+    # TODO: get mayavi concurrent to work (problem with mlab.figure())
+    i: int = 0
+    with futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
+        for L, g, dt in cases:
+            i = i + 1
+            print(f"i={i}, L={L}, g={g}, dt={dt}")
+            file_name = f"split_{i:03}.mp4"
+            executor.submit(simulate_case,
+                            box,
+                            res,
+                            max_timesteps=2001,
+                            dt=dt,
+                            g=g,
+                            g_qf=g_qf,
+                            e_dd=e_dd,
+                            imag_time=True,
+                            mu=1.1,
+                            E=1.0,
+                            psi_0=psi_0_3d,
+                            V=V_3d,
+                            V_interaction=V_3d_ddi,
+                            psi_sol=psi_sol_3d,
+                            mu_sol=functions.mu_3d,
+                            plot_psi_sol=False,
+                            psi_sol_3d_cut_x=psi_sol_3d_cut_x,
+                            psi_sol_3d_cut_z=psi_sol_3d_cut_z,
+                            plot_V=False,
+                            psi_0_noise=psi_0_noise_3d,
+                            alpha_psi=0.8,
+                            alpha_psi_sol=0.5,
+                            alpha_V=0.3,
+                            accuracy=10 ** -8,
+                            filename="anim.mp4",
+                            x_lim=(-2.0, 2.0),
+                            y_lim=(-2.0, 2.0),
+                            z_lim=(0, 0.5),
+                            slice_x_index=int(res.x / 8),
+                            slice_y_index=int(res.y / 8),
+                            slice_z_index=int(res.z / 2),
+                            interactive=True,
+                            camera_r_func=functools.partial(
+                                functions.camera_func_r,
+                                r_0=40.0, phi_0=45.0, z_0=50.0,
+                                r_per_frame=0.0),
+                            camera_phi_func=functools.partial(
+                                functions.camera_func_phi,
+                                r_0=40.0, phi_0=45.0, z_0=50.0,
+                                phi_per_frame=5.0),
+                            camera_z_func=functools.partial(
+                                functions.camera_func_z,
+                                r_0=40.0, phi_0=45.0, z_0=50.0,
+                                z_per_frame=0.0),
+                            delete_input=False
+                            )
+    print("Multi core done")
+
