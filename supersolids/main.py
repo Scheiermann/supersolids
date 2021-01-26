@@ -152,26 +152,25 @@ def simulate_case(box: NamedTuple,
     Returns
 
     """
-    with run_time.run_time():
-        Harmonic = Schroedinger.Schroedinger(box,
-                                             res,
-                                             max_timesteps,
-                                             dt,
-                                             g=g,
-                                             g_qf=g_qf,
-                                             e_dd=e_dd,
-                                             imag_time=imag_time,
-                                             mu=mu, E=E,
-                                             psi_0=psi_0,
-                                             V=V,
-                                             V_interaction=V_interaction,
-                                             psi_sol=psi_sol,
-                                             mu_sol=mu_sol,
-                                             psi_0_noise=psi_0_noise,
-                                             alpha_psi=alpha_psi,
-                                             alpha_psi_sol=alpha_psi_sol,
-                                             alpha_V=alpha_V
-                                             )
+    Harmonic = Schroedinger.Schroedinger(box,
+                                         res,
+                                         max_timesteps,
+                                         dt,
+                                         g=g,
+                                         g_qf=g_qf,
+                                         e_dd=e_dd,
+                                         imag_time=imag_time,
+                                         mu=mu, E=E,
+                                         psi_0=psi_0,
+                                         V=V,
+                                         V_interaction=V_interaction,
+                                         psi_sol=psi_sol,
+                                         mu_sol=mu_sol,
+                                         psi_0_noise=psi_0_noise,
+                                         alpha_psi=alpha_psi,
+                                         alpha_psi_sol=alpha_psi_sol,
+                                         alpha_V=alpha_V
+                                         )
     if Harmonic.dim < 3:
         # matplotlib for 1D and 2D
         ani = Animation.Animation(dim=Harmonic.dim,
@@ -189,7 +188,7 @@ def simulate_case(box: NamedTuple,
 
         # ani.set_limits_smart(0, Harmonic)
 
-        with run_time.run_time():
+        with run_time.run_time(name="ani.start"):
             ani.start(
                 Harmonic,
                 filename,
@@ -199,7 +198,7 @@ def simulate_case(box: NamedTuple,
     else:
         # mayavi for 3D
         may = MayaviAnimation.MayaviAnimation(dim=Harmonic.dim)
-        with run_time.run_time():
+        with run_time.run_time(name="may.animate"):
             may.animate(Harmonic,
                         accuracy=accuracy,
                         plot_V=plot_V,
@@ -215,11 +214,13 @@ def simulate_case(box: NamedTuple,
                         camera_phi_func=camera_phi_func,
                         camera_z_func=camera_z_func,
                         )
-        mlab.show()
+        with run_time.run_time(name="mlab.show"):
+            mlab.show()
         # TODO: close window after last frame
         # print(f"{Harmonic.t}, {Harmonic.dt * Harmonic.max_timesteps}")
         # if Harmonic.t >= Harmonic.dt * Harmonic.max_timesteps:
         #     mlab.close()
+
         cut_x = np.linspace(Harmonic.box.x0, Harmonic.box.x1, Harmonic.res.x)
         cut_y = np.linspace(Harmonic.box.y0, Harmonic.box.y1, Harmonic.res.y)
         cut_z = np.linspace(Harmonic.box.z0, Harmonic.box.z1, Harmonic.res.z)
@@ -261,7 +262,7 @@ if __name__ == "__main__":
                         y0=-15, y1=15,
                         z0=-7, z1=7)
 
-    dt: float = 2 * 10 ** -3 # 0.001
+    dt: float = 2 * 10 ** -2 # 0.001
     N: int = 3.8 * 10 ** 4 # 38000
     m: float = 164.0 * constants.u_in_kg
     a_dd: float = 130.0 * constants.a_0
