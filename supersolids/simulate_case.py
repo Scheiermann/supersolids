@@ -50,12 +50,6 @@ def simulate_case(System: Schroedinger,
         Convergence is reached when relative error of mu is smaller
         than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
-    plot_psi_sol :
-        Condition if :math:`\psi_{sol}` should be plotted.
-
-    plot_V : bool
-        Condition if V should be plotted.
-
     x_lim : Tuple[float, float]
         Limits of plot in x direction
 
@@ -117,8 +111,7 @@ def simulate_case(System: Schroedinger,
             MatplotlibAnim.start(System,
                                  filename,
                                  accuracy=accuracy,
-                                 plot_psi_sol=plot_psi_sol,
-                                 plot_V=plot_V)
+                                 )
     else:
         # mayavi for 3D
         MayAnim = MayaviAnimation.MayaviAnimation(Anim,
