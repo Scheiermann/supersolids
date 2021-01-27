@@ -14,7 +14,7 @@ time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 from pathlib import Path
 
 from mayavi import mlab
-from typing import Tuple
+from typing import Tuple, List
 
 from supersolids.Animation import Animation, MayaviAnimation, MatplotlibAnimation
 from supersolids.Schroedinger import Schroedinger
@@ -24,9 +24,7 @@ from supersolids import run_time
 def simulate_case(System: Schroedinger,
                   Anim: Animation.Animation,
                   accuracy: float = 10 ** -6,
-                  slice_x_index: int = 0,
-                  slice_y_index: int = 0,
-                  slice_z_index: int = 0,
+                  slice_indices: List[int] = [0, 0, 0],
                   interactive: bool = True,
                   delete_input: bool = True,
                   x_lim: Tuple[float, float] = (-1.0, 1.0),
@@ -98,9 +96,7 @@ def simulate_case(System: Schroedinger,
     else:
         # mayavi for 3D
         MayAnim = MayaviAnimation.MayaviAnimation(Anim,
-                                                  slice_x_index=slice_x_index,
-                                                  slice_y_index=slice_y_index,
-                                                  slice_z_index=slice_z_index,
+                                                  slice_indices=slice_indices,
                                                   dir_path=Path(__file__).parent.joinpath("results")
                                                   )
         with run_time.run_time(name="MayaviAnimation.animate"):

@@ -132,6 +132,7 @@ if __name__ == "__main__":
                                     z_per_frame=0.0),
                                 filename="anim.mp4",
                                 )
+    slice_indices = [int(Res.x / 8), int(Res.y / 8), int(Res.z / 2)]
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
@@ -139,9 +140,7 @@ if __name__ == "__main__":
                                     System=System,
                                     Anim=Anim,
                                     accuracy=10 ** -8,
-                                    slice_x_index=int(Res.x / 8), # from here just mayavi
-                                    slice_y_index=int(Res.y / 8),
-                                    slice_z_index=int(Res.z / 2),
+                                    slice_indices=slice_indices, # from here just mayavi
                                     interactive=True,
                                     delete_input=False,
                                     x_lim=(-2.0, 2.0), # from here just matplotlib

@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 from ffmpeg import input
 from mayavi import mlab
-from typing import Tuple
+from typing import Tuple, List
 
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
@@ -74,9 +74,7 @@ class MayaviAnimation(Animation.Animation):
 
     def __init__(self,
                  Anim: Animation.Animation,
-                 slice_x_index: int = 0,
-                 slice_y_index: int = 0,
-                 slice_z_index: int = 0,
+                 slice_indices: List[int] = [0, 0, 0],
                  dir_path: Path = Path(__file__).parent.joinpath("results")):
         """
         Creates an Animation with mayavi for a Schroedinger equation
@@ -107,9 +105,7 @@ class MayaviAnimation(Animation.Animation):
             dir_path.mkdir(parents=True)
 
         MayaviAnimation.mayavi_counter += 1
-        self.slice_x_index = slice_x_index
-        self.slice_y_index = slice_y_index
-        self.slice_z_index = slice_z_index
+        self.slice_indices = slice_indices
 
         self.fig = mlab.figure(f"{MayaviAnimation.mayavi_counter:02d}")
 
@@ -195,20 +191,12 @@ class MayaviAnimation(Animation.Animation):
             Convergence is reached when relative error of mu is smaller
             than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
-        slice_x_index : int
-            Index of grid point in x direction (in terms of System.x)
+        slice_indices : List[int, int, int]
+            List with indices of grid points in the directions x, y, z
+            (in terms of System.x, System.y, System.z)
             to produce a slice/plane in mayavi,
             where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice
-
-        slice_y_index : int
-            Index of grid point in y  (in terms of System.y) direction
-            to produce a slice/plane in mayavi,
-            where :math:`\psi_{prob} = |\psi|^2` is used for the slice
-
-        slice_z_index : int
-            Index of grid point in z  (in terms of System.z) direction
-            to produce a slice/plane in mayavi,
-            where :math:`\psi_{prob} = |\psi|^2` is used for the slice
+            Max values is for e.g. System.Res.x - 1.
 
         interactive : bool
             Condition for interactive mode. When camera functions are used,
@@ -234,7 +222,7 @@ class MayaviAnimation(Animation.Animation):
                                          prob_3d,
                                          colormap="spectral",
                                          plane_orientation="x_axes",
-                                         slice_index=self.slice_x_index,
+                                         slice_index=self.slice_indices[0],
                                          )
 
         slice_y_plot = mlab.volume_slice(System.x_mesh,
@@ -243,7 +231,7 @@ class MayaviAnimation(Animation.Animation):
                                          prob_3d,
                                          colormap="spectral",
                                          plane_orientation="y_axes",
-                                         slice_index=self.slice_y_index,
+                                         slice_index=self.slice_indices[1],
                                          )
 
         slice_z_plot = mlab.volume_slice(System.x_mesh,
@@ -252,7 +240,7 @@ class MayaviAnimation(Animation.Animation):
                                          prob_3d,
                                          colormap="spectral",
                                          plane_orientation="z_axes",
-                                         slice_index=self.slice_z_index,
+                                         slice_index=self.slice_indices[2],
                                          )
 
         if self.plot_V:
