@@ -12,16 +12,16 @@ time-dependent Schrodinger equation.
 """
 
 import numpy as np
-from typing import Callable, Tuple
+from typing import Callable, Tuple, Optional
 from matplotlib import pyplot as plt
 
 from supersolids import Schroedinger
 
 
 def psi_cut_1d(System: Schroedinger,
-               psi_sol_3d_cut_x: Callable = None,
-               psi_sol_3d_cut_y: Callable = None,
-               psi_sol_3d_cut_z: Callable = None,
+               psi_sol_3d_cut_x: Optional[Callable] = None,
+               psi_sol_3d_cut_y: Optional[Callable] = None,
+               psi_sol_3d_cut_z: Optional[Callable] = None,
                y_lim: Tuple[float, float] = (0.0, 1.0)
                ) -> None:
     """
@@ -46,12 +46,19 @@ def psi_cut_1d(System: Schroedinger,
     plt.plot(cut_x, prob_mitte_x, "x-", color="tab:blue", label="x cut")
     plt.plot(cut_y, prob_mitte_y, "x-", color="tab:grey", label="y cut")
     plt.plot(cut_z, prob_mitte_z, "x-", color="tab:orange", label="z cut")
-    plt.plot(cut_x, psi_sol_3d_cut_x(cut_x), "x-", color="tab:cyan",
-             label="x cut sol")
-    plt.plot(cut_y, psi_sol_3d_cut_y(y=cut_y), "x-", color="tab:green",
-             label="y cut sol")
-    plt.plot(cut_z, psi_sol_3d_cut_z(z=cut_z), "x-", color="tab:olive",
-             label="z cut sol")
+
+    if psi_sol_3d_cut_x is not None:
+        plt.plot(cut_x, psi_sol_3d_cut_x(x=cut_x), "x-", color="tab:cyan",
+                 label="x cut sol")
+
+    if psi_sol_3d_cut_y is not None:
+        plt.plot(cut_y, psi_sol_3d_cut_y(y=cut_y), "x-", color="tab:green",
+                 label="y cut sol")
+
+    if psi_sol_3d_cut_z is not None:
+        plt.plot(cut_z, psi_sol_3d_cut_z(z=cut_z), "x-", color="tab:olive",
+                 label="z cut sol")
+
     plt.ylim(y_lim)
     plt.legend()
     plt.grid()
