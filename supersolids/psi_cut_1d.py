@@ -25,8 +25,8 @@ def psi_cut_1d(System: Schroedinger,
                y_lim: Tuple[float, float] = (0.0, 1.0)
                ) -> None:
     """
-    Wrapper for Animation and Schroedinger to get a working Animation
-    of a System through the equations given by Schroedinger.
+    Creates 1D plots of the probability function of the System :math: `|\psi|^2
+    and if given of the solution.
 
     Parameters
 
