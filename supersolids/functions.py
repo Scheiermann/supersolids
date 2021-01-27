@@ -113,11 +113,11 @@ def get_parameters(N: int = 10 ** 4,
                    a_s: float = 90.0 * constants.a_0,
                    a_dd: float = 130.0 * constants.a_0,
                    w_x: float = 2.0 * np.pi * 30.0):
-    a_s_l_ho_ratio, epsilon_dd = g_qf_helper(m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
-    g_qf = get_g_qf(N, a_s_l_ho_ratio, epsilon_dd)
+    a_s_l_ho_ratio, e_dd = g_qf_helper(m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
+    g_qf = get_g_qf(N, a_s_l_ho_ratio, e_dd)
     g = get_g(N, a_s_l_ho_ratio)
 
-    return g, g_qf, epsilon_dd, a_s_l_ho_ratio
+    return g, g_qf, e_dd, a_s_l_ho_ratio
 
 
 def get_g(N: int, a_s_l_ho_ratio: float):
@@ -131,10 +131,10 @@ def g_qf_helper(m: float = 164 * constants.u_in_kg,
                 a_dd: float = 130.0 * constants.a_0,
                 w_x: float = 2.0 * np.pi * 30.0):
     l_ho = get_l_ho(m, w_x)
-    epsilon_dd = a_dd / a_s
+    e_dd = a_dd / a_s
     a_s_l_ho_ratio = a_s / l_ho
 
-    return a_s_l_ho_ratio, epsilon_dd
+    return a_s_l_ho_ratio, e_dd
 
 
 def get_g_qf(N: int, a_s_l_ho_ratio: float, epsilon_dd: float):

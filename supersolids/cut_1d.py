@@ -73,20 +73,29 @@ def cut_1d(System: Schroedinger,
     plt.show()
 
 
-def prepare_cuts(func: Callable, N, alpha_z, e_dd, a_s_l_ho_ratio) -> Optional[Callable]:
+def prepare_cuts(func: Callable, N: int, alpha_z: float,
+                 e_dd: float, a_s_l_ho_ratio: float) -> Optional[Callable]:
     """
-    Helper function to get R_r and R_z and set it for density_in_trap.
+    Helper function to get R_r and R_z and set it for the given func.
 
     Parameters
 
-    N :
-    alpha_z :
-    e_dd :
-    a_s_l_ho_ratio :
+    N : int
+        Number of particles
+
+    alpha_z : float
+        Ratio between z and x frequencies of the tap :math:`w_{z} / w_{x}`
+
+    e_dd : float
+        :math:`\epsilon_{dd} = a_{dd} / a_{s}`
+
+    a_s_l_ho_ratio : float
+        :math:`a_s` in units of :math:`l_{HO}`
 
     Returns
+
     psi_sol_3d: Optional[Callable]
-        If no singularity occurs, density_in_trap with fixed R_r and R_z,
+        If no singularity occurs, func with fixed R_r and R_z,
         (solution of func_125).
 
 

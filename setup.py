@@ -13,7 +13,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="supersolids",
-    version="0.1.24",
+    version="0.1.25",
     packages=["", "supersolids"],
     package_data={"supersolids": []},
     url="https://github.com/Scheiermann/supersolids",
@@ -30,7 +30,7 @@ setup(
                       "sphinx-rtd-theme",
                       ],
     # ext_modules=cythonize("*.pyx", language_level=3),
-    python_requires=">=3.7",
+    python_requires=">=3.6",
     description="simulate and animate supersolids.",
     long_description=long_description,
     long_description_content_type="text/markdown"

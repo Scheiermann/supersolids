@@ -35,11 +35,10 @@ if __name__ == "__main__":
                         y0=-15, y1=15,
                         z0=-7, z1=7)
 
-    dt: float = 2 * 10 ** -2 # 0.001
-    N: int = 3.8 * 10 ** 4 # 38000
+    dt: float = 2 * 10 ** -4
+    N: int = 3.8 * 10 ** 4
     m: float = 164.0 * constants.u_in_kg
     a_dd: float = 130.0 * constants.a_0
-    # a_s: float = (130/ 0.8) * constants.a_0
     a_s: float = 85.0 * constants.a_0
 
     w_x: float = 2.0 * np.pi * 30.0
