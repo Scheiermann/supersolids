@@ -25,18 +25,16 @@ from supersolids import run_time
 def simulate_case(System: Schroedinger,
                   Anim: Animation.Animation,
                   accuracy: float = 10 ** -6,
-                  plot_psi_sol: bool = False,
                   psi_sol_3d_cut_x: Callable = None,
                   psi_sol_3d_cut_y: Callable = None,
                   psi_sol_3d_cut_z: Callable = None,
-                  plot_V: bool = True,
                   filename: str = "split.mp4",
-                  x_lim: Tuple[float, float] = (-1.0, 1.0),
-                  y_lim: Tuple[float, float] = (-1.0, 1.0),
-                  z_lim: Tuple[float, float] = (-1.0, 1.0),
                   slice_x_index: int = 0,
                   slice_y_index: int = 0,
                   slice_z_index: int = 0,
+                  x_lim: Tuple[float, float] = (-1.0, 1.0),
+                  y_lim: Tuple[float, float] = (-1.0, 1.0),
+                  z_lim: Tuple[float, float] = (-1.0, 1.0),
                   interactive: bool = True,
                   delete_input: bool = True) -> None:
     """
@@ -123,18 +121,17 @@ def simulate_case(System: Schroedinger,
                                  plot_V=plot_V)
     else:
         # mayavi for 3D
-        MayAnim = MayaviAnimation.MayaviAnimation(Anim)
+        MayAnim = MayaviAnimation.MayaviAnimation(Anim,
+                                                  slice_x_index=slice_x_index,
+                                                  slice_y_index=slice_y_index,
+                                                  slice_z_index=slice_z_index,
+                                                  )
         with run_time.run_time(name="MayaviAnimation.animate"):
             MayAnim.animate(System,
                             accuracy=accuracy,
-                            plot_V=plot_V,
-                            plot_psi_sol=plot_psi_sol,
                             x_lim=x_lim,
                             y_lim=y_lim,
                             z_lim=z_lim,
-                            slice_x_index=slice_x_index,
-                            slice_y_index=slice_y_index,
-                            slice_z_index=slice_z_index,
                             interactive=interactive,
                             )
 

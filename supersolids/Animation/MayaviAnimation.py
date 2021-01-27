@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 from ffmpeg import input
 from mayavi import mlab
-from typing import Tuple, Dict
+from typing import Tuple
 
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
@@ -74,6 +74,9 @@ class MayaviAnimation(Animation.Animation):
 
     def __init__(self,
                  Anim: Animation.Animation,
+                 slice_x_index: int = 0,
+                 slice_y_index: int = 0,
+                 slice_z_index: int = 0,
                  dir_path: Path = Path(__file__).parent.joinpath("results")):
         """
         Creates an Animation with mayavi for a Schroedinger equation
@@ -88,7 +91,7 @@ class MayaviAnimation(Animation.Animation):
             Path where to look for old directories (movie data)
 
         """
-        super().__init__(dim=Anim.dim,
+        super().__init__(Res=Anim.Res,
                          alpha_psi=Anim.alpha_psi,
                          alpha_psi_sol=Anim.alpha_psi_sol,
                          alpha_V=Anim.alpha_V,
@@ -101,6 +104,9 @@ class MayaviAnimation(Animation.Animation):
             dir_path.mkdir(parents=True)
 
         MayaviAnimation.mayavi_counter += 1
+        self.slice_x_index = slice_x_index
+        self.slice_y_index = slice_y_index
+        self.slice_z_index = slice_z_index
 
         self.fig = mlab.figure(f"{MayaviAnimation.mayavi_counter:02d}")
 
@@ -174,14 +180,9 @@ class MayaviAnimation(Animation.Animation):
     @mlab.animate(delay=10, ui=True)
     def animate(self, System: Schroedinger,
                 accuracy: float = 10 ** -6,
-                plot_psi_sol: bool = False,
-                plot_V: bool = True,
                 x_lim: Tuple[float, float] = (-1, 1),
                 y_lim: Tuple[float, float] = (-1, 1),
                 z_lim: Tuple[float, float] = (-1, 1),
-                slice_x_index: int = 0,
-                slice_y_index: int = 0,
-                slice_z_index: int = 0,
                 interactive: bool = True,
                 ):
         """
@@ -197,12 +198,6 @@ class MayaviAnimation(Animation.Animation):
         accuracy : float
             Convergence is reached when relative error of mu is smaller
             than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
-
-        plot_psi_sol :
-            Condition if :math:`\psi_sol` should be plotted.
-
-        plot_V : bool
-            Condition if V should be plotted.
 
         x_lim : Tuple[float, float]
             Limits of plot in x direction
@@ -252,7 +247,7 @@ class MayaviAnimation(Animation.Animation):
                                          prob_3d,
                                          colormap="spectral",
                                          plane_orientation="x_axes",
-                                         slice_index=slice_x_index,
+                                         slice_index=self.slice_x_index,
                                          # extent=[*x_lim, *y_lim, *z_lim]
                                          )
 
@@ -262,7 +257,7 @@ class MayaviAnimation(Animation.Animation):
                                          prob_3d,
                                          colormap="spectral",
                                          plane_orientation="y_axes",
-                                         slice_index=slice_y_index,
+                                         slice_index=self.slice_y_index,
                                          # extent=[*x_lim, *y_lim, *z_lim]
                                          )
 
@@ -272,11 +267,11 @@ class MayaviAnimation(Animation.Animation):
                                          prob_3d,
                                          colormap="spectral",
                                          plane_orientation="z_axes",
-                                         slice_index=slice_z_index,
+                                         slice_index=self.slice_z_index,
                                          # extent=[*x_lim, *y_lim, *z_lim]
                                          )
 
-        if plot_V:
+        if self.plot_V:
             V_plot = mlab.contour3d(System.x_mesh,
                                     System.y_mesh,
                                     System.z_mesh,
@@ -286,7 +281,7 @@ class MayaviAnimation(Animation.Animation):
                                     transparent=True)
 
         if System.psi_sol_val is not None:
-            if plot_psi_sol:
+            if self.plot_psi_sol:
                 psi_sol_plot = mlab.contour3d(System.x_mesh,
                                               System.y_mesh,
                                               System.z_mesh,

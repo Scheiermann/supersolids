@@ -11,10 +11,14 @@ Base class for Animations
 """
 from typing import Optional, Callable
 
+from supersolids import functions
+
 
 class Animation:
     def __init__(self,
-                 dim: float = 3,
+                 Res: functions.Resolution,
+                 plot_psi_sol: bool = True,
+                 plot_V: bool = False,
                  alpha_psi: float = 0.8,
                  alpha_psi_sol: float = 0.53,
                  alpha_V: float = 0.3,
@@ -26,6 +30,12 @@ class Animation:
         Base class with configured properties for the animation.
 
         Parameters
+
+        plot_psi_sol : bool
+            Condition if :math:`\psi_{sol}` should be plotted.
+
+        plot_V : bool
+            Condition if V should be plotted.
 
         alpha_psi : float
             Alpha value for plot transparency of :math:`\psi`
@@ -46,7 +56,10 @@ class Animation:
             z component of the movement of the camera.
 
         """
-        self.dim = dim
+        self.Res = Res
+        self.dim = Res.dim
+        self.plot_psi_sol = plot_psi_sol
+        self.plot_V = plot_V
 
         self.alpha_psi: float = alpha_psi
         self.alpha_psi_sol: float = alpha_psi_sol

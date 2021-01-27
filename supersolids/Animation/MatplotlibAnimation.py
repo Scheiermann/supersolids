@@ -208,8 +208,6 @@ class MatplotlibAnimation(Animation.Animation):
     def animate(self, frame_index: int,
                 System: Schroedinger,
                 accuracy: float = 10 ** -6,
-                plot_psi_sol: bool = False,
-                plot_V: bool = True,
                 ):
         """
         Sets the plot limits appropriate,
@@ -227,12 +225,6 @@ class MatplotlibAnimation(Animation.Animation):
             Convergence is reached when relative error of mu is smaller
             than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
-        plot_psi_sol : bool
-            Condition if :math:`\psi_{sol}` should be plotted.
-
-        plot_V : bool
-            Condition if V should be plotted.
-
         """
         assert isinstance(System, Schroedinger), (
             f"System needs to be {Schroedinger},"
@@ -246,11 +238,11 @@ class MatplotlibAnimation(Animation.Animation):
         # frame)
         if frame_index == 0:
             if System.dim == 1:
-                if plot_V:
+                if self.plot_V:
                     self.V_pos, self.V_plot_val = self.get_V_plot_values(
                         0, 0, System, reserve=1.0)
             elif System.dim == 2:
-                if plot_V:
+                if self.plot_V:
                     self.V_pos, self.V_plot_val = self.get_V_plot_values(
                         0, 0, System, reserve=1.0)
                     self.V_line = self.ax.plot_surface(self.V_pos[:, :, 0],
@@ -305,9 +297,9 @@ class MatplotlibAnimation(Animation.Animation):
 
         if System.dim == 1:
             self.psi_line.set_data(System.x, np.abs(System.psi_val) ** 2.0)
-            if plot_V:
+            if self.plot_V:
                 self.V_line.set_data(self.V_pos, self.V_plot_val)
-            if plot_psi_sol:
+            if self.plot_psi_sol:
                 self.psi_sol_line.set_data(System.x, System.psi_sol_val)
         elif System.dim == 2:
             if frame_index >= 1:
@@ -381,7 +373,7 @@ class MatplotlibAnimation(Animation.Animation):
         if System.dim == 1:
             return self.psi_line, self.V_line, self.psi_sol_line, self.title
         else:
-            if plot_V:
+            if self.plot_V:
                 if frame_index == 0:
                     return self.V_line, self.title
                 else:
@@ -395,8 +387,6 @@ class MatplotlibAnimation(Animation.Animation):
     def start(self, System: Schroedinger,
               filename: str = "anim.mp4",
               accuracy: float = 10 ** -6,
-              plot_psi_sol: bool = False,
-              plot_V: bool = True
               ):
         """
         Sets the plot limits appropriate,
@@ -415,12 +405,6 @@ class MatplotlibAnimation(Animation.Animation):
         System: Schroedinger, object
             Defines the Schroedinger equation for a given problem
 
-        plot_psi_sol :
-            Condition if :math:`\psi_{sol}` should be plotted.
-
-        plot_V : bool
-            Condition if V should be plotted.
-
         """
         assert isinstance(System, Schroedinger), (
             f"System needs to be {Schroedinger},"
@@ -433,9 +417,7 @@ class MatplotlibAnimation(Animation.Animation):
         # blit=True means only re-draw the parts that have changed.
         self.anim = animation.FuncAnimation(self.fig, self.animate,
                                             fargs=(System,
-                                                   accuracy,
-                                                   plot_psi_sol,
-                                                   plot_V),
+                                                   accuracy),
                                             frames=System.max_timesteps,
                                             interval=30,
                                             blit=True,

@@ -125,7 +125,9 @@ if __name__ == "__main__":
                                         psi_0_noise=psi_0_noise_3d,
                                         )
 
-    Anim: Animation = Animation(dim=System.dim,
+    Anim: Animation = Animation(Res=System.Res,
+                                plot_psi_sol=True,
+                                plot_V=False,
                                 alpha_psi=0.8,
                                 alpha_psi_sol=0.5,
                                 alpha_V=0.3,
@@ -148,18 +150,16 @@ if __name__ == "__main__":
     simulate_case(System=System,
                   Anim=Anim,
                   accuracy=10 ** -8,
-                  plot_psi_sol=True,
                   psi_sol_3d_cut_x=psi_sol_3d_cut_x,
                   psi_sol_3d_cut_y=None,
                   psi_sol_3d_cut_z=None,
-                  plot_V=False,
                   filename="anim.mp4",
-                  x_lim=(-2.0, 2.0),
-                  y_lim=(-2.0, 2.0),
-                  z_lim=(0, 0.5),
                   slice_x_index=int(Res.x / 8),
                   slice_y_index=int(Res.y / 8),
                   slice_z_index=int(Res.z / 2),
+                  x_lim=(-2.0, 2.0),
+                  y_lim=(-2.0, 2.0),
+                  z_lim=(0, 0.5),
                   interactive=True,
                   delete_input=False
                   )

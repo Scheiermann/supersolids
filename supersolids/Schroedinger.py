@@ -12,7 +12,7 @@ Numerical solver for non-linear time-dependent Schrodinger equation.
 
 import functools
 import sys
-from typing import Callable, Dict, Union, Optional, NamedTuple
+from typing import Callable, Union, Optional
 
 import numpy as np
 import scipy
