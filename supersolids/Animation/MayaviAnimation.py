@@ -92,12 +92,15 @@ class MayaviAnimation(Animation.Animation):
 
         """
         super().__init__(Res=Anim.Res,
+                         plot_psi_sol=Anim.plot_psi_sol,
+                         plot_V=Anim.plot_V,
                          alpha_psi=Anim.alpha_psi,
                          alpha_psi_sol=Anim.alpha_psi_sol,
                          alpha_V=Anim.alpha_V,
                          camera_r_func=Anim.camera_r_func,
                          camera_phi_func=Anim.camera_phi_func,
-                         camera_z_func=Anim.camera_z_func
+                         camera_z_func=Anim.camera_z_func,
+                         filename=Anim.filename,
                          )
 
         if not dir_path.is_dir():
@@ -125,7 +128,6 @@ class MayaviAnimation(Animation.Animation):
     def create_movie(self,
                      dir_path: Path = None,
                      input_data_file_pattern: str = "*.png",
-                     filename: str = "anim.mp4",
                      delete_input: bool = True) -> None:
         """
         Creates movie filename with all matching pictures from
@@ -141,9 +143,6 @@ class MayaviAnimation(Animation.Animation):
         input_data_file_pattern : str
             Regex pattern to find all input data
 
-        filename : str
-            Filename with filetype to save the movie to
-
         delete_input : bool
             Condition if the input pictures should be deleted,
             after creation the creation of the animation as e.g. mp4
@@ -158,7 +157,7 @@ class MayaviAnimation(Animation.Animation):
             input_path = get_image_path(dir_path)
 
         input_data = Path(input_path, input_data_file_pattern)
-        output_path = Path(input_path, filename)
+        output_path = Path(input_path, self.filename)
         print(f"input_data: {input_data}")
 
         # requires either mencoder or ffmpeg to be installed on your system
@@ -180,9 +179,6 @@ class MayaviAnimation(Animation.Animation):
     @mlab.animate(delay=10, ui=True)
     def animate(self, System: Schroedinger,
                 accuracy: float = 10 ** -6,
-                x_lim: Tuple[float, float] = (-1, 1),
-                y_lim: Tuple[float, float] = (-1, 1),
-                z_lim: Tuple[float, float] = (-1, 1),
                 interactive: bool = True,
                 ):
         """
@@ -198,15 +194,6 @@ class MayaviAnimation(Animation.Animation):
         accuracy : float
             Convergence is reached when relative error of mu is smaller
             than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
-
-        x_lim : Tuple[float, float]
-            Limits of plot in x direction
-
-        y_lim : Tuple[float, float]
-            Limits of plot in y direction
-
-        z_lim : Tuple[float, float]
-            Limits of plot in z direction
 
         slice_x_index : int
             Index of grid point in x direction (in terms of System.x)
@@ -248,7 +235,6 @@ class MayaviAnimation(Animation.Animation):
                                          colormap="spectral",
                                          plane_orientation="x_axes",
                                          slice_index=self.slice_x_index,
-                                         # extent=[*x_lim, *y_lim, *z_lim]
                                          )
 
         slice_y_plot = mlab.volume_slice(System.x_mesh,
@@ -258,7 +244,6 @@ class MayaviAnimation(Animation.Animation):
                                          colormap="spectral",
                                          plane_orientation="y_axes",
                                          slice_index=self.slice_y_index,
-                                         # extent=[*x_lim, *y_lim, *z_lim]
                                          )
 
         slice_z_plot = mlab.volume_slice(System.x_mesh,
@@ -268,7 +253,6 @@ class MayaviAnimation(Animation.Animation):
                                          colormap="spectral",
                                          plane_orientation="z_axes",
                                          slice_index=self.slice_z_index,
-                                         # extent=[*x_lim, *y_lim, *z_lim]
                                          )
 
         if self.plot_V:

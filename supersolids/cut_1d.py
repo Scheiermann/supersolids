@@ -10,20 +10,22 @@ Animation for the numerical solver for the non-linear
 time-dependent Schrodinger equation.
 
 """
+import functools
 
 import numpy as np
 from typing import Callable, Tuple, Optional
 from matplotlib import pyplot as plt
 
-from supersolids import Schroedinger
+from supersolids.Schroedinger import Schroedinger
+from supersolids import functions
 
 
-def psi_cut_1d(System: Schroedinger,
-               psi_sol_3d_cut_x: Optional[Callable] = None,
-               psi_sol_3d_cut_y: Optional[Callable] = None,
-               psi_sol_3d_cut_z: Optional[Callable] = None,
-               y_lim: Tuple[float, float] = (0.0, 1.0)
-               ) -> None:
+def cut_1d(System: Schroedinger,
+           psi_sol_3d_cut_x: Optional[Callable] = None,
+           psi_sol_3d_cut_y: Optional[Callable] = None,
+           psi_sol_3d_cut_z: Optional[Callable] = None,
+           y_lim: Tuple[float, float] = (0.0, 1.0)
+           ) -> None:
     """
     Creates 1D plots of the probability function of the System :math: `|\psi|^2
     and if given of the solution.
@@ -42,9 +44,12 @@ def psi_cut_1d(System: Schroedinger,
     cut_y = np.linspace(System.Box.y0, System.Box.y1, System.Res.y)
     cut_z = np.linspace(System.Box.z0, System.Box.z1, System.Res.z)
 
-    prob_mitte_x = np.abs(System.psi_val[:, System.Res.y // 2, System.Res.z // 2]) ** 2.0
-    prob_mitte_y = np.abs(System.psi_val[System.Res.x // 2, :, System.Res.z // 2]) ** 2.0
-    prob_mitte_z = np.abs(System.psi_val[System.Res.x // 2, System.Res.y // 2, :]) ** 2.0
+    prob_mitte_x = np.abs(
+        System.psi_val[:, System.Res.y // 2, System.Res.z // 2]) ** 2.0
+    prob_mitte_y = np.abs(
+        System.psi_val[System.Res.x // 2, :, System.Res.z // 2]) ** 2.0
+    prob_mitte_z = np.abs(
+        System.psi_val[System.Res.x // 2, System.Res.y // 2, :]) ** 2.0
 
     plt.plot(cut_x, prob_mitte_x, "x-", color="tab:blue", label="x cut")
     plt.plot(cut_y, prob_mitte_y, "x-", color="tab:grey", label="y cut")
@@ -66,3 +71,35 @@ def psi_cut_1d(System: Schroedinger,
     plt.legend()
     plt.grid()
     plt.show()
+
+
+def prepare_cuts(func: Callable, N, alpha_z, e_dd, a_s_l_ho_ratio) -> Optional[Callable]:
+    """
+    Helper function to get R_r and R_z and set it for density_in_trap.
+
+    Parameters
+
+    N :
+    alpha_z :
+    e_dd :
+    a_s_l_ho_ratio :
+
+    Returns
+    psi_sol_3d: Optional[Callable]
+        If no singularity occurs, density_in_trap with fixed R_r and R_z,
+        (solution of func_125).
+
+
+    """
+    kappa = functions.get_kappa(alpha_z=alpha_z, e_dd=e_dd, x_min=0.1,
+                                x_max=5.0, res=1000)
+    R_r, R_z = functions.get_R_rz(kappa=kappa, e_dd=e_dd, N=N,
+                                  a_s_l_ho_ratio=a_s_l_ho_ratio)
+    psi_sol_3d = functools.partial(func, R_r=R_r, R_z=R_z)
+    print(f"kappa: {kappa}, R_r: {R_r}, R_z: {R_z}")
+
+    if not (np.isnan(R_r) or np.isnan(R_z)):
+        print(f"")
+        return psi_sol_3d
+    else:
+        return None

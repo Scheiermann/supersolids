@@ -35,12 +35,15 @@ class MatplotlibAnimation(Animation.Animation):
 
         """
         super().__init__(dim=Anim.dim,
+                         plot_psi_sol=Anim.plot_psi_sol,
+                         plot_V=Anim.plot_V,
                          alpha_psi=Anim.alpha_psi,
                          alpha_psi_sol=Anim.alpha_psi_sol,
                          alpha_V=Anim.alpha_V,
                          camera_r_func=Anim.camera_r_func,
                          camera_phi_func=Anim.camera_phi_func,
-                         camera_z_func=Anim.camera_z_func
+                         camera_z_func=Anim.camera_z_func,
+                         filename=Anim.filename,
                          )
 
         assert 1 <= self.dim <= 2, ("Spatial dimension needs to be 1 or 2, "
@@ -385,7 +388,6 @@ class MatplotlibAnimation(Animation.Animation):
                     return self.psi_line, self.title
 
     def start(self, System: Schroedinger,
-              filename: str = "anim.mp4",
               accuracy: float = 10 ** -6,
               ):
         """
@@ -393,10 +395,6 @@ class MatplotlibAnimation(Animation.Animation):
         even if the initial wave function :math:`\psi_0` is not normalized
 
         Parameters
-
-        filename : String
-            Name of file including file type to save the animation to
-            (tested with mp4)
 
         accuracy : float
             Convergence is reached when relative error of mu is smaller
@@ -424,7 +422,7 @@ class MatplotlibAnimation(Animation.Animation):
                                             cache_frame_data=False)
 
         # requires either mencoder or ffmpeg to be installed on your system
-        self.anim.save("results" + sep + filename,
+        self.anim.save("results" + sep + self.filename,
                        fps=15, dpi=300, extra_args=['-vcodec', 'libx264'])
 
 

@@ -25,6 +25,7 @@ class Animation:
                  camera_r_func: Optional[Callable] = None,
                  camera_phi_func: Optional[Callable] = None,
                  camera_z_func: Optional[Callable] = None,
+                 filename: str = "split.mp4",
                  ):
         """
         Base class with configured properties for the animation.
@@ -55,6 +56,9 @@ class Animation:
         camera_z_func : Callable, function
             z component of the movement of the camera.
 
+        filename : str
+            Filename with filetype to save the movie to
+
         """
         self.Res = Res
         self.dim = Res.dim
@@ -68,3 +72,5 @@ class Animation:
         self.camera_r_func: Optional[Callable] = camera_r_func
         self.camera_phi_func: Optional[Callable] = camera_phi_func
         self.camera_z_func: Optional[Callable] = camera_z_func
+
+        self.filename: str = filename

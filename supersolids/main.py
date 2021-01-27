@@ -12,12 +12,14 @@ time-dependent Schrodinger equation for 1D, 2D and 3D.
 """
 
 import functools
+from typing import Callable, Optional
 
 import numpy as np
 
 from supersolids.Animation.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.simulate_case import simulate_case
+from supersolids.cut_1d import cut_1d, prepare_cuts
 from supersolids import constants
 from supersolids import functions
 
@@ -37,8 +39,8 @@ if __name__ == "__main__":
     N: int = 3.8 * 10 ** 4 # 38000
     m: float = 164.0 * constants.u_in_kg
     a_dd: float = 130.0 * constants.a_0
-    a_s: float = (130/ 0.8) * constants.a_0
-    # a_s: float = 85.0 * constants.a_0
+    # a_s: float = (130/ 0.8) * constants.a_0
+    a_s: float = 85.0 * constants.a_0
 
     w_x: float = 2.0 * np.pi * 30.0
     w_y: float = 2.0 * np.pi * 60.0
@@ -74,12 +76,8 @@ if __name__ == "__main__":
 
     psi_0_3d = functools.partial(
         functions.psi_gauss_3d,
-        a_x=8.0,
-        a_y=4.0,
-        a_z=2.0,
-        x_0=0.0,
-        y_0=0.0,
-        z_0=0.0,
+        a_x=8.0, a_y=4.0, a_z=2.0,
+        x_0=0.0, y_0=0.0, z_0=0.0,
         k_0=0.0)
     # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
 
@@ -92,20 +90,9 @@ if __name__ == "__main__":
     psi_sol_2d = functions.thomas_fermi_2d_pos
 
     # psi_sol_3d = functions.thomas_fermi_3d
-    kappa = functions.get_kappa(alpha_z=alpha_z, e_dd=e_dd,
-                                x_min=0.1, x_max=5.0, res=1000)
-    R_r, R_z = functions.get_R_rz(kappa=kappa, e_dd=e_dd, N=N,
-                                  a_s_l_ho_ratio=a_s_l_ho_ratio)
-    psi_sol_3d = functools.partial(functions.density_in_trap,
-                                   R_r=R_r, R_z=R_z)
-    print(f"kappa: {kappa}, R_r: {R_r}, R_z: {R_z}")
-
-    psi_sol_3d_cut_x = functools.partial(functions.density_in_trap,
-                                         y=0, z=0, R_r=R_r, R_z=R_z)
-    psi_sol_3d_cut_y = functools.partial(functions.density_in_trap,
-                                         x=0, z=0, R_r=R_r, R_z=R_z)
-    psi_sol_3d_cut_z = functools.partial(functions.density_in_trap,
-                                         x=0, y=0, R_r=R_r, R_z=R_z)
+    psi_sol_3d: Optional[Callable] = prepare_cuts(functions.density_in_trap,
+                                                  N, alpha_z, e_dd,
+                                                  a_s_l_ho_ratio)
 
     System: Schroedinger = Schroedinger(Box,
                                         Res,
@@ -143,24 +130,34 @@ if __name__ == "__main__":
                                     functions.camera_func_z,
                                     r_0=40.0, phi_0=45.0, z_0=50.0,
                                     z_per_frame=0.0),
+                                filename="anim.mp4",
                                 )
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    simulate_case(System=System,
-                  Anim=Anim,
-                  accuracy=10 ** -8,
-                  psi_sol_3d_cut_x=psi_sol_3d_cut_x,
-                  psi_sol_3d_cut_y=None,
-                  psi_sol_3d_cut_z=None,
-                  filename="anim.mp4",
-                  slice_x_index=int(Res.x / 8),
-                  slice_y_index=int(Res.y / 8),
-                  slice_z_index=int(Res.z / 2),
-                  x_lim=(-2.0, 2.0),
-                  y_lim=(-2.0, 2.0),
-                  z_lim=(0, 0.5),
-                  interactive=True,
-                  delete_input=False
-                  )
+    SystemResult: Schroedinger = simulate_case(
+                                    System=System,
+                                    Anim=Anim,
+                                    accuracy=10 ** -8,
+                                    slice_x_index=int(Res.x / 8), # from here just mayavi
+                                    slice_y_index=int(Res.y / 8),
+                                    slice_z_index=int(Res.z / 2),
+                                    interactive=True,
+                                    delete_input=False,
+                                    x_lim=(-2.0, 2.0), # from here just matplotlib
+                                    y_lim=(-2.0, 2.0),
+                                    z_lim=(0, 0.5),
+                                    )
+
     print("Single core done")
+
+    if psi_sol_3d is None:
+        psi_sol_3d_cuts = [None, None, None]
+    else:
+        psi_sol_3d_cuts = [
+            functools.partial(psi_sol_3d, y=0, z=0),
+            functools.partial(psi_sol_3d, x=0, z=0),
+            functools.partial(psi_sol_3d, x=0, y=0)
+        ]
+
+    cut_1d(SystemResult, *psi_sol_3d_cuts, y_lim=(0.0, 0.05))

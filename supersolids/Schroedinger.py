@@ -51,7 +51,7 @@ class Schroedinger(object):
                  V_interaction: Optional[Callable] = None,
                  psi_sol: Optional[Callable] = functions.thomas_fermi_3d,
                  mu_sol: Optional[Callable] = functions.mu_3d,
-                 psi_0_noise: Optional[Callable] = functions.noise_mesh,
+                 psi_0_noise: np.ndarray = functions.noise_mesh,
                  ) -> None:
         """
         Schrödinger equations for the specified system.
@@ -104,12 +104,18 @@ class Schroedinger(object):
 
         if V is not None:
             self.V: Callable = V
+        else:
+            self.V = None
 
         if psi_sol is not None:
             self.psi_sol: Callable = functools.partial(psi_sol, g=self.g)
+        else:
+            self.psi_sol = None
 
         if mu_sol is not None:
             self.mu_sol: Callable = mu_sol(self.g)
+        else:
+            self.mu_sol = None
 
         try:
             box_x_len = (self.Box.x1 - self.Box.x0)
@@ -188,7 +194,9 @@ class Schroedinger(object):
             else:
                 self.V_val = self.V(self.x)
 
-            if self.psi_sol is not None:
+            if self.psi_sol is None:
+                self.psi_sol_val = None
+            else:
                 self.psi_sol_val: np.ndarray = self.psi_sol(self.x)
 
             self.k_squared: np.ndarray = self.kx ** 2.0
@@ -214,7 +222,9 @@ class Schroedinger(object):
             else:
                 self.V_val = self.V(self.pos)
 
-            if self.psi_sol is not None:
+            if self.psi_sol is None:
+                self.psi_sol_val = None
+            else:
                 self.psi_sol_val = self.psi_sol(self.pos)
 
             kx_mesh, ky_mesh, _ = functions.get_meshgrid(self.kx, self.ky)
@@ -259,7 +269,9 @@ class Schroedinger(object):
             else:
                 self.V_val = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
 
-            if self.psi_sol is not None:
+            if self.psi_sol is None:
+                self.psi_sol_val = None
+            else:
                 self.psi_sol_val = self.psi_sol(self.x_mesh,
                                                 self.y_mesh,
                                                 self.z_mesh)

@@ -11,32 +11,28 @@ time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 
 """
 
-import functools
+from pathlib import Path
 
 from mayavi import mlab
-from typing import Callable, Tuple
+from typing import Tuple
 
 from supersolids.Animation import Animation, MayaviAnimation, MatplotlibAnimation
 from supersolids.Schroedinger import Schroedinger
-from supersolids.psi_cut_1d import psi_cut_1d
 from supersolids import run_time
 
 
 def simulate_case(System: Schroedinger,
                   Anim: Animation.Animation,
                   accuracy: float = 10 ** -6,
-                  psi_sol_3d_cut_x: Callable = None,
-                  psi_sol_3d_cut_y: Callable = None,
-                  psi_sol_3d_cut_z: Callable = None,
-                  filename: str = "split.mp4",
                   slice_x_index: int = 0,
                   slice_y_index: int = 0,
                   slice_z_index: int = 0,
+                  interactive: bool = True,
+                  delete_input: bool = True,
                   x_lim: Tuple[float, float] = (-1.0, 1.0),
                   y_lim: Tuple[float, float] = (-1.0, 1.0),
                   z_lim: Tuple[float, float] = (-1.0, 1.0),
-                  interactive: bool = True,
-                  delete_input: bool = True) -> None:
+                  ) -> Schroedinger:
     """
     Wrapper for Animation and Schroedinger to get a working Animation
     of a System through the equations given by Schroedinger.
@@ -59,9 +55,6 @@ def simulate_case(System: Schroedinger,
     z_lim : Tuple[float, float]
         Limits of plot in z direction
 
-    filename : str
-        Filename with filetype to save the movie to
-
     slice_x_index : int
         Index of grid point in x direction to produce a slice/plane in mayavi,
         where :math:`\psi_{prob} = |\psi|^2` is used for the slice
@@ -76,17 +69,8 @@ def simulate_case(System: Schroedinger,
 
     interactive : bool
         Condition for interactive mode. When camera functions are used,
-        then interaction is not possible. So interactive=True turn the usage
+        then interaction is not possible. So interactive=True turns the usage
         of camera functions off.
-
-    camera_r_func : Callable or None
-        r component of the movement of the camera.
-
-    camera_phi_func : Callable or None
-        phi component of the movement of the camera.
-
-    camera_z_func : Callable or None
-        z component of the movement of the camera.
 
     delete_input : bool
         Condition if the input pictures should be deleted,
@@ -109,7 +93,6 @@ def simulate_case(System: Schroedinger,
 
         with run_time.run_time(name="Animation.start"):
             MatplotlibAnim.start(System,
-                                 filename,
                                  accuracy=accuracy,
                                  )
     else:
@@ -118,21 +101,13 @@ def simulate_case(System: Schroedinger,
                                                   slice_x_index=slice_x_index,
                                                   slice_y_index=slice_y_index,
                                                   slice_z_index=slice_z_index,
+                                                  dir_path=Path(__file__).parent.joinpath("results")
                                                   )
         with run_time.run_time(name="MayaviAnimation.animate"):
             MayAnim.animate(System,
                             accuracy=accuracy,
-                            x_lim=x_lim,
-                            y_lim=y_lim,
-                            z_lim=z_lim,
                             interactive=interactive,
                             )
-
-        psi_cut_1d(System,
-                   psi_sol_3d_cut_x,
-                   psi_sol_3d_cut_y,
-                   psi_sol_3d_cut_z,
-                   y_lim=(0.0, 0.05))
 
         with run_time.run_time(name="mlab.show"):
             mlab.show()
@@ -142,5 +117,6 @@ def simulate_case(System: Schroedinger,
         #     mlab.close()
 
         MayAnim.create_movie(input_data_file_pattern="*.png",
-                             filename=filename,
                              delete_input=delete_input)
+
+        return System
