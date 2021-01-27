@@ -16,38 +16,20 @@ import functools
 from mayavi import mlab
 from typing import Callable, Tuple
 
+from supersolids.Schroedinger import Schroedinger
 from supersolids import Animation, psi_cut_1d
 from supersolids import functions
 from supersolids import MayaviAnimation
 from supersolids import run_time
-from supersolids import Schroedinger
 
 
-def simulate_case(Box: functions.Box,
-                  Res: functions.Resolution,
-                  max_timesteps: int,
-                  dt: float,
-                  g: float = 0.0,
-                  g_qf: float = 0.0,
-                  e_dd: float = 1.0,
-                  imag_time: bool = False,
-                  mu: float = 1.1,
-                  E: float = 1.0,
-                  psi_0: Callable = functions.psi_gauss_3d,
-                  V: Callable = functions.v_harmonic_3d,
-                  V_interaction: Callable = None,
-                  psi_sol: Callable = functions.thomas_fermi_3d,
-                  mu_sol: Callable = functions.mu_3d,
+def simulate_case(System: Schroedinger,
+                  accuracy: float = 10 ** -6,
                   plot_psi_sol: bool = False,
                   psi_sol_3d_cut_x: Callable = None,
                   psi_sol_3d_cut_y: Callable = None,
                   psi_sol_3d_cut_z: Callable = None,
                   plot_V: bool = True,
-                  psi_0_noise: Callable = functions.noise_mesh,
-                  alpha_psi: float = 0.8,
-                  alpha_psi_sol: float = 0.5,
-                  alpha_V: float = 0.3,
-                  accuracy: float = 10 ** -6,
                   filename: str = "split.mp4",
                   x_lim: Tuple[float, float] = (-1.0, 1.0),
                   y_lim: Tuple[float, float] = (-1.0, 1.0),
@@ -67,21 +49,8 @@ def simulate_case(Box: functions.Box,
 
     Parameters
 
-    box : NamedTuple
-        Endpoints of box where to simulate the Schroedinger equation.
-        Keyword x0 is minimum in x direction and x1 is maximum.
-        Same for y and z. For 1D just use x0, x1.
-        For 2D x0, x1, y0, y1.
-        For 3D x0, x1, y0, y1, z0, z1.
-        Dimension of simulation is constructed from this dictionary.
-
-    res : NamedTuple
-        NamedTuple for the number of grid points in x, y, z direction.
-        Needs to have half size of box dictionary.
-        Keywords x, y z are used.
-
-    max_timesteps : int
-        Maximum timesteps  with length dt for the animation.
+    System : Schroedinger.Schroedinger
+        Schrödinger equations for the specified system
 
     accuracy : float
         Convergence is reached when relative error of mu is smaller
@@ -101,15 +70,6 @@ def simulate_case(Box: functions.Box,
 
     z_lim : Tuple[float, float]
         Limits of plot in z direction
-
-    alpha_psi : float
-        Alpha value for plot transparency of :math:`\psi`
-
-    alpha_psi_sol : float
-        Alpha value for plot transparency of :math:`\psi_sol`
-
-    alpha_V : float
-        Alpha value for plot transparency of V
 
     filename : str
         Filename with filetype to save the movie to
@@ -147,28 +107,9 @@ def simulate_case(Box: functions.Box,
     Returns
 
     """
-    Harmonic = Schroedinger.Schroedinger(Box,
-                                         Res,
-                                         max_timesteps,
-                                         dt,
-                                         g=g,
-                                         g_qf=g_qf,
-                                         e_dd=e_dd,
-                                         imag_time=imag_time,
-                                         mu=mu, E=E,
-                                         psi_0=psi_0,
-                                         V=V,
-                                         V_interaction=V_interaction,
-                                         psi_sol=psi_sol,
-                                         mu_sol=mu_sol,
-                                         psi_0_noise=psi_0_noise,
-                                         alpha_psi=alpha_psi,
-                                         alpha_psi_sol=alpha_psi_sol,
-                                         alpha_V=alpha_V
-                                         )
-    if Harmonic.dim < 3:
+    if System.dim < 3:
         # matplotlib for 1D and 2D
-        ani = Animation.Animation(dim=Harmonic.dim,
+        ani = Animation.Animation(dim=System.dim,
                                   camera_r_func=camera_r_func,
                                   camera_phi_func=camera_phi_func,
                                   camera_z_func=camera_z_func,
@@ -181,20 +122,20 @@ def simulate_case(Box: functions.Box,
             ani.ax.set_ylim(*y_lim)
             ani.ax.set_zlim(*z_lim)
 
-        # ani.set_limits_smart(0, Harmonic)
+        # ani.set_limits_smart(0, System)
 
         with run_time.run_time(name="ani.start"):
             ani.start(
-                Harmonic,
+                System,
                 filename,
                 accuracy=accuracy,
                 plot_psi_sol=plot_psi_sol,
                 plot_V=plot_V)
     else:
         # mayavi for 3D
-        may = MayaviAnimation.MayaviAnimation(dim=Harmonic.dim)
+        may = MayaviAnimation.MayaviAnimation(dim=System.dim)
         with run_time.run_time(name="may.animate"):
-            may.animate(Harmonic,
+            may.animate(System,
                         accuracy=accuracy,
                         plot_V=plot_V,
                         plot_psi_sol=plot_psi_sol,
@@ -210,7 +151,7 @@ def simulate_case(Box: functions.Box,
                         camera_z_func=camera_z_func,
                         )
 
-        psi_cut_1d.psi_cut_1d(Harmonic,
+        psi_cut_1d.psi_cut_1d(System,
                               psi_sol_3d_cut_x,
                               psi_sol_3d_cut_y,
                               psi_sol_3d_cut_z,
@@ -219,8 +160,8 @@ def simulate_case(Box: functions.Box,
         with run_time.run_time(name="mlab.show"):
             mlab.show()
         # TODO: close window after last frame
-        # print(f"{Harmonic.t}, {Harmonic.dt * Harmonic.max_timesteps}")
-        # if Harmonic.t >= Harmonic.dt * Harmonic.max_timesteps:
+        # print(f"{System.t}, {System.dt * System.max_timesteps}")
+        # if System.t >= System.dt * System.max_timesteps:
         #     mlab.close()
 
         may.create_movie(

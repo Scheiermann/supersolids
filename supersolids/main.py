@@ -15,9 +15,10 @@ import functools
 
 import numpy as np
 
+from supersolids.Schroedinger import Schroedinger
+from supersolids.simulate_case import simulate_case
 from supersolids import constants
 from supersolids import functions
-from supersolids import simulate_case
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
@@ -104,50 +105,50 @@ if __name__ == "__main__":
     psi_sol_3d_cut_z = functools.partial(functions.density_in_trap,
                                          x=0, y=0, R_r=R_r, R_z=R_z)
 
+    System: Schroedinger = Schroedinger(Box,
+                                        Res,
+                                        max_timesteps=2001,
+                                        dt=dt,
+                                        g=g,
+                                        g_qf=g_qf,
+                                        e_dd=e_dd,
+                                        imag_time=True,
+                                        mu=1.1,
+                                        E=1.0,
+                                        psi_0=psi_0_3d,
+                                        V=V_3d,
+                                        V_interaction=V_3d_ddi,
+                                        psi_sol=psi_sol_3d,
+                                        mu_sol=functions.mu_3d,
+                                        psi_0_noise=psi_0_noise_3d,
+                                        alpha_psi=0.8,
+                                        alpha_psi_sol=0.5,
+                                        alpha_V=0.3
+                                        )
+
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    simulate_case.simulate_case(Box,
-                                Res,
-                                max_timesteps=2001,
-                                dt=dt,
-                                g=g,
-                                g_qf=g_qf,
-                                e_dd=e_dd,
-                                imag_time=True,
-                                mu=1.1,
-                                E=1.0,
-                                psi_0=psi_0_3d,
-                                V=V_3d,
-                                V_interaction=V_3d_ddi,
-                                psi_sol=psi_sol_3d,
-                                mu_sol=functions.mu_3d,
-                                plot_psi_sol=True,
-                                psi_sol_3d_cut_x=psi_sol_3d_cut_x,
-                                psi_sol_3d_cut_y=None,
-                                psi_sol_3d_cut_z=None,
-                                plot_V=False,
-                                psi_0_noise=psi_0_noise_3d,
-                                alpha_psi=0.8,
-                                alpha_psi_sol=0.5,
-                                alpha_V=0.3,
-                                accuracy=10 ** -8,
-                                filename="anim.mp4",
-                                x_lim=(-2.0, 2.0),
-                                y_lim=(-2.0, 2.0),
-                                z_lim=(0, 0.5),
-                                slice_x_index=int(Res.x / 8),
-                                slice_y_index=int(Res.y / 8),
-                                slice_z_index=int(Res.z / 2),
-                                interactive=True,
-                                camera_r_func=functools.partial(
-                                    functions.camera_func_r,
-                                    r_0=40.0, phi_0=45.0, z_0=50.0, r_per_frame=0.0),
-                                camera_phi_func=functools.partial(
-                                    functions.camera_func_phi,
-                                    r_0=40.0, phi_0=45.0, z_0=50.0, phi_per_frame=5.0),
-                                camera_z_func=functools.partial(
-                                    functions.camera_func_z,
-                                    r_0=40.0, phi_0=45.0, z_0=50.0, z_per_frame=0.0),
-                                delete_input=False
-                                )
+    simulate_case(System=System,
+                  accuracy=10 ** -8,
+                  plot_psi_sol=True,
+                  psi_sol_3d_cut_x=psi_sol_3d_cut_x,
+                  psi_sol_3d_cut_y=None,
+                  psi_sol_3d_cut_z=None,
+                  plot_V=False,
+                  filename="anim.mp4",
+                  x_lim=(-2.0, 2.0),
+                  y_lim=(-2.0, 2.0),
+                  z_lim=(0, 0.5),
+                  slice_x_index=int(Res.x / 8),
+                  slice_y_index=int(Res.y / 8),
+                  slice_z_index=int(Res.z / 2),
+                  interactive=True,
+                  camera_r_func=functools.partial(functions.camera_func_r,
+                      r_0=40.0, phi_0=45.0, z_0=50.0, r_per_frame=0.0),
+                  camera_phi_func=functools.partial(functions.camera_func_phi,
+                      r_0=40.0, phi_0=45.0, z_0=50.0, phi_per_frame=5.0),
+                  camera_z_func=functools.partial(functions.camera_func_z,
+                      r_0=40.0, phi_0=45.0, z_0=50.0, z_per_frame=0.0),
+                  delete_input=False
+                  )
     print("Single core done")

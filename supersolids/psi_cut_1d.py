@@ -30,6 +30,9 @@ def psi_cut_1d(System: Schroedinger,
 
     Parameters
 
+    System : Schroedinger.Schroedinger
+        Schrödinger equations for the specified system
+
 
     Returns
 
