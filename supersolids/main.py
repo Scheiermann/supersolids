@@ -7,12 +7,11 @@
 
 """
 Animation for the numerical solver for the non-linear
-time-dependent Schrodinger equation.
+time-dependent Schrodinger equation for 1D, 2D and 3D.
 
 """
 
 import functools
-import psutil
 
 import numpy as np
 
@@ -26,7 +25,7 @@ if __name__ == "__main__":
 
     # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
-    Res = functions.Resolution(x=2 ** 8, y=2 ** 8, z=2 ** 6)
+    Res = functions.Resolution(x=2 ** 6, y=2 ** 6, z=2 ** 6)
 
     Box = functions.Box(x0=-15, x1=15,
                         y0=-15, y1=15,
@@ -100,7 +99,8 @@ if __name__ == "__main__":
 
     psi_sol_3d_cut_x = functools.partial(functions.density_in_trap,
                                          y=0, z=0, R_r=R_r, R_z=R_z)
-
+    psi_sol_3d_cut_y = functools.partial(functions.density_in_trap,
+                                         x=0, z=0, R_r=R_r, R_z=R_z)
     psi_sol_3d_cut_z = functools.partial(functions.density_in_trap,
                                          x=0, y=0, R_r=R_r, R_z=R_z)
 
@@ -121,8 +121,9 @@ if __name__ == "__main__":
                                 V_interaction=V_3d_ddi,
                                 psi_sol=psi_sol_3d,
                                 mu_sol=functions.mu_3d,
-                                plot_psi_sol=False,
+                                plot_psi_sol=True,
                                 psi_sol_3d_cut_x=psi_sol_3d_cut_x,
+                                psi_sol_3d_cut_y=psi_sol_3d_cut_y,
                                 psi_sol_3d_cut_z=psi_sol_3d_cut_z,
                                 plot_V=False,
                                 psi_0_noise=psi_0_noise_3d,

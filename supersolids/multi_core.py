@@ -7,7 +7,7 @@
 
 """
 Animation for the numerical solver for the non-linear
-time-dependent Schrodinger equation.
+time-dependent Schrodinger equation for 1D and 2D in multi-core.
 
 """
 
@@ -66,13 +66,6 @@ if __name__ == "__main__":
     # initial wave function: psi_0)
     V_1d = functions.v_harmonic_1d
     V_2d = functools.partial(functions.v_harmonic_2d, alpha_y=alpha_y)
-    V_3d = functools.partial(
-        functions.v_harmonic_3d,
-        alpha_y=alpha_y,
-        alpha_z=alpha_z)
-
-    V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
-                                 r_cut=1.0 * Box.min_length() / 2.0)
 
     # functools.partial sets all arguments except x, y, z,
     # as multiple arguments for Schroedinger aren't implement yet
@@ -85,30 +78,10 @@ if __name__ == "__main__":
                                  var=np.array([[1.0, 0.0], [0.0, 1.0]])
                                  )
 
-    psi_0_3d = functools.partial(
-        functions.psi_gauss_3d,
-        a_x=8.0,
-        a_y=4.0,
-        a_z=2.0,
-        x_0=0.0,
-        y_0=0.0,
-        z_0=0.0,
-        k_0=0.0)
-    # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
-
-    # psi_0_noise_3d = functions.noise_mesh(
-    #     min=0.8, max=1.4, shape=(Res.x, Res.y, Res.z))
-
     # Used to remember that 2D need the special pos function (g is set inside
     # of Schroedinger for convenience)
     psi_sol_1d = functions.thomas_fermi_1d
     psi_sol_2d = functions.thomas_fermi_2d_pos
-
-    psi_sol_3d_cut_x = functools.partial(functions.density_in_trap,
-                                         y=0, z=0, R_r=R_r, R_z=R_z)
-
-    psi_sol_3d_cut_z = functools.partial(functions.density_in_trap,
-                                         x=0, y=0, R_r=R_r, R_z=R_z)
 
     # TODO: As g is proportional to N * a_s/w_x,
     # changing g, V, g_qf are different (maybe other variables too)
@@ -143,11 +116,9 @@ if __name__ == "__main__":
                             psi_0=psi_0_2d,
                             V=V_2d,
                             V_interaction=None,
-                            psi_sol=psi_sol_2d,
-                            mu_sol=functions.mu_2d,
+                            psi_sol=None,
+                            mu_sol=None,
                             plot_psi_sol=False,
-                            psi_sol_3d_cut_x=psi_sol_3d_cut_x,
-                            psi_sol_3d_cut_z=psi_sol_3d_cut_z,
                             plot_V=False,
                             psi_0_noise=None,
                             alpha_psi=0.8,
@@ -158,9 +129,6 @@ if __name__ == "__main__":
                             x_lim=(-2.0, 2.0),
                             y_lim=(-2.0, 2.0),
                             z_lim=(0, 0.5),
-                            slice_x_index=int(Res.x / 8),
-                            slice_y_index=int(Res.y / 8),
-                            slice_z_index=0,
                             interactive=True,
                             camera_r_func=functools.partial(
                                 functions.camera_func_r,
@@ -174,7 +142,6 @@ if __name__ == "__main__":
                                 functions.camera_func_z,
                                 r_0=40.0, phi_0=45.0, z_0=50.0,
                                 z_per_frame=0.0),
-                            delete_input=False
                             )
     print("Multi core done")
 

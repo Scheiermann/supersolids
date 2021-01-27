@@ -7,18 +7,16 @@
 
 """
 Animation for the numerical solver for the non-linear
-time-dependent Schrodinger equation.
+time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 
 """
 
 import functools
 
-import numpy as np
 from mayavi import mlab
-from typing import Callable, Tuple, NamedTuple
-from matplotlib import pyplot as plt
+from typing import Callable, Tuple
 
-from supersolids import Animation
+from supersolids import Animation, psi_cut_1d
 from supersolids import functions
 from supersolids import MayaviAnimation
 from supersolids import run_time
@@ -42,6 +40,7 @@ def simulate_case(Box: functions.Box,
                   mu_sol: Callable = functions.mu_3d,
                   plot_psi_sol: bool = False,
                   psi_sol_3d_cut_x: Callable = None,
+                  psi_sol_3d_cut_y: Callable = None,
                   psi_sol_3d_cut_z: Callable = None,
                   plot_V: bool = True,
                   psi_0_noise: Callable = functions.noise_mesh,
@@ -210,32 +209,19 @@ def simulate_case(Box: functions.Box,
                         camera_phi_func=camera_phi_func,
                         camera_z_func=camera_z_func,
                         )
+
+        psi_cut_1d.psi_cut_1d(Harmonic,
+                              psi_sol_3d_cut_x,
+                              psi_sol_3d_cut_y,
+                              psi_sol_3d_cut_z,
+                              y_lim=(0.0, 0.05))
+
         with run_time.run_time(name="mlab.show"):
             mlab.show()
         # TODO: close window after last frame
         # print(f"{Harmonic.t}, {Harmonic.dt * Harmonic.max_timesteps}")
         # if Harmonic.t >= Harmonic.dt * Harmonic.max_timesteps:
         #     mlab.close()
-
-        cut_x = np.linspace(Harmonic.Box.x0, Harmonic.Box.x1, Harmonic.Res.x)
-        cut_y = np.linspace(Harmonic.Box.y0, Harmonic.Box.y1, Harmonic.Res.y)
-        cut_z = np.linspace(Harmonic.Box.z0, Harmonic.Box.z1, Harmonic.Res.z)
-
-        prob_mitte_x = np.abs(Harmonic.psi_val[:, Harmonic.Res.y // 2, Harmonic.Res.z // 2]) ** 2.0
-        prob_mitte_y = np.abs(Harmonic.psi_val[Harmonic.Res.x // 2, :, Harmonic.Res.z // 2]) ** 2.0
-        prob_mitte_z = np.abs(Harmonic.psi_val[Harmonic.Res.x // 2, Harmonic.Res.y // 2, :]) ** 2.0
-
-        plt.plot(cut_x, prob_mitte_x, "x-", color="tab:blue", label="x cut")
-        plt.plot(cut_y, prob_mitte_y, "x-", color="tab:grey", label="y cut")
-        plt.plot(cut_z, prob_mitte_z, "x-", color="tab:orange", label="z cut")
-        plt.plot(cut_x, psi_sol_3d_cut_x(cut_x), "x-", color="tab:cyan",
-                 label="x cut sol")
-        plt.plot(cut_z, psi_sol_3d_cut_z(z=cut_z), "x-", color="tab:olive",
-                 label="z cut sol")
-        plt.ylim([0.0, 0.005])
-        plt.legend()
-        plt.grid()
-        plt.show()
 
         may.create_movie(
             input_data_file_pattern="*.png",
