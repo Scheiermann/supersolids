@@ -52,9 +52,6 @@ class Schroedinger(object):
                  psi_sol: Optional[Callable] = functions.thomas_fermi_3d,
                  mu_sol: Optional[Callable] = functions.mu_3d,
                  psi_0_noise: Optional[Callable] = functions.noise_mesh,
-                 alpha_psi: float = 0.8,
-                 alpha_psi_sol: float = 0.53,
-                 alpha_V: float = 0.3,
                  ) -> None:
         """
         Schrödinger equations for the specified system.
@@ -75,15 +72,6 @@ class Schroedinger(object):
 
         max_timesteps : int
             Maximum timesteps  with length dt for the animation.
-
-        alpha_psi : float
-            Alpha value for plot transparency of :math:`\psi`
-
-        alpha_psi_sol : float
-            Alpha value for plot transparency of :math:`\psi_{sol}`
-
-        alpha_V : float
-            Alpha value for plot transparency of V
 
         """
         assert isinstance(Res, functions.Resolution), (
@@ -294,10 +282,6 @@ class Schroedinger(object):
 
         # attributes for animation
         self.t: float = 0.0
-
-        self.alpha_psi: float = alpha_psi
-        self.alpha_psi_sol: float = alpha_psi_sol
-        self.alpha_V: float = alpha_V
 
     def get_density(self, p: float = 2.0) -> np.ndarray:
         """

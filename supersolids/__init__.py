@@ -3,7 +3,6 @@ __all__ = ["Animation",
            "constants",
            "density_in_trap",
            "functions",
-           "MayaviAnimation",
            "run_time",
-           "Schroedinger"
+           "Schroedinger",
            ]

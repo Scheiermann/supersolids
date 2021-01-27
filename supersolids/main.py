@@ -15,6 +15,7 @@ import functools
 
 import numpy as np
 
+from supersolids.Animation.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.simulate_case import simulate_case
 from supersolids import constants
@@ -36,7 +37,8 @@ if __name__ == "__main__":
     N: int = 3.8 * 10 ** 4 # 38000
     m: float = 164.0 * constants.u_in_kg
     a_dd: float = 130.0 * constants.a_0
-    a_s: float = 85.0 * constants.a_0
+    a_s: float = (130/ 0.8) * constants.a_0
+    # a_s: float = 85.0 * constants.a_0
 
     w_x: float = 2.0 * np.pi * 30.0
     w_y: float = 2.0 * np.pi * 60.0
@@ -47,15 +49,6 @@ if __name__ == "__main__":
         N=N, m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
     print(f"g, g_qf, epsilon_dd, alpha_y, alpha_z: "
           f"{g, g_qf, e_dd, alpha_y, alpha_z}")
-
-    # psi_sol_3d = functions.thomas_fermi_3d
-    kappa = functions.get_kappa(alpha_z=alpha_z, e_dd=e_dd,
-                                x_min=0.1, x_max=5.0, res=1000)
-    R_r, R_z = functions.get_R_rz(kappa=kappa, e_dd=e_dd, N=N,
-                                  a_s_l_ho_ratio=a_s_l_ho_ratio)
-    psi_sol_3d = functools.partial(functions.density_in_trap,
-                                   R_r=R_r, R_z=R_z)
-    print(f"kappa: {kappa}, R_r: {R_r}, R_z: {R_z}")
 
     # Define functions (needed for the Schroedinger equation)
     # (e.g. potential: V, initial wave function: psi_0)
@@ -98,6 +91,15 @@ if __name__ == "__main__":
     psi_sol_1d = functions.thomas_fermi_1d
     psi_sol_2d = functions.thomas_fermi_2d_pos
 
+    # psi_sol_3d = functions.thomas_fermi_3d
+    kappa = functions.get_kappa(alpha_z=alpha_z, e_dd=e_dd,
+                                x_min=0.1, x_max=5.0, res=1000)
+    R_r, R_z = functions.get_R_rz(kappa=kappa, e_dd=e_dd, N=N,
+                                  a_s_l_ho_ratio=a_s_l_ho_ratio)
+    psi_sol_3d = functools.partial(functions.density_in_trap,
+                                   R_r=R_r, R_z=R_z)
+    print(f"kappa: {kappa}, R_r: {R_r}, R_z: {R_z}")
+
     psi_sol_3d_cut_x = functools.partial(functions.density_in_trap,
                                          y=0, z=0, R_r=R_r, R_z=R_z)
     psi_sol_3d_cut_y = functools.partial(functions.density_in_trap,
@@ -121,14 +123,30 @@ if __name__ == "__main__":
                                         psi_sol=psi_sol_3d,
                                         mu_sol=functions.mu_3d,
                                         psi_0_noise=psi_0_noise_3d,
-                                        alpha_psi=0.8,
-                                        alpha_psi_sol=0.5,
-                                        alpha_V=0.3
                                         )
+
+    Anim: Animation = Animation(dim=System.dim,
+                                alpha_psi=0.8,
+                                alpha_psi_sol=0.5,
+                                alpha_V=0.3,
+                                camera_r_func=functools.partial(
+                                    functions.camera_func_r,
+                                    r_0=40.0, phi_0=45.0, z_0=50.0,
+                                    r_per_frame=0.0),
+                                camera_phi_func=functools.partial(
+                                    functions.camera_func_phi,
+                                    r_0=40.0, phi_0=45.0, z_0=50.0,
+                                    phi_per_frame=5.0),
+                                camera_z_func=functools.partial(
+                                    functions.camera_func_z,
+                                    r_0=40.0, phi_0=45.0, z_0=50.0,
+                                    z_per_frame=0.0),
+                                )
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
     simulate_case(System=System,
+                  Anim=Anim,
                   accuracy=10 ** -8,
                   plot_psi_sol=True,
                   psi_sol_3d_cut_x=psi_sol_3d_cut_x,
@@ -143,12 +161,6 @@ if __name__ == "__main__":
                   slice_y_index=int(Res.y / 8),
                   slice_z_index=int(Res.z / 2),
                   interactive=True,
-                  camera_r_func=functools.partial(functions.camera_func_r,
-                      r_0=40.0, phi_0=45.0, z_0=50.0, r_per_frame=0.0),
-                  camera_phi_func=functools.partial(functions.camera_func_phi,
-                      r_0=40.0, phi_0=45.0, z_0=50.0, phi_per_frame=5.0),
-                  camera_z_func=functools.partial(functions.camera_func_z,
-                      r_0=40.0, phi_0=45.0, z_0=50.0, z_per_frame=0.0),
                   delete_input=False
                   )
     print("Single core done")

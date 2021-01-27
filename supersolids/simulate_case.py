@@ -16,14 +16,14 @@ import functools
 from mayavi import mlab
 from typing import Callable, Tuple
 
+from supersolids.Animation import Animation, MayaviAnimation, MatplotlibAnimation
 from supersolids.Schroedinger import Schroedinger
-from supersolids import Animation, psi_cut_1d
-from supersolids import functions
-from supersolids import MayaviAnimation
+from supersolids.psi_cut_1d import psi_cut_1d
 from supersolids import run_time
 
 
 def simulate_case(System: Schroedinger,
+                  Anim: Animation.Animation,
                   accuracy: float = 10 ** -6,
                   plot_psi_sol: bool = False,
                   psi_sol_3d_cut_x: Callable = None,
@@ -38,10 +38,6 @@ def simulate_case(System: Schroedinger,
                   slice_y_index: int = 0,
                   slice_z_index: int = 0,
                   interactive: bool = True,
-                  camera_r_func: Callable = None,
-                  camera_phi_func: Callable = functools.partial(
-                      functions.camera_func_phi, phi_per_frame=20.0),
-                  camera_z_func: Callable = None,
                   delete_input: bool = True) -> None:
     """
     Wrapper for Animation and Schroedinger to get a working Animation
@@ -109,53 +105,44 @@ def simulate_case(System: Schroedinger,
     """
     if System.dim < 3:
         # matplotlib for 1D and 2D
-        ani = Animation.Animation(dim=System.dim,
-                                  camera_r_func=camera_r_func,
-                                  camera_phi_func=camera_phi_func,
-                                  camera_z_func=camera_z_func,
-                                  )
+        MatplotlibAnim = MatplotlibAnimation.MatplotlibAnimation(Anim)
+        if MatplotlibAnim.dim == 1:
+            MatplotlibAnim.set_limits(0, 0, *x_lim, *y_lim)
+        elif MatplotlibAnim.dim == 2:
+            MatplotlibAnim.ax.set_xlim(*x_lim)
+            MatplotlibAnim.ax.set_ylim(*y_lim)
+            MatplotlibAnim.ax.set_zlim(*z_lim)
 
-        if ani.dim == 1:
-            ani.set_limits(0, 0, *x_lim, *y_lim)
-        elif ani.dim == 2:
-            ani.ax.set_xlim(*x_lim)
-            ani.ax.set_ylim(*y_lim)
-            ani.ax.set_zlim(*z_lim)
+        # Animation.set_limits_smart(0, System)
 
-        # ani.set_limits_smart(0, System)
-
-        with run_time.run_time(name="ani.start"):
-            ani.start(
-                System,
-                filename,
-                accuracy=accuracy,
-                plot_psi_sol=plot_psi_sol,
-                plot_V=plot_V)
+        with run_time.run_time(name="Animation.start"):
+            MatplotlibAnim.start(System,
+                                 filename,
+                                 accuracy=accuracy,
+                                 plot_psi_sol=plot_psi_sol,
+                                 plot_V=plot_V)
     else:
         # mayavi for 3D
-        may = MayaviAnimation.MayaviAnimation(dim=System.dim)
-        with run_time.run_time(name="may.animate"):
-            may.animate(System,
-                        accuracy=accuracy,
-                        plot_V=plot_V,
-                        plot_psi_sol=plot_psi_sol,
-                        x_lim=x_lim,
-                        y_lim=y_lim,
-                        z_lim=z_lim,
-                        slice_x_index=slice_x_index,
-                        slice_y_index=slice_y_index,
-                        slice_z_index=slice_z_index,
-                        interactive=interactive,
-                        camera_r_func=camera_r_func,
-                        camera_phi_func=camera_phi_func,
-                        camera_z_func=camera_z_func,
-                        )
+        MayAnim = MayaviAnimation.MayaviAnimation(Anim)
+        with run_time.run_time(name="MayaviAnimation.animate"):
+            MayAnim.animate(System,
+                            accuracy=accuracy,
+                            plot_V=plot_V,
+                            plot_psi_sol=plot_psi_sol,
+                            x_lim=x_lim,
+                            y_lim=y_lim,
+                            z_lim=z_lim,
+                            slice_x_index=slice_x_index,
+                            slice_y_index=slice_y_index,
+                            slice_z_index=slice_z_index,
+                            interactive=interactive,
+                            )
 
-        psi_cut_1d.psi_cut_1d(System,
-                              psi_sol_3d_cut_x,
-                              psi_sol_3d_cut_y,
-                              psi_sol_3d_cut_z,
-                              y_lim=(0.0, 0.05))
+        psi_cut_1d(System,
+                   psi_sol_3d_cut_x,
+                   psi_sol_3d_cut_y,
+                   psi_sol_3d_cut_z,
+                   y_lim=(0.0, 0.05))
 
         with run_time.run_time(name="mlab.show"):
             mlab.show()
@@ -164,7 +151,6 @@ def simulate_case(System: Schroedinger,
         # if System.t >= System.dt * System.max_timesteps:
         #     mlab.close()
 
-        may.create_movie(
-            input_data_file_pattern="*.png",
-            filename=filename,
-            delete_input=delete_input)
+        MayAnim.create_movie(input_data_file_pattern="*.png",
+                             filename=filename,
+                             delete_input=delete_input)

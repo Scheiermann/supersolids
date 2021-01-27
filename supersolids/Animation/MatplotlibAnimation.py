@@ -6,58 +6,43 @@
 # Please feel free to use and modify this, but keep the above information.
 
 """
-Implements animation
+Implements an Animation with matplotlib (for Systems in 1D or 2D).
 
 """
 import sys
 from os import sep
-from typing import Callable, Tuple, List
+from typing import Callable, Tuple, List, Optional
 
 import numpy as np
-from matplotlib import animation
-from matplotlib import cm
+from matplotlib import animation, cm
 from matplotlib import pyplot as plt
 
-from supersolids import Schroedinger, functions
+from supersolids.Animation import Animation
+from supersolids.Schroedinger import Schroedinger
+from supersolids import functions
 
 
-
-class Animation:
-    def __init__(self,
-                 dim=2,
-                 camera_r_func=None,
-                 camera_phi_func=None,
-                 camera_z_func=None,
-                 ):
+class MatplotlibAnimation(Animation.Animation):
+    def __init__(self, Anim: Animation.Animation):
         """
         Creates an Animation for a Schroedinger equation for the 1D or 2D case.
         Methods need the object Schroedinger with the parameters of the equation
 
         Parameters
 
-        dim : int
-            Dimension of the underlying Schroedinger to animate.
-
-        camera_r_func : Callable, function
-            r component of the movement of the camera.
-
-        camera_phi_func : Callable, function
-            phi component of the movement of the camera.
-
-        camera_z_func : Callable, function
-            z component of the movement of the camera.
-
-        camera_r_0 : float
-            r component of the starting point of the camera movement.
-
-        camera_phi_0 : float
-            phi component of the starting point of the camera movement.
-
-        camera_z_0 : float
-            z component of the starting point of the camera movement.
+        Anim : Animation.Animation
+            Base class Animation with configured properties for the animation.
 
         """
-        self.dim = dim
+        super().__init__(dim=Anim.dim,
+                         alpha_psi=Anim.alpha_psi,
+                         alpha_psi_sol=Anim.alpha_psi_sol,
+                         alpha_V=Anim.alpha_V,
+                         camera_r_func=Anim.camera_r_func,
+                         camera_phi_func=Anim.camera_phi_func,
+                         camera_z_func=Anim.camera_z_func
+                         )
+
         assert 1 <= self.dim <= 2, ("Spatial dimension needs to be 1 or 2, "
                                     f"but it is {self.dim}."
                                     "This is not implemented.")
@@ -91,15 +76,11 @@ class Animation:
             self.ax.set_zlabel(r'$z$')
             self.ax.grid()
 
-            self.r_func = camera_r_func
-            self.phi_func = camera_phi_func
-            self.z_func = camera_z_func
-
             camera_r_0, camera_phi_0, camera_z_0 = functions.camera_3d_trajectory(
                 0,
-                r_func=self.r_func,
-                phi_func=self.phi_func,
-                z_func=self.z_func)
+                r_func=self.camera_r_func,
+                phi_func=self.camera_phi_func,
+                z_func=self.camera_z_func)
 
             self.ax.dist = camera_r_0
             self.ax.azim = camera_phi_0
@@ -138,7 +119,7 @@ class Animation:
         self.axs[row, col].set_ylim(y_lim)
 
     def set_limits_smart(self, row: int, col: int,
-                         System: Schroedinger.Schroedinger):
+                         System: Schroedinger):
         """
         Sets the plot limits appropriate,
         even if the initial wave function :math:`\psi_0` is not normalized.
@@ -155,8 +136,8 @@ class Animation:
             Defines the Schroedinger equation for a given problem
         """
 
-        assert isinstance(System, Schroedinger.Schroedinger), (
-            f"System needs to be {Schroedinger.Schroedinger},"
+        assert isinstance(System, Schroedinger), (
+            f"System needs to be {Schroedinger},"
             f"but it is {type(System)}")
         assert self.dim == System.dim, ("Spatial dimension Animation and "
                                         "Schroedinger needs to be equal, "
@@ -191,7 +172,7 @@ class Animation:
         self.set_limits(row, col, x_min, x_max, y_min, y_max)
 
     def get_V_plot_values(self, i: int, j: int,
-                          System: Schroedinger.Schroedinger,
+                          System: Schroedinger,
                           reserve: float = 1.0):
         if System.dim == 1:
             ylim = self.axs[i, j].get_ylim()
@@ -225,7 +206,7 @@ class Animation:
         return V_pos, V_plot_val
 
     def animate(self, frame_index: int,
-                System: Schroedinger.Schroedinger,
+                System: Schroedinger,
                 accuracy: float = 10 ** -6,
                 plot_psi_sol: bool = False,
                 plot_V: bool = True,
@@ -253,8 +234,8 @@ class Animation:
             Condition if V should be plotted.
 
         """
-        assert isinstance(System, Schroedinger.Schroedinger), (
-            f"System needs to be {Schroedinger.Schroedinger},"
+        assert isinstance(System, Schroedinger), (
+            f"System needs to be {Schroedinger},"
             f"but it is {type(System)}")
         assert self.dim == System.dim, ("Spatial dimension Animation and "
                                         "Schroedinger needs to be equal, "
@@ -278,7 +259,7 @@ class Animation:
                                                        cmap=cm.Blues,
                                                        linewidth=5,
                                                        rstride=8, cstride=8,
-                                                       alpha=System.alpha_V
+                                                       alpha=self.alpha_V
                                                        )
 
                     self.V_z_line = self.ax.contourf(self.V_pos[:, :, 0],
@@ -289,7 +270,7 @@ class Animation:
                                                             0],
                                                      cmap=cm.Blues,
                                                      levels=20,
-                                                     alpha=System.alpha_V
+                                                     alpha=self.alpha_V
                                                      )
 
         # FuncAnimation calls animate 3 times with frame_index=0,
@@ -357,7 +338,7 @@ class Animation:
                                                      linewidth=5,
                                                      rstride=1,
                                                      cstride=1,
-                                                     alpha=System.alpha_psi
+                                                     alpha=self.alpha_psi
                                                      )
 
                 cmap = cm.coolwarm
@@ -411,7 +392,7 @@ class Animation:
                 else:
                     return self.psi_line, self.title
 
-    def start(self, System: Schroedinger.Schroedinger,
+    def start(self, System: Schroedinger,
               filename: str = "anim.mp4",
               accuracy: float = 10 ** -6,
               plot_psi_sol: bool = False,
@@ -441,8 +422,8 @@ class Animation:
             Condition if V should be plotted.
 
         """
-        assert isinstance(System, Schroedinger.Schroedinger), (
-            f"System needs to be {Schroedinger.Schroedinger},"
+        assert isinstance(System, Schroedinger), (
+            f"System needs to be {Schroedinger},"
             f"but it is {type(System)}")
         assert self.dim == System.dim, ("Spatial dimension Animation and "
                                         "Schroedinger needs to be equal, "
