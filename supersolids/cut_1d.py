@@ -84,7 +84,7 @@ def prepare_cuts(func: Callable, N: int, alpha_z: float,
         Number of particles
 
     alpha_z : float
-        Ratio between z and x frequencies of the tap :math:`w_{z} / w_{x}`
+        Ratio between z and x frequencies of the trap :math:`w_{z} / w_{x}`
 
     e_dd : float
         :math:`\epsilon_{dd} = a_{dd} / a_{s}`

@@ -294,6 +294,7 @@ class Schroedinger(object):
 
         # attributes for animation
         self.t: float = 0.0
+        print(f"Simpson Norm:{self.get_norm_simpson(np.abs(self.psi_val) ** 2.0)}")
 
     def get_density(self, p: float = 2.0) -> np.ndarray:
         """
@@ -345,35 +346,71 @@ class Schroedinger(object):
 
         return psi_norm
 
-
     def get_norm_simpson(self, func_val: Callable) -> float:
+        """
+        Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D.
+        Uses simpsons rule:
+        :math:`h (f(a) + 4 f(a+h) + f(a+2h)) / 3`
+
+        :param func_val: Function f to integrate.
+        :type func_val: Callable
+
+        :return: Integrated function
+        :rtype: float
+        """
         # Gauss Chebyshev integral calculation
         # x_nodes, w_weights = np.polynomial.chebyshev.chebgauss(100)
         if self.dim == 1:
-            sol_1d_int = scipy.integrate.simpson(func_val, x=self.y)
+            sol_1d_int = scipy.integrate.simpson(func_val, x=self.x)
 
             return sol_1d_int
 
         elif self.dim == 2:
-            single_integrals = np.empty(self.Res.y)
-            for i in single_integrals:
-                psi_val_1d_slice = func_val[:, i, self.Res.z // 2]
-                single_integrals[i] = scipy.integrate.simpson(psi_val_1d_slice, x=self.y)
+            dV = self.dx * self.dy
+            return dV * np.sum(func_val[0:-2, 0:-2]
+                               + 4 * func_val[0:-2, 1:-1]
+                               + func_val[0:-2, 2:]
 
-            return np.sum(single_integrals)
+                               + func_val[1:-1, 0:-2]
+                               + 4 * func_val[1:-1, 1:-1]
+                               + func_val[1:-1, 2:]
 
-        elif self.dim == 3:
-            single_integrals = np.empty(shape=(self.Res.y, self.Res.z))
-            for i in single_integrals[0]:
-                for j in single_integrals.shape[1]:
-                    psi_val_1d_slice = func_val[:, i, j]
-                    single_integrals[i, j] = scipy.integrate.simpson(psi_val_1d_slice, x=self.y)
-
-            return np.sum(single_integrals)
+                               + func_val[2:, 0:-2]
+                               + 4 * func_val[2:, 1:-1]
+                               + func_val[2:, 2:]
+                               ) / 6.0
 
         else:
             print(f"Not implemented yet.")
+            pass
 
+    def get_norm_trapez(self, func_val: Callable) -> float:
+        if self.dim == 1:
+            dV: float = self.dx
+            return dV * np.sum(func_val[0:-1] + func_val[1:]) / 2.0
+
+        elif self.dim == 2:
+            dV = self.dx * self.dy
+            return dV * np.sum(func_val[0:-1, 0:-1]
+                               + func_val[0:-1, 1:]
+                               + func_val[1:, 0:-1]
+                               + func_val[1:, 1:]
+                               ) / 4.0
+
+        elif self.dim == 3:
+            dV = self.dx * self.dy * self.dz
+            return dV * np.sum(func_val[0:-1, 0:-1, 0:-1]
+                               + func_val[0:-1, 0:-1, 1:]
+                               + func_val[0:-1, 1:, 0:-1]
+                               + func_val[0:-1, 1:, 1:]
+                               + func_val[1:, 0:-1, 0:-1]
+                               + func_val[1:, 0:-1, 1:]
+                               + func_val[1:, 1:, 0:-1]
+                               + func_val[1:, 1:, 1:]
+                               ) / 8.0
+
+        else:
+            print(f"Not implemented yet.")
             pass
 
     def time_step(self) -> None:
@@ -423,7 +460,8 @@ class Schroedinger(object):
         # for self.imag_time=False, renormalization should be preserved,
         # but we play safe here (regardless of speedup)
         # if self.imag_time:
-        psi_norm_after_evolution: float = self.get_norm(p=2.0)
+        psi_norm_after_evolution: float = self.get_norm_trapez(np.abs(self.psi_val) ** 2.0)
+        # psi_norm_after_evolution: float = self.get_norm(p=2.0)
         self.psi_val = self.psi_val / np.sqrt(psi_norm_after_evolution)
 
         psi_quadratic_int = self.get_norm(p=4.0)
@@ -431,6 +469,8 @@ class Schroedinger(object):
         # TODO: adjust for DDI
         self.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
         self.E = self.mu - 0.5 * self.g * psi_quadratic_int
+
+        # print(f"Sol norm: {self.get_norm_trapez(self.psi_sol_val)}")
 
         # TODO: These formulas for mu.sol and E are not for all cases correct
         # print(f"mu: {self.mu}")

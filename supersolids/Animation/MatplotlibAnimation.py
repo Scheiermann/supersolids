@@ -34,7 +34,7 @@ class MatplotlibAnimation(Animation.Animation):
             Base class Animation with configured properties for the animation.
 
         """
-        super().__init__(dim=Anim.dim,
+        super().__init__(Res=Anim.Res,
                          plot_psi_sol=Anim.plot_psi_sol,
                          plot_V=Anim.plot_V,
                          alpha_psi=Anim.alpha_psi,
@@ -49,6 +49,7 @@ class MatplotlibAnimation(Animation.Animation):
         assert 1 <= self.dim <= 2, ("Spatial dimension needs to be 1 or 2, "
                                     f"but it is {self.dim}."
                                     "This is not implemented.")
+        self.dim = self.Res.dim
 
         # matplotlib
         if self.dim == 1:
@@ -309,9 +310,9 @@ class MatplotlibAnimation(Animation.Animation):
                 # rotate camera
                 camera_r, camera_phi, camera_z = functions.camera_3d_trajectory(
                     frame_index,
-                    r_func=self.r_func,
-                    phi_func=self.phi_func,
-                    z_func=self.z_func,
+                    r_func=self.camera_r_func,
+                    phi_func=self.camera_phi_func,
+                    z_func=self.camera_z_func,
                     )
 
                 self.ax.dist = camera_r

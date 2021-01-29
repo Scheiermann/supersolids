@@ -29,17 +29,21 @@ if __name__ == "__main__":
 
     # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
-    Res = functions.Resolution(x=2 ** 6, y=2 ** 6, z=2 ** 6)
+    # Res = functions.Resolution(x=2 ** 7, y=2 ** 7, z=2 ** 7)
+    # Box = functions.Box(x0=-12, x1=12,
+    #                     y0=-9, y1=9,
+    #                     z0=-3, z1=3)
 
-    Box = functions.Box(x0=-15, x1=15,
-                        y0=-15, y1=15,
-                        z0=-7, z1=7)
+    Res = functions.Resolution(x=2 ** 7, y=2 ** 7)
+    Box = functions.Box(x0=-12, x1=12,
+                        y0=-9, y1=9)
 
-    dt: float = 2 * 10 ** -4
+    dt: float = 2 * 10 ** -2
     N: int = 3.8 * 10 ** 4
     m: float = 164.0 * constants.u_in_kg
     a_dd: float = 130.0 * constants.a_0
-    a_s: float = 85.0 * constants.a_0
+    # a_s: float = 85.0 * constants.a_0
+    a_s: float = (130.0 / 0.8) * constants.a_0
 
     w_x: float = 2.0 * np.pi * 30.0
     w_y: float = 2.0 * np.pi * 60.0
@@ -80,8 +84,8 @@ if __name__ == "__main__":
         k_0=0.0)
     # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
 
-    psi_0_noise_3d = functions.noise_mesh(
-        min=0.8, max=1.4, shape=(Res.x, Res.y, Res.z))
+    # psi_0_noise_3d = functions.noise_mesh(
+    #     min=0.8, max=1.4, shape=(Res.x, Res.y, Res.z))
 
     # Used to remember that 2D need the special pos function (g is set inside
     # of Schroedinger for convenience)
@@ -89,13 +93,16 @@ if __name__ == "__main__":
     psi_sol_2d = functions.thomas_fermi_2d_pos
 
     # psi_sol_3d = functions.thomas_fermi_3d
-    psi_sol_3d: Optional[Callable] = prepare_cuts(functions.density_in_trap,
-                                                  N, alpha_z, e_dd,
-                                                  a_s_l_ho_ratio)
+    if Box.dim == 3:
+        psi_sol_3d: Optional[Callable] = prepare_cuts(functions.density_in_trap,
+                                                      N, alpha_z, e_dd,
+                                                      a_s_l_ho_ratio)
+    else:
+        psi_sol_3d = None
 
     System: Schroedinger = Schroedinger(Box,
                                         Res,
-                                        max_timesteps=2001,
+                                        max_timesteps=21,
                                         dt=dt,
                                         g=g,
                                         g_qf=g_qf,
@@ -103,12 +110,12 @@ if __name__ == "__main__":
                                         imag_time=True,
                                         mu=1.1,
                                         E=1.0,
-                                        psi_0=psi_0_3d,
-                                        V=V_3d,
-                                        V_interaction=V_3d_ddi,
-                                        psi_sol=psi_sol_3d,
-                                        mu_sol=functions.mu_3d,
-                                        psi_0_noise=psi_0_noise_3d,
+                                        psi_0=psi_0_2d,
+                                        V=V_2d,
+                                        V_interaction=None,
+                                        psi_sol=psi_sol_2d,
+                                        mu_sol=functions.mu_2d,
+                                        psi_0_noise=None,
                                         )
 
     Anim: Animation = Animation(Res=System.Res,
@@ -131,7 +138,11 @@ if __name__ == "__main__":
                                     z_per_frame=0.0),
                                 filename="anim.mp4",
                                 )
-    slice_indices = [int(Res.x / 8), int(Res.y / 8), int(Res.z / 2)]
+
+    if Box.dim == 3:
+        slice_indices = [int(Res.x / 8), int(Res.y / 8), int(Res.z / 2)]
+    else:
+        slice_indices = [None, None, None]
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
@@ -149,13 +160,10 @@ if __name__ == "__main__":
 
     print("Single core done")
 
-    if psi_sol_3d is None:
-        psi_sol_3d_cuts = [None, None, None]
-    else:
+    if psi_sol_3d is not None:
         psi_sol_3d_cuts = [
             functools.partial(psi_sol_3d, y=0, z=0),
             functools.partial(psi_sol_3d, x=0, z=0),
             functools.partial(psi_sol_3d, x=0, y=0)
         ]
-
-    cut_1d(SystemResult, *psi_sol_3d_cuts, y_lim=(0.0, 0.05))
+        cut_1d(SystemResult, *psi_sol_3d_cuts, y_lim=(0.0, 0.05))
