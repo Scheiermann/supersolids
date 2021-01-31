@@ -346,45 +346,24 @@ class Schroedinger(object):
 
         return psi_norm
 
-    def get_norm_simpson(self, func_val: Callable) -> float:
+    def get_norm_trapez(self, func_val: Callable) -> float:
         """
         Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D.
-        Uses simpsons rule:
-        :math:`h (f(a) + 4 f(a+h) + f(a+2h)) / 3`
+        Uses trapez rule:
+        For 1D: :math:`h (f(a) + f(a+h)) / 2`
 
-        :param func_val: Function f to integrate.
+        For 2D: :math:`h (f(a, b) + f(a+h, b) + f(a, b+h) + f(a+h, b+h)) / 2`
+
+        For 3D there are 8 entries in the same manner
+        :math:`(a, b, c) ... (a+h, b+h, c+h)`
+
+        :param func_val: Function to integrate.
         :type func_val: Callable
 
         :return: Integrated function
         :rtype: float
         """
-        # Gauss Chebyshev integral calculation
-        # x_nodes, w_weights = np.polynomial.chebyshev.chebgauss(100)
-        if self.dim == 1:
-            sol_1d_int = scipy.integrate.simpson(func_val, x=self.x)
 
-            return sol_1d_int
-
-        elif self.dim == 2:
-            dV = self.dx * self.dy
-            return dV * np.sum(func_val[0:-2, 0:-2]
-                               + 4 * func_val[0:-2, 1:-1]
-                               + func_val[0:-2, 2:]
-
-                               + func_val[1:-1, 0:-2]
-                               + 4 * func_val[1:-1, 1:-1]
-                               + func_val[1:-1, 2:]
-
-                               + func_val[2:, 0:-2]
-                               + 4 * func_val[2:, 1:-1]
-                               + func_val[2:, 2:]
-                               ) / 6.0
-
-        else:
-            print(f"Not implemented yet.")
-            pass
-
-    def get_norm_trapez(self, func_val: Callable) -> float:
         if self.dim == 1:
             dV: float = self.dx
             return dV * np.sum(func_val[0:-1] + func_val[1:]) / 2.0
