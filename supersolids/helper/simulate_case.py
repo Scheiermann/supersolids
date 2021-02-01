@@ -18,7 +18,7 @@ from typing import Tuple, List
 
 from supersolids.Animation import Animation, MayaviAnimation, MatplotlibAnimation
 from supersolids.Schroedinger import Schroedinger
-from supersolids import run_time
+from supersolids.tools import run_time
 
 
 def simulate_case(System: Schroedinger,

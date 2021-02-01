@@ -17,7 +17,7 @@ from typing import Callable, Tuple, Optional
 from matplotlib import pyplot as plt
 
 from supersolids.Schroedinger import Schroedinger
-from supersolids import functions
+from supersolids.helper import functions
 
 
 def cut_1d(System: Schroedinger,
@@ -27,7 +27,7 @@ def cut_1d(System: Schroedinger,
            y_lim: Tuple[float, float] = (0.0, 1.0)
            ) -> None:
     """
-    Creates 1D plots of the probability function of the System :math: `|\psi|^2
+    Creates 1D plots of the probability function of the System :math:`|\psi|^2
     and if given of the solution.
 
     :param System: Schrödinger equations for the specified system
@@ -80,13 +80,13 @@ def prepare_cuts(func: Callable, N: int, alpha_z: float,
     """
     Helper function to get R_r and R_z and set it for the given func.
 
-    :param func: Function of which to take the cuts
+    :param func: Function to take cuts from
 
     :param N: Number of particles
 
     :param alpha_z: Ratio between z and x frequencies of the trap :math:`w_{z} / w_{x}`
 
-    :param e_dd: :math:`\epsilon_{dd} = a_{dd} / a_{s}`
+    :param e_dd: Factor :math:`\epsilon_{dd} = a_{dd} / a_{s}`
 
     :param a_s_l_ho_ratio: :math:`a_s` in units of :math:`l_{HO}`
 

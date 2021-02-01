@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-__all__ = ["MatplotlibAnimation",
+__all__ = ["Animation",
+           "MatplotlibAnimation",
            "MayaviAnimation",
            ]
-

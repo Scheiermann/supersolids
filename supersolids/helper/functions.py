@@ -16,7 +16,7 @@ import numpy as np
 from scipy import stats
 from typing import Tuple, Callable, Optional, List
 
-from supersolids import constants
+from supersolids.helper import constants
 
 
 class Resolution:

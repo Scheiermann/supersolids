@@ -19,7 +19,7 @@ from matplotlib import pyplot as plt
 
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
-from supersolids import functions
+from supersolids.helper import functions
 
 
 class MatplotlibAnimation(Animation.Animation):

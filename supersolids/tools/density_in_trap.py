@@ -14,8 +14,8 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 
-from supersolids import constants
-from supersolids import functions
+from supersolids.helper import constants
+from supersolids.helper import functions
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":

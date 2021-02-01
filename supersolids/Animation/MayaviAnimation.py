@@ -19,7 +19,7 @@ from typing import List
 
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
-from supersolids import functions
+from supersolids.helper import functions
 
 
 def get_image_path(dir_path: Path,

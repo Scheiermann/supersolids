@@ -11,7 +11,7 @@ Base class for Animations
 """
 from typing import Optional, Callable
 
-from supersolids import functions
+from supersolids.helper import functions
 
 
 class Animation:

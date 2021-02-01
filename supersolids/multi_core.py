@@ -18,9 +18,9 @@ import psutil
 
 import numpy as np
 
-from supersolids import constants
-from supersolids import functions
-from supersolids import simulate_case
+from supersolids.helper import constants
+from supersolids.helper import functions
+from supersolids.helper import simulate_case
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":

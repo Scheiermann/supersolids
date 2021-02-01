@@ -16,7 +16,7 @@ from typing import Callable, Union, Optional
 
 import numpy as np
 
-from supersolids import functions
+from supersolids.helper import functions
 
 
 class Schroedinger:

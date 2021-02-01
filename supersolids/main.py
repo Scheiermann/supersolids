@@ -18,10 +18,10 @@ import numpy as np
 
 from supersolids.Animation.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
-from supersolids.simulate_case import simulate_case
-from supersolids.cut_1d import cut_1d, prepare_cuts
-from supersolids import constants
-from supersolids import functions
+from supersolids.helper.simulate_case import simulate_case
+from supersolids.tools.cut_1d import cut_1d, prepare_cuts
+from supersolids.helper import constants
+from supersolids.helper import functions
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
