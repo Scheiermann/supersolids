@@ -44,6 +44,7 @@ class Box:
     """
     Specifies the ranges in which the simulation is calculated (1D, 2D or 3D).
     Needs to be given in pairs (x0, x1), (y0, y1), (z0, z1).
+
     """
     def __init__(self,
                  x0: float, x1: float,
@@ -71,10 +72,7 @@ class Box:
         """
         Calculates the box lengths in the directions available in order [x, y, z]
 
-        Returns
-
-        box_length : List
-            List of the box length in the directions available in order [x, y, z]
+        :return: List of the box length in the directions available in order [x, y, z]
         """
         if (self.y0 and self.z0) is None:
             box_lengths = [(self.x1 - self.x0)]
@@ -167,19 +165,11 @@ def psi_gauss_2d_pdf(pos, mu=np.array(
     Gives values according to gaus dirstribution (2D)
     with meshgrid of x,y as input
 
-    Parameters
+    :param pos: stacked meshgrid of an x (1D) and y (1D)
+    :param mu: Mean of gauss
+    :param var: Variance of gauss
 
-    pos : np.ndarray 3D
-        stacked meshgrid of an x (1D) and y (1D)
-    mu : np.ndarray 2D
-        Mean of gauss
-    var : np.ndarray 2D
-        Variance of gauss
-
-    Returns
-
-    z_mesh : meshgrid, 2D surface values
-        values according to gaus dirstribution (2D)
+    :param z_mesh: values according to gaus dirstribution (2D)
         with meshgrid of x,y as input
 
     """
@@ -195,25 +185,18 @@ def psi_gauss_2d(x, y, a: float = 1.0, x_0: float = 0.0,
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
-    Parameters
+    :param x: mathematical variable
 
-    x : sympy.symbol
-        mathematical variable
+    :param y: mathematical variable
 
-    y : sympy.symbol
-        mathematical variable
+    :param a: Amplitude of pulse
 
-    a : float
-        Amplitude of pulse
+    :param x_0: Mean spatial x of pulse
 
-    x_0 : float
-        Mean spatial x of pulse
+    :param y_0: Mean spatial y of pulse
 
-    y_0 : float
-        Mean spatial y of pulse
+    :param k_0: Group velocity of pulse
 
-    k_0 : float
-        Group velocity of pulse
     """
 
     return (a * np.sqrt(np.pi) ** (-0.5)
@@ -229,31 +212,26 @@ def psi_gauss_3d(x, y, z,
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
-    Parameters
+    :param x: mathematical variable
 
-    x : sympy.symbol
-        mathematical variable
+    :param y: mathematical variable
 
-    y : sympy.symbol
-        mathematical variable
+    :param z: mathematical variable
 
-    z : sympy.symbol
-        mathematical variable
+    :param a_x: Stretching factor in x direction
 
-    a : float
-        Amplitude of pulse
+    :param a_y: Stretching factor in y direction
 
-    x_0 : float
-        Mean spatial x of pulse
+    :param a_z: Stretching factor in z direction
 
-    y_0 : float
-        Mean spatial y of pulse
+    :param x_0: Mean spatial x of pulse
 
-    z_0 : float
-        Mean spatial z of pulse
+    :param y_0: Mean spatial y of pulse
 
-    k_0 : float
-        Group velocity of pulse
+    :param z_0: Mean spatial z of pulse
+
+    :param k_0: Group velocity of pulse
+
     """
 
     return ((a_x * a_y * a_z * np.pi ** (3.0 / 2.0)) ** (-0.5)
@@ -268,19 +246,14 @@ def psi_gauss_1d(x, a: float = 1.0, x_0: float = 0.0, k_0: float = 0.0):
     """
     Gaussian wave packet of width a and momentum k_0, centered at x_0
 
-    Parameters
+    :param x: mathematical variable
 
-    x : sympy.symbol
-        mathematical variable
+    :param a: Amplitude of pulse
 
-    a : float
-        Amplitude of pulse
+    :param x_0: Mean spatial x of pulse
 
-    x_0 : float
-        Mean spatial x of pulse
+    :param k_0: Group velocity of pulse
 
-    k_0 : float
-        Group velocity of pulse
     """
 
     return ((a * np.sqrt(np.pi)) ** (-0.5)
@@ -291,16 +264,12 @@ def psi_pdf(x, loc: float = 0.0, scale: float = 1.0):
     """
     Mathematical function of gauss pulse
 
-    Parameters
+    :param x: mathematical variable
 
-    x: sympy.symbol
-        mathematical variable
+    :param loc: Localization of pulse centre
 
-    loc: float
-        Localization of pulse centre
+    :param scale: Scale of pulse
 
-    scale: float
-        Scale of pulse
     """
     return stats.norm.pdf(x, loc=loc, scale=scale)
 
@@ -310,19 +279,14 @@ def psi_rect(x, x_min: float = -0.5, x_max: float = 0.5, a: float = 1.0):
     Mathematical function of rectangular pulse
     between x_min and x_max with amplitude a
 
-    Parameters
+    :param x: mathematical variable
 
-    x: sympy.symbol
-        mathematical variable
+    :param x_min: Minimum x value of pulse (spatial)
 
-    x_min: float
-        Minimum x value of pulse (spatial)
+    :param x_max: Maximum x value of pulse (spatial)
 
-    x_max: float
-        Maximum x value of pulse (spatial)
+    :param a: Amplitude of pulse
 
-    a: float
-        Amplitude of pulse
     """
 
     pulse = np.select([x < x_min, x < x_max, x_max < x], [0, a, 0])
@@ -337,10 +301,8 @@ def psi_gauss_solution(x):
     """
      Mathematical function of solution of non-linear Schroedinger for g=0
 
-     Parameters
+     :param x: mathematical variable
 
-     x: sympy.symbol
-        mathematical variable
     """
 
     return np.exp(-x ** 2) / np.sqrt(np.pi)
@@ -350,13 +312,10 @@ def thomas_fermi_1d(x, g: float = 0.0):
     """
     Mathematical function of Thomas-Fermi distribution with coupling constant g
 
-    Parameters
+    :param x: mathematical variable
 
-    x : sympy.symbol
-        mathematical variable
+    :param g: coupling constant
 
-    g : float
-        coupling constant
     """
 
     if g != 0:
@@ -376,13 +335,12 @@ def thomas_fermi_2d(x, y, g: float = 0.0):
     """
     Mathematical function of Thomas-Fermi distribution with coupling constant g
 
-    Parameters
+    :param x: mathematical variable
 
-    x : sympy.symbol
-        mathematical variable
+    :param y: mathematical variable
 
-    g : float
-       coupling constant
+    :param g: coupling constant
+
     """
 
     if g != 0:
@@ -409,13 +367,14 @@ def thomas_fermi_3d(x, y, z, g: float = 0.0):
     """
     Mathematical function of Thomas-Fermi distribution with coupling constant g
 
-    Parameters
+    :param x: mathematical variable
 
-    x : sympy.symbol
-        mathematical variable
+    :param y: mathematical variable
 
-    g : float
-       coupling constant
+    :param z: mathematical variable
+
+    :param g: coupling constant
+
     """
 
     if g != 0:
@@ -617,33 +576,22 @@ def camera_3d_trajectory(frame: int,
     it is applied to the parameters
     or the start values are used.
 
-    Parameters
+    :param frame: Index of the frame in the animation
 
-    frame : int, index
-        Index of the frame in the animation
+    :param r_func: r component of the movement of the camera.
 
-    r_func : Callable or None
-        r component of the movement of the camera.
+    :param phi_func: phi component of the movement of the camera.
 
-    phi_func : Callable or None
-        phi component of the movement of the camera.
+    :param z_func: z component of the movement of the camera.
 
-    z_func : Callable or None
-        z component of the movement of the camera.
+    :param r_0: r component of the starting point of the camera movement.
 
-    r_0 : float
-        r component of the starting point of the camera movement.
+    :param phi_0: phi component of the starting point of the camera movement.
 
-    phi_0 : float
-        phi component of the starting point of the camera movement.
+    :param z_0: z component of the starting point of the camera movement.
 
-    z_0 : float
-        z component of the starting point of the camera movement.
-
-    Returns
-
-    r, phi, z as the components of the camera position
-    in the animation for the given frame.
+    :return: r, phi, z as the components of the camera position
+        in the animation for the given frame.
 
     """
     if r_func is None:

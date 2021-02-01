@@ -15,19 +15,22 @@ import sys
 from typing import Callable, Union, Optional
 
 import numpy as np
-import scipy
 
 from supersolids import functions
 
 
-class Schroedinger(object):
+class Schroedinger:
     """
     Implements a numerical solution of the dimensionless time-dependent
     non-linear Schrodinger equation for an arbitrary potential:
 
-    With :math:`U_{dd} =  iFFT(FFT(H_{pot} \psi) \epsilon_{dd} g ((3 k_z / k^2) - 1))`
+    .. math::
+    
+       i \\partial_t \psi = [&-\\frac{1}{2} \\nabla ^2
+                              + \\frac{1}{2} (x^2 + (y \\alpha_y)^2 + (z \\alpha_z)^2) \\\\
+                             &+ g |\psi|^2  + g_{qf} |\psi|^3 + U_{dd}] \psi \\\\
 
-    :math:`i \\partial_t \psi = [-0.5 \\nabla ^2 + 0.5 (x^2 + (y \\alpha_y)^2 + (z \\alpha_z)^2) + g |\psi|^2 + g_{qf} |\psi|^3 + U_{dd}] \psi`
+    With :math:`U_{dd} =  \\mathcal{F}^{-1}(\\mathcal{F}(H_{pot} \psi) \epsilon_{dd} g ((3 k_z / k^2) - 1))`
 
     The split operator method with the Trotter-Suzuki approximation
     for the commutator relation (:math:`H = H_{pot} + H_{kin}`) is used.
@@ -56,22 +59,18 @@ class Schroedinger(object):
         """
         Schrödinger equations for the specified system.
 
-        Parameters
-
-        box : NamedTuple
-            Keyword x0 is minimum in x direction and
+        :param Box: Keyword x0 is minimum in x direction and
             x1 is maximum. Same for y and z. For 1D just use x0, x1.
             For 2D x0, x1, y0, y1.
             For 3D x0, x1, y0, y1, z0, z1.
             Dimension of simulation is constructed from this dictionary.
 
-        res : NamedTuple
-            NamedTuple for the number of grid points in x, y, z direction.
+        :param Res: functoins.Res
+            Number of grid points in x, y, z direction.
             Needs to have half size of box dictionary.
-            Keywords x, y z are used.
+            Keywords x, y, z are used.
 
-        max_timesteps : int
-            Maximum timesteps  with length dt for the animation.
+        :param max_timesteps: Maximum timesteps  with length dt for the animation.
 
         """
         assert isinstance(Res, functions.Resolution), (
@@ -275,6 +274,8 @@ class Schroedinger(object):
                 self.psi_sol_val = self.psi_sol(self.x_mesh,
                                                 self.y_mesh,
                                                 self.z_mesh)
+                print(f"Trapez Norm for psi_sol: "
+                      f"{self.get_norm_trapez(self.psi_sol_val)}")
 
             kx_mesh, ky_mesh, kz_mesh, _ = functions.get_meshgrid_3d(self.kx,
                                                                      self.ky,
@@ -294,21 +295,14 @@ class Schroedinger(object):
 
         # attributes for animation
         self.t: float = 0.0
-        print(f"Simpson Norm:{self.get_norm_simpson(np.abs(self.psi_val) ** 2.0)}")
 
     def get_density(self, p: float = 2.0) -> np.ndarray:
         """
-        Calculates :math:`|\psi|^p` for 1D, 2D or 3D.
+        Calculates :math:`|\psi|^p` for 1D, 2D or 3D (depending on self.dim).
 
-        Parameters
+        :param p: Exponent of :math:`|\psi|`. Use p=2.0 for density.
 
-        p : float
-            Exponent of :math:`|\psi|`. Use p=2.0 for density.
-
-        Returns
-
-        psi_density : np.ndarray
-            :math:`|\psi|^p`
+        :return: :math:`|\psi|^p`
         """
         if self.dim <= 3:
             psi_density: np.ndarray = np.abs(self.psi_val) ** p
@@ -319,18 +313,12 @@ class Schroedinger(object):
 
     def get_norm(self, p: float = 2.0) -> float:
         """
-        Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D.
-        For p=2 it is the 2-norm.
+        Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D
+        (depending on self.dim). For p=2 it is the 2-norm.
 
-        Parameters
+        :param p: Exponent of :math:`|\psi|`. Use p=2.0 for density.
 
-        p : float
-            Exponent of :math:`|\psi|`. Use p=2.0 for density.
-
-        Returns
-
-        psi_norm : float
-            p-norm of :math:`\int |\psi|^p \\mathrm{dV}`
+        :return: :math:`\int |\psi|^p \\mathrm{dV}`
         """
 
         if self.dim == 1:
@@ -348,8 +336,9 @@ class Schroedinger(object):
 
     def get_norm_trapez(self, func_val: Callable) -> float:
         """
-        Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D.
-        Uses trapez rule:
+        Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D
+        (depending on self.dim) by using the trapez rule.
+
         For 1D: :math:`h (f(a) + f(a+h)) / 2`
 
         For 2D: :math:`h (f(a, b) + f(a+h, b) + f(a, b+h) + f(a+h, b+h)) / 2`
@@ -357,11 +346,9 @@ class Schroedinger(object):
         For 3D there are 8 entries in the same manner
         :math:`(a, b, c) ... (a+h, b+h, c+h)`
 
-        :param func_val: Function to integrate.
-        :type func_val: Callable
+        :param func_val: Grid sampled values of the function to integrate.
 
-        :return: Integrated function
-        :rtype: float
+        :return: :math:`\int |\psi|^p \\mathrm{dV}` according to trapez rule
         """
 
         if self.dim == 1:
@@ -393,15 +380,17 @@ class Schroedinger(object):
             pass
 
     def time_step(self) -> None:
-        # Here we use half steps in real space, but will use it before and
-        # after H_kin with normal steps
+        """
+        Evolves System according Schrödinger Equations by using the
+        split operator method with the Trotter-Suzuki approximation.
+
+        """
 
         # Calculate the interaction by applying it to the psi_2 in k-space
         # (transform back and forth)
         psi_2: np.ndarray = self.get_density(p=2.0)
         psi_3: np.ndarray = self.get_density(p=3.0)
-        U_dd: np.ndarray = np.fft.ifftn(
-            self.V_k_val * np.fft.fftn(psi_2))
+        U_dd: np.ndarray = np.fft.ifftn(self.V_k_val * np.fft.fftn(psi_2))
         # update H_pot before use
         H_pot: np.ndarray = np.exp(self.U
                                    * (0.5 * self.dt)

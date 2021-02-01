@@ -35,46 +35,33 @@ def simulate_case(System: Schroedinger,
     Wrapper for Animation and Schroedinger to get a working Animation
     of a System through the equations given by Schroedinger.
 
-    Parameters
+    :param System: Schrödinger equations for the specified system
 
-    System : Schroedinger.Schroedinger
-        Schrödinger equations for the specified system
+    :param Anim: :class: Animation with configured properties
 
-    accuracy : float
-        Convergence is reached when relative error of mu is smaller
+    :param accuracy: Convergence is reached when relative error of mu is smaller
         than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
-    x_lim : Tuple[float, float]
-        Limits of plot in x direction
+    :param slice_indices: List with indices of grid points in the directions x, y, z
+        (in terms of System.x, System.y, System.z)
+        to produce a slice/plane in mayavi,
+        where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice
+        Max values is for e.g. System.Res.x - 1.
 
-    y_lim : Tuple[float, float]
-        Limits of plot in y direction
+    :param x_lim: Limits of plot in x direction
 
-    z_lim : Tuple[float, float]
-        Limits of plot in z direction
+    :param y_lim: Limits of plot in y direction
 
-    slice_x_index : int
-        Index of grid point in x direction to produce a slice/plane in mayavi,
-        where :math:`\psi_{prob} = |\psi|^2` is used for the slice
+    :param z_lim: Limits of plot in z direction
 
-    slice_y_index : int
-        Index of grid point in y direction to produce a slice/plane in mayavi,
-        where :math:`\psi_{prob} = |\psi|^2` is used for the slice
-
-    slice_z_index : int
-        Index of grid point in z direction to produce a slice/plane in mayavi,
-        where :math:`\psi_{prob} = |\psi|^2` is used for the slice
-
-    interactive : bool
-        Condition for interactive mode. When camera functions are used,
-        then interaction is not possible. So interactive=True turns the usage
+    :param interactive: Condition for interactive mode. When camera functions are used,
+        then interaction is not possible. So interactive=True turn the usage
         of camera functions off.
 
-    delete_input : bool
-        Condition if the input pictures should be deleted,
+    :param delete_input: Condition if the input pictures should be deleted,
         after creation the creation of the animation as e.g. mp4
 
-    Returns
+    :return: Referenz to Schoredinger System
 
     """
     if System.dim < 3:

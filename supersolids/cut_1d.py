@@ -30,13 +30,15 @@ def cut_1d(System: Schroedinger,
     Creates 1D plots of the probability function of the System :math: `|\psi|^2
     and if given of the solution.
 
-    Parameters
+    :param System: Schrödinger equations for the specified system
+    
+    :param psi_sol_3d_cut_x: 1D function after cut in x direction.
 
-    System : Schroedinger.Schroedinger
-        Schrödinger equations for the specified system
+    :param psi_sol_3d_cut_y: 1D function after cut in y direction.
 
-
-    Returns
+    :param psi_sol_3d_cut_z: 1D function after cut in z direction.
+    
+    :param y_lim: Limit of y for plotting the 1D cut
 
     """
 
@@ -78,26 +80,18 @@ def prepare_cuts(func: Callable, N: int, alpha_z: float,
     """
     Helper function to get R_r and R_z and set it for the given func.
 
-    Parameters
+    :param func: Function of which to take the cuts
 
-    N : int
-        Number of particles
+    :param N: Number of particles
 
-    alpha_z : float
-        Ratio between z and x frequencies of the trap :math:`w_{z} / w_{x}`
+    :param alpha_z: Ratio between z and x frequencies of the trap :math:`w_{z} / w_{x}`
 
-    e_dd : float
-        :math:`\epsilon_{dd} = a_{dd} / a_{s}`
+    :param e_dd: :math:`\epsilon_{dd} = a_{dd} / a_{s}`
 
-    a_s_l_ho_ratio : float
-        :math:`a_s` in units of :math:`l_{HO}`
+    :param a_s_l_ho_ratio: :math:`a_s` in units of :math:`l_{HO}`
 
-    Returns
-
-    psi_sol_3d: Optional[Callable]
-        If no singularity occurs, func with fixed R_r and R_z,
+    :return: If no singularity occurs, func with fixed R_r and R_z,
         (solution of func_125).
-
 
     """
     kappa = functions.get_kappa(alpha_z=alpha_z, e_dd=e_dd, x_min=0.1,

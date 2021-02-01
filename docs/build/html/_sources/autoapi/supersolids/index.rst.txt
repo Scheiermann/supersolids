@@ -4,19 +4,29 @@
 .. py:module:: supersolids
 
 
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   Animation/index.rst
+
+
 Submodules
 ----------
 .. toctree::
    :titlesonly:
    :maxdepth: 1
 
-   Animation/index.rst
-   MayaviAnimation/index.rst
    Schroedinger/index.rst
    constants/index.rst
+   cut_1d/index.rst
    density_in_trap/index.rst
    functions/index.rst
    main/index.rst
+   multi_core/index.rst
    run_time/index.rst
+   simulate_case/index.rst
 
 

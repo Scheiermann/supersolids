@@ -11,7 +11,7 @@ Implements an Animation with matplotlib (for Systems in 1D or 2D).
 """
 import sys
 from os import sep
-from typing import Callable, Tuple, List, Optional
+from typing import Tuple, List
 
 import numpy as np
 from matplotlib import animation, cm
@@ -28,10 +28,7 @@ class MatplotlibAnimation(Animation.Animation):
         Creates an Animation for a Schroedinger equation for the 1D or 2D case.
         Methods need the object Schroedinger with the parameters of the equation
 
-        Parameters
-
-        Anim : Animation.Animation
-            Base class Animation with configured properties for the animation.
+        :param Anim: Base class Animation with configured properties for the animation.
 
         """
         super().__init__(Res=Anim.Res,
@@ -97,25 +94,18 @@ class MatplotlibAnimation(Animation.Animation):
         Sets the plot limits appropriate,
         even if the initial wave function :math:`\psi_0` is not normalized.
 
-        Parameters
+        :param row: row of the subplot for the animation
 
-        row : int, index
-            row of the subplot for the animation
+        :param col: column of the subplot for the animation
 
-        col : int, index
-            column of the subplot for the animation
+        :param x_min: minimum x value of subplot
 
-        x_min : float, index
-            minimum x value of subplot
+        :param x_max: maximum x value of subplot
 
-        x_max : float, index
-            maximum x value of subplot
+        :param y_min: minimum y value of subplot
 
-        y_min : float, index
-            minimum y value of subplot
+        :param y_max: maximum y value of subplot
 
-        y_max : float, index
-            maximum y value of subplot
         """
 
         y_lim = (y_min - 0.2 * (y_max - y_min), y_max + 0.2 * (y_max - y_min))
@@ -128,16 +118,11 @@ class MatplotlibAnimation(Animation.Animation):
         Sets the plot limits appropriate,
         even if the initial wave function :math:`\psi_0` is not normalized.
 
-        Parameters
+        :param row: row of the subplot for the animation
 
-        row: int, index
-            row of the subplot for the animation
+        :param col: column of the subplot for the animation
 
-        col: int, index
-            column of the subplot for the animation
-
-        System: Schroedinger, object
-            Defines the Schroedinger equation for a given problem
+        :param System: Defines the Schroedinger equation for a given problem
         """
 
         assert isinstance(System, Schroedinger), (
@@ -217,16 +202,11 @@ class MatplotlibAnimation(Animation.Animation):
         Sets the plot limits appropriate,
         even if the initial wave function :math:`\psi_0` is not normalized.
 
-        Parameters
+        :param frame_index: Current index of frame
 
-        frame_index: int, index
-            Current index of frame
+        :param System: Defines the Schroedinger equation for a given problem
 
-        System: Schroedinger, object
-            Defines the Schroedinger equation for a given problem
-
-        accuracy : float
-            Convergence is reached when relative error of mu is smaller
+        :param accuracy: Convergence is reached when relative error of mu is smaller
             than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
         """
@@ -395,14 +375,10 @@ class MatplotlibAnimation(Animation.Animation):
         Sets the plot limits appropriate,
         even if the initial wave function :math:`\psi_0` is not normalized
 
-        Parameters
-
-        accuracy : float
-            Convergence is reached when relative error of mu is smaller
+        :param accuracy: Convergence is reached when relative error of mu is smaller
             than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
-        System: Schroedinger, object
-            Defines the Schroedinger equation for a given problem
+        :param System: Defines the Schroedinger equation for a given problem
 
         """
         assert isinstance(System, Schroedinger), (
@@ -435,25 +411,15 @@ def plot_2d(resolution=32,
             **kwargs):
     """
 
-    Parameters
+    :param resolution: number of grid points in one direction
 
-    resolution : int
-        number of grid points in one direction
+    :param x_lim: Limits of plot in x direction
 
-    x_lim : Tuple[float, float]
-        Limits of plot in x direction
+    :param y_lim: Limits of plot in y direction
 
-    y_lim : Tuple[float, float]
-        Limits of plot in y direction
+    :param z_lim: Limits of plot in z direction
 
-    z_lim : Tuple[float, float]
-        Limits of plot in z direction
-
-    alpha : float
-        alpha value for plot transparency
-
-    Returns
-
+    :param alpha: alpha value for plot transparency
 
     """
     fig = plt.figure()

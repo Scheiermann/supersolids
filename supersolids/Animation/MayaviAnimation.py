@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 from ffmpeg import input
 from mayavi import mlab
-from typing import Tuple, List
+from typing import List
 
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
@@ -31,20 +31,13 @@ def get_image_path(dir_path: Path,
     Gets the highest number and returns a path with dir_name counted one up
     (prevents colliding with old data).
 
-    Parameters
+    :param dir_path: Path where to look for old directories (movie data)
+    :param dir_name: General name of the directories without the counter
+    :param counting_format: Format of counter of the directories
 
-    dir_path : Path
-        Path where to look for old directories (movie data)
-    dir_name : str
-        General name of the directories without the counter
-    counting_format : str
-        Format of counter of the directories
-
-    Returns
-
-    input_path : Path
-    Path for the new directory (not colliding with old data)
+    :return: Path for the new directory (not colliding with old data)
     """
+
     # "movie" and "%03d" strings are hardcoded
     # in mayavi movie_maker _update_subdir
     existing = sorted([x for x in dir_path.glob(dir_name + "*") if x.is_dir()])
@@ -80,13 +73,9 @@ class MayaviAnimation(Animation.Animation):
         Creates an Animation with mayavi for a Schroedinger equation
         Methods need the object Schroedinger with the parameters of the equation
 
-        Parameters
+        :param Anim: Base class Animation with configured properties for the animation.
 
-        Anim : Animation.Animation
-            Base class Animation with configured properties for the animation.
-
-        dir_path : Path
-            Path where to look for old directories (movie data)
+        :param dir_path: Path where to look for old directories (movie data)
 
         """
         super().__init__(Res=Anim.Res,
@@ -131,20 +120,12 @@ class MayaviAnimation(Animation.Animation):
         By default deletes all input pictures after creation of movie
         to save disk space.
 
-        Parameters
+        :param dir_path: Path where to look for old directories (movie data)
 
-        dir_path : Path
-            Path where to look for old directories (movie data)
+        :param input_data_file_pattern: Regex pattern to find all input data
 
-        input_data_file_pattern : str
-            Regex pattern to find all input data
-
-        delete_input : bool
-            Condition if the input pictures should be deleted,
+        :param delete_input: Condition if the input pictures should be deleted,
             after creation the creation of the animation as e.g. mp4
-
-        Returns
-
 
         """
         if dir_path is None:
@@ -182,29 +163,20 @@ class MayaviAnimation(Animation.Animation):
         Animation is limited to System.max_timesteps or
         the convergence according to accuracy.
 
-        Parameters
+        :param System: Schrödinger equations for the specified system
 
-        System : Schroedinger.Schroedinger
-            Schrödinger equations for the specified system
-
-        accuracy : float
-            Convergence is reached when relative error of mu is smaller
+        :param accuracy: Convergence is reached when relative error of mu is smaller
             than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
-        slice_indices : List[int, int, int]
-            List with indices of grid points in the directions x, y, z
+        :param slice_indices: List with indices of grid points in the directions x, y, z
             (in terms of System.x, System.y, System.z)
             to produce a slice/plane in mayavi,
             where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice
             Max values is for e.g. System.Res.x - 1.
 
-        interactive : bool
-            Condition for interactive mode. When camera functions are used,
+        :param interactive: Condition for interactive mode. When camera functions are used,
             then interaction is not possible. So interactive=True turn the usage
             of camera functions off.
-
-        Returns
-
 
         """
         prob_3d = np.abs(System.psi_val) ** 2

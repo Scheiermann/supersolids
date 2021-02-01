@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>supersolids.Schroedinger &mdash; supersolids 0.1.24 documentation</title>
+  <title>supersolids.Schroedinger &mdash; supersolids 0.1.25 documentation</title>
   
 
   
@@ -177,12 +177,14 @@
 </table>
 <dl class="py class">
 <dt id="supersolids.Schroedinger.Schroedinger">
-<em class="property">class </em><code class="sig-prename descclassname">supersolids.Schroedinger.</code><code class="sig-name descname">Schroedinger</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">box</span><span class="p">:</span> <span class="n">NamedTuple</span></em>, <em class="sig-param"><span class="n">res</span><span class="p">:</span> <span class="n">NamedTuple</span></em>, <em class="sig-param"><span class="n">max_timesteps</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">dt</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">g</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">g_qf</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">e_dd</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">imag_time</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">mu</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.1</span></em>, <em class="sig-param"><span class="n">E</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">psi_0</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="default_value">functions.psi_gauss_3d</span></em>, <em class="sig-param"><span class="n">V</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">functions.v_harmonic_3d</span></em>, <em class="sig-param"><span class="n">V_interaction</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">psi_sol</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">functions.thomas_fermi_3d</span></em>, <em class="sig-param"><span class="n">mu_sol</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">functions.mu_3d</span></em>, <em class="sig-param"><span class="n">psi_0_noise</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">functions.noise_mesh</span></em>, <em class="sig-param"><span class="n">alpha_psi</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.8</span></em>, <em class="sig-param"><span class="n">alpha_psi_sol</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.53</span></em>, <em class="sig-param"><span class="n">alpha_V</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.3</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/Schroedinger.html#Schroedinger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Implements a numerical solution of the dimensionless time-dependent
+<em class="property">class </em><code class="sig-prename descclassname">supersolids.Schroedinger.</code><code class="sig-name descname">Schroedinger</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Box</span><span class="p">:</span> <span class="n">functions.Box</span></em>, <em class="sig-param"><span class="n">Res</span><span class="p">:</span> <span class="n">functions.Resolution</span></em>, <em class="sig-param"><span class="n">max_timesteps</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">dt</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">g</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">g_qf</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">e_dd</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">imag_time</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">mu</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.1</span></em>, <em class="sig-param"><span class="n">E</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">psi_0</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="default_value">functions.psi_gauss_3d</span></em>, <em class="sig-param"><span class="n">V</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">functions.v_harmonic_3d</span></em>, <em class="sig-param"><span class="n">V_interaction</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">psi_sol</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">functions.thomas_fermi_3d</span></em>, <em class="sig-param"><span class="n">mu_sol</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">functions.mu_3d</span></em>, <em class="sig-param"><span class="n">psi_0_noise</span><span class="p">:</span> <span class="n">np.ndarray</span> <span class="o">=</span> <span class="default_value">functions.noise_mesh</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/Schroedinger.html#Schroedinger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements a numerical solution of the dimensionless time-dependent
 non-linear Schrodinger equation for an arbitrary potential:</p>
-<p>With <span class="math notranslate nohighlight">\(U_{dd} =  iFFT(FFT(H_{pot} \psi) \epsilon_{dd} g ((3 k_z / k^2) - 1))\)</span></p>
-<p><span class="math notranslate nohighlight">\(i \partial_t \psi = [-0.5 \nabla ^2 + 0.5 (x^2 + (y \alpha_y)^2 + (z \alpha_z)^2) + g |\psi|^2 + g_{qf} |\psi|^3 + U_{dd}] \psi\)</span></p>
+<div class="math notranslate nohighlight">
+\[\begin{split}i \partial_t \psi = [&amp;-\frac{1}{2} \nabla ^2
+                       + \frac{1}{2} (x^2 + (y \alpha_y)^2 + (z \alpha_z)^2) \\
+                      &amp;+ g |\psi|^2  + g_{qf} |\psi|^3 + U_{dd}] \psi \\\end{split}\]</div>
+<p>With <span class="math notranslate nohighlight">\(U_{dd} =  \mathcal{F}^{-1}(\mathcal{F}(H_{pot} \psi) \epsilon_{dd} g ((3 k_z / k^2) - 1))\)</span></p>
 <p>The split operator method with the Trotter-Suzuki approximation
 for the commutator relation (<span class="math notranslate nohighlight">\(H = H_{pot} + H_{kin}\)</span>) is used.
 Hence the accuracy is proportional to <span class="math notranslate nohighlight">\(dt^4\)</span>
@@ -190,15 +192,13 @@ The approximation is needed because of the Baker-Campell-Hausdorff formula.</p>
 <dl class="py method">
 <dt id="supersolids.Schroedinger.Schroedinger.get_density">
 <code class="sig-name descname">get_density</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">p</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">2.0</span></em><span class="sig-paren">)</span> &#x2192; np.ndarray<a class="reference internal" href="../../../_modules/supersolids/Schroedinger.html#Schroedinger.get_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.get_density" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates <span class="math notranslate nohighlight">\(|\psi|^p\)</span> for 1D, 2D or 3D.</p>
-<p>Parameters</p>
-<dl class="simple">
-<dt>p<span class="classifier">float</span></dt><dd><p>Exponent of <span class="math notranslate nohighlight">\(|\psi|\)</span>. Use p=2.0 for density.</p>
+<dd><p>Calculates <span class="math notranslate nohighlight">\(|\psi|^p\)</span> for 1D, 2D or 3D (depending on self.dim).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> – Exponent of <span class="math notranslate nohighlight">\(|\psi|\)</span>. Use p=2.0 for density.</p>
 </dd>
-</dl>
-<p>Returns</p>
-<dl class="simple">
-<dt>psi_density<span class="classifier">np.ndarray</span></dt><dd><p><span class="math notranslate nohighlight">\(|\psi|^p\)</span></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(|\psi|^p\)</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -206,16 +206,33 @@ The approximation is needed because of the Baker-Campell-Hausdorff formula.</p>
 <dl class="py method">
 <dt id="supersolids.Schroedinger.Schroedinger.get_norm">
 <code class="sig-name descname">get_norm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">p</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">2.0</span></em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="../../../_modules/supersolids/Schroedinger.html#Schroedinger.get_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.get_norm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates <span class="math notranslate nohighlight">\(\int |\psi|^p \mathrm{dV}\)</span> for 1D, 2D or 3D.
-For p=2 it is the 2-norm.</p>
-<p>Parameters</p>
-<dl class="simple">
-<dt>p<span class="classifier">float</span></dt><dd><p>Exponent of <span class="math notranslate nohighlight">\(|\psi|\)</span>. Use p=2.0 for density.</p>
+<dd><p>Calculates <span class="math notranslate nohighlight">\(\int |\psi|^p \mathrm{dV}\)</span> for 1D, 2D or 3D
+(depending on self.dim). For p=2 it is the 2-norm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> – Exponent of <span class="math notranslate nohighlight">\(|\psi|\)</span>. Use p=2.0 for density.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(\int |\psi|^p \mathrm{dV}\)</span></p>
 </dd>
 </dl>
-<p>Returns</p>
-<dl class="simple">
-<dt>psi_norm<span class="classifier">float</span></dt><dd><p>p-norm of <span class="math notranslate nohighlight">\(\int |\psi|^p \mathrm{dV}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="supersolids.Schroedinger.Schroedinger.get_norm_trapez">
+<code class="sig-name descname">get_norm_trapez</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">func_val</span><span class="p">:</span> <span class="n">Callable</span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.get_norm_trapez" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates <span class="math notranslate nohighlight">\(\int |\psi|^p \mathrm{dV}\)</span> for 1D, 2D or 3D
+(depending on self.dim) by using the trapez rule.</p>
+<p>For 1D: <span class="math notranslate nohighlight">\(h (f(a) + f(a+h)) / 2\)</span></p>
+<p>For 2D: <span class="math notranslate nohighlight">\(h (f(a, b) + f(a+h, b) + f(a, b+h) + f(a+h, b+h)) / 2\)</span></p>
+<p>For 3D there are 8 entries in the same manner
+<span class="math notranslate nohighlight">\((a, b, c) ... (a+h, b+h, c+h)\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>func_val</strong> – Grid sampled values of the function to integrate.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(\int |\psi|^p \mathrm{dV}\)</span> according to trapez rule</p>
 </dd>
 </dl>
 </dd></dl>
@@ -223,7 +240,9 @@ For p=2 it is the 2-norm.</p>
 <dl class="py method">
 <dt id="supersolids.Schroedinger.Schroedinger.time_step">
 <code class="sig-name descname">time_step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../../../_modules/supersolids/Schroedinger.html#Schroedinger.time_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.time_step" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Evolves System according Schrödinger Equations by using the
+split operator method with the Trotter-Suzuki approximation.</p>
+</dd></dl>
 
 </dd></dl>
 

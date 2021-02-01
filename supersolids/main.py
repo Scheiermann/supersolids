@@ -29,17 +29,18 @@ if __name__ == "__main__":
 
     # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
-    Res = functions.Resolution(x=2 ** 6, y=2 ** 6, z=2 ** 6)
+    Res = functions.Resolution(x=2 ** 8, y=2 ** 8, z=2 ** 7)
 
-    Box = functions.Box(x0=-15, x1=15,
-                        y0=-15, y1=15,
-                        z0=-7, z1=7)
+    Box = functions.Box(x0=-12, x1=12,
+                        y0=-8, y1=8,
+                        z0=-2, z1=2)
 
-    dt: float = 2 * 10 ** -4
+    dt: float = 8 * 10 ** -3
     N: int = 3.8 * 10 ** 4
     m: float = 164.0 * constants.u_in_kg
     a_dd: float = 130.0 * constants.a_0
-    a_s: float = 85.0 * constants.a_0
+    a_s: float = 80.0 * constants.a_0
+    # a_s: float = (130 / 0.8) * constants.a_0
 
     w_x: float = 2.0 * np.pi * 30.0
     w_y: float = 2.0 * np.pi * 60.0
@@ -75,7 +76,7 @@ if __name__ == "__main__":
 
     psi_0_3d = functools.partial(
         functions.psi_gauss_3d,
-        a_x=8.0, a_y=4.0, a_z=2.0,
+        a_x=5.0, a_y=2.0, a_z=1.0,
         x_0=0.0, y_0=0.0, z_0=0.0,
         k_0=0.0)
     # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
@@ -115,7 +116,7 @@ if __name__ == "__main__":
                                         )
 
     Anim: Animation = Animation(Res=System.Res,
-                                plot_psi_sol=True,
+                                plot_psi_sol=False,
                                 plot_V=False,
                                 alpha_psi=0.8,
                                 alpha_psi_sol=0.5,

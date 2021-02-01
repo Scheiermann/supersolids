@@ -30,34 +30,28 @@ class Animation:
         """
         Base class with configured properties for the animation.
 
-        Parameters
+        :param Res: functoins.Res
+            Number of grid points in x, y, z direction.
+            Needs to have half size of box dictionary.
+            Keywords x, y, z are used.
 
-        plot_psi_sol : bool
-            Condition if :math:`\psi_{sol}` should be plotted.
+        :param plot_psi_sol: Condition if :math:`\psi_{sol}` should be plotted.
 
-        plot_V : bool
-            Condition if V should be plotted.
+        :param plot_V: Condition if V should be plotted.
 
-        alpha_psi : float
-            Alpha value for plot transparency of :math:`\psi`
+        :param alpha_psi: Alpha value for plot transparency of :math:`\psi`
 
-        alpha_psi_sol : float
-            Alpha value for plot transparency of :math:`\psi_{sol}`
+        :param alpha_psi_sol: Alpha value for plot transparency of :math:`\psi_{sol}`
 
-        alpha_V : float
-            Alpha value for plot transparency of V
+        :param alpha_V: Alpha value for plot transparency of V
 
-        camera_r_func : Callable, function
-            r component of the movement of the camera.
+        :param camera_r_func: r component of the movement of the camera.
 
-        camera_phi_func : Callable, function
-            phi component of the movement of the camera.
+        :param camera_phi_func: phi component of the movement of the camera.
 
-        camera_z_func : Callable, function
-            z component of the movement of the camera.
+        :param camera_z_func: z component of the movement of the camera.
 
-        filename : str
-            Filename with filetype to save the movie to
+        :param filename: Filename with filetype to save the movie to
 
         """
         self.Res = Res

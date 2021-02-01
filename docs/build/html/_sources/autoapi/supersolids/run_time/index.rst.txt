@@ -21,6 +21,6 @@ Functions
    supersolids.run_time.run_time
 
 
-.. function:: run_time() -> Iterator
+.. function:: run_time(name: str = 'method') -> Iterator
 
 
