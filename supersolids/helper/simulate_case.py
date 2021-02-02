@@ -84,7 +84,7 @@ def simulate_case(System: Schroedinger,
         # mayavi for 3D
         MayAnim = MayaviAnimation.MayaviAnimation(Anim,
                                                   slice_indices=slice_indices,
-                                                  dir_path=Path(__file__).parent.joinpath("results")
+                                                  dir_path=Path(__file__).parent.parent.joinpath("results")
                                                   )
         with run_time.run_time(name="MayaviAnimation.animate"):
             MayAnim.animate(System,
