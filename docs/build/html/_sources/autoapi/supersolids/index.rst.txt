@@ -22,7 +22,8 @@ Submodules
    :maxdepth: 1
 
    Schroedinger/index.rst
-   main/index.rst
+   __main__/index.rst
    multi_core/index.rst
+   single_core/index.rst
 
 

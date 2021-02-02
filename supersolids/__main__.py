@@ -11,6 +11,7 @@ time-dependent Schrodinger equation for 1D, 2D and 3D.
 
 """
 
+import argparse
 import functools
 from typing import Callable, Optional
 
@@ -25,31 +26,57 @@ from supersolids.helper import functions
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    # Define constants (needed for the Schroedinger equation)
+    # Use parser to
+    parser = argparse.ArgumentParser(description="Define constants for Schrödinger equation")
+    parser.add_argument("-dt", metavar="dt", type=float, default=1 * 10 ** -3, nargs="?",
+                        help="Length of timestep to evolve Schrödinger system")
+    parser.add_argument("-Res", metavar="Res", type=int,
+                        default=[2 ** 8, 2 ** 8, 2 ** 7], nargs="*",
+                        help="List of resolutions for the box (1D, 2D, 3D). Needs to be 2 ** int.")
+    parser.add_argument("-Box", metavar="Box", type=float, default=[-12, 12, -8, 8, -2, 2],
+                        nargs="*", help=("Box dimensionality. "
+                        "Two values per dimension to set start and end (1D, 2D, 3D)."))
+    parser.add_argument("-N", metavar="N", type=int, default=3.8 * 10 ** 4,
+                        help="Number of particles in box")
+    parser.add_argument("-m", metavar="m", type=int, default=164.0 * constants.u_in_kg,
+                        help="Mass of a particle")
+    parser.add_argument("-a_dd", metavar="a_dd", type=float, default=130.0 * constants.a_0,
+                        help="Constant a_dd")
+    parser.add_argument("-a_s", metavar="a_s", type=float, default=80.0 * constants.a_0,
+                        help="Constant a_s")
+    parser.add_argument("-w_x", metavar="w_x", type=float, default=2.0 * np.pi * 30.0,
+                        help="Frequency of harmonic trap in x direction")
+    parser.add_argument("-w_y", metavar="w_y", type=float, default=2.0 * np.pi * 60.0,
+                        help="Frequency of harmonic trap in y direction")
+    parser.add_argument("-w_z", metavar="w_z", type=float, default=2.0 * np.pi * 160.0,
+                        help="Frequency of harmonic trap in z direction")
+    parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int, default=2001,
+                        help="Simulate until accuracy is reached")
+    parser.add_argument("-accuracy", metavar="accuracy", type=float, default=10 ** -8,
+                        help="Simulate until accuracy is reached")
+    args = parser.parse_args()
+    print(f"args: {args}")
 
-    # due to fft of the points the res
-    # needs to be 2 ** resolution_exponent
-    Res = functions.Resolution(x=2 ** 8, y=2 ** 8, z=2 ** 7)
+    assert len(args.Res) <= 3, "Dimension of Res needs to be smaller than 3."
+    assert len(args.Box) <= 6, ("Dimension of Box needs to be smaller than 6, "
+                               "as the maximum dimension of the problem is 3.")
 
-    Box = functions.Box(x0=-12, x1=12,
-                        y0=-8, y1=8,
-                        z0=-2, z1=2)
+    keys = ["x", "y", "z"][:len(args.Res)]
+    keys_box = ["x0", "x1", "y0", "y1", "z0", "z1"][:len(args.Box)]
+    dict_res = dict(zip(keys, args.Res))
+    dict_box = dict(zip(keys_box, args.Box))
+    print(dict_res)
+    print(dict_box)
+    Res = functions.Resolution(**dict_res)
+    Box = functions.Box(**dict_box)
 
-    dt: float = 8 * 10 ** -3
-    N: int = 3.8 * 10 ** 4
-    m: float = 164.0 * constants.u_in_kg
-    a_dd: float = 130.0 * constants.a_0
-    a_s: float = 80.0 * constants.a_0
-    # a_s: float = (130 / 0.8) * constants.a_0
+    print(f"Res: {Res.x}, {Res.y}, {Res.z}")
+    print(f"Box: {Box.x0}, {Box.x1}, {Box.y0}, {Box.y1}, {Box.z0}, {Box.z1}")
 
-    w_x: float = 2.0 * np.pi * 30.0
-    w_y: float = 2.0 * np.pi * 60.0
-    w_z: float = 2.0 * np.pi * 160.0
-
-    alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
+    alpha_y, alpha_z = functions.get_alphas(w_x=args.w_x, w_y=args.w_y, w_z=args.w_z)
     g, g_qf, e_dd, a_s_l_ho_ratio = functions.get_parameters(
-        N=N, m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
-    print(f"g, g_qf, epsilon_dd, alpha_y, alpha_z: "
+        N=args.N, m=args.m, a_s=args.a_s, a_dd=args.a_dd, w_x=args.w_x)
+    print(f"g, g_qf, e_dd, alpha_y, alpha_z: "
           f"{g, g_qf, e_dd, alpha_y, alpha_z}")
 
     # Define functions (needed for the Schroedinger equation)
@@ -92,15 +119,15 @@ if __name__ == "__main__":
     # psi_sol_3d = functions.thomas_fermi_3d
     if Box.dim == 3:
         psi_sol_3d: Optional[Callable] = prepare_cuts(functions.density_in_trap,
-                                                      N, alpha_z, e_dd,
+                                                      args.N, alpha_z, e_dd,
                                                       a_s_l_ho_ratio)
     else:
         psi_sol_3d = None
 
     System: Schroedinger = Schroedinger(Box,
                                         Res,
-                                        max_timesteps=2001,
-                                        dt=dt,
+                                        max_timesteps=args.max_timesteps,
+                                        dt=args.dt,
                                         g=g,
                                         g_qf=g_qf,
                                         e_dd=e_dd,
@@ -146,7 +173,7 @@ if __name__ == "__main__":
     SystemResult: Schroedinger = simulate_case(
                                     System=System,
                                     Anim=Anim,
-                                    accuracy=10 ** -8,
+                                    accuracy=args.accuracy,
                                     slice_indices=slice_indices, # from here just mayavi
                                     interactive=True,
                                     delete_input=False,

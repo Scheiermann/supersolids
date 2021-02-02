@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 # from Cython.Build import cythonize
 # To compile: python setup.py build_ext --inplace
 
@@ -13,8 +13,8 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="supersolids",
-    version="0.1.25",
-    packages=["", "supersolids"],
+    version="0.1.26",
+    packages=find_packages(),
     package_data={"supersolids": []},
     url="https://github.com/Scheiermann/supersolids",
     license="MIT",

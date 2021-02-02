@@ -51,6 +51,14 @@ You need to add python to your path (if you didn't do it, when installing python
 Or you can follow the guide here:  
 https://www.magicmathmandarin.org/2017/12/07/setting-up-python-after-installing-or-re-installing-anaconda/  
 
+## Usage
+The package has a __main__.py, so it can be run as module.
+To get how it works run:
+python -m supersolids -h
+
+Example:
+python -m supersolids -dt=0.0001 -Res=[2**6, 2**5, 2**4]
+
 ## Issues  
 1. Please read the **README.md** closely.  
 2. If you have please check every step again.  

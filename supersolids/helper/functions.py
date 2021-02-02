@@ -51,12 +51,12 @@ class Box:
                  y0: Optional[float] = None, y1: Optional[float] = None,
                  z0: Optional[float] = None, z1: Optional[float] = None):
         dim = 1
-        if (y0 or y1) is None:
-            assert (y0 and y1) is None, "y0 and y1 needs to be given in combination."
+        if (y0 is None) or (y1 is None):
+            assert (y0 is None) or (y1 is None) is None, "y0 and y1 needs to be given in combination."
         else:
             dim = dim + 1
-        if (z0 or z1) is None:
-            assert (z0 and z1) is None, "z0 and z1 needs to be given in combination."
+        if (z0 is None) or (z1 is None):
+            assert (z0 is None) or (z1 is None) is None, "z0 and z1 needs to be given in combination."
         else:
             dim = dim + 1
 
@@ -74,7 +74,7 @@ class Box:
 
         :return: List of the box length in the directions available in order [x, y, z]
         """
-        if (self.y0 and self.z0) is None:
+        if (self.y0  is None) and (self.z0 is None):
             box_lengths = [(self.x1 - self.x0)]
         elif self.z0 is None:
             box_lengths = [(self.x1 - self.x0), (self.y1 - self.y0)]

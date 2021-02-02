@@ -23,7 +23,7 @@ copyright = '2021, Daniel Scheiermann'
 author = 'Daniel Scheiermann'
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.25"
+release = "0.1.26"
 
 
 # -- General configuration ---------------------------------------------------
@@ -38,8 +38,11 @@ extensions = ["recommonmark",
               "sphinx.ext.mathjax",
               "sphinx.ext.viewcode",
               "sphinx_rtd_theme",
+              "sphinx.ext.autodoc.typehints",
               ]
 
+
+autodoc_typehints = 'description'
 autoapi_type = 'python'
 autoapi_dirs = [sys.path[0]]
 
