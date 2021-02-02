@@ -72,7 +72,7 @@ Issues
 ------
 1. Please read the **README.md** closely.
 2. If you have please check every step again.
-3. If the issue persist please **open a "Issue" in git**:
+3. If the issue persist please **open an "Issue" in git**:
     a) Click on "New Issue" on https://github.com/Scheiermann/supersolids/issues.
     b) Assign a suitable label.
     c) Follow the steps on git the to create the issue.
