@@ -52,11 +52,11 @@ Or you can follow the guide here:
 https://www.magicmathmandarin.org/2017/12/07/setting-up-python-after-installing-or-re-installing-anaconda/  
 
 ## Usage
-The package has a __main__.py, so it can be run as module.
-To get how it works run:
+The package uses __main__.py, so it can be run as module.  
+To get help for the flags, run:  
 python -m supersolids -h
 
-Example:
+To actually run (example):  
 python -m supersolids -dt=0.0001 -Res=[2 ** 6, 2 ** 5, 2 ** 4]
 
 ## Issues  
