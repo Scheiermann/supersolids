@@ -57,7 +57,7 @@ To get how it works run:
 python -m supersolids -h
 
 Example:
-python -m supersolids -dt=0.0001 -Res=[2**6, 2**5, 2**4]
+python -m supersolids -dt=0.0001 -Res=[2 ** 6, 2 ** 5, 2 ** 4]
 
 ## Issues  
 1. Please read the **README.md** closely.  
