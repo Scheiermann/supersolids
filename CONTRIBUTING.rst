@@ -1,4 +1,6 @@
-## How to contribute
+Contributing
+------------
+
 If you want to use special Latex packages add them in tex/preamble.tex
 
 To add more text, pleas edit **tex/text.tex**.
