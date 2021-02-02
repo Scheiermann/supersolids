@@ -27,7 +27,7 @@ def cut_1d(System: Schroedinger,
            y_lim: Tuple[float, float] = (0.0, 1.0)
            ) -> None:
     """
-    Creates 1D plots of the probability function of the System :math:`|\psi|^2
+    Creates 1D plots of the probability function of the System :math:`|\psi|^2`
     and if given of the solution.
 
     :param System: Schrödinger equations for the specified system
@@ -78,7 +78,7 @@ def cut_1d(System: Schroedinger,
 def prepare_cuts(func: Callable, N: int, alpha_z: float,
                  e_dd: float, a_s_l_ho_ratio: float) -> Optional[Callable]:
     """
-    Helper function to get R_r and R_z and set it for the given func.
+    Helper function to get :math:`R_r` and :math:`R_z` and set it for the given func.
 
     :param func: Function to take cuts from
 
@@ -90,8 +90,8 @@ def prepare_cuts(func: Callable, N: int, alpha_z: float,
 
     :param a_s_l_ho_ratio: :math:`a_s` in units of :math:`l_{HO}`
 
-    :return: If no singularity occurs, func with fixed R_r and R_z,
-        (solution of func_125).
+    :return: func with fixed :math:`R_r` and :math:`R_z`
+        (zeros of :math:`func_{125}`), if no singularity occurs, else None.
 
     """
     kappa = functions.get_kappa(alpha_z=alpha_z, e_dd=e_dd, x_min=0.1,
@@ -102,7 +102,6 @@ def prepare_cuts(func: Callable, N: int, alpha_z: float,
     print(f"kappa: {kappa}, R_r: {R_r}, R_z: {R_z}")
 
     if not (np.isnan(R_r) or np.isnan(R_z)):
-        print(f"")
         return psi_sol_3d
     else:
         return None
