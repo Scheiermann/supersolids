@@ -39,6 +39,9 @@ class Resolution:
         self.y = y
         self.z = z
 
+    def __str__(self) -> List[Optional[float]]:
+        return str([self.x, self.y, self.z])
+
 
 class Box:
     """
@@ -68,13 +71,16 @@ class Box:
         self.z0 = z0
         self.z1 = z1
 
+    def __str__(self) -> List[Optional[float]]:
+        return str([self.x0, self.x1, self.y0, self.y1, self.z0, self.z1])
+
     def lengths(self) -> List[float]:
         """
         Calculates the box lengths in the directions available in order [x, y, z]
 
         :return: List of the box length in the directions available in order [x, y, z]
         """
-        if (self.y0  is None) and (self.z0 is None):
+        if (self.y0 is None) and (self.z0 is None):
             box_lengths = [(self.x1 - self.x0)]
         elif self.z0 is None:
             box_lengths = [(self.x1 - self.x0), (self.y1 - self.y0)]

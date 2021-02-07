@@ -31,11 +31,11 @@ if __name__ == "__main__":
     # needs to be 2 ** resolution_exponent
     Res = functions.Resolution(x=2 ** 7, y=2 ** 7, z=2 ** 7)
 
-    Box = functions.Box(x0=-3, x1=3,
-                        y0=-3, y1=3,
-                        z0=-6, z1=6)
+    Box = functions.Box(x0=-7, x1=7,
+                        y0=-4, y1=4,
+                        z0=-3, z1=3)
 
-    dt: float = 8 * 10 ** -4
+    dt: float = 2 * 10 ** -4
     N: int = 1 * 10 ** 4
     m: float = 164.0 * constants.u_in_kg
     a_dd: float = 130.0 * constants.a_0
@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
     psi_0_3d = functools.partial(
         functions.psi_gauss_3d,
-        a_x=0.2, a_y=0.2, a_z=3.0,
+        a_x=3.5, a_y=1.5, a_z=1.2,
         x_0=0.0, y_0=0.0, z_0=0.0,
         k_0=0.0)
     # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     System: Schroedinger = Schroedinger(Box,
                                         Res,
-                                        max_timesteps=2001,
+                                        max_timesteps=20001,
                                         dt=dt,
                                         g=g,
                                         g_qf=g_qf,
@@ -108,7 +108,7 @@ if __name__ == "__main__":
                                         mu=1.1,
                                         E=1.0,
                                         psi_0=psi_0_3d,
-                                        V=None,
+                                        V=V_3d,
                                         V_interaction=V_3d_ddi,
                                         psi_sol=psi_sol_3d,
                                         mu_sol=functions.mu_3d,
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     SystemResult: Schroedinger = simulate_case(
                                     System=System,
                                     Anim=Anim,
-                                    accuracy=10 ** -8,
+                                    accuracy=10 ** -12,
                                     slice_indices=slice_indices, # from here just mayavi
                                     interactive=True,
                                     delete_input=False,

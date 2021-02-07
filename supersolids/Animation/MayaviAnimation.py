@@ -277,10 +277,17 @@ class MayaviAnimation(Animation.Animation):
             prob_plot.mlab_source.trait_set(scalars=prob_3d)
 
             # Update legend (especially time)
-            mlab.title(f"g = {System.g:.2}, dt = {System.dt:.6}, "
+            mlab.title(f"Box = {System.Box}, "
+                       f"Res = {System.Res}, "
                        f"max_timesteps = {System.max_timesteps:d}, "
+                       f"dt = {System.dt:.6f}, "
+                       f"g = {System.g:.2}, "
+                       f"g_qf = {System.g_qf:.2},\n"
+                       f"e_dd = {System.e_dd:02.03f}, "
                        f"imag_time = {System.imag_time}, "
+                       f"mu = {System.mu:02.03f}, "
                        f"mu_rel = {mu_rel:02.05e}, "
+                       f"E = {System.E:02.03f}, "
                        f"t = {System.t:02.05f}",
                        height=0.95,
                        line_width=1.0,
