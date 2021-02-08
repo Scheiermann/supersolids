@@ -35,7 +35,7 @@ if __name__ == "__main__":
                         y0=-4, y1=4,
                         z0=-3, z1=3)
 
-    dt: float = 2 * 10 ** -4
+    dt: float = 8 * 10 ** -3
     N: int = 1 * 10 ** 4
     m: float = 164.0 * constants.u_in_kg
     a_dd: float = 130.0 * constants.a_0
@@ -147,9 +147,9 @@ if __name__ == "__main__":
                                     System=System,
                                     Anim=Anim,
                                     accuracy=10 ** -12,
+                                    delete_input=False,
                                     slice_indices=slice_indices, # from here just mayavi
                                     interactive=True,
-                                    delete_input=False,
                                     x_lim=(-2.0, 2.0), # from here just matplotlib
                                     y_lim=(-2.0, 2.0),
                                     z_lim=(0, 0.5),

@@ -288,7 +288,8 @@ class MayaviAnimation(Animation.Animation):
                        f"mu = {System.mu:02.03f}, "
                        f"mu_rel = {mu_rel:02.05e}, "
                        f"E = {System.E:02.03f}, "
-                       f"t = {System.t:02.05f}",
+                       f"t = {System.t:02.05f}, "
+                       f"processed = {i/System.max_timesteps:02.03f}%",
                        height=0.95,
                        line_width=1.0,
                        size=0.3,
