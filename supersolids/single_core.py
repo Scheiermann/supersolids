@@ -19,32 +19,32 @@ import numpy as np
 from supersolids.Animation.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.helper.simulate_case import simulate_case
-from supersolids.tools.cut_1d import cut_1d, prepare_cuts
-from supersolids.helper import constants
-from supersolids.helper import functions
+from supersolids.tools.cut_1d import prepare_cuts
+from supersolids.helper import constants, functions
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     # Define constants (needed for the Schroedinger equation)
+    # this is done at this point, to be able to use those
+    # constants for the definitions of V, psi_0, psi_sol
 
     # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
     Res = functions.Resolution(x=2 ** 7, y=2 ** 7, z=2 ** 7)
 
-    Box = functions.Box(x0=-7, x1=7,
-                        y0=-4, y1=4,
-                        z0=-3, z1=3)
+    Box = functions.Box(x0=-12, x1=12,
+                        y0=-5, y1=5,
+                        z0=-4, z1=4)
 
-    dt: float = 8 * 10 ** -3
-    N: int = 1 * 10 ** 4
+    dt: float = 1 * 10 ** -3
+    N: int = 6 * 10 ** 4
     m: float = 164.0 * constants.u_in_kg
     a_dd: float = 130.0 * constants.a_0
     a_s: float = 85.0 * constants.a_0
-    # a_s: float = (130 / 0.8) * constants.a_0
 
-    w_x: float = 2.0 * np.pi * 30.0
-    w_y: float = 2.0 * np.pi * 60.0
-    w_z: float = 2.0 * np.pi * 160.0
+    w_x: float = 2.0 * np.pi * 33.0
+    w_y: float = 2.0 * np.pi * 80.0
+    w_z: float = 2.0 * np.pi * 167.0
 
     alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
     g, g_qf, e_dd, a_s_l_ho_ratio = functions.get_parameters(
@@ -56,10 +56,9 @@ if __name__ == "__main__":
     # (e.g. potential: V, initial wave function: psi_0)
     V_1d = functions.v_harmonic_1d
     V_2d = functools.partial(functions.v_harmonic_2d, alpha_y=alpha_y)
-    V_3d = functools.partial(
-        functions.v_harmonic_3d,
-        alpha_y=alpha_y,
-        alpha_z=alpha_z)
+    V_3d = functools.partial(functions.v_harmonic_3d,
+                             alpha_y=alpha_y,
+                             alpha_z=alpha_z)
 
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
                                  r_cut=1.0 * Box.min_length() / 2.0)
@@ -97,13 +96,17 @@ if __name__ == "__main__":
     else:
         psi_sol_3d = None
 
-    System: Schroedinger = Schroedinger(Box,
+    System: Schroedinger = Schroedinger(N,
+                                        Box,
                                         Res,
-                                        max_timesteps=20001,
+                                        max_timesteps=15001,
                                         dt=dt,
                                         g=g,
                                         g_qf=g_qf,
+                                        w_y=w_y,
+                                        w_z=w_z,
                                         e_dd=e_dd,
+                                        a_s=a_s,
                                         imag_time=True,
                                         mu=1.1,
                                         E=1.0,
@@ -137,7 +140,7 @@ if __name__ == "__main__":
                                 )
 
     if Box.dim == 3:
-        slice_indices = [int(Res.x / 8), int(Res.y / 8), int(Res.z / 2)]
+        slice_indices = [int(7 * Res.x / 16), int(Res.y / 2), int(Res.z / 2)]
     else:
         slice_indices = [None, None, None]
 
@@ -146,7 +149,7 @@ if __name__ == "__main__":
     SystemResult: Schroedinger = simulate_case(
                                     System=System,
                                     Anim=Anim,
-                                    accuracy=10 ** -12,
+                                    accuracy=10 ** -10,
                                     delete_input=False,
                                     slice_indices=slice_indices, # from here just mayavi
                                     interactive=True,
@@ -157,10 +160,3 @@ if __name__ == "__main__":
 
     print("Single core done")
 
-    if psi_sol_3d is not None:
-        psi_sol_3d_cuts = [
-            functools.partial(psi_sol_3d, y=0, z=0),
-            functools.partial(psi_sol_3d, x=0, z=0),
-            functools.partial(psi_sol_3d, x=0, y=0)
-        ]
-        cut_1d(SystemResult, *psi_sol_3d_cuts, y_lim=(0.0, 0.05))

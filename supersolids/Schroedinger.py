@@ -16,7 +16,7 @@ from typing import Callable, Union, Optional
 
 import numpy as np
 
-from supersolids.helper import functions
+from supersolids.helper import constants, functions
 
 
 class Schroedinger:
@@ -39,12 +39,16 @@ class Schroedinger:
     """
 
     def __init__(self,
+                 N: int,
                  Box: functions.Box,
                  Res: functions.Resolution,
                  max_timesteps: int,
                  dt: float,
                  g: float = 0.0,
                  g_qf: float = 0.0,
+                 w_y: float = 2.0 * np.pi * 80.0,
+                 w_z: float = 2.0 * np.pi * 167.0,
+                 a_s: float = 85.0 * constants.a_0,
                  e_dd: float = 1.0,
                  imag_time: bool = True,
                  mu: float = 1.1,
@@ -76,6 +80,10 @@ class Schroedinger:
         assert isinstance(Res, functions.Resolution), (
             f"box: {type(Res)} is not type {type(functions.Resolution)}")
 
+        self.N: int = N
+        self.w_y: float = w_y
+        self.w_z: float = w_z
+        self.a_s: float = a_s
         self.Res: functions.Resolution = Res
         self.max_timesteps: int = max_timesteps
 
@@ -379,12 +387,23 @@ class Schroedinger:
             print(f"Not implemented yet.")
             pass
 
+    def dt_adaptive(self):
+        # TODO: adaptiv dt
+        if self.t > 1.5:
+            self.dt = 4 * 10 ** -3
+        elif self.t > 2.0:
+            self.dt = 2 * 10 ** -3
+        elif self.t > 2.4:
+            self.dt = 8 * 10 ** -4
+
     def time_step(self) -> None:
         """
         Evolves System according Schrödinger Equations by using the
         split operator method with the Trotter-Suzuki approximation.
 
         """
+        # adjust dt, to get the time accuracy when needed
+        # self.dt_adaptive()
 
         # Calculate the interaction by applying it to the psi_2 in k-space
         # (transform back and forth)

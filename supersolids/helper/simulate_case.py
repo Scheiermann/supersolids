@@ -11,21 +11,24 @@ time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 
 """
 
+import functools
 from pathlib import Path
 
+import numpy as np
 from mayavi import mlab
-from typing import Tuple, List
+from typing import Tuple
 
 from supersolids.Animation import Animation, MayaviAnimation, MatplotlibAnimation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.tools import run_time
+from supersolids.tools.cut_1d import cut_1d
 
 
 def simulate_case(System: Schroedinger,
                   Anim: Animation.Animation,
                   accuracy: float = 10 ** -6,
                   delete_input: bool = True,
-                  slice_indices: List[int] = [0, 0, 0],
+                  slice_indices: np.ndarray = [0, 0, 0],
                   interactive: bool = True,
                   x_lim: Tuple[float, float] = (-1.0, 1.0),
                   y_lim: Tuple[float, float] = (-1.0, 1.0),
@@ -42,8 +45,15 @@ def simulate_case(System: Schroedinger,
     :param accuracy: Convergence is reached when relative error of mu is smaller
         than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
-    :param slice_indices: List with indices of grid points in the directions x, y, z
-        (in terms of System.x, System.y, System.z)
+    :param interactive: Condition for interactive mode. When camera functions are used,
+        then interaction is not possible. So interactive=True turn the usage
+        of camera functions off.
+
+    :param delete_input: Condition if the input pictures should be deleted,
+        after creation the creation of the animation as e.g. mp4
+
+    :param slice_indices: Numpy array with indices of grid points
+        in the directions x, y, z (in terms of System.x, System.y, System.z)
         to produce a slice/plane in mayavi,
         where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice
         Max values is for e.g. System.Res.x - 1.
@@ -54,14 +64,7 @@ def simulate_case(System: Schroedinger,
 
     :param z_lim: Limits of plot in z direction
 
-    :param interactive: Condition for interactive mode. When camera functions are used,
-        then interaction is not possible. So interactive=True turn the usage
-        of camera functions off.
-
-    :param delete_input: Condition if the input pictures should be deleted,
-        after creation the creation of the animation as e.g. mp4
-
-    :return: Referenz to Schoredinger System
+    :return: Referenz to Schroedinger System
 
     """
     if System.dim < 3:
@@ -99,7 +102,10 @@ def simulate_case(System: Schroedinger,
         # if System.t >= System.dt * System.max_timesteps:
         #     mlab.close()
 
-        MayAnim.create_movie(input_data_file_pattern="*.png",
-                             delete_input=delete_input)
+        result_path = MayAnim.create_movie(input_data_file_pattern="*.png",
+                                           delete_input=delete_input)
+
+        cut_1d(System, slice_indices=slice_indices,
+               dir_path=result_path, y_lim=(0.0, 0.05))
 
         return System

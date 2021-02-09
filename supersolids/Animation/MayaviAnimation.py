@@ -15,11 +15,10 @@ from pathlib import Path
 import numpy as np
 from ffmpeg import input
 from mayavi import mlab
-from typing import List
 
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
-from supersolids.helper import functions
+from supersolids.helper import functions, constants
 
 
 def get_image_path(dir_path: Path,
@@ -67,13 +66,19 @@ class MayaviAnimation(Animation.Animation):
 
     def __init__(self,
                  Anim: Animation.Animation,
-                 slice_indices: List[int] = [0, 0, 0],
+                 slice_indices: np.ndarray = [0, 0, 0],
                  dir_path: Path = Path(__file__).parent.joinpath("results")):
         """
         Creates an Animation with mayavi for a Schroedinger equation
         Methods need the object Schroedinger with the parameters of the equation
 
         :param Anim: Base class Animation with configured properties for the animation.
+
+        :param slice_indices: Numpy array with indices of grid points
+            in the directions x, y, z (in terms of System.x, System.y, System.z)
+            to produce a slice/plane in mayavi,
+            where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice
+            Max values is for e.g. System.Res.x - 1.
 
         :param dir_path: Path where to look for old directories (movie data)
 
@@ -113,7 +118,7 @@ class MayaviAnimation(Animation.Animation):
     def create_movie(self,
                      dir_path: Path = None,
                      input_data_file_pattern: str = "*.png",
-                     delete_input: bool = True) -> None:
+                     delete_input: bool = True) -> Path:
         """
         Creates movie filename with all matching pictures from
         input_data_file_pattern.
@@ -153,6 +158,8 @@ class MayaviAnimation(Animation.Animation):
             for trash_file in input_data_used:
                 trash_file.unlink()
 
+        return input_path
+
     @mlab.animate(delay=10, ui=True)
     def animate(self, System: Schroedinger,
                 accuracy: float = 10 ** -6,
@@ -168,8 +175,8 @@ class MayaviAnimation(Animation.Animation):
         :param accuracy: Convergence is reached when relative error of mu is smaller
             than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
-        :param slice_indices: List with indices of grid points in the directions x, y, z
-            (in terms of System.x, System.y, System.z)
+        :param slice_indices: Numpy array with indices of grid points
+            in the directions x, y, z (in terms of System.x, System.y, System.z)
             to produce a slice/plane in mayavi,
             where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice
             Max values is for e.g. System.Res.x - 1.
@@ -235,11 +242,11 @@ class MayaviAnimation(Animation.Animation):
                                               transparent=True)
 
         axes_style()
-        for i in range(0, System.max_timesteps):
+        for frame in range(0, System.max_timesteps):
             if not interactive:
                 # rotate camera
                 camera_r, camera_phi, camera_z = functions.camera_3d_trajectory(
-                    i,
+                    frame,
                     r_func=self.camera_r_func,
                     phi_func=self.camera_phi_func,
                     z_func=self.camera_z_func
@@ -254,7 +261,7 @@ class MayaviAnimation(Animation.Animation):
 
             # The initial plot needs to be shown first,
             # also a timestep is needed for mu_rel
-            if i > 0:
+            if frame > 0:
                 mu_old = System.mu
                 System.time_step()
 
@@ -266,8 +273,39 @@ class MayaviAnimation(Animation.Animation):
                     yield None
                     break
 
-            if i == (System.max_timesteps - 1):
+            if frame == (System.max_timesteps - 1):
                 print(f"Maximum timesteps are reached. Animation is stopped.")
+
+            # Update legend (especially time)
+            text = (f"N = {System.N}, "
+                    f"Box = {System.Box}, "
+                    f"Res = {System.Res}, "
+                    f"max_timesteps = {System.max_timesteps:d}, "
+                    f"dt = {System.dt:.6f}, "
+                    f"g = {System.g:.2}, "
+                    f"g_qf = {System.g_qf:.2},\n"
+                    f"e_dd = {System.e_dd:02.03f}, "
+                    f"a_s/a_0 = {System.a_s/constants.a_0:02.02f}, "
+                    f"w_y/2pi= {System.w_y/(2*np.pi):02.02f}, "
+                    f"w_z/2pi= {System.w_z/(2*np.pi):02.02f}, "
+                    f"imag_time = {System.imag_time}, "
+                    f"mu = {System.mu:02.03f}, "
+                    f"mu_rel = {mu_rel:02.05e}, "
+                    f"E = {System.E:02.03f}, "
+                    f"t = {System.t:02.05f}, "
+                    f"processed = {frame/System.max_timesteps:02.03f}%"
+                    )
+
+            if frame == 0:
+                # create title for first frame
+                title = mlab.title(text=text,
+                       height=0.95,
+                       line_width=1.0,
+                       size=0.3,
+                       color=(0, 0, 0),
+                       figure=self.fig)
+
+            title.set(text=text)
 
             # Update plot functions
             prob_3d = np.abs(System.psi_val) ** 2
@@ -275,24 +313,5 @@ class MayaviAnimation(Animation.Animation):
             slice_y_plot.mlab_source.trait_set(scalars=prob_3d)
             slice_z_plot.mlab_source.trait_set(scalars=prob_3d)
             prob_plot.mlab_source.trait_set(scalars=prob_3d)
-
-            # Update legend (especially time)
-            mlab.title(f"Box = {System.Box}, "
-                       f"Res = {System.Res}, "
-                       f"max_timesteps = {System.max_timesteps:d}, "
-                       f"dt = {System.dt:.6f}, "
-                       f"g = {System.g:.2}, "
-                       f"g_qf = {System.g_qf:.2},\n"
-                       f"e_dd = {System.e_dd:02.03f}, "
-                       f"imag_time = {System.imag_time}, "
-                       f"mu = {System.mu:02.03f}, "
-                       f"mu_rel = {mu_rel:02.05e}, "
-                       f"E = {System.E:02.03f}, "
-                       f"t = {System.t:02.05f}, "
-                       f"processed = {i/System.max_timesteps:02.03f}%",
-                       height=0.95,
-                       line_width=1.0,
-                       size=0.3,
-                       color=(0, 0, 0))
 
             yield
