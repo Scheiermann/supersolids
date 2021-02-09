@@ -11,7 +11,6 @@ time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 
 """
 
-import functools
 from pathlib import Path
 
 import numpy as np
@@ -90,17 +89,13 @@ def simulate_case(System: Schroedinger,
                                                   dir_path=Path(__file__).parent.parent.joinpath("results")
                                                   )
         with run_time.run_time(name="MayaviAnimation.animate"):
-            MayAnim.animate(System,
-                            accuracy=accuracy,
-                            interactive=interactive,
-                            )
+            MayAnimator = MayAnim.animate(System,
+                                          accuracy=accuracy,
+                                          interactive=interactive,
+                                          )
 
         with run_time.run_time(name="mlab.show"):
             mlab.show()
-        # TODO: close window after last frame
-        # print(f"{System.t}, {System.dt * System.max_timesteps}")
-        # if System.t >= System.dt * System.max_timesteps:
-        #     mlab.close()
 
         result_path = MayAnim.create_movie(input_data_file_pattern="*.png",
                                            delete_input=delete_input)

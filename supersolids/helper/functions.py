@@ -103,7 +103,9 @@ def get_meshgrid(x, y):
 
 
 def get_meshgrid_3d(x, y, z):
-    x_mesh, y_mesh, z_mesh = np.meshgrid(x, y, z)
+    # WARNING: np.meshgrid and mgrid have different structure,
+    # resulting in fact x and y NEED to be swapped here (it is NOT a typo)
+    x_mesh, y_mesh, z_mesh = np.meshgrid(y, x, z)
     pos = np.empty(x_mesh.shape + (3,))
     pos[:, :, :, 0] = x_mesh
     pos[:, :, :, 1] = y_mesh

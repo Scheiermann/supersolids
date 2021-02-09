@@ -20,7 +20,6 @@ from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.helper import functions, constants
 
-
 def get_image_path(dir_path: Path,
                    dir_name: str = "movie",
                    counting_format: str = "%03d") -> Path:
@@ -269,11 +268,21 @@ class MayaviAnimation(Animation.Animation):
 
                 # Stop animation when accuracy is reached
                 if mu_rel < accuracy:
-                    print(f"accuracy reached: {mu_rel}")
+                    print(f"Accuracy reached: {mu_rel}")
+                    mlab.close(all=True)
+                    yield None
+                    break
+
+                elif np.isnan(mu_rel) and np.isnan(System.mu):
+                    assert np.isnan(System.E), ("E should be nan, when mu is nan."
+                                                "Then the system is divergent.")
+                    print(f"Accuracy NOT reached! System diverged.")
+                    mlab.close(all=True)
                     yield None
                     break
 
             if frame == (System.max_timesteps - 1):
+                # Animation stops at the next step, to actually show the last step
                 print(f"Maximum timesteps are reached. Animation is stopped.")
 
             # Update legend (especially time)
@@ -299,11 +308,11 @@ class MayaviAnimation(Animation.Animation):
             if frame == 0:
                 # create title for first frame
                 title = mlab.title(text=text,
-                       height=0.95,
-                       line_width=1.0,
-                       size=0.3,
-                       color=(0, 0, 0),
-                       figure=self.fig)
+                                   height=0.95,
+                                   line_width=1.0,
+                                   size=0.3,
+                                   color=(0, 0, 0),
+                                   )
 
             title.set(text=text)
 

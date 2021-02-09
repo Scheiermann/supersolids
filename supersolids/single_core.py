@@ -30,13 +30,13 @@ if __name__ == "__main__":
 
     # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
-    Res = functions.Resolution(x=2 ** 7, y=2 ** 7, z=2 ** 7)
+    Res = functions.Resolution(x=2 ** 8, y=2 ** 7, z=2 ** 5)
 
-    Box = functions.Box(x0=-12, x1=12,
+    Box = functions.Box(x0=-10, x1=10,
                         y0=-5, y1=5,
                         z0=-4, z1=4)
 
-    dt: float = 1 * 10 ** -3
+    dt: float = 2 * 10 ** -4
     N: int = 6 * 10 ** 4
     m: float = 164.0 * constants.u_in_kg
     a_dd: float = 130.0 * constants.a_0
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     System: Schroedinger = Schroedinger(N,
                                         Box,
                                         Res,
-                                        max_timesteps=15001,
+                                        max_timesteps=20001,
                                         dt=dt,
                                         g=g,
                                         g_qf=g_qf,
@@ -140,7 +140,7 @@ if __name__ == "__main__":
                                 )
 
     if Box.dim == 3:
-        slice_indices = [int(7 * Res.x / 16), int(Res.y / 2), int(Res.z / 2)]
+        slice_indices = [int(Res.x / 2), int(Res.y / 2), int(Res.z / 2)]
     else:
         slice_indices = [None, None, None]
 
