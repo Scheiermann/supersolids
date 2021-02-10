@@ -36,7 +36,7 @@ if __name__ == "__main__":
                         y0=-5, y1=5,
                         z0=-4, z1=4)
 
-    dt: float = 2 * 10 ** -4
+    dt: float = 2 * 10 ** -3
     N: int = 6 * 10 ** 4
     m: float = 164.0 * constants.u_in_kg
     a_dd: float = 130.0 * constants.a_0
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     System: Schroedinger = Schroedinger(N,
                                         Box,
                                         Res,
-                                        max_timesteps=20001,
+                                        max_timesteps=80001,
                                         dt=dt,
                                         g=g,
                                         g_qf=g_qf,

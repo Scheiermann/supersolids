@@ -269,7 +269,6 @@ class MayaviAnimation(Animation.Animation):
                 # Stop animation when accuracy is reached
                 if mu_rel < accuracy:
                     print(f"Accuracy reached: {mu_rel}")
-                    mlab.close(all=True)
                     yield None
                     break
 
@@ -277,7 +276,6 @@ class MayaviAnimation(Animation.Animation):
                     assert np.isnan(System.E), ("E should be nan, when mu is nan."
                                                 "Then the system is divergent.")
                     print(f"Accuracy NOT reached! System diverged.")
-                    mlab.close(all=True)
                     yield None
                     break
 
@@ -286,23 +284,23 @@ class MayaviAnimation(Animation.Animation):
                 print(f"Maximum timesteps are reached. Animation is stopped.")
 
             # Update legend (especially time)
-            text = (f"N = {System.N}, "
-                    f"Box = {System.Box}, "
-                    f"Res = {System.Res}, "
-                    f"max_timesteps = {System.max_timesteps:d}, "
-                    f"dt = {System.dt:.6f}, "
-                    f"g = {System.g:.2}, "
-                    f"g_qf = {System.g_qf:.2},\n"
-                    f"e_dd = {System.e_dd:02.03f}, "
-                    f"a_s/a_0 = {System.a_s/constants.a_0:02.02f}, "
-                    f"w_y/2pi= {System.w_y/(2*np.pi):02.02f}, "
-                    f"w_z/2pi= {System.w_z/(2*np.pi):02.02f}, "
-                    f"imag_time = {System.imag_time}, "
-                    f"mu = {System.mu:02.03f}, "
-                    f"mu_rel = {mu_rel:02.05e}, "
-                    f"E = {System.E:02.03f}, "
-                    f"t = {System.t:02.05f}, "
-                    f"processed = {frame/System.max_timesteps:02.03f}%"
+            text = (f"N={System.N}, "
+                    f"Box={System.Box}, "
+                    f"Res={System.Res}, "
+                    f"max_timesteps={System.max_timesteps:d}, "
+                    f"dt={System.dt:.6f}, "
+                    f"g={System.g:.2}, "
+                    f"g_qf={System.g_qf:.2}, "
+                    f"e_dd={System.e_dd:05.03f},\n"
+                    f"a_s/a_0={System.a_s/constants.a_0:05.02f}, "
+                    f"w_y/2pi={System.w_y/(2*np.pi):05.02f}, "
+                    f"w_z/2pi={System.w_z/(2*np.pi):05.02f}, "
+                    f"imag_time={System.imag_time}, "
+                    f"mu={System.mu:+05.03f}, "
+                    f"mu_rel={mu_rel:+05.05e}, "
+                    f"E={System.E:+05.03f}, "
+                    f"t={System.t:07.05f}, "
+                    f"processed={frame/System.max_timesteps:05.03f}%"
                     )
 
             if frame == 0:
@@ -310,7 +308,7 @@ class MayaviAnimation(Animation.Animation):
                 title = mlab.title(text=text,
                                    height=0.95,
                                    line_width=1.0,
-                                   size=0.3,
+                                   size=1.0,
                                    color=(0, 0, 0),
                                    )
 
@@ -324,3 +322,6 @@ class MayaviAnimation(Animation.Animation):
             prob_plot.mlab_source.trait_set(scalars=prob_3d)
 
             yield
+
+        # Finally close
+        mlab.close(all=True)
