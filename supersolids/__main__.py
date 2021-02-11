@@ -124,7 +124,8 @@ if __name__ == "__main__":
     else:
         psi_sol_3d = None
 
-    System: Schroedinger = Schroedinger(Box,
+    System: Schroedinger = Schroedinger(args.N,
+                                        Box,
                                         Res,
                                         max_timesteps=args.max_timesteps,
                                         dt=args.dt,
