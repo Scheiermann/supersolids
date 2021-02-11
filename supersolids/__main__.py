@@ -28,31 +28,31 @@ from supersolids.helper import functions
 if __name__ == "__main__":
     # Use parser to
     parser = argparse.ArgumentParser(description="Define constants for Schrödinger equation")
-    parser.add_argument("-dt", metavar="dt", type=float, default=1 * 10 ** -3, nargs="?",
+    parser.add_argument("-dt", metavar="dt", type=float, default=2 * 10 ** -3, nargs="?",
                         help="Length of timestep to evolve Schrödinger system")
     parser.add_argument("-Res", metavar="Res", type=int,
-                        default=[2 ** 8, 2 ** 8, 2 ** 7], nargs="*",
+                        default=[2 ** 8, 2 ** 7, 2 ** 5], nargs="*",
                         help="List of resolutions for the box (1D, 2D, 3D). Needs to be 2 ** int.")
     parser.add_argument("-Box", metavar="Box", type=float, default=[-12, 12, -8, 8, -2, 2],
                         nargs="*", help=("Box dimensionality. "
                         "Two values per dimension to set start and end (1D, 2D, 3D)."))
-    parser.add_argument("-N", metavar="N", type=int, default=3.8 * 10 ** 4,
+    parser.add_argument("-N", metavar="N", type=int, default=6 * 10 ** 4,
                         help="Number of particles in box")
     parser.add_argument("-m", metavar="m", type=int, default=164.0 * constants.u_in_kg,
                         help="Mass of a particle")
     parser.add_argument("-a_dd", metavar="a_dd", type=float, default=130.0 * constants.a_0,
                         help="Constant a_dd")
-    parser.add_argument("-a_s", metavar="a_s", type=float, default=80.0 * constants.a_0,
+    parser.add_argument("-a_s", metavar="a_s", type=float, default=85.0 * constants.a_0,
                         help="Constant a_s")
-    parser.add_argument("-w_x", metavar="w_x", type=float, default=2.0 * np.pi * 30.0,
+    parser.add_argument("-w_x", metavar="w_x", type=float, default=2.0 * np.pi * 33.0,
                         help="Frequency of harmonic trap in x direction")
-    parser.add_argument("-w_y", metavar="w_y", type=float, default=2.0 * np.pi * 60.0,
+    parser.add_argument("-w_y", metavar="w_y", type=float, default=2.0 * np.pi * 80.0,
                         help="Frequency of harmonic trap in y direction")
-    parser.add_argument("-w_z", metavar="w_z", type=float, default=2.0 * np.pi * 160.0,
+    parser.add_argument("-w_z", metavar="w_z", type=float, default=2.0 * np.pi * 167.0,
                         help="Frequency of harmonic trap in z direction")
-    parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int, default=2001,
+    parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int, default=80001,
                         help="Simulate until accuracy is reached")
-    parser.add_argument("-accuracy", metavar="accuracy", type=float, default=10 ** -8,
+    parser.add_argument("-accuracy", metavar="accuracy", type=float, default=10 ** -12,
                         help="Simulate until accuracy is reached")
     args = parser.parse_args()
     print(f"args: {args}")
@@ -130,7 +130,10 @@ if __name__ == "__main__":
                                         dt=args.dt,
                                         g=g,
                                         g_qf=g_qf,
+                                        w_y=args.w_y,
+                                        w_z=args.w_z,
                                         e_dd=e_dd,
+                                        a_s=args.a_s,
                                         imag_time=True,
                                         mu=1.1,
                                         E=1.0,
@@ -139,7 +142,7 @@ if __name__ == "__main__":
                                         V_interaction=V_3d_ddi,
                                         psi_sol=psi_sol_3d,
                                         mu_sol=functions.mu_3d,
-                                        psi_0_noise=psi_0_noise_3d,
+                                        psi_0_noise=None,
                                         )
 
     Anim: Animation = Animation(Res=System.Res,
@@ -164,7 +167,7 @@ if __name__ == "__main__":
                                 )
 
     if Box.dim == 3:
-        slice_indices = [int(Res.x / 8), int(Res.y / 8), int(Res.z / 2)]
+        slice_indices = [int(Res.x / 2), int(Res.y / 2), int(Res.z / 2)]
     else:
         slice_indices = [None, None, None]
 
@@ -174,20 +177,12 @@ if __name__ == "__main__":
                                     System=System,
                                     Anim=Anim,
                                     accuracy=args.accuracy,
+                                    delete_input=False,
                                     slice_indices=slice_indices, # from here just mayavi
                                     interactive=True,
-                                    delete_input=False,
                                     x_lim=(-2.0, 2.0), # from here just matplotlib
                                     y_lim=(-2.0, 2.0),
                                     z_lim=(0, 0.5),
                                     )
 
     print("Single core done")
-
-    if psi_sol_3d is not None:
-        psi_sol_3d_cuts = [
-            functools.partial(psi_sol_3d, y=0, z=0),
-            functools.partial(psi_sol_3d, x=0, z=0),
-            functools.partial(psi_sol_3d, x=0, y=0)
-        ]
-        cut_1d(SystemResult, *psi_sol_3d_cuts, y_lim=(0.0, 0.05))

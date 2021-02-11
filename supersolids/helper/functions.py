@@ -626,6 +626,21 @@ def noise_mesh(min: float = 0.8,
     return noise
 
 
+def dt_adaptive(t, dt) -> float:
+    # TODO: adaptiv dt
+    if t > 2.4:
+        dt_adapted = 5 * 10 ** -4
+    elif t > 1.5:
+        dt_adapted = 1 * 10 ** -3
+    elif t > 1.2:
+        dt_adapted = 2 * 10 ** -3
+    else:
+        dt_adapted = dt
+
+    return dt_adapted
+
+
+
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == '__main__':
     # due to fft of the points the res needs to be 2 **

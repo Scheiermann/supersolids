@@ -44,6 +44,7 @@ class Schroedinger:
                  Res: functions.Resolution,
                  max_timesteps: int,
                  dt: float,
+                 dt_func: Optional[Callable] = None,
                  g: float = 0.0,
                  g_qf: float = 0.0,
                  w_y: float = 2.0 * np.pi * 80.0,
@@ -92,6 +93,7 @@ class Schroedinger:
 
         self.Box: functions.Box = Box
         self.dt: float = dt
+        self.dt_func: Optional[Callable] = dt_func
         self.g: float = g
         self.g_qf: float = g_qf
         self.e_dd: float = e_dd
@@ -387,15 +389,6 @@ class Schroedinger:
             print(f"Not implemented yet.")
             pass
 
-    def dt_adaptive(self):
-        # TODO: adaptiv dt
-        if self.t > 1.5:
-            self.dt = 4 * 10 ** -3
-        elif self.t > 2.0:
-            self.dt = 2 * 10 ** -3
-        elif self.t > 2.4:
-            self.dt = 8 * 10 ** -4
-
     def time_step(self) -> None:
         """
         Evolves System according Schrödinger Equations by using the
@@ -403,7 +396,7 @@ class Schroedinger:
 
         """
         # adjust dt, to get the time accuracy when needed
-        # self.dt_adaptive()
+        # self.dt = self.dt_func(self.t, self.dt)
 
         # Calculate the interaction by applying it to the psi_2 in k-space
         # (transform back and forth)

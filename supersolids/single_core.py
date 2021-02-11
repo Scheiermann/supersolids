@@ -36,7 +36,9 @@ if __name__ == "__main__":
                         y0=-5, y1=5,
                         z0=-4, z1=4)
 
-    dt: float = 2 * 10 ** -3
+    dt: float = 4 * 10 ** -3
+    # dt_func = functools.partial(functions.dt_adaptive)
+
     N: int = 6 * 10 ** 4
     m: float = 164.0 * constants.u_in_kg
     a_dd: float = 130.0 * constants.a_0
@@ -101,6 +103,7 @@ if __name__ == "__main__":
                                         Res,
                                         max_timesteps=80001,
                                         dt=dt,
+                                        dt_func=None,
                                         g=g,
                                         g_qf=g_qf,
                                         w_y=w_y,
@@ -149,7 +152,7 @@ if __name__ == "__main__":
     SystemResult: Schroedinger = simulate_case(
                                     System=System,
                                     Anim=Anim,
-                                    accuracy=10 ** -10,
+                                    accuracy=10 ** -12,
                                     delete_input=False,
                                     slice_indices=slice_indices, # from here just mayavi
                                     interactive=True,
