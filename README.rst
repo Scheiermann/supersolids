@@ -20,6 +20,11 @@ Use this wheel to install, e.g:
 pip install vtk-9.0.20210105-cp39-cp39-linux_x86_64.whl
 Then install mayavi (pip install mayavi or also build it from source, as there could be incapabilities with vtk9).
 
+pip
+---
+For **python3.9** follow the instructions above, then continue with (else do the following):
+pip install supersolids
+
 Archlinux
 ---------
 It is provided in the AUR under https://aur.archlinux.org/python-supersolids.git
@@ -28,28 +33,15 @@ then remove mayavi from the dependencies and run "makepkg -sic".
 For **python3.8** the remove the dependecies in the PKGBUILD and uncomment
 the pip install lines instead.
 
-pip
----
-For **python3.9** follow the instructions above, then continue with (else do the following):
-Go to the directory supersolids/dist/, where the wheel lies (\*.whl).
-Use this wheel to install, e.g:
-pip install supersolids-0.1.21-py3-none-any.whl
+Windows
+-------
+You need to add python to your path (if you didn't do it, when installing python/anaconda).
+Then continue with pip installation
 
 Source
 ---------------------------
 Go to the directory, where the "setup.py" lies.
 For **Linux** use "python setup.py install --user" from console to **build** and **install** the package
-
-Windows
--------
-You need to add python to your path (if you didn't do it, when installing python/anaconda).
-1. Open Anaconda Prompt. Use commands "where python", "where pip", "where conda".
-2. Use the output path (without \*.exe, we call the output here AX, BX, CX) in the following command::
-SETX PATH "%PATH%; AX; BX; CX"
-For example, where the user is dr-angry:
-SETX PATH "%PATH%; C:\Users\dr-angry\anaconda3\Scripts; C:\Users\dr-angry\anaconda3"
-3. Now restart/open gitbash.
-4. Use "python setup.py install" in gitbash from the path where "setup.py" lies.
 
 Usage
 -----
