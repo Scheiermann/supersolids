@@ -1,8 +1,5 @@
-README
-======
-
 Supersolids
------------
+===========
 Package to simulate and animate supersolids.
 This is done by solving the dimensionless time-dependent
 non-linear Schrodinger equation for an arbitrary potential.
@@ -62,6 +59,8 @@ python -m supersolids -h
 
 To actually run (example):
 python -m supersolids -dt=0.0001 -Res=[2 ** 6, 2 ** 5, 2 ** 4]
+
+The default path for the results is ~/supersolids/results
 
 Issues
 ------

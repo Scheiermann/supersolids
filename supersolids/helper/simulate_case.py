@@ -27,6 +27,7 @@ def simulate_case(System: Schroedinger,
                   Anim: Animation.Animation,
                   accuracy: float = 10 ** -6,
                   delete_input: bool = True,
+                  dir_path: Path = Path.home().joinpath("supersolids", "results"),
                   slice_indices: np.ndarray = [0, 0, 0],
                   interactive: bool = True,
                   x_lim: Tuple[float, float] = (-1.0, 1.0),
@@ -50,6 +51,8 @@ def simulate_case(System: Schroedinger,
 
     :param delete_input: Condition if the input pictures should be deleted,
         after creation the creation of the animation as e.g. mp4
+
+    :param dir_path: Path where to look for old directories (movie data)
 
     :param slice_indices: Numpy array with indices of grid points
         in the directions x, y, z (in terms of System.x, System.y, System.z)
@@ -88,7 +91,7 @@ def simulate_case(System: Schroedinger,
         MayAnim = MayaviAnimation.MayaviAnimation(
             Anim,
             slice_indices=slice_indices,
-            dir_path=Path(__file__).parent.parent.joinpath("results")
+            dir_path=dir_path,
             )
         with run_time.run_time(name="MayaviAnimation.animate"):
             MayAnimator = MayAnim.animate(System, accuracy=accuracy, interactive=interactive)

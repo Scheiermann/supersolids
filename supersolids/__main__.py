@@ -13,6 +13,7 @@ time-dependent Schrodinger equation for 1D, 2D and 3D.
 
 import argparse
 import functools
+from pathlib import Path
 from typing import Callable, Optional
 
 import numpy as np
@@ -54,12 +55,18 @@ if __name__ == "__main__":
                         help="Simulate until accuracy is reached")
     parser.add_argument("-accuracy", metavar="accuracy", type=float, default=10 ** -12,
                         help="Simulate until accuracy is reached")
+    parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
+                        help="Absolute path to save data to")
     args = parser.parse_args()
     print(f"args: {args}")
 
     assert len(args.Res) <= 3, "Dimension of Res needs to be smaller than 3."
     assert len(args.Box) <= 6, ("Dimension of Box needs to be smaller than 6, "
                                "as the maximum dimension of the problem is 3.")
+    try:
+        dir_path = Path(args.dir_path).expanduser()
+    except Exception:
+        dir_path = args.dir_path
 
     keys = ["x", "y", "z"][:len(args.Res)]
     keys_box = ["x0", "x1", "y0", "y1", "z0", "z1"][:len(args.Box)]
@@ -179,6 +186,7 @@ if __name__ == "__main__":
                                     Anim,
                                     accuracy=args.accuracy,
                                     delete_input=False,
+                                    dir_path=dir_path,
                                     slice_indices=slice_indices, # from here just mayavi
                                     interactive=True,
                                     x_lim=(-2.0, 2.0), # from here just matplotlib

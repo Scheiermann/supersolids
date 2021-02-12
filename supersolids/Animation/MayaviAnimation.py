@@ -66,7 +66,8 @@ class MayaviAnimation(Animation.Animation):
     def __init__(self,
                  Anim: Animation.Animation,
                  slice_indices: np.ndarray = [0, 0, 0],
-                 dir_path: Path = Path(__file__).parent.joinpath("results")):
+                 dir_path: Path = Path.home().joinpath("supersolids", "results"),
+                 ):
         """
         Creates an Animation with mayavi for a Schroedinger equation
         Methods need the object Schroedinger with the parameters of the equation

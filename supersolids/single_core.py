@@ -12,6 +12,7 @@ time-dependent Schrodinger equation for 1D, 2D and 3D.
 """
 
 import functools
+from pathlib import Path
 from typing import Callable, Optional
 
 import numpy as np
@@ -154,6 +155,7 @@ if __name__ == "__main__":
                                     Anim=Anim,
                                     accuracy=10 ** -12,
                                     delete_input=False,
+                                    dir_path=Path(__file__).parent.parent.joinpath("results"),
                                     slice_indices=slice_indices, # from here just mayavi
                                     interactive=True,
                                     x_lim=(-2.0, 2.0), # from here just matplotlib
