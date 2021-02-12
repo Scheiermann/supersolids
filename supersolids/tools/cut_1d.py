@@ -91,7 +91,7 @@ def cut_1d(System: Schroedinger,
     plt.legend()
     plt.grid()
     plt.savefig(Path(dir_path, "1d_cut.png"))
-    plt.show()
+    # plt.show()
 
 
 def prepare_cuts(func: Callable, N: int, alpha_z: float,
