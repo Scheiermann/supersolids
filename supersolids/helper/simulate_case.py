@@ -79,20 +79,19 @@ def simulate_case(System: Schroedinger,
         # Animation.set_limits_smart(0, System)
 
         with run_time.run_time(name="Animation.start"):
-            MatplotlibAnim.start(System,
-                                 accuracy=accuracy,
-                                 )
+            MatplotlibAnim.start(
+                System,
+                accuracy=accuracy,
+                )
     else:
         # mayavi for 3D
-        MayAnim = MayaviAnimation.MayaviAnimation(Anim,
-                                                  slice_indices=slice_indices,
-                                                  dir_path=Path(__file__).parent.parent.joinpath("results")
-                                                  )
+        MayAnim = MayaviAnimation.MayaviAnimation(
+            Anim,
+            slice_indices=slice_indices,
+            dir_path=Path(__file__).parent.parent.joinpath("results")
+            )
         with run_time.run_time(name="MayaviAnimation.animate"):
-            MayAnimator = MayAnim.animate(System,
-                                          accuracy=accuracy,
-                                          interactive=interactive,
-                                          )
+            MayAnimator = MayAnim.animate(System, accuracy=accuracy, interactive=interactive)
 
         with run_time.run_time(name="mlab.show"):
             mlab.show()

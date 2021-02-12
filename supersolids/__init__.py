@@ -4,4 +4,5 @@ __all__ = ["Animation",
            "tools",
            "multi_core",
            "Schroedinger",
+           "single_core",
            ]

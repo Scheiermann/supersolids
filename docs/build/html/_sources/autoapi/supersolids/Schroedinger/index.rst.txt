@@ -21,7 +21,7 @@ Classes
 
 
 
-.. py:class:: Schroedinger(Box: functions.Box, Res: functions.Resolution, max_timesteps: int, dt: float, g: float = 0.0, g_qf: float = 0.0, e_dd: float = 1.0, imag_time: bool = True, mu: float = 1.1, E: float = 1.0, psi_0: Callable = functions.psi_gauss_3d, V: Optional[Callable] = functions.v_harmonic_3d, V_interaction: Optional[Callable] = None, psi_sol: Optional[Callable] = functions.thomas_fermi_3d, mu_sol: Optional[Callable] = functions.mu_3d, psi_0_noise: np.ndarray = functions.noise_mesh)
+.. py:class:: Schroedinger(N: int, Box: functions.Box, Res: functions.Resolution, max_timesteps: int, dt: float, dt_func: Optional[Callable] = None, g: float = 0.0, g_qf: float = 0.0, w_y: float = 2.0 * np.pi * 80.0, w_z: float = 2.0 * np.pi * 167.0, a_s: float = 85.0 * constants.a_0, e_dd: float = 1.0, imag_time: bool = True, mu: float = 1.1, E: float = 1.0, psi_0: Callable = functions.psi_gauss_3d, V: Optional[Callable] = functions.v_harmonic_3d, V_interaction: Optional[Callable] = None, psi_sol: Optional[Callable] = functions.thomas_fermi_3d, mu_sol: Optional[Callable] = functions.mu_3d, psi_0_noise: np.ndarray = functions.noise_mesh)
 
    Implements a numerical solution of the dimensionless time-dependent
    non-linear Schrodinger equation for an arbitrary potential:

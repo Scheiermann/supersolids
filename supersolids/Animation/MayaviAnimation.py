@@ -160,10 +160,7 @@ class MayaviAnimation(Animation.Animation):
         return input_path
 
     @mlab.animate(delay=10, ui=True)
-    def animate(self, System: Schroedinger,
-                accuracy: float = 10 ** -6,
-                interactive: bool = True,
-                ):
+    def animate(self, System: Schroedinger, accuracy: float = 10 ** -6, interactive: bool = True):
         """
         Animates solving of the Schroedinger equations of System with mayavi in 3D.
         Animation is limited to System.max_timesteps or
