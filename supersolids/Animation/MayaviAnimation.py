@@ -67,6 +67,7 @@ class MayaviAnimation(Animation.Animation):
                  Anim: Animation.Animation,
                  slice_indices: np.ndarray = [0, 0, 0],
                  dir_path: Path = Path.home().joinpath("supersolids", "results"),
+                 offscreen: bool = False,
                  ):
         """
         Creates an Animation with mayavi for a Schroedinger equation
@@ -100,7 +101,9 @@ class MayaviAnimation(Animation.Animation):
 
         MayaviAnimation.mayavi_counter += 1
         self.slice_indices = slice_indices
+        self.offscreen = offscreen
 
+        mlab.options.offscreen = self.offscreen
         self.fig = mlab.figure(f"{MayaviAnimation.mayavi_counter:02d}")
 
         # dir_path need to be saved to access it after the figure closed
@@ -113,7 +116,9 @@ class MayaviAnimation(Animation.Animation):
         self.fig.scene.movie_maker.record = True
         # set dir_path to save images to
         self.fig.scene.movie_maker.directory = dir_path
-        self.fig.scene.show_axes = True
+
+        if not self.offscreen:
+            self.fig.scene.show_axes = True
 
     def create_movie(self,
                      dir_path: Path = None,

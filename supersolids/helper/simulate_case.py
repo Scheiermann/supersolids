@@ -92,12 +92,14 @@ def simulate_case(System: Schroedinger,
             Anim,
             slice_indices=slice_indices,
             dir_path=dir_path,
+            offscreen=(not interactive),
             )
         with run_time.run_time(name="MayaviAnimation.animate"):
             MayAnimator = MayAnim.animate(System, accuracy=accuracy, interactive=interactive)
 
         with run_time.run_time(name="mlab.show"):
-            mlab.show()
+            if interactive:
+                mlab.show()
 
         result_path = MayAnim.create_movie(input_data_file_pattern="*.png",
                                            delete_input=delete_input)

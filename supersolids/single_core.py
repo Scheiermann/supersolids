@@ -31,13 +31,13 @@ if __name__ == "__main__":
 
     # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
-    Res = functions.Resolution(x=2 ** 8, y=2 ** 7, z=2 ** 5)
+    Res = functions.Resolution(x=2 ** 7, y=2 ** 7, z=2 ** 8)
 
-    Box = functions.Box(x0=-10, x1=10,
-                        y0=-5, y1=5,
-                        z0=-4, z1=4)
+    Box = functions.Box(x0=-3, x1=3,
+                        y0=-3, y1=3,
+                        z0=-12, z1=12)
 
-    dt: float = 4 * 10 ** -3
+    dt: float = 2 * 10 ** -3
     # dt_func = functools.partial(functions.dt_adaptive)
 
     N: int = 6 * 10 ** 4
@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     psi_0_3d = functools.partial(
         functions.psi_gauss_3d,
-        a_x=3.5, a_y=1.5, a_z=1.2,
+        a_x=1.0, a_y=1.0, a_z=5.0,
         x_0=0.0, y_0=0.0, z_0=0.0,
         k_0=0.0)
     # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     System: Schroedinger = Schroedinger(N,
                                         Box,
                                         Res,
-                                        max_timesteps=80001,
+                                        max_timesteps=2001,
                                         dt=dt,
                                         dt_func=None,
                                         g=g,
@@ -115,7 +115,7 @@ if __name__ == "__main__":
                                         mu=1.1,
                                         E=1.0,
                                         psi_0=psi_0_3d,
-                                        V=V_3d,
+                                        V=None,
                                         V_interaction=V_3d_ddi,
                                         psi_sol=psi_sol_3d,
                                         mu_sol=functions.mu_3d,
@@ -155,7 +155,7 @@ if __name__ == "__main__":
                                     Anim=Anim,
                                     accuracy=10 ** -12,
                                     delete_input=False,
-                                    dir_path=Path(__file__).parent.parent.joinpath("results"),
+                                    dir_path=Path(__file__).parent.joinpath("results"),
                                     slice_indices=slice_indices, # from here just mayavi
                                     interactive=True,
                                     x_lim=(-2.0, 2.0), # from here just matplotlib
