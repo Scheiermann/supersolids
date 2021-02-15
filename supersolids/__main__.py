@@ -13,6 +13,7 @@ time-dependent Schrodinger equation for 1D, 2D and 3D.
 
 import argparse
 import functools
+import sys
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -57,13 +58,14 @@ if __name__ == "__main__":
                         help="Simulate until accuracy is reached")
     parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to save data to")
+    parser.add_argument("--V_none", default=False, action="store_true",
+                        help="If not used, a gauss potential is used."
+                             "If used, no potential is used.")
     parser.add_argument("--offscreen", default=False, action="store_true",
-                        help="If not used, interactive animation is shown (saves as mp4)"
-                             "If used, saves Schroedinger as pkl and allows offscreen usage.")
+                        help="If not used, interactive animation is shown and saved as mp4."
+                             "If used, Schroedinger is saved as pkl and allows offscreen usage.")
     args = parser.parse_args()
     print(f"args: {args}")
-
-    interactive = (not args.offscreen)
 
     assert len(args.Res) <= 3, "Dimension of Res needs to be smaller than 3."
     assert len(args.Box) <= 6, ("Dimension of Box needs to be smaller than 6, "
@@ -136,6 +138,24 @@ if __name__ == "__main__":
     else:
         psi_sol_3d = None
 
+    if Res.dim == 1:
+        V = V_1d
+        psi_0 = psi_0_1d
+        V_interaction = None
+    elif Res.dim == 2:
+        V = V_2d
+        psi_0 = psi_0_2d
+        V_interaction = None
+    elif Res.dim == 3:
+        V = V_3d
+        psi_0 = psi_0_3d
+        V_interaction = V_3d_ddi
+    else:
+        sys.exit("Spatial dimension over 3. This is not implemented.")
+
+    if args.V_none:
+        V = None
+
     System: Schroedinger = Schroedinger(args.N,
                                         Box,
                                         Res,
@@ -150,9 +170,9 @@ if __name__ == "__main__":
                                         imag_time=True,
                                         mu=1.1,
                                         E=1.0,
-                                        psi_0=psi_0_3d,
-                                        V=V_3d,
-                                        V_interaction=V_3d_ddi,
+                                        psi_0=psi_0,
+                                        V=V,
+                                        V_interaction=V_interaction,
                                         psi_sol=psi_sol_3d,
                                         mu_sol=functions.mu_3d,
                                         psi_0_noise=None,
@@ -193,7 +213,7 @@ if __name__ == "__main__":
                                     delete_input=False,
                                     dir_path=dir_path,
                                     slice_indices=slice_indices, # from here just mayavi
-                                    interactive=interactive,
+                                    offscreen=args.offscreen,
                                     x_lim=(-2.0, 2.0), # from here just matplotlib
                                     y_lim=(-2.0, 2.0),
                                     z_lim=(0, 0.5),

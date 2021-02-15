@@ -73,22 +73,21 @@ class MayaviAnimation(Animation.Animation):
         MayaviAnimation.mayavi_counter += 1
         self.slice_indices = slice_indices
         self.offscreen = offscreen
-
-        mlab.options.offscreen = self.offscreen
-        self.fig = mlab.figure(f"{MayaviAnimation.mayavi_counter:02d}")
-
         # dir_path need to be saved to access it after the figure closed
         self.dir_path = dir_path
 
-        self.fig.scene.disable_render = False
-        # anti_aliasing default is 8,
-        # and removes res issues when downscaling, but takes longer
-        self.fig.scene.anti_aliasing_frames = 8
-        self.fig.scene.movie_maker.record = True
-        # set dir_path to save images to
-        self.fig.scene.movie_maker.directory = dir_path
-
         if not self.offscreen:
+            mlab.options.offscreen = self.offscreen
+            self.fig = mlab.figure(f"{MayaviAnimation.mayavi_counter:02d}")
+
+            self.fig.scene.disable_render = False
+            # anti_aliasing default is 8,
+            # and removes res issues when downscaling, but takes longer
+            self.fig.scene.anti_aliasing_frames = 8
+            self.fig.scene.movie_maker.record = True
+            # set dir_path to save images to
+            self.fig.scene.movie_maker.directory = dir_path
+
             self.fig.scene.show_axes = True
 
     def create_movie(self,

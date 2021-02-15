@@ -31,7 +31,7 @@ def simulate_case(System: Schroedinger,
                   dir_path: Path = Path.home().joinpath("supersolids",
                                                         "results"),
                   slice_indices: np.ndarray = [0, 0, 0],
-                  interactive: bool = True,
+                  offscreen: bool = False,
                   x_lim: Tuple[float, float] = (-1.0, 1.0),
                   y_lim: Tuple[float, float] = (-1.0, 1.0),
                   z_lim: Tuple[float, float] = (-1.0, 1.0),
@@ -47,7 +47,7 @@ def simulate_case(System: Schroedinger,
     :param accuracy: Convergence is reached when relative error of mu is smaller
         than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
 
-    :param interactive: Condition for interactive mode. When camera functions are used,
+    :param offscreen: Condition for interactive mode. When camera functions are used,
         then interaction is not possible. So interactive=True turn the usage
         of camera functions off.
 
@@ -89,18 +89,19 @@ def simulate_case(System: Schroedinger,
                 accuracy=accuracy,
             )
     else:
-        # mayavi for 3D
-        MayAnim = MayaviAnimation.MayaviAnimation(
-            Anim,
-            slice_indices=slice_indices,
-            dir_path=dir_path,
-            offscreen=(not interactive),
-        )
+        if not offscreen:
+            # mayavi for 3D
+            MayAnim = MayaviAnimation.MayaviAnimation(
+                Anim,
+                slice_indices=slice_indices,
+                dir_path=dir_path,
+                offscreen=offscreen,
+            )
 
-        if interactive:
             with run_time.run_time(name="MayaviAnimation.animate"):
                 MayAnimator = MayAnim.animate(System, accuracy=accuracy,
-                                              interactive=interactive)
+                                              interactive=(not offscreen),
+                                              )
 
             with run_time.run_time(name="mlab.show"):
                     mlab.show()

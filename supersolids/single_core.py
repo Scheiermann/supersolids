@@ -35,9 +35,9 @@ if __name__ == "__main__":
 
     Box = functions.Box(x0=-3, x1=3,
                         y0=-3, y1=3,
-                        z0=-12, z1=12)
+                        z0=-15, z1=15)
 
-    dt: float = 2 * 10 ** -3
+    dt: float = 5 * 10 ** -3
     # dt_func = functools.partial(functions.dt_adaptive)
 
     N: int = 6 * 10 ** 4
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     System: Schroedinger = Schroedinger(N,
                                         Box,
                                         Res,
-                                        max_timesteps=2001,
+                                        max_timesteps=8001,
                                         dt=dt,
                                         dt_func=None,
                                         g=g,
@@ -157,7 +157,7 @@ if __name__ == "__main__":
                                     delete_input=False,
                                     dir_path=Path(__file__).parent.joinpath("results"),
                                     slice_indices=slice_indices, # from here just mayavi
-                                    interactive=True,
+                                    offscreen=True,
                                     x_lim=(-2.0, 2.0), # from here just matplotlib
                                     y_lim=(-2.0, 2.0),
                                     z_lim=(0, 0.5),
