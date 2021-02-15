@@ -11,12 +11,14 @@ Numerical solver for non-linear time-dependent Schrodinger equation.
 """
 
 import functools
+import pickle
 import sys
 from typing import Callable, Union, Optional
+from pathlib import Path
 
 import numpy as np
 
-from supersolids.helper import constants, functions
+from supersolids.helper import constants, functions, get_path
 
 
 class Schroedinger:
@@ -99,8 +101,9 @@ class Schroedinger:
         self.e_dd: float = e_dd
         self.imag_time: float = imag_time
 
-        assert self.Box.dim == self.Res.dim, (f"Dimension of Box ({self.Box.dim}) and "
-                                    f"Res ({self.Res.dim}) needs to be equal.")
+        assert self.Box.dim == self.Res.dim, (
+            f"Dimension of Box ({self.Box.dim}) and "
+            f"Res ({self.Res.dim}) needs to be equal.")
         self.dim: int = self.Box.dim
 
         # mu = - ln(N) / (2 * dtau), where N is the norm of the :math:`\psi`
@@ -440,7 +443,8 @@ class Schroedinger:
         # for self.imag_time=False, renormalization should be preserved,
         # but we play safe here (regardless of speedup)
         # if self.imag_time:
-        psi_norm_after_evolution: float = self.get_norm_trapez(np.abs(self.psi_val) ** 2.0)
+        psi_norm_after_evolution: float = self.get_norm_trapez(
+            np.abs(self.psi_val) ** 2.0)
         # psi_norm_after_evolution: float = self.get_norm(p=2.0)
         self.psi_val = self.psi_val / np.sqrt(psi_norm_after_evolution)
 
@@ -459,3 +463,49 @@ class Schroedinger:
         #           f"E_sol: {self.mu_sol - 0.5 * self.g * psi_quadratic_int}")
         # else:
         #     print(f"E: {self.E}")
+
+    def simulate_raw(self, accuracy: float = 10 ** -6,
+                     dir_path: Path = Path.home().joinpath("supersolids", "results")):
+
+        print(f"Accuracy goal: {accuracy}")
+
+        # Create a results dir, if there is none
+        if not dir_path.is_dir():
+            dir_path.mkdir(parents=True)
+
+        # Initialize mu_rel
+        mu_rel = self.mu
+
+        _, last_index, dir_name, counting_format = get_path.get_path(dir_path)
+        input_path = Path(dir_path, dir_name + counting_format % (last_index + 1))
+
+        # Create a movie dir, if there is none
+        if not input_path.is_dir():
+            input_path.mkdir(parents=True)
+
+        for frame in range(0, self.max_timesteps):
+            mu_old = self.mu
+            self.time_step()
+
+            with open(Path(input_path, f"step_{frame:05d}.pkl"), "wb") as f:
+                pickle.dump(obj=self, file=f)
+
+            print(f"t={self.t:07.05f}, mu_rel={mu_rel:+05.05e}, "
+                  f"processed={frame / self.max_timesteps:05.03f}%")
+
+            mu_rel = np.abs((self.mu - mu_old) / self.mu)
+
+            # Stop animation when accuracy is reached
+            if mu_rel < accuracy:
+                print(f"Accuracy reached: {mu_rel}")
+                break
+
+            elif np.isnan(mu_rel) and np.isnan(self.mu):
+                assert np.isnan(self.E), ("E should be nan, when mu is nan."
+                                          "Then the system is divergent.")
+                print(f"Accuracy NOT reached! System diverged.")
+                break
+
+            if frame == (self.max_timesteps - 1):
+                # Animation stops at the next step, to actually show the last step
+                print(f"Maximum timesteps are reached. Animation is stopped.")

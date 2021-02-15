@@ -17,7 +17,8 @@ import numpy as np
 from mayavi import mlab
 from typing import Tuple
 
-from supersolids.Animation import Animation, MayaviAnimation, MatplotlibAnimation
+from supersolids.Animation import Animation, MayaviAnimation, \
+    MatplotlibAnimation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.tools import run_time
 from supersolids.tools.cut_1d import cut_1d
@@ -27,7 +28,8 @@ def simulate_case(System: Schroedinger,
                   Anim: Animation.Animation,
                   accuracy: float = 10 ** -6,
                   delete_input: bool = True,
-                  dir_path: Path = Path.home().joinpath("supersolids", "results"),
+                  dir_path: Path = Path.home().joinpath("supersolids",
+                                                        "results"),
                   slice_indices: np.ndarray = [0, 0, 0],
                   interactive: bool = True,
                   x_lim: Tuple[float, float] = (-1.0, 1.0),
@@ -85,7 +87,7 @@ def simulate_case(System: Schroedinger,
             MatplotlibAnim.start(
                 System,
                 accuracy=accuracy,
-                )
+            )
     else:
         # mayavi for 3D
         MayAnim = MayaviAnimation.MayaviAnimation(
@@ -93,18 +95,23 @@ def simulate_case(System: Schroedinger,
             slice_indices=slice_indices,
             dir_path=dir_path,
             offscreen=(not interactive),
-            )
-        with run_time.run_time(name="MayaviAnimation.animate"):
-            MayAnimator = MayAnim.animate(System, accuracy=accuracy, interactive=interactive)
+        )
 
-        with run_time.run_time(name="mlab.show"):
-            if interactive:
-                mlab.show()
+        if interactive:
+            with run_time.run_time(name="MayaviAnimation.animate"):
+                MayAnimator = MayAnim.animate(System, accuracy=accuracy,
+                                              interactive=interactive)
 
-        result_path = MayAnim.create_movie(input_data_file_pattern="*.png",
-                                           delete_input=delete_input)
+            with run_time.run_time(name="mlab.show"):
+                    mlab.show()
 
-        cut_1d(System, slice_indices=slice_indices,
-               dir_path=result_path, y_lim=(0.0, 0.05))
+            result_path = MayAnim.create_movie(dir_path=dir_path,
+                                               input_data_file_pattern="*.png",
+                                               delete_input=delete_input)
+
+            cut_1d(System, slice_indices=slice_indices,
+                   dir_path=result_path, y_lim=(0.0, 0.05))
+        else:
+            System.simulate_raw(accuracy=accuracy, dir_path=dir_path)
 
         return System

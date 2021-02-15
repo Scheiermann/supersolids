@@ -18,36 +18,7 @@ from mayavi import mlab
 
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
-from supersolids.helper import functions, constants
-
-def get_image_path(dir_path: Path,
-                   dir_name: str = "movie",
-                   counting_format: str = "%03d") -> Path:
-    """
-    Looks up all directories with matching dir_name
-    and counting format in dir_path.
-    Gets the highest number and returns a path with dir_name counted one up
-    (prevents colliding with old data).
-
-    :param dir_path: Path where to look for old directories (movie data)
-    :param dir_name: General name of the directories without the counter
-    :param counting_format: Format of counter of the directories
-
-    :return: Path for the new directory (not colliding with old data)
-    """
-
-    # "movie" and "%03d" strings are hardcoded
-    # in mayavi movie_maker _update_subdir
-    existing = sorted([x for x in dir_path.glob(dir_name + "*") if x.is_dir()])
-    try:
-        last_index = int(existing[-1].name.split(dir_name)[1])
-    except IndexError as e:
-        assert last_index is not None, (
-            "Extracting last index from dir_path failed")
-
-    input_path = Path(dir_path, dir_name + counting_format % last_index)
-
-    return input_path
+from supersolids.helper import functions, constants, get_path
 
 
 def axes_style():
@@ -139,9 +110,9 @@ class MayaviAnimation(Animation.Animation):
 
         """
         if dir_path is None:
-            input_path = get_image_path(self.dir_path)
+            input_path, _, _, _ = get_path.get_path(self.dir_path)
         else:
-            input_path = get_image_path(dir_path)
+            input_path, _, _, _ = get_path.get_path(dir_path)
 
         input_data = Path(input_path, input_data_file_pattern)
         output_path = Path(input_path, self.filename)
