@@ -25,8 +25,8 @@ def get_path(dir_path: Path,
     try:
         last_index: int = int(existing[-1].name.split(dir_name)[1])
     except IndexError as e:
-        assert last_index is not None, (
-            "Extracting last index from dir_path failed")
+        last_index = 0
+        print(f"No old data found. Setting last_index={last_index}.")
 
     input_path = Path(dir_path, dir_name + counting_format % last_index)
 
