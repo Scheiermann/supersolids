@@ -57,8 +57,13 @@ if __name__ == "__main__":
                         help="Simulate until accuracy is reached")
     parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to save data to")
+    parser.add_argument("--offscreen", default=False, action="store_true",
+                        help="If not used, interactive animation is shown (saves as mp4)"
+                             "If used, saves Schroedinger as pkl and allows offscreen usage.")
     args = parser.parse_args()
     print(f"args: {args}")
+
+    interactive = (not args.offscreen)
 
     assert len(args.Res) <= 3, "Dimension of Res needs to be smaller than 3."
     assert len(args.Box) <= 6, ("Dimension of Box needs to be smaller than 6, "
@@ -188,7 +193,7 @@ if __name__ == "__main__":
                                     delete_input=False,
                                     dir_path=dir_path,
                                     slice_indices=slice_indices, # from here just mayavi
-                                    interactive=True,
+                                    interactive=interactive,
                                     x_lim=(-2.0, 2.0), # from here just matplotlib
                                     y_lim=(-2.0, 2.0),
                                     z_lim=(0, 0.5),
