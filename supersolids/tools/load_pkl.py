@@ -43,5 +43,5 @@ if __name__ == "__main__":
 
     result_path = MayAnim.create_movie(dir_path=MayAnim.dir_path,
                                        input_data_file_pattern="*.png",
-                                       delete_input=False)
+                                       delete_input=True)
 

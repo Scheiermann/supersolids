@@ -464,7 +464,8 @@ class Schroedinger:
         # else:
         #     print(f"E: {self.E}")
 
-    def simulate_raw(self, accuracy: float = 10 ** -6, steps_per_pickle: int = 10,
+    def simulate_raw(self, accuracy: float = 10 ** -6,
+                     steps_per_pickle: int = 10,
                      dir_path: Path = Path.home().joinpath("supersolids", "results"),
                      filename_schroedinger=f"schroedinger.pkl",
                      filename_steps=f"step_",

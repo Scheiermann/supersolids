@@ -135,28 +135,7 @@ class MayaviAnimation(Animation.Animation):
 
         return input_path
 
-    @mlab.animate(delay=10, ui=True)
-    def animate_pkl(self,
-                    dir_path: Path = None,
-                    filename_schroedinger=f"schroedinger.pkl",
-                    filename_steps=f"step_",
-                    steps_format: str = "%05d"
-                    ):
-
-        if dir_path is None:
-            input_path, _, _, _ = get_path.get_path(self.dir_path)
-            self.dir_path = input_path
-            self.fig.scene.movie_maker.directory = self.dir_path
-        else:
-            input_path, _, _, _ = get_path.get_path(dir_path)
-            self.dir_path = input_path
-            self.fig.scene.movie_maker.directory = self.dir_path
-
-        print("Load schroedinger")
-        with open(Path(input_path, filename_schroedinger), "rb") as f:
-            # WARNING: this is just the input Schroedinger at t=0
-            System = pickle.load(file=f)
-
+    def prepare(self, System: Schroedinger):
         prob_3d = np.abs(System.psi_val) ** 2
         prob_plot = mlab.contour3d(System.x_mesh,
                                    System.y_mesh,
@@ -165,66 +144,6 @@ class MayaviAnimation(Animation.Animation):
                                    colormap="spectral",
                                    opacity=self.alpha_psi,
                                    transparent=True)
-        yield
-
-        # read new frames until Exception (last frame read)
-        frame = 0
-        while True:
-            print(f"frame={frame}")
-            try:
-                # get the psi_val of Schroedinger at other timesteps (t!=0)
-                with open(Path(input_path, filename_steps + steps_format % frame + ".pkl"),
-                          "rb"
-                          ) as f:
-                    psi_val_pkl = pickle.load(file=f)
-
-                # Update plot functions
-                prob_3d = np.abs(psi_val_pkl) ** 2
-                prob_plot.mlab_source.trait_set(scalars=prob_3d)
-
-                yield
-
-            except FileNotFoundError:
-                yield None
-                break
-
-            frame = frame + 1
-
-        # Finally close
-        mlab.close(all=True)
-
-    @mlab.animate(delay=10, ui=True)
-    def animate(self, System: Schroedinger, accuracy: float = 10 ** -6, interactive: bool = True):
-        """
-        Animates solving of the Schroedinger equations of System with mayavi in 3D.
-        Animation is limited to System.max_timesteps or
-        the convergence according to accuracy.
-
-        :param System: Schrödinger equations for the specified system
-
-        :param accuracy: Convergence is reached when relative error of mu is smaller
-            than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
-
-        :param slice_indices: Numpy array with indices of grid points
-            in the directions x, y, z (in terms of System.x, System.y, System.z)
-            to produce a slice/plane in mayavi,
-            where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice
-            Max values is for e.g. System.Res.x - 1.
-
-        :param interactive: Condition for interactive mode. When camera functions are used,
-            then interaction is not possible. So interactive=True turn the usage
-            of camera functions off.
-
-        """
-        prob_3d = np.abs(System.psi_val) ** 2
-        prob_plot = mlab.contour3d(System.x_mesh,
-                                   System.y_mesh,
-                                   System.z_mesh,
-                                   prob_3d,
-                                   colormap="spectral",
-                                   opacity=self.alpha_psi,
-                                   transparent=True)
-
         slice_x_plot = mlab.volume_slice(System.x_mesh,
                                          System.y_mesh,
                                          System.z_mesh,
@@ -260,6 +179,8 @@ class MayaviAnimation(Animation.Animation):
                                     colormap="hot",
                                     opacity=self.alpha_V,
                                     transparent=True)
+        else:
+            V_plot = None
 
         if System.psi_sol_val is not None:
             if self.plot_psi_sol:
@@ -270,8 +191,122 @@ class MayaviAnimation(Animation.Animation):
                                               colormap="cool",
                                               opacity=self.alpha_psi_sol,
                                               transparent=True)
+        else:
+            psi_sol_plot = None
+
 
         axes_style()
+
+        return prob_plot, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot
+
+    @mlab.animate(delay=10, ui=True)
+    def animate_pkl(self,
+                    dir_path: Path = None,
+                    filename_schroedinger=f"schroedinger.pkl",
+                    filename_steps=f"step_",
+                    steps_format: str = "%05d",
+                    steps_per_pickle: int = 10,
+                    ):
+
+        if dir_path is None:
+            input_path, _, _, _ = get_path.get_path(self.dir_path)
+            self.dir_path = input_path
+            self.fig.scene.movie_maker.directory = self.dir_path
+        else:
+            input_path, _, _, _ = get_path.get_path(dir_path)
+            self.dir_path = input_path
+            self.fig.scene.movie_maker.directory = self.dir_path
+
+        print("Load schroedinger")
+        with open(Path(input_path, filename_schroedinger), "rb") as f:
+            # WARNING: this is just the input Schroedinger at t=0
+            System = pickle.load(file=f)
+
+        prob_plot, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot = self.prepare(System)
+
+        yield
+
+        # read new frames until Exception (last frame read)
+        frame = 0
+        while True:
+            print(f"frame={frame}")
+            try:
+                # get the psi_val of Schroedinger at other timesteps (t!=0)
+                with open(Path(input_path, filename_steps + steps_format % frame + ".pkl"),
+                          "rb"
+                          ) as f:
+                    psi_val_pkl = pickle.load(file=f)
+
+                # Update legend (especially time)
+                text = (f"N={System.N}, "
+                        f"Box={System.Box}, "
+                        f"Res={System.Res}, "
+                        f"max_timesteps={System.max_timesteps:d}, "
+                        f"dt={System.dt:.6f}, "
+                        f"g={System.g:.2}, "
+                        f"g_qf={System.g_qf:.2}, "
+                        f"e_dd={System.e_dd:05.03f},\n"
+                        f"a_s/a_0={System.a_s / constants.a_0:05.02f}, "
+                        f"w_y/2pi={System.w_y / (2 * np.pi):05.02f}, "
+                        f"w_z/2pi={System.w_z / (2 * np.pi):05.02f}, "
+                        f"imag_time={System.imag_time}, "
+                        f"processed={frame / System.max_timesteps:05.03f}%"
+                        )
+
+                if frame == 0:
+                    # create title for first frame
+                    title = mlab.title(text=text,
+                                       height=0.95,
+                                       line_width=1.0,
+                                       size=1.0,
+                                       color=(0, 0, 0),
+                                       )
+
+                title.set(text=text)
+
+                # Update plot functions
+                prob_3d = np.abs(psi_val_pkl) ** 2
+                slice_x_plot.mlab_source.trait_set(scalars=prob_3d)
+                slice_y_plot.mlab_source.trait_set(scalars=prob_3d)
+                slice_z_plot.mlab_source.trait_set(scalars=prob_3d)
+                prob_plot.mlab_source.trait_set(scalars=prob_3d)
+
+                yield
+
+            except FileNotFoundError:
+                yield None
+                break
+
+            frame = frame + steps_per_pickle
+
+        # Finally close
+        mlab.close(all=True)
+
+    @mlab.animate(delay=10, ui=True)
+    def animate(self, System: Schroedinger, accuracy: float = 10 ** -6, interactive: bool = True):
+        """
+        Animates solving of the Schroedinger equations of System with mayavi in 3D.
+        Animation is limited to System.max_timesteps or
+        the convergence according to accuracy.
+
+        :param System: Schrödinger equations for the specified system
+
+        :param accuracy: Convergence is reached when relative error of mu is smaller
+            than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`
+
+        :param slice_indices: Numpy array with indices of grid points
+            in the directions x, y, z (in terms of System.x, System.y, System.z)
+            to produce a slice/plane in mayavi,
+            where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice
+            Max values is for e.g. System.Res.x - 1.
+
+        :param interactive: Condition for interactive mode. When camera functions are used,
+            then interaction is not possible. So interactive=True turn the usage
+            of camera functions off.
+
+        """
+        prob_plot, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot = self.prepare(System)
+
         for frame in range(0, System.max_timesteps):
             if not interactive:
                 # rotate camera
