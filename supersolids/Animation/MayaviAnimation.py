@@ -9,7 +9,7 @@
 Functions for Potential and initial wave function :math:`\psi_0`
 
 """
-
+import pickle
 from pathlib import Path
 
 import numpy as np
@@ -136,6 +136,64 @@ class MayaviAnimation(Animation.Animation):
         return input_path
 
     @mlab.animate(delay=10, ui=True)
+    def animate_pkl(self,
+                    dir_path: Path = None,
+                    filename_schroedinger=f"schroedinger.pkl",
+                    filename_steps=f"step_",
+                    steps_format: str = "%05d"
+                    ):
+
+        if dir_path is None:
+            input_path, _, _, _ = get_path.get_path(self.dir_path)
+            self.dir_path = input_path
+            self.fig.scene.movie_maker.directory = self.dir_path
+        else:
+            input_path, _, _, _ = get_path.get_path(dir_path)
+            self.dir_path = input_path
+            self.fig.scene.movie_maker.directory = self.dir_path
+
+        print("Load schroedinger")
+        with open(Path(input_path, filename_schroedinger), "rb") as f:
+            # WARNING: this is just the input Schroedinger at t=0
+            System = pickle.load(file=f)
+
+        prob_3d = np.abs(System.psi_val) ** 2
+        prob_plot = mlab.contour3d(System.x_mesh,
+                                   System.y_mesh,
+                                   System.z_mesh,
+                                   prob_3d,
+                                   colormap="spectral",
+                                   opacity=self.alpha_psi,
+                                   transparent=True)
+        yield
+
+        # read new frames until Exception (last frame read)
+        frame = 0
+        while True:
+            print(f"frame={frame}")
+            try:
+                # get the psi_val of Schroedinger at other timesteps (t!=0)
+                with open(Path(input_path, filename_steps + steps_format % frame + ".pkl"),
+                          "rb"
+                          ) as f:
+                    psi_val_pkl = pickle.load(file=f)
+
+                # Update plot functions
+                prob_3d = np.abs(psi_val_pkl) ** 2
+                prob_plot.mlab_source.trait_set(scalars=prob_3d)
+
+                yield
+
+            except FileNotFoundError:
+                yield None
+                break
+
+            frame = frame + 1
+
+        # Finally close
+        mlab.close(all=True)
+
+    @mlab.animate(delay=10, ui=True)
     def animate(self, System: Schroedinger, accuracy: float = 10 ** -6, interactive: bool = True):
         """
         Animates solving of the Schroedinger equations of System with mayavi in 3D.
@@ -229,7 +287,7 @@ class MayaviAnimation(Animation.Animation):
                           elevation=camera_z)
 
             # Initialize mu_rel
-            mu_rel = System.mu
+            mu_rel = 1
 
             # The initial plot needs to be shown first,
             # also a timestep is needed for mu_rel

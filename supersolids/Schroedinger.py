@@ -465,7 +465,11 @@ class Schroedinger:
         #     print(f"E: {self.E}")
 
     def simulate_raw(self, accuracy: float = 10 ** -6, steps_per_pickle: int = 10,
-                     dir_path: Path = Path.home().joinpath("supersolids", "results")):
+                     dir_path: Path = Path.home().joinpath("supersolids", "results"),
+                     filename_schroedinger=f"schroedinger.pkl",
+                     filename_steps=f"step_",
+                     steps_format: str = "%05d"
+                     ):
 
         print(f"Accuracy goal: {accuracy}")
 
@@ -483,10 +487,9 @@ class Schroedinger:
         if not input_path.is_dir():
             input_path.mkdir(parents=True)
 
-        with open(Path(input_path, f"constants.pkl"), "wb") as f:
-            pickle.dump(obj=[self.N, self.Box, self.Res, self.dt, self.g, self.g_qf,
-                             self.w_y, self.w_z, self.a_s, self.e_dd, self.imag_time,
-                             self.psi, self.V], file=f)
+        # save used Schroedinger
+        with open(Path(input_path, filename_schroedinger), "wb") as f:
+            pickle.dump(obj=self, file=f)
 
         for frame in range(0, self.max_timesteps):
             mu_old = self.mu
@@ -494,7 +497,9 @@ class Schroedinger:
 
             # save psi_val after steps_per_pickle steps of dt (to save disk space)
             if (frame % steps_per_pickle) == 0:
-                with open(Path(input_path, f"step_{frame:05d}.pkl"), "wb") as f:
+                with open(Path(input_path, filename_steps + steps_format % frame + ".pkl"),
+                          "wb"
+                          ) as f:
                     pickle.dump(obj=self.psi_val, file=f)
 
             print(f"t={self.t:07.05f}, mu_rel={mu_rel:+05.05e}, "
