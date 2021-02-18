@@ -232,10 +232,10 @@ class MayaviAnimation(Animation.Animation):
             print(f"frame={frame}")
             try:
                 # get the psi_val of Schroedinger at other timesteps (t!=0)
-                with open(Path(input_path, filename_steps + steps_format % frame + ".pkl"),
+                with open(Path(input_path, filename_steps + steps_format % frame + ".npz"),
                           "rb"
                           ) as f:
-                    psi_val_pkl = pickle.load(file=f)
+                    psi_val_pkl = np.load(file=f)["psi_val"]
 
                 # Update legend (especially time)
                 text = (f"N={System.N}, "
@@ -250,6 +250,7 @@ class MayaviAnimation(Animation.Animation):
                         f"w_y/2pi={System.w_y / (2 * np.pi):05.02f}, "
                         f"w_z/2pi={System.w_z / (2 * np.pi):05.02f}, "
                         f"imag_time={System.imag_time}, "
+                        f"t={System.dt * frame:07.05f}, "
                         f"processed={frame / System.max_timesteps:05.03f}%"
                         )
 

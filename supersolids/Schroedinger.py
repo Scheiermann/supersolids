@@ -498,10 +498,11 @@ class Schroedinger:
 
             # save psi_val after steps_per_pickle steps of dt (to save disk space)
             if (frame % steps_per_pickle) == 0:
-                with open(Path(input_path, filename_steps + steps_format % frame + ".pkl"),
+                with open(Path(input_path,
+                               filename_steps + steps_format % frame + ".npz"),
                           "wb"
-                          ) as f:
-                    pickle.dump(obj=self.psi_val, file=f)
+                          ) as g:
+                    np.savez_compressed(g, psi_val=self.psi_val)
 
             print(f"t={self.t:07.05f}, mu_rel={mu_rel:+05.05e}, "
                   f"processed={frame / self.max_timesteps:05.03f}%")
