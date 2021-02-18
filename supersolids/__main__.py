@@ -21,7 +21,7 @@ import numpy as np
 
 from supersolids.Animation.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
-from supersolids.helper.simulate_case import simulate_case
+from supersolids.tools.simulate_case import simulate_case
 from supersolids.tools.cut_1d import prepare_cuts
 from supersolids.helper import constants
 from supersolids.helper import functions
