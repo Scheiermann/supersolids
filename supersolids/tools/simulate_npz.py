@@ -10,6 +10,7 @@ Animation for the numerical solver for the non-linear
 time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 
 """
+import argparse
 import pickle
 from pathlib import Path
 
@@ -22,15 +23,36 @@ from supersolids.tools.simulate_case import simulate_case
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    movie_number = 9
-    frame = 15570
-    max_timesteps = 101
-    movie_format: str = "%03d"
-    filename_schroedinger = f"schroedinger.pkl"
-    filename_steps = f"step_"
-    steps_format: str = "%06d"
+    # Use parser to
+    parser = argparse.ArgumentParser(description="Define constants for Schrödinger equation")
+    parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int, default=80001,
+                        help="Simulate until accuracy or maximum of steps of length dt is reached")
+    parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
+                        help="Absolute path to save data to")
+    parser.add_argument("-dir_name", metavar="dir_path", type=str, default="movie" + "%03d" % 1,
+                        help="Name of directory where the files to load lie. "
+                        "For example the standard naming convention is movie001")
+    parser.add_argument("-filename_schroedinger", metavar="filename_schroedinger", type=str,
+                        default="schroedinger.pkl",
+                        help="Name of file, where the Schroedinger object is saved")
+    parser.add_argument("-filename_npz", metavar="filename_npz",
+                        type=str, default="step_" + "%06d" % 1 + ".npz",
+                        help="Name of file, where psi_val is saved."
+                        "For example the standard naming convention is step_000001.npz")
+    parser.add_argument("--offscreen", default=False, action="store_true",
+                        help="If not used, interactive animation is shown and saved as mp4."
+                             "If used, Schroedinger is saved as pkl and allows offscreen usage.")
+    args = parser.parse_args()
+    print(f"args: {args}")
 
-    dir_path = Path.home().joinpath("supersolids", "results")
+    try:
+        dir_path = Path(args.dir_path).expanduser()
+    except Exception:
+        dir_path = args.dir_path
+
+    input_path = Path(dir_path, args.dir_name)
+    schroedinger_path = Path(input_path, args.filename_schroedinger)
+    psi_val_path = Path(input_path, args.filename_npz)
 
     Anim: Animation = Animation(plot_psi_sol=False,
                                 plot_V=False,
@@ -40,30 +62,26 @@ if __name__ == "__main__":
                                 filename="anim.mp4",
                                 )
 
-    input_path = Path(dir_path, "movie" + movie_format % movie_number)
-
-    schroedinger_path = Path(input_path, filename_schroedinger)
-    psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
     try:
         print("Load schroedinger")
         with open(schroedinger_path, "rb") as f:
             # WARNING: this is just the input Schroedinger at t=0
             System = pickle.load(file=f)
 
-        print(f"File at {Path(input_path, filename_schroedinger)} loaded.")
+        print(f"File at {schroedinger_path} loaded.")
         try:
             # get the psi_val of Schroedinger at other timesteps (t!=0)
             with open(psi_val_path, "rb") as f:
                 System.psi_val = np.load(file=f)["psi_val"]
 
-            System.max_timesteps = max_timesteps
+            System.max_timesteps = args.max_timesteps
             SystemResult: Schroedinger = simulate_case(
                 System=System,
                 Anim=Anim,
                 accuracy=10 ** -12,
                 delete_input=False,
                 dir_path=dir_path,
-                offscreen=True,
+                offscreen=args.offscreen,
                 x_lim=(-2.0, 2.0),  # from here just matplotlib
                 y_lim=(-2.0, 2.0),
                 z_lim=(0, 0.5),
