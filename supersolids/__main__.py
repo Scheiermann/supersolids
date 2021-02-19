@@ -13,6 +13,7 @@ time-dependent Schrodinger equation for 1D, 2D and 3D.
 
 import argparse
 import functools
+import json
 import sys
 from pathlib import Path
 from typing import Callable, Optional
@@ -32,12 +33,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Define constants for Schrödinger equation")
     parser.add_argument("-dt", metavar="dt", type=float, default=2 * 10 ** -3, nargs="?",
                         help="Length of timestep to evolve Schrödinger system")
-    parser.add_argument("-Res", metavar="Res", type=int,
-                        default=[2 ** 8, 2 ** 7, 2 ** 5], nargs="*",
+    parser.add_argument("-Res", metavar="Res", type=json.loads,
+                        default={"x": 256, "y": 128, "z": 32},
                         help="List of resolutions for the box (1D, 2D, 3D). Needs to be 2 ** int.")
-    parser.add_argument("-Box", metavar="Box", type=float, default=[-10, 10, -5, 5, -4, 4],
-                        nargs="*", help=("Box dimensionality. "
-                        "Two values per dimension to set start and end (1D, 2D, 3D)."))
+    parser.add_argument("-Box", metavar="Box", type=json.loads,
+                        default={"x0": -10, "x1": 10, "y0": -5, "y1": 5, "z0": -4, "z1": 4},
+                        help=("Box dimensionality. "
+                              "Two values per dimension to set start and end (1D, 2D, 3D)."))
     parser.add_argument("-N", metavar="N", type=int, default=6 * 10 ** 4,
                         help="Number of particles in box")
     parser.add_argument("-m", metavar="m", type=int, default=164.0 * constants.u_in_kg,
@@ -53,9 +55,9 @@ if __name__ == "__main__":
     parser.add_argument("-w_z", metavar="w_z", type=float, default=2.0 * np.pi * 167.0,
                         help="Frequency of harmonic trap in z direction")
     parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int, default=80001,
-                        help="Simulate until accuracy is reached")
+                        help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-accuracy", metavar="accuracy", type=float, default=10 ** -12,
-                        help="Simulate until accuracy is reached")
+                        help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to save data to")
     parser.add_argument("--V_none", default=False, action="store_true",
@@ -69,23 +71,18 @@ if __name__ == "__main__":
 
     assert len(args.Res) <= 3, "Dimension of Res needs to be smaller than 3."
     assert len(args.Box) <= 6, ("Dimension of Box needs to be smaller than 6, "
-                               "as the maximum dimension of the problem is 3.")
+                                "as the maximum dimension of the problem is 3.")
+    assert len(args.Box) == 2 * len(args.Res), (f"Dimension of Box is {len(args.Box)}, but needs "
+                                                f"to be 2 times higher than of Res, "
+                                                f"which currently is {len(args.Res)}.")
+
+    Res = functions.Resolution(**args.Res)
+    Box = functions.Box(**args.Box)
+
     try:
         dir_path = Path(args.dir_path).expanduser()
     except Exception:
         dir_path = args.dir_path
-
-    keys = ["x", "y", "z"][:len(args.Res)]
-    keys_box = ["x0", "x1", "y0", "y1", "z0", "z1"][:len(args.Box)]
-    dict_res = dict(zip(keys, args.Res))
-    dict_box = dict(zip(keys_box, args.Box))
-    print(dict_res)
-    print(dict_box)
-    Res = functions.Resolution(**dict_res)
-    Box = functions.Box(**dict_box)
-
-    print(f"Res: {Res.x}, {Res.y}, {Res.z}")
-    print(f"Box: {Box.x0}, {Box.x1}, {Box.y0}, {Box.y1}, {Box.z0}, {Box.z1}")
 
     alpha_y, alpha_z = functions.get_alphas(w_x=args.w_x, w_y=args.w_y, w_z=args.w_z)
     g, g_qf, e_dd, a_s_l_ho_ratio = functions.get_parameters(
