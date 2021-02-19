@@ -24,21 +24,22 @@ from supersolids.tools.simulate_case import simulate_case
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     # Use parser to
-    parser = argparse.ArgumentParser(description="Define constants for Schrödinger equation")
+    parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
+                                                 "and continue simulation from there.")
     parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int, default=80001,
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to save data to")
     parser.add_argument("-dir_name", metavar="dir_path", type=str, default="movie" + "%03d" % 1,
                         help="Name of directory where the files to load lie. "
-                        "For example the standard naming convention is movie001")
+                             "For example the standard naming convention is movie001")
     parser.add_argument("-filename_schroedinger", metavar="filename_schroedinger", type=str,
                         default="schroedinger.pkl",
                         help="Name of file, where the Schroedinger object is saved")
     parser.add_argument("-filename_npz", metavar="filename_npz",
                         type=str, default="step_" + "%06d" % 1 + ".npz",
-                        help="Name of file, where psi_val is saved."
-                        "For example the standard naming convention is step_000001.npz")
+                        help="Name of file, where psi_val is saved. "
+                             "For example the standard naming convention is step_000001.npz")
     parser.add_argument("--offscreen", default=False, action="store_true",
                         help="If not used, interactive animation is shown and saved as mp4."
                              "If used, Schroedinger is saved as pkl and allows offscreen usage.")
