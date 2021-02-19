@@ -469,7 +469,7 @@ class Schroedinger:
                      dir_path: Path = Path.home().joinpath("supersolids", "results"),
                      filename_schroedinger=f"schroedinger.pkl",
                      filename_steps=f"step_",
-                     steps_format: str = "%05d"
+                     steps_format: str = "%06d"
                      ):
 
         print(f"Accuracy goal: {accuracy}")

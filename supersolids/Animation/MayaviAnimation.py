@@ -204,7 +204,7 @@ class MayaviAnimation(Animation.Animation):
                     dir_path: Path = None,
                     filename_schroedinger=f"schroedinger.pkl",
                     filename_steps=f"step_",
-                    steps_format: str = "%05d",
+                    steps_format: str = "%06d",
                     steps_per_pickle: int = 10,
                     ):
 
