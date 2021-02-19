@@ -200,7 +200,7 @@ class MayaviAnimation(Animation.Animation):
         return prob_plot, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot
 
     @mlab.animate(delay=10, ui=True)
-    def animate_pkl(self,
+    def animate_npz(self,
                     dir_path: Path = None,
                     filename_schroedinger=f"schroedinger.pkl",
                     filename_steps=f"step_",

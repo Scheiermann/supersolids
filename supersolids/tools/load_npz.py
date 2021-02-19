@@ -13,7 +13,6 @@ time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 
 from pathlib import Path
 
-import numpy as np
 from mayavi import mlab
 
 from supersolids.Animation.Animation import Animation
@@ -38,10 +37,9 @@ if __name__ == "__main__":
                                               dir_path=dir_path,
                                               )
 
-    MayAnimator = MayAnim.animate_pkl()
+    MayAnimator = MayAnim.animate_npz()
     mlab.show()
 
     result_path = MayAnim.create_movie(dir_path=MayAnim.dir_path,
                                        input_data_file_pattern="*.png",
                                        delete_input=True)
-
