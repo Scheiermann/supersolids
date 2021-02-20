@@ -206,6 +206,7 @@ class MayaviAnimation(Animation.Animation):
                     filename_steps=f"step_",
                     steps_format: str = "%06d",
                     steps_per_pickle: int = 10,
+                    frame_start: int = 0,
                     ):
 
         if dir_path is None:
@@ -227,7 +228,7 @@ class MayaviAnimation(Animation.Animation):
         yield
 
         # read new frames until Exception (last frame read)
-        frame = 0
+        frame = frame_start
         while True:
             print(f"frame={frame}")
             try:

@@ -37,7 +37,7 @@ if __name__ == "__main__":
                                               dir_path=dir_path,
                                               )
 
-    MayAnimator = MayAnim.animate_npz()
+    MayAnimator = MayAnim.animate_npz(frame_start=0)
     mlab.show()
 
     result_path = MayAnim.create_movie(dir_path=MayAnim.dir_path,
