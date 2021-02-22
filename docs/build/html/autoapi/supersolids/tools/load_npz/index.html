@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>supersolids.helper.get_path &mdash; supersolids 0.1.26 documentation</title>
+  <title>supersolids.tools.load_npz &mdash; supersolids 0.1.26 documentation</title>
   
 
   
@@ -137,13 +137,13 @@
     
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.get_path</span></code></li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.tools.load_npz</span></code></li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../../../../_sources/autoapi/supersolids/helper/get_path/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../../../_sources/autoapi/supersolids/tools/load_npz/index.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -156,45 +156,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-supersolids.helper.get_path">
-<span id="supersolids-helper-get-path"></span><h1><a class="reference internal" href="#module-supersolids.helper.get_path" title="supersolids.helper.get_path"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.get_path</span></code></a><a class="headerlink" href="#module-supersolids.helper.get_path" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-supersolids.tools.load_npz">
+<span id="supersolids-tools-load-npz"></span><h1><a class="reference internal" href="#module-supersolids.tools.load_npz" title="supersolids.tools.load_npz"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.tools.load_npz</span></code></a><a class="headerlink" href="#module-supersolids.tools.load_npz" title="Permalink to this headline">¶</a></h1>
+<p>Animation for the numerical solver for the non-linear
+time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.</p>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_path" title="supersolids.helper.get_path.get_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_path</span></code></a>(dir_path: pathlib.Path, dir_name: str = 'movie', counting_format: str = '%03d') → Tuple[(pathlib.Path, int, str, str)]</p></td>
-<td><p>Looks up all directories with matching dir_name</p></td>
-</tr>
-</tbody>
-</table>
-<dl class="py function">
-<dt id="supersolids.helper.get_path.get_path">
-<code class="sig-prename descclassname">supersolids.helper.get_path.</code><code class="sig-name descname">get_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dir_path</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">dir_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'movie'</span></em>, <em class="sig-param"><span class="n">counting_format</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'%03d'</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>pathlib.Path<span class="p">, </span>int<span class="p">, </span>str<span class="p">, </span>str<span class="p">]</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_path.html#get_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#supersolids.helper.get_path.get_path" title="Permalink to this definition">¶</a></dt>
-<dd><p>Looks up all directories with matching dir_name
-and counting format in dir_path.
-Gets the highest number and returns a path with dir_name counted one up
-(prevents colliding with old data).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dir_path</strong> – Path where to look for old directories (movie data)</p></li>
-<li><p><strong>dir_name</strong> – General name of the directories without the counter</p></li>
-<li><p><strong>counting_format</strong> – Format of counter of the directories</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Path for the new directory (not colliding with old data)</p>
-</dd>
-</dl>
-</dd></dl>
+<dl class="py data">
+<dt id="supersolids.tools.load_npz.parser">
+<code class="sig-prename descclassname">supersolids.tools.load_npz.</code><code class="sig-name descname">parser</code><a class="headerlink" href="#supersolids.tools.load_npz.parser" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-</div>
 </div>
 </div>
 
