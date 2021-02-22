@@ -11,6 +11,7 @@ time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 
 """
 
+import argparse
 from pathlib import Path
 
 from mayavi import mlab
@@ -22,7 +23,36 @@ from supersolids.Animation import MayaviAnimation
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    dir_path = Path.home().joinpath("supersolids", "results")
+    parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
+                                                 "and create movie.")
+    parser.add_argument("-dir_path", metavar="dir_name", type=str, default="~/supersolids/results",
+                        help="Absolute path to load data from")
+    parser.add_argument("-filename_schroedinger", metavar="filename_schroedinger", type=str,
+                        default="schroedinger.pkl",
+                        help="Name of file, where the Schroedinger object is saved")
+    parser.add_argument("-filename_steps", metavar="filename_steps",
+                        type=str, default="step_",
+                        help="Name of file, without enumarator for the files. "
+                             "For example the standard naming convention is step_000001.npz, "
+                             "the string needed is step_")
+    parser.add_argument("-steps_format", metavar="steps_format",
+                        type=str, default="%06d",
+                        help="Formating string to enumerate the files. "
+                             "For example the standard naming convention is step_000001.npz, "
+                             "the string needed is percent 06d")
+    parser.add_argument("-steps_per_npz", metavar="steps_per_npz",
+                        type=int, default=10,
+                        help="Number of dt steps skipped between saved npz.")
+    parser.add_argument("-frame_start", metavar="frame_start",
+                        type=int, default=0,
+                        help="Counter of first saved npz.")
+    args = parser.parse_args()
+    print(f"args: {args}")
+
+    try:
+        dir_path = Path(args.dir_path).expanduser()
+    except Exception:
+        dir_path = args.dir_path
 
     Anim: Animation = Animation(plot_psi_sol=False,
                                 plot_V=False,
@@ -37,7 +67,13 @@ if __name__ == "__main__":
                                               dir_path=dir_path,
                                               )
 
-    MayAnimator = MayAnim.animate_npz(frame_start=0)
+    MayAnimator = MayAnim.animate_npz(dir_path=None,
+                                      filename_schroedinger=args.filename_schroedinger,
+                                      filename_steps=args.filename_steps,
+                                      steps_format=args.steps_format,
+                                      steps_per_npz=args.steps_per_npz,
+                                      frame_start=args.frame_start
+                                      )
     mlab.show()
 
     result_path = MayAnim.create_movie(dir_path=MayAnim.dir_path,
