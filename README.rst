@@ -48,9 +48,13 @@ Usage
 The package uses __main__.py, so it can be run as module.
 To get help for the flags, run:
 python -m supersolids -h
+python -m supersolids.tools.load_npz -h
+python -m supersolids.tools.simulate_npz -h
 
 To actually run (example):
-python -m supersolids -dt=0.0001 -Res=[2 ** 6, 2 ** 5, 2 ** 4]
+python -m supersolids -Res='{"x": 16, "y": 32, "z": 62}' -Box='{"x0": -10, "x1": 10, "y0": -6, "y1": 5, "z0": -8, "z1": 8}'
+python -m supersolids.tools.load_npz -frame_start=79000
+python -m supersolids.tools.simulate_npz -dir_name=movie004 -filename_npz=step_079000.npz
 
 The default path for the results is ~/supersolids/results
 
