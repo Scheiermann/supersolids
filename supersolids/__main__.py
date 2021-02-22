@@ -33,7 +33,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Define constants for Schrödinger equation")
     parser.add_argument("-dt", metavar="dt", type=float, default=2 * 10 ** -3, nargs="?",
                         help="Length of timestep to evolve Schrödinger system")
-    parser.add_argument("-Res", metavar="Res", type=json.loads,
+    parser.add_argument("-Res", metavar="Resolution", type=json.loads,
                         default={"x": 256, "y": 128, "z": 32},
                         help="List of resolutions for the box (1D, 2D, 3D). Needs to be 2 ** int.")
     parser.add_argument("-Box", metavar="Box", type=json.loads,
@@ -56,6 +56,9 @@ if __name__ == "__main__":
                         help="Frequency of harmonic trap in z direction")
     parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int, default=80001,
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
+    parser.add_argument("-a", metavar="Amplitude", type=json.loads,
+                        default={"a_x": 3.5, "a_y": 1.5, "a_z": 1.2},
+                        help="Psi amplitudes in x, y, z direction for the 3d gauss packet")
     parser.add_argument("-accuracy", metavar="accuracy", type=float, default=10 ** -12,
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
@@ -75,6 +78,9 @@ if __name__ == "__main__":
     assert len(args.Box) == 2 * len(args.Res), (f"Dimension of Box is {len(args.Box)}, but needs "
                                                 f"to be 2 times higher than of Res, "
                                                 f"which currently is {len(args.Res)}.")
+    assert len(args.a) == len(args.Res), (f"Dimension of Amplitudes is {len(args.a)}, but needs "
+                                          f"to be the same as dimension of Res, "
+                                          f"which currently is {len(args.Res)}.")
 
     Res = functions.Resolution(**args.Res)
     Box = functions.Box(**args.Box)
@@ -87,26 +93,20 @@ if __name__ == "__main__":
     alpha_y, alpha_z = functions.get_alphas(w_x=args.w_x, w_y=args.w_y, w_z=args.w_z)
     g, g_qf, e_dd, a_s_l_ho_ratio = functions.get_parameters(
         N=args.N, m=args.m, a_s=args.a_s, a_dd=args.a_dd, w_x=args.w_x)
-    print(f"g, g_qf, e_dd, alpha_y, alpha_z: "
-          f"{g, g_qf, e_dd, alpha_y, alpha_z}")
+    print(f"g, g_qf, e_dd, alpha_y, alpha_z: {g, g_qf, e_dd, alpha_y, alpha_z}")
 
     # Define functions (needed for the Schroedinger equation)
     # (e.g. potential: V, initial wave function: psi_0)
     V_1d = functions.v_harmonic_1d
     V_2d = functools.partial(functions.v_harmonic_2d, alpha_y=alpha_y)
-    V_3d = functools.partial(
-        functions.v_harmonic_3d,
-        alpha_y=alpha_y,
-        alpha_z=alpha_z)
+    V_3d = functools.partial(functions.v_harmonic_3d, alpha_y=alpha_y, alpha_z=alpha_z)
 
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
                                  r_cut=1.0 * Box.min_length() / 2.0)
 
     # functools.partial sets all arguments except x, y, z,
-    # psi_0_1d = functools.partial(
-    #     functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
-    psi_0_1d = functools.partial(
-        functions.psi_gauss_1d, a=3.0, x_0=0.0, k_0=0.0)
+    # psi_0_1d = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
+    psi_0_1d = functools.partial(functions.psi_gauss_1d, a=3.0, x_0=0.0, k_0=0.0)
     psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf,
                                  mu=[0.0, 0.0],
                                  var=np.array([[1.0, 0.0], [0.0, 1.0]])
@@ -114,13 +114,12 @@ if __name__ == "__main__":
 
     psi_0_3d = functools.partial(
         functions.psi_gauss_3d,
-        a_x=3.5, a_y=1.5, a_z=1.2,
+        a_x=args.a["a_x"], a_y=args.a["a_y"], a_z=args.a["a_z"],
         x_0=0.0, y_0=0.0, z_0=0.0,
         k_0=0.0)
     # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
 
-    psi_0_noise_3d = functions.noise_mesh(
-        min=0.8, max=1.4, shape=(Res.x, Res.y, Res.z))
+    psi_0_noise_3d = functions.noise_mesh(min=0.8, max=1.4, shape=(Res.x, Res.y, Res.z))
 
     # Used to remember that 2D need the special pos function (g is set inside
     # of Schroedinger for convenience)
