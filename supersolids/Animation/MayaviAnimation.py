@@ -205,7 +205,7 @@ class MayaviAnimation(Animation.Animation):
                     filename_schroedinger=f"schroedinger.pkl",
                     filename_steps=f"step_",
                     steps_format: str = "%06d",
-                    steps_per_pickle: int = 10,
+                    steps_per_npz: int = 10,
                     frame_start: int = 0,
                     ):
 
@@ -233,9 +233,8 @@ class MayaviAnimation(Animation.Animation):
             print(f"frame={frame}")
             try:
                 # get the psi_val of Schroedinger at other timesteps (t!=0)
-                with open(Path(input_path, filename_steps + steps_format % frame + ".npz"),
-                          "rb"
-                          ) as f:
+                psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
+                with open(psi_val_path, "rb") as f:
                     psi_val_pkl = np.load(file=f)["psi_val"]
 
                 # Update legend (especially time)
@@ -255,7 +254,7 @@ class MayaviAnimation(Animation.Animation):
                         f"processed={frame / System.max_timesteps:05.03f}%"
                         )
 
-                if frame == 0:
+                if frame == frame_start:
                     # create title for first frame
                     title = mlab.title(text=text,
                                        height=0.95,
@@ -279,7 +278,7 @@ class MayaviAnimation(Animation.Animation):
                 yield None
                 break
 
-            frame = frame + steps_per_pickle
+            frame = frame + steps_per_npz
 
         # Finally close
         mlab.close(all=True)
