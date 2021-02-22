@@ -28,7 +28,7 @@ if __name__ == "__main__":
                                                  "and continue simulation from there.")
     parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int, default=80001,
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
-    parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
+    parser.add_argument("-dir_path", metavar="dir_name", type=str, default="~/supersolids/results",
                         help="Absolute path to save data to")
     parser.add_argument("-dir_name", metavar="dir_path", type=str, default="movie" + "%03d" % 1,
                         help="Name of directory where the files to load lie. "
@@ -37,7 +37,7 @@ if __name__ == "__main__":
                         default="schroedinger.pkl",
                         help="Name of file, where the Schroedinger object is saved")
     parser.add_argument("-filename_npz", metavar="filename_npz",
-                        type=str, default="step_" + "%06d" % 1 + ".npz",
+                        type=str, default="step_" + "%06d" % 0 + ".npz",
                         help="Name of file, where psi_val is saved. "
                              "For example the standard naming convention is step_000001.npz")
     parser.add_argument("--offscreen", default=False, action="store_true",
@@ -75,12 +75,16 @@ if __name__ == "__main__":
             with open(psi_val_path, "rb") as f:
                 System.psi_val = np.load(file=f)["psi_val"]
 
+            # get the frame number as it encodes the number steps dt,
+            # so System.t can be reconstructed
+            frame = int(args.filename_npz.split(".npz")[0].split("_")[-1])
+            System.t = System.dt * frame
             System.max_timesteps = args.max_timesteps
             SystemResult: Schroedinger = simulate_case(
                 System=System,
                 Anim=Anim,
                 accuracy=10 ** -12,
-                delete_input=False,
+                delete_input=True,
                 dir_path=dir_path,
                 offscreen=args.offscreen,
                 x_lim=(-2.0, 2.0),  # from here just matplotlib
