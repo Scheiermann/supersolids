@@ -26,6 +26,8 @@ if __name__ == "__main__":
     # Use parser to
     parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
                                                  "and continue simulation from there.")
+    parser.add_argument("-accuracy", metavar="accuracy", type=float, default=10 ** -12,
+                        help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int, default=80001,
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-dir_path", metavar="dir_name", type=str, default="~/supersolids/results",
@@ -86,7 +88,7 @@ if __name__ == "__main__":
             SystemResult: Schroedinger = simulate_case(
                 System=System,
                 Anim=Anim,
-                accuracy=10 ** -12,
+                accuracy=args.accuracy,
                 delete_input=True,
                 dir_path=dir_path,
                 offscreen=args.offscreen,
