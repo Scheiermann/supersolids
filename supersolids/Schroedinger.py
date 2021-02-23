@@ -464,12 +464,14 @@ class Schroedinger:
         # else:
         #     print(f"E: {self.E}")
 
-    def simulate_raw(self, accuracy: float = 10 ** -6,
-                     steps_per_pickle: int = 10,
+    def simulate_raw(self,
+                     accuracy: float = 10 ** -6,
                      dir_path: Path = Path.home().joinpath("supersolids", "results"),
                      filename_schroedinger=f"schroedinger.pkl",
                      filename_steps=f"step_",
-                     steps_format: str = "%06d"
+                     steps_format: str = "%06d",
+                     steps_per_npz: int = 10,
+                     frame_start: int = 0,
                      ):
 
         print(f"Accuracy goal: {accuracy}")
@@ -492,12 +494,12 @@ class Schroedinger:
         with open(Path(input_path, filename_schroedinger), "wb") as f:
             pickle.dump(obj=self, file=f)
 
-        for frame in range(0, self.max_timesteps):
+        for frame in range(frame_start, frame_start + self.max_timesteps):
             mu_old = self.mu
             self.time_step()
 
             # save psi_val after steps_per_pickle steps of dt (to save disk space)
-            if (frame % steps_per_pickle) == 0:
+            if (frame % steps_per_npz) == 0:
                 with open(Path(input_path,
                                filename_steps + steps_format % frame + ".npz"),
                           "wb"
@@ -505,7 +507,7 @@ class Schroedinger:
                     np.savez_compressed(g, psi_val=self.psi_val)
 
             print(f"t={self.t:07.05f}, mu_rel={mu_rel:+05.05e}, "
-                  f"processed={frame / self.max_timesteps:05.03f}%")
+                  f"processed={(frame - frame_start) / self.max_timesteps:05.03f}%")
 
             mu_rel = np.abs((self.mu - mu_old) / self.mu)
 

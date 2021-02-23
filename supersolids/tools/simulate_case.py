@@ -35,6 +35,8 @@ def simulate_case(System: Schroedinger,
                   x_lim: Tuple[float, float] = (-1.0, 1.0),
                   y_lim: Tuple[float, float] = (-1.0, 1.0),
                   z_lim: Tuple[float, float] = (-1.0, 1.0),
+                  steps_per_npz: int = 10,
+                  frame_start: int = 0,
                   ) -> Schroedinger:
     """
     Wrapper for Animation and Schroedinger to get a working Animation
@@ -113,6 +115,10 @@ def simulate_case(System: Schroedinger,
             cut_1d(System, slice_indices=slice_indices,
                    dir_path=result_path, y_lim=(0.0, 0.05))
         else:
-            System.simulate_raw(accuracy=accuracy, dir_path=dir_path)
+            System.simulate_raw(accuracy=accuracy,
+                                dir_path=dir_path,
+                                steps_per_npz=steps_per_npz,
+                                frame_start=frame_start,
+                                )
 
         return System
