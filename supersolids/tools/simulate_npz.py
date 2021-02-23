@@ -40,6 +40,9 @@ if __name__ == "__main__":
                         type=str, default="step_" + "%06d" % 0 + ".npz",
                         help="Name of file, where psi_val is saved. "
                              "For example the standard naming convention is step_000001.npz")
+    parser.add_argument("-steps_per_npz", metavar="steps_per_npz",
+                        type=int, default=10,
+                        help="Number of dt steps skipped between saved npz.")
     parser.add_argument("--offscreen", default=False, action="store_true",
                         help="If not used, interactive animation is shown and saved as mp4."
                              "If used, Schroedinger is saved as pkl and allows offscreen usage.")
@@ -90,7 +93,9 @@ if __name__ == "__main__":
                 x_lim=(-2.0, 2.0),  # from here just matplotlib
                 y_lim=(-2.0, 2.0),
                 z_lim=(0, 0.5),
-            )
+                steps_per_npz=args.steps_per_npz,
+                frame_start=frame,
+                )
 
         except FileNotFoundError:
             print(f"File at {psi_val_path} not found.")
