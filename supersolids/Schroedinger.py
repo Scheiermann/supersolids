@@ -11,11 +11,11 @@ Numerical solver for non-linear time-dependent Schrodinger equation.
 """
 
 import functools
-import pickle
 import sys
 from typing import Callable, Union, Optional
 from pathlib import Path
 
+import dill
 import numpy as np
 
 from supersolids.helper import constants, functions, get_path
@@ -49,6 +49,7 @@ class Schroedinger:
                  dt_func: Optional[Callable] = None,
                  g: float = 0.0,
                  g_qf: float = 0.0,
+                 w_x: float = 2.0 * np.pi * 33.0,
                  w_y: float = 2.0 * np.pi * 80.0,
                  w_z: float = 2.0 * np.pi * 167.0,
                  a_s: float = 85.0 * constants.a_0,
@@ -84,6 +85,7 @@ class Schroedinger:
             f"box: {type(Res)} is not type {type(functions.Resolution)}")
 
         self.N: int = N
+        self.w_x: float = w_x
         self.w_y: float = w_y
         self.w_z: float = w_z
         self.a_s: float = a_s
@@ -492,14 +494,15 @@ class Schroedinger:
 
         # save used Schroedinger
         with open(Path(input_path, filename_schroedinger), "wb") as f:
-            pickle.dump(obj=self, file=f)
+            dill.dump(obj=self, file=f)
 
-        for frame in range(frame_start, frame_start + self.max_timesteps):
+        frame_end = frame_start + self.max_timesteps
+        for frame in range(frame_start, frame_end):
             mu_old = self.mu
             self.time_step()
 
             # save psi_val after steps_per_pickle steps of dt (to save disk space)
-            if (frame % steps_per_npz) == 0:
+            if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
                 with open(Path(input_path,
                                filename_steps + steps_format % frame + ".npz"),
                           "wb"
