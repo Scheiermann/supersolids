@@ -25,8 +25,11 @@ from supersolids.Animation import MayaviAnimation
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
                                                  "and create movie.")
-    parser.add_argument("-dir_path", metavar="dir_name", type=str, default="~/supersolids/results",
+    parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to load data from")
+    parser.add_argument("-dir_name", metavar="dir_name", type=str, default="movie" + "%03d" % 1,
+                        help="Name of directory where the files to load lie. "
+                             "For example the standard naming convention is movie001")
     parser.add_argument("-filename_schroedinger", metavar="filename_schroedinger", type=str,
                         default="schroedinger.pkl",
                         help="Name of file, where the Schroedinger object is saved")
@@ -46,6 +49,9 @@ if __name__ == "__main__":
     parser.add_argument("-frame_start", metavar="frame_start",
                         type=int, default=0,
                         help="Counter of first saved npz.")
+    parser.add_argument("--delete_input", default=False, action="store_true",
+                        help="If flag is not used, the pictures after "
+                             "animation is created and saved.")
     args = parser.parse_args()
     print(f"args: {args}")
 
@@ -67,7 +73,8 @@ if __name__ == "__main__":
                                               dir_path=dir_path,
                                               )
 
-    MayAnimator = MayAnim.animate_npz(dir_path=None,
+    MayAnimator = MayAnim.animate_npz(dir_path=dir_path,
+                                      dir_name=args.dir_name,
                                       filename_schroedinger=args.filename_schroedinger,
                                       filename_steps=args.filename_steps,
                                       steps_format=args.steps_format,
@@ -78,4 +85,4 @@ if __name__ == "__main__":
 
     result_path = MayAnim.create_movie(dir_path=MayAnim.dir_path,
                                        input_data_file_pattern="*.png",
-                                       delete_input=True)
+                                       delete_input=args.delete_input)
