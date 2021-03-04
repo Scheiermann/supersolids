@@ -85,12 +85,35 @@ class Box:
         elif self.z0 is None:
             box_lengths = [(self.x1 - self.x0), (self.y1 - self.y0)]
         else:
-            box_lengths = [(self.x1 - self.x0), (self.y1 - self.y0), (self.z1 - self.z0)]
+            box_lengths = [(self.x1 - self.x0),
+                           (self.y1 - self.y0),
+                           (self.z1 - self.z0)]
 
         return box_lengths
 
     def min_length(self):
         return min(self.lengths())
+
+
+def BoxResAssert(Res, Box):
+    assert len(Res) <= 3, "Dimension of Res needs to be smaller than 3."
+    assert len(Box) <= 6, ("Dimension of Box needs to be smaller than 6, "
+                           "as the maximum dimension of the problem is 3.")
+    assert len(Box) == 2 * len(Res), (
+        f"Dimension of Box is {len(Box)}, but needs "
+        f"to be 2 times higher than of Res, "
+        f"which currently is {len(Res)}.")
+
+
+def aResAssert(Res, a):
+        assert len(a) == len(Res), (
+        f"Dimension of Amplitudes is {len(a)}, but needs "
+        f"to be the same as dimension of Res, "
+        f"which currently is {len(Res)}.")
+
+
+def V_3d(s):
+    return eval(s, globals())
 
 
 def get_meshgrid(x, y):
@@ -475,7 +498,8 @@ def dipol_dipol_interaction(kx_mesh: float,
 
 def f_kappa(kappa: np.ndarray, epsilon: float = 10 ** -10) -> float:
     k2_1 = (kappa ** 2.0 - 1.0 + epsilon)
-    result = ((2.0 * kappa ** 2.0 + 1.0) - (3.0 * kappa ** 2.0) * atan_special(k2_1)) / k2_1
+    result = ((2.0 * kappa ** 2.0 + 1.0) - (3.0 * kappa ** 2.0) * atan_special(
+        k2_1)) / k2_1
 
     return result
 
@@ -485,7 +509,7 @@ def atan_special(x):
     if x > 0:
         result = np.arctan(np.sqrt(x)) / np.sqrt(x)
     elif x == 0:
-       result = 0.0
+        result = 0.0
     else:
         result = np.arctanh(np.sqrt(-x)) / np.sqrt(-x)
 
@@ -638,7 +662,6 @@ def dt_adaptive(t, dt) -> float:
         dt_adapted = dt
 
     return dt_adapted
-
 
 
 # Script runs, if script is run as main script (called by python *.py)
