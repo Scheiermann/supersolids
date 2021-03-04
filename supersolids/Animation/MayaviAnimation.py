@@ -9,7 +9,9 @@
 Functions for Potential and initial wave function :math:`\psi_0`
 
 """
-import pickle
+import zipfile
+
+import dill
 from pathlib import Path
 
 import numpy as np
@@ -191,6 +193,8 @@ class MayaviAnimation(Animation.Animation):
                                               colormap="cool",
                                               opacity=self.alpha_psi_sol,
                                               transparent=True)
+            else:
+                psi_sol_plot = None
         else:
             psi_sol_plot = None
 
@@ -202,6 +206,7 @@ class MayaviAnimation(Animation.Animation):
     @mlab.animate(delay=10, ui=True)
     def animate_npz(self,
                     dir_path: Path = None,
+                    dir_name: str = None,
                     filename_schroedinger=f"schroedinger.pkl",
                     filename_steps=f"step_",
                     steps_format: str = "%06d",
@@ -209,19 +214,25 @@ class MayaviAnimation(Animation.Animation):
                     frame_start: int = 0,
                     ):
 
-        if dir_path is None:
-            input_path, _, _, _ = get_path.get_path(self.dir_path)
-            self.dir_path = input_path
-            self.fig.scene.movie_maker.directory = self.dir_path
+        if (dir_path is None) or (dir_path == Path("~/supersolids/results").expanduser()):
+            if dir_name is not None:
+                input_path = Path(self.dir_path, dir_name)
+            else:
+                input_path, _, _, _ = get_path.get_path(self.dir_path)
         else:
             input_path, _, _, _ = get_path.get_path(dir_path)
-            self.dir_path = input_path
-            self.fig.scene.movie_maker.directory = self.dir_path
+
+        self.dir_path = input_path
+        self.fig.scene.movie_maker.directory = self.dir_path
+        _, last_index, _, _ = get_path.get_path(self.dir_path,
+                                                dir_name=filename_steps,
+                                                file_pattern=".npz"
+                                                )
 
         print("Load schroedinger")
         with open(Path(input_path, filename_schroedinger), "rb") as f:
             # WARNING: this is just the input Schroedinger at t=0
-            System = pickle.load(file=f)
+            System = dill.load(file=f)
 
         prob_plot, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot = self.prepare(System)
 
@@ -274,11 +285,23 @@ class MayaviAnimation(Animation.Animation):
 
                 yield
 
+            except zipfile.BadZipFile:
+                print(f"Zipfile with frame {frame} can't be read. Maybe the simulation "
+                      "was stopped before file was successfully created."
+                      "Animation is built until, but without that frame.")
+                yield None
+                break
+
             except FileNotFoundError:
                 yield None
                 break
 
             frame = frame + steps_per_npz
+            if frame == last_index + steps_per_npz:
+                yield None
+                break
+            elif frame > last_index:
+                frame = last_index
 
         # Finally close
         mlab.close(all=True)
