@@ -27,6 +27,7 @@ from supersolids.tools.cut_1d import prepare_cuts
 from supersolids.helper import constants
 from supersolids.helper import functions
 
+
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     # Use parser to
@@ -35,10 +36,10 @@ if __name__ == "__main__":
                         help="Length of timestep to evolve Schrödinger system")
     parser.add_argument("-Res", metavar="Resolution", type=json.loads,
                         default={"x": 256, "y": 128, "z": 32},
-                        help="List of resolutions for the box (1D, 2D, 3D). Needs to be 2 ** int.")
+                        help="Dictionary of resolutions for the box (1D, 2D, 3D). Needs to be 2 ** int.")
     parser.add_argument("-Box", metavar="Box", type=json.loads,
                         default={"x0": -10, "x1": 10, "y0": -5, "y1": 5, "z0": -4, "z1": 4},
-                        help=("Box dimensionality. "
+                        help=("Dictionary for the Box dimensionality. "
                               "Two values per dimension to set start and end (1D, 2D, 3D)."))
     parser.add_argument("-N", metavar="N", type=int, default=6 * 10 ** 4,
                         help="Number of particles in box")
@@ -63,24 +64,21 @@ if __name__ == "__main__":
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to save data to")
+    parser.add_argument("-noise", metavar="noise", type=json.loads,
+                        default=None, action='store', nargs=2,
+                        help="Min and max of gauss noise added to psi.")
     parser.add_argument("--V_none", default=False, action="store_true",
                         help="If not used, a gauss potential is used."
                              "If used, no potential is used.")
     parser.add_argument("--offscreen", default=False, action="store_true",
-                        help="If not used, interactive animation is shown and saved as mp4."
-                             "If used, Schroedinger is saved as pkl and allows offscreen usage.")
+                        help="If flag is not used, interactive animation is "
+                             "shown and saved as mp4, else Schroedinger is "
+                             "saved as pkl and allows offscreen usage.")
     args = parser.parse_args()
     print(f"args: {args}")
 
-    assert len(args.Res) <= 3, "Dimension of Res needs to be smaller than 3."
-    assert len(args.Box) <= 6, ("Dimension of Box needs to be smaller than 6, "
-                                "as the maximum dimension of the problem is 3.")
-    assert len(args.Box) == 2 * len(args.Res), (f"Dimension of Box is {len(args.Box)}, but needs "
-                                                f"to be 2 times higher than of Res, "
-                                                f"which currently is {len(args.Res)}.")
-    assert len(args.a) == len(args.Res), (f"Dimension of Amplitudes is {len(args.a)}, but needs "
-                                          f"to be the same as dimension of Res, "
-                                          f"which currently is {len(args.Res)}.")
+    functions.BoxResAssert(args.Res, args.Box)
+    functions.aResAssert(args.Box, args.a)
 
     Res = functions.Resolution(**args.Res)
     Box = functions.Box(**args.Box)
@@ -119,7 +117,14 @@ if __name__ == "__main__":
         k_0=0.0)
     # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
 
-    psi_0_noise_3d = functions.noise_mesh(min=0.8, max=1.4, shape=(Res.x, Res.y, Res.z))
+    if args.noise is None:
+        psi_0_noise_3d = None
+    else:
+        psi_0_noise_3d = functions.noise_mesh(
+            min=args.noise[0],
+            max=args.noise[1],
+            shape=(Res.x, Res.y, Res.z)
+            )
 
     # Used to remember that 2D need the special pos function (g is set inside
     # of Schroedinger for convenience)
@@ -159,6 +164,7 @@ if __name__ == "__main__":
                                         dt=args.dt,
                                         g=g,
                                         g_qf=g_qf,
+                                        w_x=args.w_x,
                                         w_y=args.w_y,
                                         w_z=args.w_z,
                                         e_dd=e_dd,
