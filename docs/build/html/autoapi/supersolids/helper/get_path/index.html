@@ -33,7 +33,6 @@
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
@@ -168,14 +167,14 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_path" title="supersolids.helper.get_path.get_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_path</span></code></a>(dir_path: pathlib.Path, dir_name: str = 'movie', counting_format: str = '%03d') → Tuple[(pathlib.Path, int, str, str)]</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_path" title="supersolids.helper.get_path.get_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_path</span></code></a>(dir_path: pathlib.Path, dir_name: str = 'movie', counting_format: str = '%03d', file_pattern: str = '') → Tuple[(pathlib.Path, int, str, str)]</p></td>
 <td><p>Looks up all directories with matching dir_name</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
 <dt id="supersolids.helper.get_path.get_path">
-<code class="sig-prename descclassname">supersolids.helper.get_path.</code><code class="sig-name descname">get_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dir_path</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">dir_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'movie'</span></em>, <em class="sig-param"><span class="n">counting_format</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'%03d'</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>pathlib.Path<span class="p">, </span>int<span class="p">, </span>str<span class="p">, </span>str<span class="p">]</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_path.html#get_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#supersolids.helper.get_path.get_path" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">supersolids.helper.get_path.</span></code><code class="sig-name descname"><span class="pre">get_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'movie'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counting_format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'%03d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_pattern</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">,</span> </span><span class="pre">int</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_path.html#get_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_path.get_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Looks up all directories with matching dir_name
 and counting format in dir_path.
 Gets the highest number and returns a path with dir_name counted one up
