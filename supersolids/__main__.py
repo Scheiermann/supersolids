@@ -64,12 +64,21 @@ if __name__ == "__main__":
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to save data to")
+    parser.add_argument("-V", type=functions.V_3d,
+                        help="Potential as lambda function. For example: "
+                             "-V='lambda x,y,z: 10 * x * y'")
     parser.add_argument("-noise", metavar="noise", type=json.loads,
                         default=None, action='store', nargs=2,
                         help="Min and max of gauss noise added to psi.")
     parser.add_argument("--V_none", default=False, action="store_true",
                         help="If not used, a gauss potential is used."
                              "If used, no potential is used.")
+    parser.add_argument("--real_time", default=False, action="store_true",
+                        help="Switch for Split-Operator method to use imaginary time or not")
+    parser.add_argument("--plot_psi_sol", default=False, action="store_true",
+                        help="Option to plot the manually given solution for the wavefunction psi")
+    parser.add_argument("--plot_V", default=False, action="store_true",
+                        help="Option to plot the external potential of the system (the trap)")
     parser.add_argument("--offscreen", default=False, action="store_true",
                         help="If flag is not used, interactive animation is "
                              "shown and saved as mp4, else Schroedinger is "
@@ -78,7 +87,7 @@ if __name__ == "__main__":
     print(f"args: {args}")
 
     functions.BoxResAssert(args.Res, args.Box)
-    functions.aResAssert(args.Box, args.a)
+    functions.aResAssert(args.Res, args.a)
 
     Res = functions.Resolution(**args.Res)
     Box = functions.Box(**args.Box)
@@ -104,18 +113,21 @@ if __name__ == "__main__":
 
     # functools.partial sets all arguments except x, y, z,
     # psi_0_1d = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
-    psi_0_1d = functools.partial(functions.psi_gauss_1d, a=3.0, x_0=0.0, k_0=0.0)
-    psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf,
-                                 mu=[0.0, 0.0],
-                                 var=np.array([[1.0, 0.0], [0.0, 1.0]])
-                                 )
-
-    psi_0_3d = functools.partial(
-        functions.psi_gauss_3d,
-        a_x=args.a["a_x"], a_y=args.a["a_y"], a_z=args.a["a_z"],
-        x_0=0.0, y_0=0.0, z_0=0.0,
-        k_0=0.0)
-    # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
+    a_len = len(args.a)
+    if a_len == 1:
+        psi_0_1d = functools.partial(functions.psi_gauss_1d, a=args.a["a_x"], x_0=2.0, k_0=0.0)
+    elif a_len == 2:
+        psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf,
+                                     mu=[0.0, 0.0],
+                                     var=np.array([[args.a["a_x"], 0.0], [0.0, args.a["a_y"]]])
+                                     )
+    else:
+        psi_0_3d = functools.partial(
+            functions.psi_gauss_3d,
+            a_x=args.a["a_x"], a_y=args.a["a_y"], a_z=args.a["a_z"],
+            x_0=0.0, y_0=0.0, z_0=0.0,
+            k_0=0.0)
+        # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
 
     if args.noise is None:
         psi_0_noise_3d = None
@@ -140,22 +152,34 @@ if __name__ == "__main__":
         psi_sol_3d = None
 
     if Res.dim == 1:
-        V = V_1d
+        x_lim = (Box.x0, Box.x1)
+        y_lim = (-1, 1) # arbitrary as not used
+        V_trap = V_1d
         psi_0 = psi_0_1d
+        psi_sol = psi_sol_1d
         V_interaction = None
     elif Res.dim == 2:
-        V = V_2d
+        x_lim = (Box.x0, Box.x1)
+        y_lim = (Box.y0, Box.y1)
+        V_trap = V_2d
         psi_0 = psi_0_2d
+        psi_sol = psi_sol_2d
         V_interaction = None
     elif Res.dim == 3:
-        V = V_3d
+        V_trap = V_3d
         psi_0 = psi_0_3d
+        psi_sol = psi_sol_3d
         V_interaction = V_3d_ddi
     else:
         sys.exit("Spatial dimension over 3. This is not implemented.")
 
     if args.V_none:
         V = None
+    else:
+        if args.V is not None:
+            V = (lambda x, y, z: V_trap(x, y, z) + args.V(x, y, z))
+        else:
+            V = V_trap
 
     System: Schroedinger = Schroedinger(args.N,
                                         Box,
@@ -169,20 +193,20 @@ if __name__ == "__main__":
                                         w_z=args.w_z,
                                         e_dd=e_dd,
                                         a_s=args.a_s,
-                                        imag_time=True,
+                                        imag_time=(not args.real_time),
                                         mu=1.1,
                                         E=1.0,
                                         psi_0=psi_0,
                                         V=V,
                                         V_interaction=V_interaction,
-                                        psi_sol=psi_sol_3d,
+                                        psi_sol=psi_sol,
                                         mu_sol=functions.mu_3d,
-                                        psi_0_noise=None,
+                                        psi_0_noise=psi_0_noise_3d,
                                         )
 
     Anim: Animation = Animation(Res=System.Res,
-                                plot_psi_sol=False,
-                                plot_V=False,
+                                plot_psi_sol=args.plot_psi_sol,
+                                plot_V=args.plot_V,
                                 alpha_psi=0.8,
                                 alpha_psi_sol=0.5,
                                 alpha_V=0.3,
@@ -216,9 +240,8 @@ if __name__ == "__main__":
                                     dir_path=dir_path,
                                     slice_indices=slice_indices, # from here just mayavi
                                     offscreen=args.offscreen,
-                                    x_lim=(-2.0, 2.0), # from here just matplotlib
-                                    y_lim=(-2.0, 2.0),
-                                    z_lim=(0, 0.5),
+                                    x_lim=x_lim, # from here just matplotlib
+                                    y_lim=y_lim,
                                     )
 
     print("Single core done")
