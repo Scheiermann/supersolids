@@ -172,7 +172,7 @@ class MatplotlibAnimation(Animation.Animation):
 
             V_pos = np.linspace(range_in_box[0],
                                 range_in_box[-1],
-                                System.Res["x"])
+                                System.Res.x)
             V_plot_val = System.V(V_pos)
 
         elif System.dim == 2:
@@ -185,10 +185,10 @@ class MatplotlibAnimation(Animation.Animation):
 
             x = np.linspace(range_in_box[:, 0].min(),
                             range_in_box[:, 0].max(),
-                            System.Res["x"])
+                            System.Res.x)
             y = np.linspace(range_in_box[:, 1].min(),
                             range_in_box[:, 1].max(),
-                            System.Res["y"])
+                            System.Res.y)
             _, _, V_pos = functions.get_meshgrid(x, y)
             V_plot_val = System.V(V_pos)
 
