@@ -41,9 +41,10 @@ if __name__ == "__main__":
                         default=None,
                         help=("Dictionary for the Box dimensionality. "
                               "Two values per dimension to set start and end (1D, 2D, 3D)."))
-    parser.add_argument("-w_x", metavar="w_x", type=float,
-                        default=2.0 * np.pi * 33.0,
-                        help="Frequency of harmonic trap in x direction")
+    parser.add_argument("-w", metavar="Trap frequency", type=json.loads,
+                        default=None,
+                        help="Frequency of harmonic trap in x, y, z direction. If None, "
+                        "frequency of the loaded System from the npz is taken.")
     parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int,
                         default=80001,
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
@@ -125,17 +126,28 @@ if __name__ == "__main__":
             else:
                 Res = functions.Resolution(**args.Res)
 
-            alpha_y, alpha_z = functions.get_alphas(w_x=System_loaded.w_x,
-                                                    w_y=System_loaded.w_y,
-                                                    w_z=System_loaded.w_z)
-            V_3d = functools.partial(functions.v_harmonic_3d,
-                                     alpha_y=alpha_y,
-                                     alpha_z=alpha_z)
+            if args.w is None:
+                w_x = System_loaded.w_x
+                w_y = System_loaded.w_y
+                w_z = System_loaded.w_z
+                alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
+            else:
+                w_x = args.w["w_x"]
+                w_y = args.w["w_y"]
+                w_z = args.w["w_z"]
+                alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
+
+            V_loaded = functools.partial(functions.v_harmonic_3d,
+                                         alpha_y=alpha_y,
+                                         alpha_z=alpha_z)
 
             if args.V is None:
-                V = V_3d
+                V = V_loaded
             else:
-                V = (lambda x, y, z: V_3d(x, y, z) + args.V(x, y, z))
+                if System_loaded.V is None:
+                    V = (lambda x, y, z: args.V(x, y, z))
+                else:
+                    V = (lambda x, y, z: V_loaded(x, y, z) + args.V(x, y, z))
 
             System: Schroedinger = Schroedinger(System_loaded.N,
                                                 Box,
@@ -145,9 +157,9 @@ if __name__ == "__main__":
                                                 dt_func=System_loaded.dt_func,
                                                 g=System_loaded.g,
                                                 g_qf=System_loaded.g_qf,
-                                                # w_x=System_loaded.w_x,
-                                                w_y=System_loaded.w_y,
-                                                w_z=System_loaded.w_z,
+                                                w_x=w_x,
+                                                w_y=w_y,
+                                                w_z=w_z,
                                                 a_s=System_loaded.a_s,
                                                 e_dd=System_loaded.e_dd,
                                                 imag_time=System_loaded.imag_time,
@@ -156,6 +168,9 @@ if __name__ == "__main__":
                                                 V=V,
                                                 psi_0_noise=None
                                                 )
+
+            # As psi_0_noise needs to be applied on the loaded psi_val and not the initial psi_val
+            # we apply noise after loading the old System
             if args.noise is None:
                 System.psi_val = System_loaded.psi_val
             else:
@@ -178,7 +193,7 @@ if __name__ == "__main__":
                 z_lim=(0, 0.5),
                 steps_per_npz=args.steps_per_npz,
                 frame_start=frame,
-            )
+                )
 
         except FileNotFoundError:
             print(f"File at {psi_val_path} not found.")
