@@ -56,6 +56,10 @@ To actually run (example):
 * python -m supersolids.tools.load_npz -frame_start=79000
 * python -m supersolids.tools.simulate_npz -dir_name=movie004 -filename_npz=step_079000.npz
 
+If you use an IDE and your script parameter includes double quotes,
+escape the double quotes with backslashes, for example:
+"-Res={\"x\":256}" "-Box={\"x0\":-10, \"x1\":10}" "-a={\"a_x\": 2.0}" -max_timesteps=51
+
 The default path for the results is ~/supersolids/results
 
 Issues
