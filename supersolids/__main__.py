@@ -166,6 +166,8 @@ if __name__ == "__main__":
         psi_sol = psi_sol_2d
         V_interaction = None
     elif Res.dim == 3:
+        x_lim = (Box.x0, Box.x1) # arbitrary as not used (mayavi vs matplotlib)
+        y_lim = (Box.y0, Box.y1) # arbitrary as not used (mayavi vs matplotlib)
         V_trap = V_3d
         psi_0 = psi_0_3d
         psi_sol = psi_sol_3d
