@@ -14,14 +14,15 @@ with open(path.join(this_directory, "README.rst"), encoding="utf-8") as f:
 
 setup(
     name="supersolids",
-    version="0.1.29.rc26",
+    version="0.1.30",
     packages=find_packages(),
     package_data={"supersolids": []},
     url="https://github.com/Scheiermann/supersolids",
     license="MIT",
     author="Scheiermann",
     author_email="daniel.scheiermann@stud.uni-hannover.de",
-    install_requires=["ffmpeg-python",
+    install_requires=["dill",
+                      "ffmpeg-python",
                       "matplotlib",
                       "numpy",
                       "mayavi",
