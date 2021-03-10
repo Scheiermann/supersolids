@@ -58,7 +58,8 @@ To actually run (example):
 
 If you use an IDE and your script parameter includes double quotes,
 escape the double quotes with backslashes, for example:
-"-Res={\"x\":256}" "-Box={\"x0\":-10, \"x1\":10}" "-a={\"a_x\": 2.0}" -max_timesteps=51
+"-Res={\\"x\\": 256}" "-Box={\\"x0\\": -10, \\"x1\\": 10}" "-a={\\"a_x\\": 2.0}" -max_timesteps=51
+"-V=lambda x, y, z: 100.0 * np.exp(-(x**2 + y**2)/ 1.0 ** 2)"
 
 The default path for the results is ~/supersolids/results
 
