@@ -13,6 +13,7 @@ time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 import argparse
 import functools
 import json
+import sys
 from pathlib import Path
 
 import dill
@@ -99,7 +100,7 @@ if __name__ == "__main__":
                                 )
 
     try:
-        print("Load schroedinger")
+        print("\nLoad schroedinger")
         with open(schroedinger_path, "rb") as f:
             # WARNING: this is just the input Schroedinger at t=0
             System_loaded = dill.load(file=f)
@@ -125,6 +126,60 @@ if __name__ == "__main__":
                 Res: functions.Resolution = System_loaded.Res
             else:
                 Res = functions.Resolution(**args.Res)
+
+            # check if changes of Box or Res, can be done
+            x_step_old = (Box.lengths()[0] / Res.x)
+            y_step_old = (Box.lengths()[1] / Res.y)
+            z_step_old = (Box.lengths()[2] / Res.z)
+            x_step_new = (System_loaded.Box.lengths()[0] / System_loaded.Res.x)
+            y_step_new = (System_loaded.Box.lengths()[1] / System_loaded.Res.y)
+            z_step_new = (System_loaded.Box.lengths()[2] / System_loaded.Res.z)
+            box_offset_x = np.abs(System_loaded.Box.x0 - Box.x0)
+            box_offset_y = np.abs(System_loaded.Box.y0 - Box.y0)
+            box_offset_z = np.abs(System_loaded.Box.z0 - Box.z0)
+            box_offset_steps_x: int = int(box_offset_x / x_step_old)
+            box_offset_steps_y: int = int(box_offset_y / y_step_old)
+            box_offset_steps_z: int = int(box_offset_z / z_step_old)
+
+            if x_step_old != x_step_new:
+                print(f"\nOld x_step {x_step_old} and new x_step {x_step_new} "
+                f"need to be the same as psi values are calculated gridwise to "
+                f"specific coordinates. These need to match, when changing Box "
+                f"or Res."
+                )
+                sys.exit(1)
+            if (box_offset_x % x_step_old != 0.0):
+                print(f"\nTo match the grids, the difference between the "
+                f"minimum Box values ({box_offset_x}) "
+                f"needs to be a multiple of the old x_step {x_step_old}."
+                )
+                sys.exit(1)
+            if y_step_old != y_step_new:
+                print(f"\nOld y_step {y_step_old} and new y_step {y_step_new} "
+                f"need to be the same as psi values are calculated gridwise to "
+                f"specific coordinates. These need to match, when changing Box "
+                f"or Res."
+                )
+                sys.exit(1)
+            if (box_offset_y % y_step_old != 0.0):
+                print(f"\nTo match the grids, the difference between the "
+                f"minimum Box values ({box_offset_y}) "
+                f"needs to be a multiple of the old y_step {y_step_old}."
+                )
+                sys.exit(1)
+            if (z_step_old % z_step_new != 0) or (z_step_old < z_step_new):
+                print(f"\nOld z_step {z_step_old} and new z_step {z_step_new} "
+                f"need to be the same as psi values are calculated gridwise to "
+                f"specific coordinates. These need to match, when changing Box "
+                f"or Res."
+                )
+                sys.exit(1)
+            if (box_offset_z % z_step_old != 0.0):
+                print(f"\nTo match the grids, the difference between the "
+                f"minimum Box values ({box_offset_z}) "
+                f"needs to be a multiple of the old z_step {z_step_old}."
+                )
+                sys.exit(1)
 
             if args.w is None:
                 w_x = System_loaded.w_x
@@ -180,6 +235,41 @@ if __name__ == "__main__":
                     shape=(Res.x, Res.y, Res.z)
                     )
                 System.psi_val = psi_0_noise_3d * System_loaded.psi_val
+
+            # remove the n-th slices, if Res is shrunk down
+            if System.Res.x < System_loaded.Res.x:
+                x_shrink = int(System_loaded.Res.x / System.Res.x)
+                System.psi_val = System.psi_val[0::x_shrink, :, :]
+            else:
+                # Fill up the new grid points with 0, when adding grid points by changing Box or Res
+                System.psi_val = np.pad(
+                    System_loaded.psi_val,
+                    ((box_offset_steps_x, Res.x - System_loaded.Res.x - box_offset_steps_x),
+                     (0, 0),
+                     (0, 0))
+                )
+            if System.Res.y < System_loaded.Res.y:
+                y_shrink = int(System_loaded.Res.y / System.Res.y)
+                System.psi_val = System.psi_val[:, 0::y_shrink, :]
+            else:
+                # Fill up the new grid points with 0, when adding grid points by changing Box or Res
+                System.psi_val = np.pad(
+                    System.psi_val,
+                    ((0, 0),
+                     (box_offset_steps_y, Res.y - System_loaded.Res.y - box_offset_steps_y),
+                     (0, 0))
+                )
+            if System.Res.z < System_loaded.Res.z:
+                z_shrink = int(System_loaded.Res.z / System.Res.z)
+                System.psi_val = System.psi_val[:, :, 0::z_shrink]
+            else:
+                # Fill up the new grid points with 0, when adding grid points by changing Box or Res
+                System.psi_val = np.pad(
+                    System_loaded.psi_val,
+                    ((0, 0),
+                     (0, 0),
+                     (box_offset_steps_z, Res.z - System_loaded.Res.z - box_offset_steps_z))
+                )
 
             SystemResult: Schroedinger = simulate_case(
                 System=System,
