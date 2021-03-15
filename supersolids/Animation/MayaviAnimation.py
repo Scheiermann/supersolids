@@ -220,7 +220,10 @@ class MayaviAnimation(Animation.Animation):
             else:
                 input_path, _, _, _ = get_path.get_path(self.dir_path)
         else:
-            input_path, _, _, _ = get_path.get_path(dir_path)
+            if dir_name is not None:
+                input_path = Path(self.dir_path, dir_name)
+            else:
+                input_path, _, _, _ = get_path.get_path(dir_path)
 
         self.dir_path = input_path
         self.fig.scene.movie_maker.directory = self.dir_path
