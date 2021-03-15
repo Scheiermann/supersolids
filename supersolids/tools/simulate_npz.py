@@ -128,12 +128,12 @@ if __name__ == "__main__":
                 Res = functions.Resolution(**args.Res)
 
             # check if changes of Box or Res, can be done
-            x_step_old = (Box.lengths()[0] / Res.x)
-            y_step_old = (Box.lengths()[1] / Res.y)
-            z_step_old = (Box.lengths()[2] / Res.z)
-            x_step_new = (System_loaded.Box.lengths()[0] / System_loaded.Res.x)
-            y_step_new = (System_loaded.Box.lengths()[1] / System_loaded.Res.y)
-            z_step_new = (System_loaded.Box.lengths()[2] / System_loaded.Res.z)
+            x_step_old = (System_loaded.Box.lengths()[0] / System_loaded.Res.x)
+            y_step_old = (System_loaded.Box.lengths()[1] / System_loaded.Res.y)
+            z_step_old = (System_loaded.Box.lengths()[2] / System_loaded.Res.z)
+            x_step_new = (Box.lengths()[0] / Res.x)
+            y_step_new = (Box.lengths()[1] / Res.y)
+            z_step_new = (Box.lengths()[2] / Res.z)
             box_offset_x = np.abs(System_loaded.Box.x0 - Box.x0)
             box_offset_y = np.abs(System_loaded.Box.y0 - Box.y0)
             box_offset_z = np.abs(System_loaded.Box.z0 - Box.z0)
