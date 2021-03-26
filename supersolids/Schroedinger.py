@@ -116,30 +116,32 @@ class Schroedinger:
 
         self.psi: Callable = psi_0
 
-        if V is not None:
-            self.V: Callable = V
-        else:
+        if V is None:
             self.V = None
-
-        if psi_sol is not None:
-            self.psi_sol: Callable = functools.partial(psi_sol, g=self.g)
         else:
+            self.V: Callable = V
+
+        if V_interaction is None:
+            self.V_interaction = None
+        else:
+            self.V_interaction: Callable = V_interaction
+
+        if psi_sol is None:
             self.psi_sol = None
-
-        if mu_sol is not None:
-            self.mu_sol: Callable = mu_sol(self.g)
         else:
+            self.psi_sol: Callable = functools.partial(psi_sol, g=self.g)
+
+        if mu_sol is None:
             self.mu_sol = None
+        else:
+            self.mu_sol: Callable = mu_sol(self.g)
 
         try:
             box_x_len = (self.Box.x1 - self.Box.x0)
-            self.x: np.ndarray = np.linspace(self.Box.x0, self.Box.x1,
-                                             self.Res.x)
+            self.x: np.ndarray = np.linspace(self.Box.x0, self.Box.x1, self.Res.x)
             self.dx: float = (box_x_len / self.Res.x)
             self.dkx: float = np.pi / (box_x_len / 2.0)
-            self.kx: np.ndarray = np.fft.fftfreq(self.Res.x,
-                                                 d=1.0 / (
-                                                         self.dkx * self.Res.x))
+            self.kx: np.ndarray = np.fft.fftfreq(self.Res.x, d=1.0 / (self.dkx * self.Res.x))
 
         except KeyError:
             sys.exit(
@@ -164,9 +166,7 @@ class Schroedinger:
                                                  self.Res.y)
                 self.dy: float = box_y_len / self.Res.y
                 self.dky: float = np.pi / (box_y_len / 2.0)
-                self.ky: np.ndarray = np.fft.fftfreq(self.Res.y,
-                                                     d=1.0 / (
-                                                             self.dky * self.Res.y))
+                self.ky: np.ndarray = np.fft.fftfreq(self.Res.y, d=1.0 / (self.dky * self.Res.y))
 
             except KeyError:
                 sys.exit(
@@ -183,9 +183,7 @@ class Schroedinger:
                                                  self.Res.z)
                 self.dz: float = box_z_len / self.Res.z
                 self.dkz: float = np.pi / (box_z_len / 2.0)
-                self.kz: np.ndarray = np.fft.fftfreq(self.Res.z,
-                                                     d=1.0 / (
-                                                             self.dkz * self.Res.z))
+                self.kz: np.ndarray = np.fft.fftfreq(self.Res.z, d=1.0 / (self.dkz * self.Res.z))
 
             except KeyError:
                 sys.exit(
