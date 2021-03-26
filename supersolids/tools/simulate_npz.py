@@ -54,7 +54,7 @@ if __name__ == "__main__":
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-V", type=functions.V_3d,
                         help="Potential as lambda function. For example: "
-                             "-V='lambda x,y,z: 10 * x * y'")
+                             "-V='lambda x,y,z: 0 * x * y * z'")
     parser.add_argument("-noise", metavar="noise", type=json.loads,
                         default=None, action='store', nargs=2,
                         help="Min and max of gauss noise added to psi.")
@@ -79,6 +79,11 @@ if __name__ == "__main__":
     parser.add_argument("--offscreen", default=False, action="store_true",
                         help="If not used, interactive animation is shown and saved as mp4."
                              "If used, Schroedinger is saved as pkl and allows offscreen usage.")
+    parser.add_argument("--V_reload", default=True, action="store_false",
+                        help="If not used, V will be the lambda function provided by the V flag."
+                             "If used, the V is loaded from the provided Schroedinger, "
+                             "plus the lambda function provided by the V flag.")
+
     args = parser.parse_args()
     print(f"args: {args}")
 
@@ -137,44 +142,52 @@ if __name__ == "__main__":
             box_offset_x = np.abs(System_loaded.Box.x0 - Box.x0)
             box_offset_y = np.abs(System_loaded.Box.y0 - Box.y0)
             box_offset_z = np.abs(System_loaded.Box.z0 - Box.z0)
+            box_offset_x_end = np.abs(System_loaded.Box.x1 - Box.x0)
+            box_offset_y_end = np.abs(System_loaded.Box.y1 - Box.y0)
+            box_offset_z_end = np.abs(System_loaded.Box.z1 - Box.z0)
             box_offset_steps_x: int = int(box_offset_x / x_step_old)
             box_offset_steps_y: int = int(box_offset_y / y_step_old)
             box_offset_steps_z: int = int(box_offset_z / z_step_old)
+            box_offset_steps_x_end: int = int(box_offset_x_end / x_step_old)
+            box_offset_steps_y_end: int = int(box_offset_y_end / y_step_old)
+            box_offset_steps_z_end: int = int(box_offset_z_end / z_step_old)
 
-            if x_step_old != x_step_new:
+            # smaller steps than loaded are not allowed as then interpolation of psi value is needed
+            # so e.g. x_step_new >= x_step_old
+            if (x_step_new % x_step_old != 0) or (x_step_old > x_step_new):
                 print(f"\nOld x_step {x_step_old} and new x_step {x_step_new} "
                 f"need to be the same as psi values are calculated gridwise to "
                 f"specific coordinates. These need to match, when changing Box "
                 f"or Res."
                 )
                 sys.exit(1)
-            if (box_offset_x % x_step_old != 0.0):
+            if box_offset_x % x_step_old != 0.0:
                 print(f"\nTo match the grids, the difference between the "
                 f"minimum Box values ({box_offset_x}) "
                 f"needs to be a multiple of the old x_step {x_step_old}."
                 )
                 sys.exit(1)
-            if y_step_old != y_step_new:
+            if (y_step_new % y_step_old != 0) or (y_step_old > y_step_new):
                 print(f"\nOld y_step {y_step_old} and new y_step {y_step_new} "
                 f"need to be the same as psi values are calculated gridwise to "
                 f"specific coordinates. These need to match, when changing Box "
                 f"or Res."
                 )
                 sys.exit(1)
-            if (box_offset_y % y_step_old != 0.0):
+            if box_offset_y % y_step_old != 0.0:
                 print(f"\nTo match the grids, the difference between the "
                 f"minimum Box values ({box_offset_y}) "
                 f"needs to be a multiple of the old y_step {y_step_old}."
                 )
                 sys.exit(1)
-            if (z_step_old % z_step_new != 0) or (z_step_old < z_step_new):
+            if (z_step_new % z_step_old != 0) or (z_step_old > z_step_new):
                 print(f"\nOld z_step {z_step_old} and new z_step {z_step_new} "
                 f"need to be the same as psi values are calculated gridwise to "
                 f"specific coordinates. These need to match, when changing Box "
                 f"or Res."
                 )
                 sys.exit(1)
-            if (box_offset_z % z_step_old != 0.0):
+            if box_offset_z % z_step_old != 0.0:
                 print(f"\nTo match the grids, the difference between the "
                 f"minimum Box values ({box_offset_z}) "
                 f"needs to be a multiple of the old z_step {z_step_old}."
@@ -192,24 +205,29 @@ if __name__ == "__main__":
                 w_z = args.w["w_z"]
                 alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
 
-            V_loaded = functools.partial(functions.v_harmonic_3d,
-                                         alpha_y=alpha_y,
-                                         alpha_z=alpha_z)
+            V_harmonic = functools.partial(functions.v_harmonic_3d,
+                                           alpha_y=alpha_y,
+                                           alpha_z=alpha_z)
 
+            # TODO: Usage of -V=None uses harmonic potential with w_x, w_y, w_z.
+            # Used to get access to the function from bash
+            # To get actually no potential use -V="lambda x,y,z: 0"
             if args.V is None:
-                V = V_loaded
+                V = (lambda x, y, z: V_harmonic(x, y, z))
             else:
-                if System_loaded.V is None:
-                    V = (lambda x, y, z: args.V(x, y, z))
+                if args.V_reload:
+                    if System_loaded.V is None:
+                        V = (lambda x, y, z: args.V(x, y, z))
+                    else:
+                        V = (lambda x, y, z: System_loaded.V(x, y, z) + args.V(x, y, z))
                 else:
-                    V = (lambda x, y, z: V_loaded(x, y, z) + args.V(x, y, z))
+                    V = (lambda x, y, z: args.V(x, y, z))
 
             System: Schroedinger = Schroedinger(System_loaded.N,
                                                 Box,
                                                 Res,
                                                 max_timesteps=args.max_timesteps,
                                                 dt=args.dt,
-                                                dt_func=System_loaded.dt_func,
                                                 g=System_loaded.g,
                                                 g_qf=System_loaded.g_qf,
                                                 w_x=w_x,
@@ -221,9 +239,11 @@ if __name__ == "__main__":
                                                 mu=System_loaded.mu,
                                                 E=System_loaded.E,
                                                 V=V,
+                                                V_interaction=System_loaded.V_interaction,
                                                 psi_0_noise=None
                                                 )
 
+            # Load psi values from System_loaded into System
             # As psi_0_noise needs to be applied on the loaded psi_val and not the initial psi_val
             # we apply noise after loading the old System
             if args.noise is None:
@@ -239,38 +259,83 @@ if __name__ == "__main__":
             # remove the n-th slices, if Res is shrunk down
             if System.Res.x < System_loaded.Res.x:
                 x_shrink = int(System_loaded.Res.x / System.Res.x)
-                System.psi_val = System.psi_val[0::x_shrink, :, :]
+                System.psi_val = System.psi_val[box_offset_steps_x:box_offset_steps_x_end, :, :]
             else:
-                # Fill up the new grid points with 0, when adding grid points by changing Box or Res
-                System.psi_val = np.pad(
-                    System_loaded.psi_val,
-                    ((box_offset_steps_x, Res.x - System_loaded.Res.x - box_offset_steps_x),
-                     (0, 0),
-                     (0, 0))
-                )
+                if x_step_new == x_step_old:
+                    # Fill up the new grid points with 0, when adding grid points by changing Box or Res
+                    System.psi_val = np.pad(
+                        System.psi_val,
+                        ((box_offset_steps_x, Res.x - System_loaded.Res.x - box_offset_steps_x),
+                         (0, 0),
+                         (0, 0))
+                    )
+                else:
+                    box_offset_new_x_end = np.abs(System_loaded.Box.x1 - System.Box.x1)
+                    box_offset_new_steps_x_end = int(box_offset_new_x_end / x_step_new)
+                    box_offset_new_steps_x = int(box_offset_x / x_step_new)
+                    discard_n_th_x = int(x_step_new / x_step_old)
+                    psi_loaded_lower_res_x = System.psi_val[::discard_n_th_x, :, :]
+
+                    System.psi_val = np.pad(
+                        psi_loaded_lower_res_x,
+                        ((box_offset_new_steps_x, box_offset_new_steps_x_end),
+                         (0, 0),
+                         (0, 0))
+                    )
+
             if System.Res.y < System_loaded.Res.y:
                 y_shrink = int(System_loaded.Res.y / System.Res.y)
-                System.psi_val = System.psi_val[:, 0::y_shrink, :]
+                System.psi_val = System.psi_val[:, box_offset_steps_y:box_offset_steps_y_end, :]
             else:
-                # Fill up the new grid points with 0, when adding grid points by changing Box or Res
-                System.psi_val = np.pad(
-                    System.psi_val,
-                    ((0, 0),
-                     (box_offset_steps_y, Res.y - System_loaded.Res.y - box_offset_steps_y),
-                     (0, 0))
-                )
+                if y_step_new == y_step_old:
+                    # Fill up the new grid points with 0, when adding grid points by changing Box or Res
+                    System.psi_val = np.pad(
+                        System.psi_val,
+                        ((0, 0),
+                         (box_offset_steps_y, Res.y - System_loaded.Res.y - box_offset_steps_y),
+                         (0, 0))
+                    )
+                else:
+                    box_offset_new_y_end = np.abs(System_loaded.Box.y1 - System.Box.y1)
+                    box_offset_new_steps_y_end = int(box_offset_new_y_end / y_step_new)
+                    box_offset_new_steps_y = int(box_offset_y / y_step_new)
+                    discard_n_th_y = int(y_step_new / y_step_old)
+                    psi_loaded_lower_res_y = System.psi_val[:, ::discard_n_th_y, :]
+
+                    System.psi_val = np.pad(
+                        psi_loaded_lower_res_y,
+                        ((0, 0),
+                         (box_offset_new_steps_y, box_offset_new_steps_y_end),
+                         (0, 0))
+                    )
+
             if System.Res.z < System_loaded.Res.z:
                 z_shrink = int(System_loaded.Res.z / System.Res.z)
-                System.psi_val = System.psi_val[:, :, 0::z_shrink]
+                System.psi_val = System.psi_val[:, :, box_offset_steps_z:box_offset_steps_z_end]
             else:
-                # Fill up the new grid points with 0, when adding grid points by changing Box or Res
-                System.psi_val = np.pad(
-                    System_loaded.psi_val,
-                    ((0, 0),
-                     (0, 0),
-                     (box_offset_steps_z, Res.z - System_loaded.Res.z - box_offset_steps_z))
-                )
+                if z_step_new == z_step_old:
+                    # Fill up the new grid points with 0, when adding grid points by changing Box or Res
+                    System.psi_val = np.pad(
+                        System.psi_val,
+                        ((0, 0),
+                         (0, 0),
+                         (box_offset_steps_z, Res.z - System_loaded.Res.z - box_offset_steps_z))
+                    )
+                else:
+                    box_offset_new_z_end = np.abs(System_loaded.Box.z1 - System.Box.z1)
+                    box_offset_new_steps_z_end = int(box_offset_new_z_end / z_step_new)
+                    box_offset_new_steps_z = int(box_offset_z / z_step_new)
+                    discard_n_th_z = int(z_step_new / z_step_old)
+                    psi_loaded_lower_res_z = System.psi_val[:, :, :discard_n_th_z]
 
+                    System.psi_val = np.pad(
+                        psi_loaded_lower_res_z,
+                        ((0, 0),
+                         (0, 0),
+                         (box_offset_new_steps_z, box_offset_new_steps_z_end))
+                    )
+
+            lol = np.abs(System.psi_val)
             SystemResult: Schroedinger = simulate_case(
                 System=System,
                 Anim=Anim,
