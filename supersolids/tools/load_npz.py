@@ -49,6 +49,10 @@ if __name__ == "__main__":
     parser.add_argument("-frame_start", metavar="frame_start",
                         type=int, default=0,
                         help="Counter of first saved npz.")
+    parser.add_argument("--plot_psi_sol", default=False, action="store_true",
+                        help="Option to plot the manually given solution for the wavefunction psi")
+    parser.add_argument("--plot_V", default=False, action="store_true",
+                        help="Option to plot the external potential of the system (the trap)")
     parser.add_argument("--delete_input", default=False, action="store_true",
                         help="If flag is not used, the pictures after "
                              "animation is created and saved.")
@@ -60,8 +64,8 @@ if __name__ == "__main__":
     except Exception:
         dir_path = args.dir_path
 
-    Anim: Animation = Animation(plot_psi_sol=False,
-                                plot_V=False,
+    Anim: Animation = Animation(plot_psi_sol=args.plot_psi_sol,
+                                plot_V=args.plot_V,
                                 alpha_psi=0.8,
                                 alpha_psi_sol=0.5,
                                 alpha_V=0.3,
