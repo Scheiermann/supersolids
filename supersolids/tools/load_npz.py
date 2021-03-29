@@ -12,6 +12,7 @@ time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 """
 
 import argparse
+import json
 from pathlib import Path
 
 from mayavi import mlab
@@ -49,6 +50,9 @@ if __name__ == "__main__":
     parser.add_argument("-frame_start", metavar="frame_start",
                         type=int, default=0,
                         help="Counter of first saved npz.")
+    parser.add_argument("-slice_indices", metavar="Indices to slice the plot.", type=json.loads,
+                        default=None,
+                        help="Indices to slice the plot in x, y, z direction.")
     parser.add_argument("--plot_psi_sol", default=False, action="store_true",
                         help="Option to plot the manually given solution for the wavefunction psi")
     parser.add_argument("--plot_V", default=False, action="store_true",
@@ -58,6 +62,9 @@ if __name__ == "__main__":
                              "animation is created and saved.")
     args = parser.parse_args()
     print(f"args: {args}")
+    slice_x = args.slice_indices["x"]
+    slice_y = args.slice_indices["y"]
+    slice_z = args.slice_indices["z"]
 
     try:
         dir_path = Path(args.dir_path).expanduser()
@@ -75,6 +82,7 @@ if __name__ == "__main__":
     # mayavi for 3D
     MayAnim = MayaviAnimation.MayaviAnimation(Anim,
                                               dir_path=dir_path,
+                                              slice_indices=[slice_x, slice_y, slice_z],
                                               )
 
     MayAnimator = MayAnim.animate_npz(dir_path=dir_path,
