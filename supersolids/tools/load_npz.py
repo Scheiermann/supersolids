@@ -51,7 +51,7 @@ if __name__ == "__main__":
                         type=int, default=0,
                         help="Counter of first saved npz.")
     parser.add_argument("-slice_indices", metavar="Indices to slice the plot.", type=json.loads,
-                        default=None,
+                        default={"x": 0, "y": 0, "z": 0},
                         help="Indices to slice the plot in x, y, z direction.")
     parser.add_argument("--plot_psi_sol", default=False, action="store_true",
                         help="Option to plot the manually given solution for the wavefunction psi")
