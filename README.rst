@@ -71,9 +71,9 @@ Issues
     * Follow the steps on git the to create the issue.
       Please **describe your issue closely** (what are your configurations, did it work before,
       what have you changed, what is the result, what have you expected as a result?).
-    * Try to include screenshots (to the question in 3b).
+    * Try to include screenshots.
     * Describe what you think causes the issue and if you have **suggestions how to solve** it,
-      mention it! (to the question in 3b).
+      mention it!
     * **Close the issue**, if you accidentally did something wrong (but mention that before closing).
 
 Contributing
