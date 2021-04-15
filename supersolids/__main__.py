@@ -247,7 +247,7 @@ if __name__ == "__main__":
                                     offscreen=args.offscreen,
                                     x_lim=x_lim, # from here just matplotlib
                                     y_lim=y_lim,
-                                    filename_steps=args.filename_steps,
+                                    steps_per_npz=args.steps_per_npz,
                                     frame_start=0,
                                     )
 
