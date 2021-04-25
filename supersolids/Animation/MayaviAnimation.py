@@ -9,6 +9,7 @@
 Functions for Potential and initial wave function :math:`\psi_0`
 
 """
+import sys
 import zipfile
 
 import dill
@@ -214,6 +215,15 @@ class MayaviAnimation(Animation.Animation):
                     frame_start: int = 0,
                     ):
 
+        if sys.version_info >= (3, 8, 0):
+            from importlib.metadata import version
+            supersolids_version = version('supersolids')
+        elif sys.version_info >= (3, 6, 0):
+            import pkg_resources
+            supersolids_version = pkg_resources.get_distribution("supersolids").version
+        else:
+            supersolids_version = "unkown"
+
         if (dir_path is None) or (dir_path == Path("~/supersolids/results").expanduser()):
             if dir_name is not None:
                 input_path = Path(self.dir_path, dir_name)
@@ -266,7 +276,8 @@ class MayaviAnimation(Animation.Animation):
                         f"w_z/2pi={System.w_z / (2 * np.pi):05.02f}, "
                         f"imag_time={System.imag_time}, "
                         f"t={System.dt * frame:07.05f}, "
-                        f"processed={frame / System.max_timesteps:05.03f}%"
+                        f"processed={frame / System.max_timesteps:05.03f}%, "
+                        f"version={supersolids_version}"
                         )
 
                 if frame == frame_start:
