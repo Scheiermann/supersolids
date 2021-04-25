@@ -79,7 +79,7 @@ if __name__ == "__main__":
     parser.add_argument("--offscreen", default=False, action="store_true",
                         help="If not used, interactive animation is shown and saved as mp4."
                              "If used, Schroedinger is saved as pkl and allows offscreen usage.")
-    parser.add_argument("--V_reload", default=True, action="store_false",
+    parser.add_argument("--V_reload", default=False, action="store_true",
                         help="If not used, V will be the lambda function provided by the V flag."
                              "If used, the V is loaded from the provided Schroedinger, "
                              "plus the lambda function provided by the V flag.")
@@ -209,7 +209,7 @@ if __name__ == "__main__":
                                            alpha_y=alpha_y,
                                            alpha_z=alpha_z)
 
-            # TODO: Usage of -V=None uses harmonic potential with w_x, w_y, w_z.
+            # -V=None uses harmonic potential with w_x, w_y, w_z.
             # Used to get access to the function from bash
             # To get actually no potential use -V="lambda x,y,z: 0"
             if args.V is None:
