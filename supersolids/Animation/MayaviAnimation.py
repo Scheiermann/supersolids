@@ -261,6 +261,7 @@ class MayaviAnimation(Animation.Animation):
                         f"g_qf={System.g_qf:.2}, "
                         f"e_dd={System.e_dd:05.03f},\n"
                         f"a_s/a_0={System.a_s / constants.a_0:05.02f}, "
+                        f"w_x/2pi={System.w_x / (2 * np.pi):05.02f}, "
                         f"w_y/2pi={System.w_y / (2 * np.pi):05.02f}, "
                         f"w_z/2pi={System.w_z / (2 * np.pi):05.02f}, "
                         f"imag_time={System.imag_time}, "
