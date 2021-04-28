@@ -392,6 +392,25 @@ class Schroedinger:
             print(f"Not implemented yet.")
             pass
 
+    def get_r2(self):
+        if self.dim == 1:
+            r = self.x_mesh ** 2.0
+        elif self.dim == 2:
+            r = self.x_mesh ** 2.0 + self.y_mesh ** 2.0
+        elif self.dim == 3:
+            r = self.x_mesh ** 2.0 + self.y_mesh ** 2.0 + self.z_mesh ** 2.0
+        else:
+            sys.exit("Spatial dimension over 3. This is not implemented.")
+
+        return r
+
+    def get_center_of_mass(self):
+        """
+        Calculates the center of mass of the System.
+
+        """
+        return np.sqrt(self.get_density(p=2.0) * self.get_r2())
+
     def time_step(self) -> None:
         """
         Evolves System according Schrödinger Equations by using the
