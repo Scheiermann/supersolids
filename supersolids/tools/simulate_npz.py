@@ -25,6 +25,7 @@ from supersolids.Schroedinger import Schroedinger
 from supersolids.helper import functions
 from supersolids.tools.simulate_case import simulate_case
 
+
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     # Use parser to
@@ -213,15 +214,18 @@ if __name__ == "__main__":
             # Used to get access to the function from bash
             # To get actually no potential use -V="lambda x,y,z: 0"
             if args.V is None:
-                V = (lambda x, y, z: V_harmonic(x, y, z))
+                V_new = (lambda x, y, z: V_harmonic(x, y, z))
             else:
                 if args.V_reload:
                     if System_loaded.V is None:
-                        V = (lambda x, y, z: args.V(x, y, z))
+                        V_new = (lambda x, y, z: args.V(x, y, z))
                     else:
-                        V = (lambda x, y, z: System_loaded.V(x, y, z) + args.V(x, y, z))
+                        V_new = (lambda x, y, z: V_harmonic(x, y, z) + args.V(x, y, z))
+                        # TODO: check why this causing a loop
+                        # (probably V_new and System_loaded.V have same reference)
+                        # V_new = (lambda x, y, z: System_loaded.V(x, y, z) + args.V(x, y, z))
                 else:
-                    V = (lambda x, y, z: args.V(x, y, z))
+                    V_new = (lambda x, y, z: args.V(x, y, z))
 
             System: Schroedinger = Schroedinger(System_loaded.N,
                                                 Box,
@@ -238,7 +242,7 @@ if __name__ == "__main__":
                                                 imag_time=System_loaded.imag_time,
                                                 mu=System_loaded.mu,
                                                 E=System_loaded.E,
-                                                V=V,
+                                                V=V_new,
                                                 V_interaction=System_loaded.V_interaction,
                                                 psi_0_noise=None
                                                 )
@@ -335,7 +339,6 @@ if __name__ == "__main__":
                          (box_offset_new_steps_z, box_offset_new_steps_z_end))
                     )
 
-            lol = np.abs(System.psi_val)
             SystemResult: Schroedinger = simulate_case(
                 System=System,
                 Anim=Anim,
