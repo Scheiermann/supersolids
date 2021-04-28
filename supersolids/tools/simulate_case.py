@@ -17,8 +17,7 @@ import numpy as np
 from mayavi import mlab
 from typing import Tuple
 
-from supersolids.Animation import Animation, MayaviAnimation, \
-    MatplotlibAnimation
+from supersolids.Animation import Animation, MayaviAnimation, MatplotlibAnimation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.tools import run_time
 from supersolids.tools.cut_1d import cut_1d
@@ -28,8 +27,7 @@ def simulate_case(System: Schroedinger,
                   Anim: Animation.Animation,
                   accuracy: float = 10 ** -6,
                   delete_input: bool = True,
-                  dir_path: Path = Path.home().joinpath("supersolids",
-                                                        "results"),
+                  dir_path: Path = Path.home().joinpath("supersolids", "results"),
                   slice_indices: np.ndarray = [0, 0, 0],
                   offscreen: bool = False,
                   x_lim: Tuple[float, float] = (-1.0, 1.0),
@@ -106,7 +104,7 @@ def simulate_case(System: Schroedinger,
                                               )
 
             with run_time.run_time(name="mlab.show"):
-                    mlab.show()
+                mlab.show()
 
             result_path = MayAnim.create_movie(dir_path=dir_path,
                                                input_data_file_pattern="*.png",
