@@ -394,11 +394,23 @@ class Schroedinger:
 
     def get_r2(self):
         if self.dim == 1:
-            r = self.x_mesh ** 2.0
+            r2 = self.x_mesh ** 2.0
         elif self.dim == 2:
-            r = self.x_mesh ** 2.0 + self.y_mesh ** 2.0
+            r2 = self.x_mesh ** 2.0 + self.y_mesh ** 2.0
         elif self.dim == 3:
-            r = self.x_mesh ** 2.0 + self.y_mesh ** 2.0 + self.z_mesh ** 2.0
+            r2 = self.x_mesh ** 2.0 + self.y_mesh ** 2.0 + self.z_mesh ** 2.0
+        else:
+            sys.exit("Spatial dimension over 3. This is not implemented.")
+
+        return r2
+
+    def get_r_vector(self):
+        if self.dim == 1:
+            r = self.x_mesh.ravel()
+        elif self.dim == 2:
+            r = (self.x_mesh.ravel(), self.y_mesh.ravel())
+        elif self.dim == 3:
+            r = np.array([self.x_mesh.ravel(), self.y_mesh.ravel(), self.z_mesh.ravel()])
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")
 
