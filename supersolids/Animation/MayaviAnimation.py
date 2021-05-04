@@ -71,8 +71,9 @@ def axes_style():
     ax.label_text_property.font_size = 8
     ax.label_text_property.color = (0.0, 0.0, 0.0)
     ax.title_text_property.color = (0.0, 0.0, 0.0)
-    ax.property.color = (0.0, 0.0, 0.0)
-    ax.property.line_width = 2.5
+    # throws error, maybe deprecated
+    # ax.property_tuple.color = (0.0, 0.0, 0.0)
+    # ax.property_tuple.line_width = 2.5
 
 
 class MayaviAnimation(Animation.Animation):
