@@ -6,6 +6,8 @@
 # Please feel free to use and modify this, but keep the above information.
 
 """
+DEPRECATED
+
 Animation for the numerical solver for the non-linear
 time-dependent Schrodinger equation for 1D and 2D in multi-core.
 
