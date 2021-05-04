@@ -62,10 +62,14 @@ if __name__ == "__main__":
     parser.add_argument("-dir_path", metavar="dir_path", type=str,
                         default="~/supersolids/results",
                         help="Absolute path to save data to")
-    parser.add_argument("-dir_name", metavar="dir_name", type=str,
+    parser.add_argument("-dir_name_load", metavar="dir_name_load", type=str,
                         default="movie" + "%03d" % 1,
                         help="Name of directory where the files to load lie. "
                              "For example the standard naming convention is movie001")
+    parser.add_argument("-dir_name_result", metavar="dir_name_result", type=str,
+                        default="",
+                        help="Name of directory where to save the results at. "
+                             "For example the standard naming convention is movie002")
     parser.add_argument("-filename_schroedinger",
                         metavar="filename_schroedinger", type=str,
                         default="schroedinger.pkl",
@@ -345,6 +349,7 @@ if __name__ == "__main__":
                 accuracy=args.accuracy,
                 delete_input=True,
                 dir_path=dir_path,
+                dir_name_result=args.dir_name_result,
                 offscreen=args.offscreen,
                 x_lim=(-2.0, 2.0),  # from here just matplotlib
                 y_lim=(-2.0, 2.0),

@@ -28,6 +28,7 @@ def simulate_case(System: Schroedinger,
                   accuracy: float = 10 ** -6,
                   delete_input: bool = True,
                   dir_path: Path = Path.home().joinpath("supersolids", "results"),
+                  dir_name_result: str = "",
                   slice_indices: np.ndarray = [0, 0, 0],
                   offscreen: bool = False,
                   x_lim: Tuple[float, float] = (-1.0, 1.0),
@@ -56,6 +57,9 @@ def simulate_case(System: Schroedinger,
 
     :param dir_path: Path where to look for old directories (movie data)
 
+    :param dir_name_result: Name of directory where to save the results at. For example the
+        standard naming convention is movie002")
+
     :param slice_indices: Numpy array with indices of grid points
         in the directions x, y, z (in terms of System.x, System.y, System.z)
         to produce a slice/plane in mayavi,
@@ -68,7 +72,12 @@ def simulate_case(System: Schroedinger,
 
     :param z_lim: Limits of plot in z direction
 
-    :return: Referenz to Schroedinger System
+    :param steps_per_npz: Number of dt steps skipped between saved npz.
+
+    :param frame_start: Number of named file, where psi_val is loaded from. For example
+        the standard naming convention is step_000001.npz
+
+    :return: Reference to Schroedinger System
 
     """
     if System.dim < 3:
@@ -115,6 +124,7 @@ def simulate_case(System: Schroedinger,
         else:
             System.simulate_raw(accuracy=accuracy,
                                 dir_path=dir_path,
+                                dir_name_result=dir_name_result,
                                 steps_per_npz=steps_per_npz,
                                 frame_start=frame_start,
                                 )
