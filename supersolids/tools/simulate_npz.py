@@ -224,10 +224,7 @@ if __name__ == "__main__":
                     if System_loaded.V is None:
                         V_new = (lambda x, y, z: args.V(x, y, z))
                     else:
-                        V_new = (lambda x, y, z: V_harmonic(x, y, z) + args.V(x, y, z))
-                        # TODO: check why this causing a loop
-                        # (probably V_new and System_loaded.V have same reference)
-                        # V_new = (lambda x, y, z: System_loaded.V(x, y, z) + args.V(x, y, z))
+                        V_new = (lambda x, y, z: System_loaded.V(x, y, z) + args.V(x, y, z))
                 else:
                     V_new = (lambda x, y, z: args.V(x, y, z))
 
