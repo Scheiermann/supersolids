@@ -24,6 +24,47 @@ from supersolids.Schroedinger import Schroedinger
 from supersolids.helper import functions, constants, get_path
 
 
+def get_supersolids_version():
+    if sys.version_info >= (3, 8, 0):
+        from importlib.metadata import version
+        supersolids_version = version('supersolids')
+    elif sys.version_info >= (3, 6, 0):
+        import pkg_resources
+        supersolids_version = pkg_resources.get_distribution(
+            "supersolids").version
+    else:
+        supersolids_version = "unkown"
+
+    return supersolids_version
+
+
+def get_legend(System, frame, supersolids_version, mu_rel=None):
+    # Update legend (especially time)
+    text = (f"version={supersolids_version}, "
+            f"N={System.N}, "
+            f"Box={System.Box}, "
+            f"Res={System.Res}, "
+            f"max_timesteps={System.max_timesteps:d}, "
+            f"dt={System.dt:.6f}, "
+            f"g={System.g:.2}, "
+            f"g_qf={System.g_qf:.2}, "
+            f"e_dd={System.e_dd:05.03f},\n"
+            f"a_s/a_0={System.a_s / constants.a_0:05.02f}, "
+            f"w_x/2pi={System.w_x / (2 * np.pi):05.02f}, "
+            f"w_y/2pi={System.w_y / (2 * np.pi):05.02f}, "
+            f"w_z/2pi={System.w_z / (2 * np.pi):05.02f}, "
+            f"imag_time={System.imag_time}, "
+            f"t={System.dt * frame:07.05f}, "
+            f"processed={frame / System.max_timesteps:05.03f}%, "
+            f"E={System.E:+05.03f}, "
+            f"mu={System.mu:+05.03f}, "
+            )
+    if mu_rel is not None:
+        text = text + f"mu_rel={mu_rel:+05.05e}"
+
+    return text
+
+
 def axes_style():
     ax = mlab.axes(line_width=2, nb_labels=5)
     ax.axes.visibility = True
@@ -215,14 +256,7 @@ class MayaviAnimation(Animation.Animation):
                     frame_start: int = 0,
                     ):
 
-        if sys.version_info >= (3, 8, 0):
-            from importlib.metadata import version
-            supersolids_version = version('supersolids')
-        elif sys.version_info >= (3, 6, 0):
-            import pkg_resources
-            supersolids_version = pkg_resources.get_distribution("supersolids").version
-        else:
-            supersolids_version = "unkown"
+        supersolids_version = get_supersolids_version()
 
         if (dir_path is None) or (dir_path == Path("~/supersolids/results").expanduser()):
             if dir_name is not None:
@@ -261,24 +295,7 @@ class MayaviAnimation(Animation.Animation):
                 with open(psi_val_path, "rb") as f:
                     psi_val_pkl = np.load(file=f)["psi_val"]
 
-                # Update legend (especially time)
-                text = (f"N={System.N}, "
-                        f"Box={System.Box}, "
-                        f"Res={System.Res}, "
-                        f"max_timesteps={System.max_timesteps:d}, "
-                        f"dt={System.dt:.6f}, "
-                        f"g={System.g:.2}, "
-                        f"g_qf={System.g_qf:.2}, "
-                        f"e_dd={System.e_dd:05.03f},\n"
-                        f"a_s/a_0={System.a_s / constants.a_0:05.02f}, "
-                        f"w_x/2pi={System.w_x / (2 * np.pi):05.02f}, "
-                        f"w_y/2pi={System.w_y / (2 * np.pi):05.02f}, "
-                        f"w_z/2pi={System.w_z / (2 * np.pi):05.02f}, "
-                        f"imag_time={System.imag_time}, "
-                        f"t={System.dt * frame:07.05f}, "
-                        f"processed={frame / System.max_timesteps:05.03f}%, "
-                        f"version={supersolids_version}"
-                        )
+                text = get_legend(System, frame, supersolids_version)
 
                 if frame == frame_start:
                     # create title for first frame
@@ -346,6 +363,8 @@ class MayaviAnimation(Animation.Animation):
         """
         prob_plot, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot = self.prepare(System)
 
+        supersolids_version = get_supersolids_version()
+
         for frame in range(0, System.max_timesteps):
             if not interactive:
                 # rotate camera
@@ -389,24 +408,7 @@ class MayaviAnimation(Animation.Animation):
                 print(f"Maximum timesteps are reached. Animation is stopped.")
 
             # Update legend (especially time)
-            text = (f"N={System.N}, "
-                    f"Box={System.Box}, "
-                    f"Res={System.Res}, "
-                    f"max_timesteps={System.max_timesteps:d}, "
-                    f"dt={System.dt:.6f}, "
-                    f"g={System.g:.2}, "
-                    f"g_qf={System.g_qf:.2}, "
-                    f"e_dd={System.e_dd:05.03f},\n"
-                    f"a_s/a_0={System.a_s/constants.a_0:05.02f}, "
-                    f"w_y/2pi={System.w_y/(2*np.pi):05.02f}, "
-                    f"w_z/2pi={System.w_z/(2*np.pi):05.02f}, "
-                    f"imag_time={System.imag_time}, "
-                    f"mu={System.mu:+05.03f}, "
-                    f"mu_rel={mu_rel:+05.05e}, "
-                    f"E={System.E:+05.03f}, "
-                    f"t={System.t:07.05f}, "
-                    f"processed={frame/System.max_timesteps:05.03f}%"
-                    )
+            text = get_legend(System, frame, supersolids_version, mu_rel)
 
             if frame == 0:
                 # create title for first frame
