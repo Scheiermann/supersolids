@@ -97,7 +97,7 @@ if __name__ == "__main__":
     except Exception:
         dir_path = args.dir_path
 
-    input_path = Path(dir_path, args.dir_name)
+    input_path = Path(dir_path, args.dir_name_load)
     schroedinger_path = Path(input_path, args.filename_schroedinger)
     psi_val_path = Path(input_path, args.filename_npz)
 
