@@ -409,7 +409,7 @@ class Schroedinger:
         Calculates the center of mass of the System.
 
         """
-        return np.sqrt(self.get_density(p=2.0) * self.get_r2())
+        return np.average(self.get_density(p=2.0).ravel() * self.get_r_vector(), axis=1)
 
     def time_step(self) -> None:
         """
@@ -486,6 +486,7 @@ class Schroedinger:
     def simulate_raw(self,
                      accuracy: float = 10 ** -6,
                      dir_path: Path = Path.home().joinpath("supersolids", "results"),
+                     dir_name_result: str = "",
                      filename_schroedinger=f"schroedinger.pkl",
                      filename_steps=f"step_",
                      steps_format: str = "%06d",
@@ -502,8 +503,11 @@ class Schroedinger:
         # Initialize mu_rel
         mu_rel = self.mu
 
-        _, last_index, dir_name, counting_format = get_path.get_path(dir_path)
-        input_path = Path(dir_path, dir_name + counting_format % (last_index + 1))
+        if dir_name_result == "":
+            _, last_index, dir_name, counting_format = get_path.get_path(dir_path)
+            input_path = Path(dir_path, dir_name + counting_format % (last_index + 1))
+        else:
+            input_path = Path(dir_path, dir_name_result)
 
         # Create a movie dir, if there is none
         if not input_path.is_dir():
