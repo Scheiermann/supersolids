@@ -138,10 +138,13 @@ class Schroedinger:
 
         try:
             box_x_len = (self.Box.x1 - self.Box.x0)
-            self.x: np.ndarray = np.linspace(self.Box.x0, self.Box.x1, self.Res.x)
+            self.x: np.ndarray = np.linspace(self.Box.x0,
+                                             self.Box.x1,
+                                             self.Res.x)
             self.dx: float = (box_x_len / self.Res.x)
             self.dkx: float = np.pi / (box_x_len / 2.0)
-            self.kx: np.ndarray = np.fft.fftfreq(self.Res.x, d=1.0 / (self.dkx * self.Res.x))
+            self.kx: np.ndarray = np.fft.fftfreq(self.Res.x,
+                d=1.0 / (self.dkx * self.Res.x))
 
         except KeyError:
             sys.exit(
@@ -166,7 +169,8 @@ class Schroedinger:
                                                  self.Res.y)
                 self.dy: float = box_y_len / self.Res.y
                 self.dky: float = np.pi / (box_y_len / 2.0)
-                self.ky: np.ndarray = np.fft.fftfreq(self.Res.y, d=1.0 / (self.dky * self.Res.y))
+                self.ky: np.ndarray = np.fft.fftfreq(self.Res.y,
+                    d=1.0 / (self.dky * self.Res.y))
 
             except KeyError:
                 sys.exit(
@@ -183,7 +187,8 @@ class Schroedinger:
                                                  self.Res.z)
                 self.dz: float = box_z_len / self.Res.z
                 self.dkz: float = np.pi / (box_z_len / 2.0)
-                self.kz: np.ndarray = np.fft.fftfreq(self.Res.z, d=1.0 / (self.dkz * self.Res.z))
+                self.kz: np.ndarray = np.fft.fftfreq(self.Res.z,
+                    d=1.0 / (self.dkz * self.Res.z))
 
             except KeyError:
                 sys.exit(
@@ -511,7 +516,8 @@ class Schroedinger:
 
     def simulate_raw(self,
                      accuracy: float = 10 ** -6,
-                     dir_path: Path = Path.home().joinpath("supersolids", "results"),
+                     dir_path: Path = Path.home().joinpath("supersolids",
+                                                           "results"),
                      dir_name_result: str = "",
                      filename_schroedinger=f"schroedinger.pkl",
                      filename_steps=f"step_",
@@ -530,8 +536,10 @@ class Schroedinger:
         mu_rel = self.mu
 
         if dir_name_result == "":
-            _, last_index, dir_name, counting_format = get_path.get_path(dir_path)
-            input_path = Path(dir_path, dir_name + counting_format % (last_index + 1))
+            _, last_index, dir_name, counting_format = get_path.get_path(
+                dir_path)
+            input_path = Path(dir_path,
+                              dir_name + counting_format % (last_index + 1))
         else:
             input_path = Path(dir_path, dir_name_result)
 
