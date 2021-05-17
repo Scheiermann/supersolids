@@ -293,7 +293,7 @@ class Schroedinger:
                                                 self.y_mesh,
                                                 self.z_mesh)
                 print(f"Trapez Norm for psi_sol: "
-                      f"{self.get_norm_trapez(self.psi_sol_val)}")
+                      f"{self.trapez_integral(self.psi_sol_val)}")
 
             kx_mesh, ky_mesh, kz_mesh, _ = functions.get_meshgrid_3d(self.kx,
                                                                      self.ky,
@@ -352,7 +352,7 @@ class Schroedinger:
 
         return psi_norm
 
-    def get_norm_trapez(self, func_val: Callable) -> float:
+    def trapez_integral(self, func_val: Callable) -> float:
         """
         Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D
         (depending on self.dim) by using the trapez rule.
@@ -415,7 +415,8 @@ class Schroedinger:
         elif self.dim == 2:
             r = (self.x_mesh.ravel(), self.y_mesh.ravel())
         elif self.dim == 3:
-            r = np.array([self.x_mesh.ravel(), self.y_mesh.ravel(), self.z_mesh.ravel()])
+            r = np.array(
+                [self.x_mesh.ravel(), self.y_mesh.ravel(), self.z_mesh.ravel()])
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")
 
@@ -426,19 +427,31 @@ class Schroedinger:
         Calculates the center of mass of the System.
 
         """
-        return np.average(self.get_density(p=2.0).ravel() * self.get_r_vector(), axis=1)
+        return np.average(self.get_density(p=2.0).ravel() * self.get_r_vector(),
+                          axis=1)
+
+    def get_parity(self):
+        under0_x = int(self.Res.x / 2)
+        under0_y = int(self.Res.y / 2)
+        under0_z = int(self.Res.z / 2)
+        psi_under0 = self.psi_val[0:under0_x, 0:under0_y, 0:under0_z]
+        psi_over0 = self.psi_val[under0_x:, under0_y:, under0_z:]
+
+        parity = self.trapez_integral(np.abs(psi_over0 - psi_under0) ** 2.0)
+
+        return parity
 
     def get_phase_var(self, x0, x1, y0, y1, z0, z1):
         """
         Calculates the variance of the phase of the System.
 
         """
-        prob_cropped = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1].ravel()
-        psi_val_cropped = self.psi_val[x0:x1, y0:y1, z0:z1].ravel()
+        prob_cropped = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1]
+        psi_val_cropped = self.psi_val[x0:x1, y0:y1, z0:z1]
         angle = np.angle(psi_val_cropped)
 
-        phase = np.sum(prob_cropped * (angle + np.pi))
-        phase2 = np.sum(prob_cropped * (angle + np.pi) ** 2.0)
+        phase = self.trapez_integral(prob_cropped * (angle + np.pi))
+        phase2 = self.trapez_integral(prob_cropped * (angle + np.pi) ** 2.0)
         phase_var = np.sqrt(np.abs(phase2 - phase ** 2.0))
 
         return phase_var
@@ -494,7 +507,8 @@ class Schroedinger:
         # for self.imag_time=False, renormalization should be preserved,
         # but we play safe here (regardless of speedup)
         # if self.imag_time:
-        psi_norm_after_evolution: float = self.get_norm_trapez(np.abs(self.psi_val) ** 2.0)
+        psi_norm_after_evolution: float = self.trapez_integral(
+            np.abs(self.psi_val) ** 2.0)
         # psi_norm_after_evolution: float = self.get_norm(p=2.0)
         self.psi_val = self.psi_val / np.sqrt(psi_norm_after_evolution)
 
@@ -504,7 +518,7 @@ class Schroedinger:
         self.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
         self.E = self.mu - 0.5 * self.g * psi_quadratic_int
 
-        # print(f"Sol norm: {self.get_norm_trapez(self.psi_sol_val)}")
+        # print(f"Sol norm: {self.trapez_integral(self.psi_sol_val)}")
 
         # TODO: These formulas for mu.sol and E are not for all cases correct
         # print(f"mu: {self.mu}")
