@@ -33,7 +33,7 @@ if __name__ == "__main__":
     # Use parser to
     parser = argparse.ArgumentParser(description="Define constants for Schrödinger equation")
     parser.add_argument("-dt", metavar="dt", type=float, default=2 * 10 ** -3, nargs="?",
-                        help="Length of timestep to evolve Schrödinger system")
+                        help="Length of timestep to evolve Schrödinger system.")
     parser.add_argument("-Res", metavar="Resolution", type=json.loads,
                         default={"x": 256, "y": 128, "z": 32},
                         help="Dictionary of resolutions for the box (1D, 2D, 3D). Needs to be 2 ** int.")
@@ -64,7 +64,7 @@ if __name__ == "__main__":
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to save data to")
-    parser.add_argument("-V", type=functions.V_3d,
+    parser.add_argument("-V", type=functions.lambda_parsed,
                         help="Potential as lambda function. For example: "
                              "-V='lambda x,y,z: 10 * x * y'")
     parser.add_argument("-noise", metavar="noise", type=json.loads,
@@ -74,11 +74,11 @@ if __name__ == "__main__":
                         help="If not used, a gauss potential is used."
                              "If used, no potential is used.")
     parser.add_argument("--real_time", default=False, action="store_true",
-                        help="Switch for Split-Operator method to use imaginary time or not")
+                        help="Switch for Split-Operator method to use imaginary time or not.")
     parser.add_argument("--plot_psi_sol", default=False, action="store_true",
-                        help="Option to plot the manually given solution for the wavefunction psi")
+                        help="Option to plot the manually given solution for the wavefunction psi.")
     parser.add_argument("--plot_V", default=False, action="store_true",
-                        help="Option to plot the external potential of the system (the trap)")
+                        help="Option to plot the external potential of the system (the trap).")
     parser.add_argument("-steps_per_npz", metavar="steps_per_npz",
                         type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
@@ -91,8 +91,8 @@ if __name__ == "__main__":
 
     functions.BoxResAssert(args.Res, args.Box)
     functions.aResAssert(args.Res, args.a)
-
     Res = functions.Resolution(**args.Res)
+
     Box = functions.Box(**args.Box)
 
     try:
