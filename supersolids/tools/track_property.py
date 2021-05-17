@@ -11,6 +11,7 @@
 """
 
 import argparse
+import json
 import sys
 import zipfile
 from pathlib import Path
@@ -48,6 +49,7 @@ def track_property(input_path,
                    frame_start: int = 0,
                    property_name: str = "get_center_of_mass",
                    property_func: bool = False,
+                   property_args=[],
                    ):
 
     last_index = get_last_index(input_path, filename_steps)
@@ -86,7 +88,7 @@ def track_property(input_path,
 
         if property_func:
             try:
-                yield property()
+                yield property(*property_args)
             except AttributeError:
                 sys.exit(f"The loaded Schroedinger object has no method named {property_name}.")
         elif callable(property):
@@ -149,6 +151,8 @@ if __name__ == "__main__":
                              "an Schroedinger object."
                              "If used, flag property_name will be a interpreted as method of an "
                              "Schroedinger object.")
+    parser.add_argument("--property_args", default=[], type=json.loads, action='store', nargs="*",
+                        help="Arguments for property_name, if property_func is used.")
 
     args = parser.parse_args()
     print(f"args: {args}")
@@ -167,6 +171,7 @@ if __name__ == "__main__":
                                     frame_start=args.frame_start,
                                     property_name=args.property_name,
                                     property_func=args.property_func,
+                                    property_args=args.property_args,
                                     )
 
     property_all = property_to_array(property_tuple)
@@ -187,5 +192,7 @@ if __name__ == "__main__":
     plt.xlabel(f"Number of loaded npz ($\propto time$)")
     plt.ylabel(f"{args.property_name}")
     plt.grid()
-    plt.savefig(Path(input_path, f"{args.property_name}"))
+    plt.title(f"with property_args: {args.property_args}")
+    if args.property_name:
+        plt.savefig(Path(input_path, f"{args.property_name}"))
     # plt.show()
