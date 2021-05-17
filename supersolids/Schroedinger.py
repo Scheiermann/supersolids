@@ -423,6 +423,21 @@ class Schroedinger:
         """
         return np.average(self.get_density(p=2.0).ravel() * self.get_r_vector(), axis=1)
 
+    def get_phase_var(self, x0, x1, y0, y1, z0, z1):
+        """
+        Calculates the variance of the phase of the System.
+
+        """
+        prob_cropped = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1].ravel()
+        psi_val_cropped = self.psi_val[x0:x1, y0:y1, z0:z1].ravel()
+        angle = np.angle(psi_val_cropped)
+
+        phase = np.sum(prob_cropped * (angle + np.pi))
+        phase2 = np.sum(prob_cropped * (angle + np.pi) ** 2.0)
+        phase_var = np.sqrt(np.abs(phase2 - phase ** 2.0))
+
+        return phase_var
+
     def time_step(self) -> None:
         """
         Evolves System according Schrödinger Equations by using the
@@ -474,8 +489,7 @@ class Schroedinger:
         # for self.imag_time=False, renormalization should be preserved,
         # but we play safe here (regardless of speedup)
         # if self.imag_time:
-        psi_norm_after_evolution: float = self.get_norm_trapez(
-            np.abs(self.psi_val) ** 2.0)
+        psi_norm_after_evolution: float = self.get_norm_trapez(np.abs(self.psi_val) ** 2.0)
         # psi_norm_after_evolution: float = self.get_norm(p=2.0)
         self.psi_val = self.psi_val / np.sqrt(psi_norm_after_evolution)
 
