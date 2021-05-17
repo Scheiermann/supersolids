@@ -29,18 +29,14 @@ from supersolids.tools.simulate_case import simulate_case
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     # Use parser to
-    parser = argparse.ArgumentParser(
-        description="Load old simulations of Schrödinger system "
-                    "and continue simulation from there.")
-    parser.add_argument("-dt", metavar="dt", type=float, default=2 * 10 ** -3,
-                        nargs="?",
+    parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
+                                                 "and continue simulation from there.")
+    parser.add_argument("-dt", metavar="dt", type=float, default=2 * 10 ** -3, nargs="?",
                         help="Length of timestep to evolve Schrödinger system")
-    parser.add_argument("-Res", metavar="Resolution", type=json.loads,
-                        default=None,
+    parser.add_argument("-Res", metavar="Resolution", type=json.loads, default=None,
                         help="Dictionary of resolutions for the box (1D, 2D, 3D). "
                              "Needs to be 2 ** int.")
-    parser.add_argument("-Box", metavar="Box", type=json.loads,
-                        default=None,
+    parser.add_argument("-Box", metavar="Box", type=json.loads, default=None,
                         help=("Dictionary for the Box dimensionality. "
                               "Two values per dimension to set start and end (1D, 2D, 3D)."))
     parser.add_argument("-w", metavar="Trap frequency", type=json.loads,
@@ -53,21 +49,19 @@ if __name__ == "__main__":
     parser.add_argument("-accuracy", metavar="accuracy", type=float,
                         default=10 ** -12,
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
-    parser.add_argument("-V", type=functions.V_3d,
+    parser.add_argument("-V", type=functions.lambda_parsed,
                         help="Potential as lambda function. For example: "
                              "-V='lambda x,y,z: 0 * x * y * z'")
     parser.add_argument("-noise", metavar="noise", type=json.loads,
                         default=None, action='store', nargs=2,
                         help="Min and max of gauss noise added to psi.")
     parser.add_argument("-dir_path", metavar="dir_path", type=str,
-                        default="~/supersolids/results",
-                        help="Absolute path to save data to")
+                        default="~/supersolids/results", help="Absolute path to save data to")
     parser.add_argument("-dir_name_load", metavar="dir_name_load", type=str,
                         default="movie" + "%03d" % 1,
                         help="Name of directory where the files to load lie. "
                              "For example the standard naming convention is movie001")
-    parser.add_argument("-dir_name_result", metavar="dir_name_result", type=str,
-                        default="",
+    parser.add_argument("-dir_name_result", metavar="dir_name_result", type=str, default="",
                         help="Name of directory where to save the results at. "
                              "For example the standard naming convention is movie002")
     parser.add_argument("-filename_schroedinger",
