@@ -246,15 +246,18 @@ class MayaviAnimation(Animation.Animation):
 
         return prob_plot, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot
 
-    @mlab.animate(delay=10, ui=True)
+    # @mlab.animate(delay=10, ui=True)
     def animate_npz(self,
                     dir_path: Path = None,
                     dir_name: str = None,
-                    filename_schroedinger=f"schroedinger.pkl",
-                    filename_steps=f"step_",
+                    filename_schroedinger: str = f"schroedinger.pkl",
+                    filename_steps: str = f"step_",
                     steps_format: str = "%06d",
                     steps_per_npz: int = 10,
                     frame_start: int = 0,
+                    arg_slices: bool = False,
+                    azimuth: float = 0.0,
+                    elevation: float = 0.0,
                     ):
 
         supersolids_version = get_supersolids_version()
@@ -306,15 +309,23 @@ class MayaviAnimation(Animation.Animation):
                                        size=1.0,
                                        color=(0, 0, 0),
                                        )
+                    mlab.view(azimuth=azimuth, elevation=elevation)
 
                 title.set(text=text)
 
                 # Update plot functions
                 prob_3d = np.abs(psi_val_pkl) ** 2
-                slice_x_plot.mlab_source.trait_set(scalars=prob_3d)
-                slice_y_plot.mlab_source.trait_set(scalars=prob_3d)
-                slice_z_plot.mlab_source.trait_set(scalars=prob_3d)
                 prob_plot.mlab_source.trait_set(scalars=prob_3d)
+
+                if arg_slices:
+                    psi_arg = np.angle(psi_val_pkl)
+                    slice_x_plot.mlab_source.trait_set(scalars=psi_arg)
+                    slice_y_plot.mlab_source.trait_set(scalars=psi_arg)
+                    slice_z_plot.mlab_source.trait_set(scalars=psi_arg)
+                else:
+                    slice_x_plot.mlab_source.trait_set(scalars=prob_3d)
+                    slice_y_plot.mlab_source.trait_set(scalars=prob_3d)
+                    slice_z_plot.mlab_source.trait_set(scalars=prob_3d)
 
                 yield
 
