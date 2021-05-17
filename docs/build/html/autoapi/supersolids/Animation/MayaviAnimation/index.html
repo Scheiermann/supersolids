@@ -228,11 +228,14 @@ to save disk space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dir_path</strong> – Path where to look for old directories (movie data)</p></li>
-<li><p><strong>input_data_file_pattern</strong> – Regex pattern to find all input data</p></li>
-<li><p><strong>delete_input</strong> – Condition if the input pictures should be deleted,
+<li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – Path where to look for old directories (movie data)</p></li>
+<li><p><strong>input_data_file_pattern</strong> (<em>str</em>) – Regex pattern to find all input data</p></li>
+<li><p><strong>delete_input</strong> (<em>bool</em>) – Condition if the input pictures should be deleted,
 after creation the creation of the animation as e.g. mp4</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pathlib.Path</p>
 </dd>
 </dl>
 </dd></dl>
@@ -240,12 +243,33 @@ after creation the creation of the animation as e.g. mp4</p></li>
 <dl class="py method">
 <dt id="supersolids.Animation.MayaviAnimation.MayaviAnimation.prepare">
 <code class="sig-name descname"><span class="pre">prepare</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MayaviAnimation.html#MayaviAnimation.prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.MayaviAnimation.prepare" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>System</strong> (<a class="reference internal" href="../../Schroedinger/index.html#supersolids.Schroedinger.Schroedinger" title="supersolids.Schroedinger.Schroedinger"><em>supersolids.Schroedinger.Schroedinger</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="supersolids.Animation.MayaviAnimation.MayaviAnimation.animate_npz">
-<code class="sig-name descname"><span class="pre">animate_npz</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">self</span></em>, <em class="sig-param"><span class="pre">dir_path</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">dir_name</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">filename_schroedinger=f'schroedinger.pkl'</span></em>, <em class="sig-param"><span class="pre">filename_steps=f'step_'</span></em>, <em class="sig-param"><span class="pre">steps_format</span> <span class="pre">=</span> <span class="pre">'%06d'</span></em>, <em class="sig-param"><span class="pre">steps_per_npz</span> <span class="pre">=</span> <span class="pre">10</span></em>, <em class="sig-param"><span class="pre">frame_start</span> <span class="pre">=</span> <span class="pre">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MayaviAnimation.html#MayaviAnimation.animate_npz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.MayaviAnimation.animate_npz" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname"><span class="pre">animate_npz</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">self</span></em>, <em class="sig-param"><span class="pre">dir_path</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">dir_name</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">filename_schroedinger</span> <span class="pre">=</span> <span class="pre">f'schroedinger.pkl'</span></em>, <em class="sig-param"><span class="pre">filename_steps</span> <span class="pre">=</span> <span class="pre">f'step_'</span></em>, <em class="sig-param"><span class="pre">steps_format</span> <span class="pre">=</span> <span class="pre">'%06d'</span></em>, <em class="sig-param"><span class="pre">steps_per_npz</span> <span class="pre">=</span> <span class="pre">10</span></em>, <em class="sig-param"><span class="pre">frame_start</span> <span class="pre">=</span> <span class="pre">0</span></em>, <em class="sig-param"><span class="pre">arg_slices</span> <span class="pre">=</span> <span class="pre">False</span></em>, <em class="sig-param"><span class="pre">azimuth</span> <span class="pre">=</span> <span class="pre">0.0</span></em>, <em class="sig-param"><span class="pre">elevation</span> <span class="pre">=</span> <span class="pre">0.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MayaviAnimation.html#MayaviAnimation.animate_npz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.MayaviAnimation.animate_npz" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – </p></li>
+<li><p><strong>dir_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>filename_schroedinger</strong> (<em>str</em>) – </p></li>
+<li><p><strong>filename_steps</strong> (<em>str</em>) – </p></li>
+<li><p><strong>steps_format</strong> (<em>str</em>) – </p></li>
+<li><p><strong>steps_per_npz</strong> (<em>int</em>) – </p></li>
+<li><p><strong>frame_start</strong> (<em>int</em>) – </p></li>
+<li><p><strong>arg_slices</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>azimuth</strong> (<em>float</em>) – </p></li>
+<li><p><strong>elevation</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="supersolids.Animation.MayaviAnimation.MayaviAnimation.animate">
@@ -256,15 +280,15 @@ the convergence according to accuracy.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>System</strong> – Schrödinger equations for the specified system</p></li>
-<li><p><strong>accuracy</strong> – Convergence is reached when relative error of mu is smaller
+<li><p><strong>System</strong> (<a class="reference internal" href="../../Schroedinger/index.html#supersolids.Schroedinger.Schroedinger" title="supersolids.Schroedinger.Schroedinger"><em>supersolids.Schroedinger.Schroedinger</em></a>) – Schrödinger equations for the specified system</p></li>
+<li><p><strong>accuracy</strong> (<em>float</em>) – Convergence is reached when relative error of mu is smaller
 than accuracy, where <span class="math notranslate nohighlight">\(\mu = - \log(\psi_{normed}) / (2 dt)\)</span></p></li>
 <li><p><strong>slice_indices</strong> – Numpy array with indices of grid points
 in the directions x, y, z (in terms of System.x, System.y, System.z)
 to produce a slice/plane in mayavi,
 where <span class="math notranslate nohighlight">\(\psi_{prob}\)</span> = <span class="math notranslate nohighlight">\(|\psi|^2\)</span> is used for the slice
 Max values is for e.g. System.Res.x - 1.</p></li>
-<li><p><strong>interactive</strong> – Condition for interactive mode. When camera functions are used,
+<li><p><strong>interactive</strong> (<em>bool</em>) – Condition for interactive mode. When camera functions are used,
 then interaction is not possible. So interactive=True turn the usage
 of camera functions off.</p></li>
 </ul>

@@ -182,13 +182,17 @@ Gets the highest number and returns a path with dir_name counted one up
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dir_path</strong> – Path where to look for old directories (movie data)</p></li>
-<li><p><strong>dir_name</strong> – General name of the directories without the counter</p></li>
-<li><p><strong>counting_format</strong> – Format of counter of the directories</p></li>
+<li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – Path where to look for old directories (movie data)</p></li>
+<li><p><strong>dir_name</strong> (<em>str</em>) – General name of the directories without the counter</p></li>
+<li><p><strong>counting_format</strong> (<em>str</em>) – Format of counter of the directories</p></li>
+<li><p><strong>file_pattern</strong> (<em>str</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Path for the new directory (not colliding with old data)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple[pathlib.Path, int, str, str]</p>
 </dd>
 </dl>
 </dd></dl>
