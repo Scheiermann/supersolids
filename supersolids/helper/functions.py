@@ -112,7 +112,7 @@ def aResAssert(Res, a):
         f"which currently is {len(Res)}.")
 
 
-def V_3d(s):
+def lambda_parsed(s):
     return eval(s, globals())
 
 
