@@ -52,9 +52,10 @@ if __name__ == "__main__":
     parser.add_argument("-V", type=functions.lambda_parsed,
                         help="Potential as lambda function. For example: "
                              "-V='lambda x,y,z: 0 * x * y * z'")
-    parser.add_argument("-noise", metavar="noise", type=json.loads,
-                        default=None, action='store', nargs=2,
-                        help="Min and max of gauss noise added to psi.")
+    parser.add_argument("-noise", metavar="noise", type=json.loads, default=None, action='store',
+                        nargs=2, help="Min and max of gauss noise to apply on psi.")
+    parser.add_argument("-noise_func", metavar="noise_func", type=functions.lambda_parsed,
+                        default=None, help="Function to apply on the range given by noise flag.")
     parser.add_argument("-dir_path", metavar="dir_path", type=str,
                         default="~/supersolids/results", help="Absolute path to save data to")
     parser.add_argument("-dir_name_load", metavar="dir_name_load", type=str,
@@ -64,16 +65,14 @@ if __name__ == "__main__":
     parser.add_argument("-dir_name_result", metavar="dir_name_result", type=str, default="",
                         help="Name of directory where to save the results at. "
                              "For example the standard naming convention is movie002")
-    parser.add_argument("-filename_schroedinger",
-                        metavar="filename_schroedinger", type=str,
+    parser.add_argument("-filename_schroedinger", metavar="filename_schroedinger", type=str,
                         default="schroedinger.pkl",
                         help="Name of file, where the Schroedinger object is saved")
     parser.add_argument("-filename_npz", metavar="filename_npz",
                         type=str, default="step_" + "%06d" % 0 + ".npz",
                         help="Name of file, where psi_val is saved. "
                              "For example the standard naming convention is step_000001.npz")
-    parser.add_argument("-steps_per_npz", metavar="steps_per_npz",
-                        type=int, default=10,
+    parser.add_argument("-steps_per_npz", metavar="steps_per_npz", type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
     parser.add_argument("--offscreen", default=False, action="store_true",
                         help="If not used, interactive animation is shown and saved as mp4."
@@ -82,6 +81,8 @@ if __name__ == "__main__":
                         help="If not used, V will be the lambda function provided by the V flag."
                              "If used, the V is loaded from the provided Schroedinger, "
                              "plus the lambda function provided by the V flag.")
+    parser.add_argument("--real_time", default=False, action="store_true",
+                        help="Switch for Split-Operator method to use imaginary time or not.")
 
     args = parser.parse_args()
     print(f"args: {args}")
@@ -234,7 +235,7 @@ if __name__ == "__main__":
                                                 w_z=w_z,
                                                 a_s=System_loaded.a_s,
                                                 e_dd=System_loaded.e_dd,
-                                                imag_time=System_loaded.imag_time,
+                                                imag_time=(not args.real_time),
                                                 mu=System_loaded.mu,
                                                 E=System_loaded.E,
                                                 V=V_new,
@@ -253,7 +254,11 @@ if __name__ == "__main__":
                     max=args.noise[1],
                     shape=(Res.x, Res.y, Res.z)
                     )
-                System.psi_val = psi_0_noise_3d * System_loaded.psi_val
+                if args.noise_func:
+                    lol =args.noise_func(psi_0_noise_3d)
+                    System.psi_val = args.noise_func(psi_0_noise_3d) * System_loaded.psi_val
+                else:
+                    System.psi_val = psi_0_noise_3d * System_loaded.psi_val
 
             # remove the n-th slices, if Res is shrunk down
             if System.Res.x < System_loaded.Res.x:
