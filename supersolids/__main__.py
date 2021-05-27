@@ -26,7 +26,8 @@ from supersolids.tools.simulate_case import simulate_case
 from supersolids.tools.cut_1d import prepare_cuts
 from supersolids.helper import constants
 from supersolids.helper import functions
-
+from supersolids.helper.Resolution import Resolution, ResAssert
+from supersolids.helper.Box import Box, BoxResAssert
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
@@ -89,11 +90,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(f"args: {args}")
 
-    functions.BoxResAssert(args.Res, args.Box)
-    functions.aResAssert(args.Res, args.a)
-    Res = functions.Resolution(**args.Res)
+    BoxResAssert(args.Res, args.Box)
+    ResAssert(args.Res, args.a)
+    Res = Resolution(**args.Res)
 
-    Box = functions.Box(**args.Box)
+    Box = Box(**args.Box)
 
     try:
         dir_path = Path(args.dir_path).expanduser()

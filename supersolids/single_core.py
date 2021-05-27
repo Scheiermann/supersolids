@@ -22,6 +22,8 @@ from supersolids.Schroedinger import Schroedinger
 from supersolids.tools.simulate_case import simulate_case
 from supersolids.tools.cut_1d import prepare_cuts
 from supersolids.helper import constants, functions
+from supersolids.helper.Resolution import Resolution
+from supersolids.helper.Box import Box
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
@@ -31,11 +33,9 @@ if __name__ == "__main__":
 
     # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
-    Res = functions.Resolution(x=2 ** 8, y=2 ** 7, z=2 ** 5)
+    Res: Resolution = Resolution(x=2 ** 8, y=2 ** 7, z=2 ** 5)
 
-    Box = functions.Box(x0=-10, x1=10,
-                        y0=-5, y1=5,
-                        z0=-4, z1=4)
+    Box: Box = Box(x0=-10, x1=10, y0=-5, y1=5, z0=-4, z1=4)
 
     dt: float = 2 * 10 ** -3
     # dt_func = functools.partial(functions.dt_adaptive)

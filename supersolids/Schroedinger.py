@@ -19,7 +19,8 @@ import dill
 import numpy as np
 
 from supersolids.helper import constants, functions, get_path
-
+from supersolids.helper.Resolution import Resolution
+from supersolids.helper.Box import Box
 
 class Schroedinger:
     """
@@ -42,8 +43,8 @@ class Schroedinger:
 
     def __init__(self,
                  N: int,
-                 Box: functions.Box,
-                 Res: functions.Resolution,
+                 Box: Box,
+                 Res: Resolution,
                  max_timesteps: int,
                  dt: float,
                  dt_func: Optional[Callable] = None,
@@ -73,7 +74,7 @@ class Schroedinger:
             For 3D x0, x1, y0, y1, z0, z1.
             Dimension of simulation is constructed from this dictionary.
 
-        :param Res: functoins.Res
+        :param Res: Res
             Number of grid points in x, y, z direction.
             Needs to have half size of box dictionary.
             Keywords x, y, z are used.
@@ -81,21 +82,21 @@ class Schroedinger:
         :param max_timesteps: Maximum timesteps  with length dt for the animation.
 
         """
-        assert isinstance(Res, functions.Resolution), (
-            f"box: {type(Res)} is not type {type(functions.Resolution)}")
+        assert isinstance(Res, Resolution), (
+            f"box: {type(Res)} is not type {type(Resolution)}")
 
         self.N: int = N
         self.w_x: float = w_x
         self.w_y: float = w_y
         self.w_z: float = w_z
         self.a_s: float = a_s
-        self.Res: functions.Resolution = Res
+        self.Res: Resolution = Res
         self.max_timesteps: int = max_timesteps
 
         assert isinstance(Box, functions.Box), (
             f"box: {type(Box)} is not type {type(functions.Box)}")
 
-        self.Box: functions.Box = Box
+        self.Box: Box = Box
         self.dt: float = dt
         self.dt_func: Optional[Callable] = dt_func
         self.g: float = g
@@ -527,8 +528,7 @@ class Schroedinger:
 
     def simulate_raw(self,
                      accuracy: float = 10 ** -6,
-                     dir_path: Path = Path.home().joinpath("supersolids",
-                                                           "results"),
+                     dir_path: Path = Path.home().joinpath("supersolids", "results"),
                      dir_name_result: str = "",
                      filename_schroedinger=f"schroedinger.pkl",
                      filename_steps=f"step_",
@@ -547,10 +547,8 @@ class Schroedinger:
         mu_rel = self.mu
 
         if dir_name_result == "":
-            _, last_index, dir_name, counting_format = get_path.get_path(
-                dir_path)
-            input_path = Path(dir_path,
-                              dir_name + counting_format % (last_index + 1))
+            _, last_index, dir_name, counting_format = get_path.get_path(dir_path)
+            input_path = Path(dir_path, dir_name + counting_format % (last_index + 1))
         else:
             input_path = Path(dir_path, dir_name_result)
 
@@ -569,10 +567,8 @@ class Schroedinger:
 
             # save psi_val after steps_per_pickle steps of dt (to save disk space)
             if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
-                with open(Path(input_path,
-                               filename_steps + steps_format % frame + ".npz"),
-                          "wb"
-                          ) as g:
+                with open(Path(input_path, filename_steps + steps_format % frame + ".npz"),
+                          "wb") as g:
                     np.savez_compressed(g, psi_val=self.psi_val)
 
             print(f"t={self.t:07.05f}, mu_rel={mu_rel:+05.05e}, "

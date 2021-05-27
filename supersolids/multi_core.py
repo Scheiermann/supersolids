@@ -23,6 +23,8 @@ import numpy as np
 from supersolids.helper import constants
 from supersolids.helper import functions
 from supersolids.helper import simulate_case
+from supersolids.helper.Resolution import Resolution
+from supersolids.helper.Box import Box
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
@@ -33,9 +35,9 @@ if __name__ == "__main__":
 
     # due to fft of the points the res
     # needs to be 2 ** resolution_exponent
-    Res = functions.Resolution(x=2 ** 6, y=2 ** 6, z=None)
+    Res = Resolution(x=2 ** 6, y=2 ** 6, z=None)
 
-    Box = functions.Box(x0=-15, x1=15,
+    Box = Box(x0=-15, x1=15,
                         y0=-15, y1=15,
                         z0=None, z1=None)
 

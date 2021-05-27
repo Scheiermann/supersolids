@@ -24,7 +24,8 @@ from supersolids.Animation.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.helper import functions
 from supersolids.tools.simulate_case import simulate_case
-
+from supersolids.helper.Resolution import Resolution
+from supersolids.helper.Box import Box
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
@@ -123,14 +124,14 @@ if __name__ == "__main__":
             System_loaded.max_timesteps = args.max_timesteps
 
             if args.Box is None:
-                Box: functions.Box = System_loaded.Box
+                Box: Box = System_loaded.Box
             else:
-                Box = functions.Box(**args.Box)
+                Box = Box(**args.Box)
 
             if args.Res is None:
-                Res: functions.Resolution = System_loaded.Res
+                Res: Resolution = System_loaded.Res
             else:
-                Res = functions.Resolution(**args.Res)
+                Res = Resolution(**args.Res)
 
             # check if changes of Box or Res, can be done
             x_step_old = (System_loaded.Box.lengths()[0] / System_loaded.Res.x)
