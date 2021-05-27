@@ -20,6 +20,7 @@ import dill
 import numpy as np
 from matplotlib import pyplot as plt
 
+from supersolids import Schroedinger
 from supersolids.helper import get_path
 
 
@@ -41,6 +42,36 @@ def get_last_index(input_path, filename_steps):
     return last_index
 
 
+def get_property(System: Schroedinger,
+                 property_name: str = "get_center_of_mass",
+                 ):
+    try:
+        property = getattr(System, property_name)
+    except AttributeError:
+        sys.exit(
+            f"The loaded Schroedinger object has no property named {property_name}.")
+
+    return property
+
+
+def property_check(property,
+                   property_name: str = "get_center_of_mass",
+                   property_func: bool = False,
+                   property_args=[],
+                   ):
+    if property_func:
+        try:
+            return property(*property_args)
+        except AttributeError:
+            sys.exit(
+                f"The loaded Schroedinger object has no method named {property_name}.")
+    elif callable(property):
+        sys.exit(
+            f"{property_name} is a function, but flag property_func is not set.")
+    else:
+        return property
+
+
 def track_property(input_path,
                    filename_schroedinger=f"schroedinger.pkl",
                    filename_steps=f"step_",
@@ -51,7 +82,6 @@ def track_property(input_path,
                    property_func: bool = False,
                    property_args=[],
                    ):
-
     last_index = get_last_index(input_path, filename_steps)
     print("Load schroedinger")
     with open(Path(input_path, filename_schroedinger), "rb") as f:
@@ -81,20 +111,7 @@ def track_property(input_path,
 
         frame = frame + steps_per_npz
 
-        try:
-            property = getattr(System, property_name)
-        except AttributeError:
-            sys.exit(f"The loaded Schroedinger object has no property named {property_name}.")
-
-        if property_func:
-            try:
-                yield property(*property_args)
-            except AttributeError:
-                sys.exit(f"The loaded Schroedinger object has no method named {property_name}.")
-        elif callable(property):
-            sys.exit(f"{property_name} is a function, but flag property_func is not set.")
-        else:
-            yield property
+        yield property_check(get_property(System, property_name), property_name, property_func, property_args)
 
         if frame == last_index + steps_per_npz:
             break
@@ -120,9 +137,11 @@ def property_to_array(property_tuple):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Load old simulations of Schrödinger system and get property.")
-    parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
+    parser.add_argument("-dir_path", metavar="dir_path", type=str,
+                        default="~/supersolids/results",
                         help="Absolute path to load data from")
-    parser.add_argument("-dir_name", metavar="dir_name", type=str, default="movie" + "%03d" % 1,
+    parser.add_argument("-dir_name", metavar="dir_name", type=str,
+                        default="movie" + "%03d" % 1,
                         help="Name of directory where the files to load lie. "
                              "For example the standard naming convention is movie001")
     parser.add_argument("-filename_schroedinger",
@@ -139,7 +158,8 @@ if __name__ == "__main__":
                         help="Formating string to enumerate the files. "
                              "For example the standard naming convention is step_000001.npz, "
                              "the string needed is percent 06d")
-    parser.add_argument("-steps_per_npz", metavar="steps_per_npz", type=int, default=10,
+    parser.add_argument("-steps_per_npz", metavar="steps_per_npz", type=int,
+                        default=10,
                         help="Number of dt steps skipped between saved npz.")
     parser.add_argument("-frame_start", metavar="frame_start",
                         type=int, default=0,
@@ -151,7 +171,8 @@ if __name__ == "__main__":
                              "an Schroedinger object."
                              "If used, flag property_name will be a interpreted as method of an "
                              "Schroedinger object.")
-    parser.add_argument("--property_args", default=[], type=json.loads, action='store', nargs="*",
+    parser.add_argument("--property_args", default=[], type=json.loads,
+                        action='store', nargs="*",
                         help="Arguments for property_name, if property_func is used.")
 
     args = parser.parse_args()
