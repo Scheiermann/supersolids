@@ -24,13 +24,15 @@ def get_path(dir_path: Path,
     # in mayavi movie_maker _update_subdir
     if file_pattern:
         existing = sorted([x for x in dir_path.glob(dir_name + "*") if x.is_file()])
-        last_str_part = existing[-1].name.split(file_pattern)[0]
         try:
-            last_index: int = int(last_str_part.split(dir_name)[1])
+            last_str_part = existing[-1].name.split(file_pattern)[0]
+            try:
+                last_index: int = int(last_str_part.split(dir_name)[1])
+            except IndexError as e:
+                print(f"Old file not found. Setting last_index={last_index}.")
         except IndexError as e:
             last_index = 0
-            print(f"Old file not found. Setting last_index={last_index}.")
-
+            print(f"No file found in directory {dir_name}* at path {dir_path}.")
     else:
         existing = sorted([x for x in dir_path.glob(dir_name + "*") if x.is_dir()])
 
