@@ -124,9 +124,9 @@ if __name__ == "__main__":
             System_loaded.max_timesteps = args.max_timesteps
 
             if args.Box is None:
-                Box: Box = System_loaded.Box
+                MyBox: Box = System_loaded.Box
             else:
-                Box = Box(**args.Box)
+                MyBox = Box(**args.Box)
 
             if args.Res is None:
                 Res: Resolution = System_loaded.Res
@@ -137,15 +137,15 @@ if __name__ == "__main__":
             x_step_old = (System_loaded.Box.lengths()[0] / System_loaded.Res.x)
             y_step_old = (System_loaded.Box.lengths()[1] / System_loaded.Res.y)
             z_step_old = (System_loaded.Box.lengths()[2] / System_loaded.Res.z)
-            x_step_new = (Box.lengths()[0] / Res.x)
-            y_step_new = (Box.lengths()[1] / Res.y)
-            z_step_new = (Box.lengths()[2] / Res.z)
-            box_offset_x = np.abs(System_loaded.Box.x0 - Box.x0)
-            box_offset_y = np.abs(System_loaded.Box.y0 - Box.y0)
-            box_offset_z = np.abs(System_loaded.Box.z0 - Box.z0)
-            box_offset_x_end = np.abs(System_loaded.Box.x1 - Box.x0)
-            box_offset_y_end = np.abs(System_loaded.Box.y1 - Box.y0)
-            box_offset_z_end = np.abs(System_loaded.Box.z1 - Box.z0)
+            x_step_new = (MyBox.lengths()[0] / Res.x)
+            y_step_new = (MyBox.lengths()[1] / Res.y)
+            z_step_new = (MyBox.lengths()[2] / Res.z)
+            box_offset_x = np.abs(System_loaded.Box.x0 - MyBox.x0)
+            box_offset_y = np.abs(System_loaded.Box.y0 - MyBox.y0)
+            box_offset_z = np.abs(System_loaded.Box.z0 - MyBox.z0)
+            box_offset_x_end = np.abs(System_loaded.Box.x1 - MyBox.x0)
+            box_offset_y_end = np.abs(System_loaded.Box.y1 - MyBox.y0)
+            box_offset_z_end = np.abs(System_loaded.Box.z1 - MyBox.z0)
             box_offset_steps_x: int = int(box_offset_x / x_step_old)
             box_offset_steps_y: int = int(box_offset_y / y_step_old)
             box_offset_steps_z: int = int(box_offset_z / z_step_old)
@@ -225,7 +225,7 @@ if __name__ == "__main__":
                     V_new = (lambda x, y, z: args.V(x, y, z))
 
             System: Schroedinger = Schroedinger(System_loaded.N,
-                                                Box,
+                                                MyBox,
                                                 Res,
                                                 max_timesteps=args.max_timesteps,
                                                 dt=args.dt,

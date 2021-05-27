@@ -37,9 +37,7 @@ if __name__ == "__main__":
     # needs to be 2 ** resolution_exponent
     Res = Resolution(x=2 ** 6, y=2 ** 6, z=None)
 
-    Box = Box(x0=-15, x1=15,
-                        y0=-15, y1=15,
-                        z0=None, z1=None)
+    MyBox = Box(x0=-15, x1=15, y0=-15, y1=15, z0=None, z1=None)
 
     dt: float = 2 * 10 ** -2 # 0.001
     N: int = 3.8 * 10 ** 4 # 38000
@@ -107,7 +105,7 @@ if __name__ == "__main__":
             print(f"i={i}, L={L}, g={g}, dt={dt}")
             file_name = f"split_{i:03}.mp4"
             executor.submit(simulate_case,
-                            Box,
+                            MyBox,
                             Res,
                             max_timesteps=2001,
                             dt=dt,

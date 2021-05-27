@@ -35,7 +35,7 @@ if __name__ == "__main__":
     # needs to be 2 ** resolution_exponent
     Res: Resolution = Resolution(x=2 ** 8, y=2 ** 7, z=2 ** 5)
 
-    Box: Box = Box(x0=-10, x1=10, y0=-5, y1=5, z0=-4, z1=4)
+    MyBox: Box = Box(x0=-10, x1=10, y0=-5, y1=5, z0=-4, z1=4)
 
     dt: float = 2 * 10 ** -3
     # dt_func = functools.partial(functions.dt_adaptive)
@@ -64,7 +64,7 @@ if __name__ == "__main__":
                              alpha_z=alpha_z)
 
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
-                                 r_cut=1.0 * Box.min_length() / 2.0)
+                                 r_cut=1.0 * MyBox.min_length() / 2.0)
 
     # functools.partial sets all arguments except x, y, z,
     # psi_0_1d = functools.partial(
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     psi_sol_2d = functions.thomas_fermi_2d_pos
 
     # psi_sol_3d = functions.thomas_fermi_3d
-    if Box.dim == 3:
+    if MyBox.dim == 3:
         psi_sol_3d: Optional[Callable] = prepare_cuts(functions.density_in_trap,
                                                       N, alpha_z, e_dd,
                                                       a_s_l_ho_ratio)
@@ -100,7 +100,7 @@ if __name__ == "__main__":
         psi_sol_3d = None
 
     System: Schroedinger = Schroedinger(N,
-                                        Box,
+                                        MyBox,
                                         Res,
                                         max_timesteps=8001,
                                         dt=dt,
@@ -143,7 +143,7 @@ if __name__ == "__main__":
                                 filename="anim.mp4",
                                 )
 
-    if Box.dim == 3:
+    if MyBox.dim == 3:
         slice_indices = [int(Res.x / 2), int(Res.y / 2), int(Res.z / 2)]
     else:
         slice_indices = [None, None, None]

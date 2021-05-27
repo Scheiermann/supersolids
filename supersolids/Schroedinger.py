@@ -43,7 +43,7 @@ class Schroedinger:
 
     def __init__(self,
                  N: int,
-                 Box: Box,
+                 MyBox: Box,
                  Res: Resolution,
                  max_timesteps: int,
                  dt: float,
@@ -68,7 +68,7 @@ class Schroedinger:
         """
         Schrödinger equations for the specified system.
 
-        :param Box: Keyword x0 is minimum in x direction and
+        :param MyBox: Keyword x0 is minimum in x direction and
             x1 is maximum. Same for y and z. For 1D just use x0, x1.
             For 2D x0, x1, y0, y1.
             For 3D x0, x1, y0, y1, z0, z1.
@@ -93,10 +93,10 @@ class Schroedinger:
         self.Res: Resolution = Res
         self.max_timesteps: int = max_timesteps
 
-        assert isinstance(Box, functions.Box), (
-            f"box: {type(Box)} is not type {type(functions.Box)}")
+        assert isinstance(MyBox, Box), (
+            f"box: {type(MyBox)} is not type {type(Box)}")
 
-        self.Box: Box = Box
+        self.Box: Box = MyBox
         self.dt: float = dt
         self.dt_func: Optional[Callable] = dt_func
         self.g: float = g
@@ -182,7 +182,7 @@ class Schroedinger:
 
         if self.dim >= 3:
             try:
-                box_z_len = Box.z1 - Box.z0
+                box_z_len = MyBox.z1 - MyBox.z0
                 self.z: np.ndarray = np.linspace(self.Box.z0,
                                                  self.Box.z1,
                                                  self.Res.z)

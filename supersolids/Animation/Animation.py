@@ -11,12 +11,12 @@ Base class for Animations
 """
 from typing import Optional, Callable
 
-from supersolids.helper import functions
+from supersolids.helper.Resolution import Resolution
 
 
 class Animation:
     def __init__(self,
-                 Res: functions.Resolution = functions.Resolution(x=2 ** 8, y=2 ** 7, z=2 ** 5),
+                 Res: Resolution = Resolution(x=2 ** 8, y=2 ** 7, z=2 ** 5),
                  plot_psi_sol: bool = True,
                  plot_V: bool = False,
                  alpha_psi: float = 0.8,

@@ -94,7 +94,7 @@ if __name__ == "__main__":
     ResAssert(args.Res, args.a)
     Res = Resolution(**args.Res)
 
-    Box = Box(**args.Box)
+    MyBox = Box(**args.Box)
 
     try:
         dir_path = Path(args.dir_path).expanduser()
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     V_3d = functools.partial(functions.v_harmonic_3d, alpha_y=alpha_y, alpha_z=alpha_z)
 
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
-                                 r_cut=1.0 * Box.min_length() / 2.0)
+                                 r_cut=1.0 * MyBox.min_length() / 2.0)
 
     # functools.partial sets all arguments except x, y, z,
     # psi_0_1d = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     psi_sol_2d = functions.thomas_fermi_2d_pos
 
     # psi_sol_3d = functions.thomas_fermi_3d
-    if Box.dim == 3:
+    if MyBox.dim == 3:
         psi_sol_3d: Optional[Callable] = prepare_cuts(functions.density_in_trap,
                                                       args.N, alpha_z, e_dd,
                                                       a_s_l_ho_ratio)
@@ -156,22 +156,22 @@ if __name__ == "__main__":
         psi_sol_3d = None
 
     if Res.dim == 1:
-        x_lim = (Box.x0, Box.x1)
+        x_lim = (MyBox.x0, MyBox.x1)
         y_lim = (-1, 1) # arbitrary as not used
         V_trap = V_1d
         psi_0 = psi_0_1d
         psi_sol = psi_sol_1d
         V_interaction = None
     elif Res.dim == 2:
-        x_lim = (Box.x0, Box.x1)
-        y_lim = (Box.y0, Box.y1)
+        x_lim = (MyBox.x0, MyBox.x1)
+        y_lim = (MyBox.y0, MyBox.y1)
         V_trap = V_2d
         psi_0 = psi_0_2d
         psi_sol = psi_sol_2d
         V_interaction = None
     elif Res.dim == 3:
-        x_lim = (Box.x0, Box.x1) # arbitrary as not used (mayavi vs matplotlib)
-        y_lim = (Box.y0, Box.y1) # arbitrary as not used (mayavi vs matplotlib)
+        x_lim = (MyBox.x0, MyBox.x1) # arbitrary as not used (mayavi vs matplotlib)
+        y_lim = (MyBox.y0, MyBox.y1) # arbitrary as not used (mayavi vs matplotlib)
         V_trap = V_3d
         psi_0 = psi_0_3d
         psi_sol = psi_sol_3d
@@ -188,7 +188,7 @@ if __name__ == "__main__":
             V = V_trap
 
     System: Schroedinger = Schroedinger(args.N,
-                                        Box,
+                                        MyBox,
                                         Res,
                                         max_timesteps=args.max_timesteps,
                                         dt=args.dt,
@@ -231,7 +231,7 @@ if __name__ == "__main__":
                                 filename="anim.mp4",
                                 )
 
-    if Box.dim == 3:
+    if MyBox.dim == 3:
         slice_indices = [int(Res.x / 2), int(Res.y / 2), int(Res.z / 2)]
     else:
         slice_indices = [None, None, None]
