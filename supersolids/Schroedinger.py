@@ -431,13 +431,10 @@ class Schroedinger:
                           axis=1)
 
     def get_parity(self):
-        under0_x = int(self.Res.x / 2)
-        under0_y = int(self.Res.y / 2)
-        under0_z = int(self.Res.z / 2)
-        psi_under0 = self.psi_val[0:under0_x, 0:under0_y, 0:under0_z]
-        psi_over0 = self.psi_val[under0_x:, under0_y:, under0_z:]
+        psi_under0, psi_over0 = np.split(self.psi_val, 2)
+        psi_over0_reversed = psi_over0[::-1]
 
-        parity = self.trapez_integral(np.abs(psi_over0 - psi_under0) ** 2.0)
+        parity = self.trapez_integral(np.abs(psi_under0 - psi_over0_reversed) ** 2.0)
 
         return parity
 
