@@ -126,7 +126,7 @@ if __name__ == "__main__":
             if args.Box is None:
                 MyBox: Box = System_loaded.Box
             else:
-                MyBox = Box(**args.Box)
+                MyBox: Box = Box(**args.Box)
 
             if args.Res is None:
                 Res: Resolution = System_loaded.Res
@@ -256,7 +256,6 @@ if __name__ == "__main__":
                     shape=(Res.x, Res.y, Res.z)
                     )
                 if args.noise_func:
-                    lol =args.noise_func(psi_0_noise_3d)
                     System.psi_val = args.noise_func(psi_0_noise_3d) * System_loaded.psi_val
                 else:
                     System.psi_val = psi_0_noise_3d * System_loaded.psi_val
