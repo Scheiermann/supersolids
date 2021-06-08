@@ -17,6 +17,7 @@ from pathlib import Path
 
 import dill
 import numpy as np
+import scipy.signal
 
 from supersolids.helper import constants, functions, get_path
 from supersolids.helper.Resolution import Resolution
@@ -33,7 +34,7 @@ class Schroedinger:
                               + \\frac{1}{2} (x^2 + (y \\alpha_y)^2 + (z \\alpha_z)^2) \\\\
                              &+ g |\psi|^2  + g_{qf} |\psi|^3 + U_{dd}] \psi \\\\
 
-    With :math:`U_{dd} =  \\mathcal{F}^{-1}(\\mathcal{F}(H_{pot} \psi) \epsilon_{dd} g ((3 k_z / k^2) - 1))`
+    With :math:`U_{dd} = \\mathcal{F}^{-1}(\\mathcal{F}(H_{pot} \psi) \epsilon_{dd} g ((3 k_z / k^2) - 1))`
 
     The split operator method with the Trotter-Suzuki approximation
     for the commutator relation (:math:`H = H_{pot} + H_{kin}`) is used.
@@ -82,8 +83,7 @@ class Schroedinger:
         :param max_timesteps: Maximum timesteps  with length dt for the animation.
 
         """
-        assert isinstance(Res, Resolution), (
-            f"box: {type(Res)} is not type {type(Resolution)}")
+        assert isinstance(Res, Resolution), (f"box: {type(Res)} is not type {type(Resolution)}")
 
         self.N: int = N
         self.w_x: float = w_x
@@ -422,6 +422,27 @@ class Schroedinger:
             sys.exit("Spatial dimension over 3. This is not implemented.")
 
         return r
+
+    def get_peaks_along_x(self, height=0.05, amount=4):
+        prob = np.abs(self.psi_val) ** 2.0
+        peaks, properties = scipy.signal.find_peaks(prob[:, 63, 15], height=height)
+        peak_amount_indices = np.argsort(properties['peak_heights'])[-amount:]
+        peaks_amount = peaks[peak_amount_indices]
+
+        return peaks_amount
+
+    def get_peak_positions(self, height=0.05, amount=4):
+        peaks = self.get_peaks_along_x(height=height, amount=amount)
+        s = self.Box.lengths()[0] * (peaks / self.Res.x) + self.Box.x0
+
+        return s
+
+    def get_peak_distances(self, height=0.05, amount=3):
+        peaks = self.get_peaks_along_x(height=height, amount=amount)
+        s_indices = np.diff(peaks)
+        s = self.Box.lengths()[0] * (s_indices / self.Res.x)
+
+        return s
 
     def get_center_of_mass(self):
         """
