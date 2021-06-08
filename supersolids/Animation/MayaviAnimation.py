@@ -311,6 +311,11 @@ class MayaviAnimation(Animation.Animation):
                                        )
                     mlab.view(azimuth=azimuth, elevation=elevation)
 
+                    if arg_slices:
+                        cbar = mlab.colorbar(object=slice_x_plot, orientation='vertical', nb_labels=10)
+                        cbar.use_default_range = False
+                        cbar.data_range = np.array([0.0, 2.0 * np.pi])
+
                 title.set(text=text)
 
                 # Update plot functions
@@ -318,7 +323,7 @@ class MayaviAnimation(Animation.Animation):
                 prob_plot.mlab_source.trait_set(scalars=prob_3d)
 
                 if arg_slices:
-                    psi_arg = np.angle(psi_val_pkl)
+                    psi_arg = np.angle(psi_val_pkl) + np.pi
                     slice_x_plot.mlab_source.trait_set(scalars=psi_arg)
                     slice_y_plot.mlab_source.trait_set(scalars=psi_arg)
                     slice_z_plot.mlab_source.trait_set(scalars=psi_arg)
