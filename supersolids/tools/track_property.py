@@ -111,7 +111,10 @@ def track_property(input_path,
 
         frame = frame + steps_per_npz
 
-        yield property_check(get_property(System, property_name), property_name, property_func, property_args)
+        yield property_check(get_property(System, property_name),
+                             property_name,
+                             property_func,
+                             property_args)
 
         if frame == last_index + steps_per_npz:
             break
@@ -128,7 +131,11 @@ def property_to_array(property_tuple):
 
     # load all other values
     for i, property in enumerate(property_tuple):
-        property_all = np.vstack((property_all, property))
+        try:
+            property_all = np.vstack((property_all, property))
+        except ValueError:
+            sys.exit(f"Failed at {i}: {property}. Not enough values. "
+                     "Adjust provided arguments of property.")
 
     return property_all
 
@@ -205,12 +212,13 @@ if __name__ == "__main__":
     if dim == 1:
         plt.plot(property_all, "x-")
     else:
-        labels = ["x", "y", "z"]
+        labels = []
         for i in range(0, dim):
+            labels.append(str(i + 1))
             plt.plot(property_all.T[i], "x-", label=labels[i])
         plt.legend()
 
-    plt.xlabel(f"Number of loaded npz ($\propto time$)")
+    plt.xlabel(rf"Number of loaded npz ($\propto time$)")
     plt.ylabel(f"{args.property_name}")
     plt.grid()
     plt.title(f"with property_args: {args.property_args}")
