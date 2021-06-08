@@ -66,6 +66,12 @@ if __name__ == "__main__":
     parser.add_argument("-frame", type=int, default=0, help="Counter of first saved npz.")
     parser.add_argument("-dir_start", type=int, default=1, help="Counter of first dir name.")
     parser.add_argument("-dir_end", type=int, default=2, help="Counter of last dir name.")
+    parser.add_argument("-v_arange", metavar=("v_start", "v_end", "v_step"),
+                        type=json.loads, default=None, action='store',
+                        nargs=3, help="v_start, v_end, v_step, to match directories properly.")
+    parser.add_argument("-d_arange", metavar=("d_start", "d_end", "d_step"),
+                        type=json.loads, default=None, action='store',
+                        nargs=3, help="d_start, d_end, d_step, to match directories properly.")
     parser.add_argument("-property_name", type=str, default="mu",
                         help="Name of property to get from the Schroedinger object.")
     parser.add_argument("--property_func", default=False, action="store_true",
@@ -100,13 +106,8 @@ if __name__ == "__main__":
                                               args.property_args)
                                )
 
-    v_start = 0.6
-    v_end = 1.5
-    v_step = 0.2
-
-    d_start = 0.5
-    d_end = 1.4
-    d_step = 0.2
+    v_start, v_end, v_step = args.v_arange
+    d_start, d_end, d_step = args.d_arange
 
     v_0_list = []
     delta_list = []
@@ -115,11 +116,11 @@ if __name__ == "__main__":
             v_0_list.append(v_0)
             delta_list.append(delta)
 
-    print(v_0_list)
-    print(delta_list)
-    print(property_values)
-    print(property_values[0].shape)
-    print(len(property_values))
+    print(f"Extracted v_0: {v_0_list}")
+    print(f"Extracted delta: {delta_list}")
+    print(f"Extracted property_values: {property_values}")
+    print(f"Extracted property_values[0].shape: {property_values[0].shape}")
+    print(f"Extracted len(property_values): {len(property_values)}")
 
     try:
         dim = property_values[0].shape[0]
@@ -127,15 +128,23 @@ if __name__ == "__main__":
         dim = 1
 
     if dim == 1:
-        plt.plot(property_values[0], "x-")
+        plt.plot(property_values, "x-")
     else:
-        labels = ["x", "y", "z"]
+        labels = []
         for i in range(0, dim):
+            labels.append(str(i + 1))
             plt.plot(property_values[0].T[i], "x-", label=labels[i])
         plt.legend()
 
-    plt.xlabel(f"Number of loaded npz ($\propto time$)")
+    v_d = zip(v_0_list, delta_list)
+    plt.xlabel(f"Amplitude of distortion (v_0)")
     plt.ylabel(f"{args.property_name}")
+    plt.xticks(np.arange(len(v_0_list)), [round(elem, 3) for elem in v_0_list], rotation=90)
+    secx = plt.Axes.secondary_xaxis(plt.gca(), "top")
+    secx.set_xticks(np.arange(len(delta_list)))
+    secx.set_xticklabels([round(elem, 3) for elem in delta_list])
+    secx.tick_params(axis="x", rotation=90)
+    secx.set_xlabel(f"Frequency of distortion (delta)")
     plt.grid()
     plt.title(f"with property_args: {args.property_args}")
     if args.property_name:
