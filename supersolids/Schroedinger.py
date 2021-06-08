@@ -526,26 +526,17 @@ class Schroedinger:
         # for self.imag_time=False, renormalization should be preserved,
         # but we play safe here (regardless of speedup)
         # if self.imag_time:
-        psi_norm_after_evolution: float = self.trapez_integral(
-            np.abs(self.psi_val) ** 2.0)
-        # psi_norm_after_evolution: float = self.get_norm(p=2.0)
+        psi_norm_after_evolution: float = self.trapez_integral(np.abs(self.psi_val) ** 2.0)
         self.psi_val = self.psi_val / np.sqrt(psi_norm_after_evolution)
 
         psi_quadratic_int = self.get_norm(p=4.0)
+        psi_quintic_int = self.get_norm(p=5.0)
 
-        # TODO: adjust for DDI
         self.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
-        self.E = self.mu - 0.5 * self.g * psi_quadratic_int
-
-        # print(f"Sol norm: {self.trapez_integral(self.psi_sol_val)}")
-
-        # TODO: These formulas for mu.sol and E are not for all cases correct
-        # print(f"mu: {self.mu}")
-        # if self.g != 0:
-        #     print(f"E: {self.E}, "
-        #           f"E_sol: {self.mu_sol - 0.5 * self.g * psi_quadratic_int}")
-        # else:
-        #     print(f"E: {self.E}")
+        U_dd_int = self.trapez_integral(U_dd * psi_2)
+        self.E = (self.mu - 0.5 * self.g * psi_quadratic_int
+                          - 0.5 * U_dd_int
+                          - (3.0 / 5.0) * self.g_qf * psi_quintic_int)
 
     def simulate_raw(self,
                      accuracy: float = 10 ** -6,
