@@ -293,8 +293,8 @@ class Schroedinger:
                 self.psi_sol_val = self.psi_sol(self.x_mesh,
                                                 self.y_mesh,
                                                 self.z_mesh)
-                print(f"Trapez Norm for psi_sol: "
-                      f"{self.trapez_integral(self.psi_sol_val)}")
+                print(f"Norm for psi_sol (trapez integral): "
+                      f"{self.trapez_integral(np.abs(self.psi_sol_val) ** 2.0)}")
 
             kx_mesh, ky_mesh, kz_mesh, _ = functions.get_meshgrid_3d(self.kx,
                                                                      self.ky,
