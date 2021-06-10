@@ -57,6 +57,9 @@ if __name__ == "__main__":
                         nargs=2, help="Min and max of gauss noise to apply on psi.")
     parser.add_argument("-noise_func", metavar="noise_func", type=functions.lambda_parsed,
                         default=None, help="Function to apply on the range given by noise flag.")
+    parser.add_argument("-neighborhood", type=json.loads, default=[0, 0.05, 4, 0.1], action='store',
+                        nargs=4, help="Arguments for function get_peak_neighborhood: "
+                        "axis, height, amount, fraction")
     parser.add_argument("-dir_path", metavar="dir_path", type=str,
                         default="~/supersolids/results", help="Absolute path to save data to")
     parser.add_argument("-dir_name_load", metavar="dir_name_load", type=str,
@@ -255,10 +258,16 @@ if __name__ == "__main__":
                     max=args.noise[1],
                     shape=(Res.x, Res.y, Res.z)
                     )
+                bool_grid = System_loaded.get_peak_neighborhood(axis=args.neighborhood[0],
+                                                                height=args.neighborhood[1],
+                                                                amount=args.neighborhood[2],
+                                                                fraction=args.neighborhood[3])
                 if args.noise_func:
-                    System.psi_val = args.noise_func(psi_0_noise_3d) * System_loaded.psi_val
+                    noise = args.noise_func(psi_0_noise_3d)
                 else:
-                    System.psi_val = psi_0_noise_3d * System_loaded.psi_val
+                    noise = psi_0_noise_3d
+                noise_neighborhood = np.where(bool_grid, noise, np.ones(shape=np.shape(noise)))
+                System.psi_val = noise_neighborhood * System_loaded.psi_val
 
             # remove the n-th slices, if Res is shrunk down
             if System.Res.x < System_loaded.Res.x:
