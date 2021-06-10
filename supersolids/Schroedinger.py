@@ -423,26 +423,79 @@ class Schroedinger:
 
         return r
 
-    def get_peaks_along_x(self, height=0.05, amount=4):
+    def get_peaks_along(self, axis=0, height=0.05, amount=4):
         prob = np.abs(self.psi_val) ** 2.0
-        peaks, properties = scipy.signal.find_peaks(prob[:, 63, 15], height=height)
-        peak_amount_indices = np.argsort(properties['peak_heights'])[-amount:]
-        peaks_amount = peaks[peak_amount_indices]
+        res_x_middle = int(self.Res.x / 2)
+        res_y_middle = int(self.Res.y / 2)
+        res_z_middle = int(self.Res.z / 2)
+        if axis == 0:
+            peaks, properties = scipy.signal.find_peaks(prob[:, res_y_middle, res_z_middle],
+                                                        height=height)
+        elif axis == 1:
+            peaks, properties = scipy.signal.find_peaks(prob[res_x_middle, :, res_z_middle],
+                                                        height=height)
+        elif axis == 2:
+            peaks, properties = scipy.signal.find_peaks(prob[res_x_middle, res_y_middle, :],
+                                                        height=height)
+        else:
+            peaks, properties = scipy.signal.find_peaks(prob, height=height)
 
-        return peaks_amount
+        # get the highest peaks in a sorted fashion (the n biggest, where n is amount)
+        sorting_indices = np.argsort(properties['peak_heights'])[-amount:]
+        peaks_sorted_indices = peaks[sorting_indices]
 
-    def get_peak_positions(self, height=0.05, amount=4):
-        peaks = self.get_peaks_along_x(height=height, amount=amount)
-        s = self.Box.lengths()[0] * (peaks / self.Res.x) + self.Box.x0
+        # sort properties in the same fashion as peaks
+        properties_sorted = properties.copy()
+        for key, value in properties.items():
+            properties_sorted[key] = value[sorting_indices]
 
-        return s
+        return peaks_sorted_indices, properties_sorted
 
-    def get_peak_distances(self, height=0.05, amount=3):
-        peaks = self.get_peaks_along_x(height=height, amount=amount)
-        s_indices = np.diff(peaks)
-        s = self.Box.lengths()[0] * (s_indices / self.Res.x)
+    def get_peak_positions(self, axis=0, height=0.05, amount=4):
+        peaks_indices, _ = self.get_peaks_along(height=height, amount=amount, axis=axis)
+        if axis == 0:
+            positions = self.Box.lengths()[axis] * (peaks_indices / self.Res.x) + self.Box.x0
+        elif axis == 1:
+            positions = self.Box.lengths()[axis] * (peaks_indices / self.Res.y) + self.Box.y0
+        elif axis == 2:
+            positions = self.Box.lengths()[axis] * (peaks_indices / self.Res.z) + self.Box.z0
+        else:
+            sys.exit(f"No such axis. Choose 0, 1 or 2 for axis x, y or z.")
 
-        return s
+        return positions
+
+    def get_peak_distances(self, axis=0, height=0.05, amount=3):
+        """
+        Calculates the distances between the peaks in terms of box units.
+
+        """
+        peaks_indices, _ = self.get_peaks_along(axis=axis, height=height, amount=amount)
+        distances_indices = np.diff(peaks_indices)
+        if axis == 0:
+            distances = self.Box.lengths()[axis] * (distances_indices / self.Res.x)
+        elif axis == 1:
+            distances = self.Box.lengths()[axis] * (distances_indices / self.Res.y)
+        elif axis == 2:
+            distances = self.Box.lengths()[axis] * (distances_indices / self.Res.z)
+        else:
+            sys.exit(f"No such axis. Choose 0, 1 or 2 for axis x, y or z.")
+
+        return distances
+
+    def get_peak_neighborhood(self, axis=0, height=0.05, amount=4, fraction=0.1):
+        """
+        Calculates the neighborhood of the peaks,
+        which has at least the given fraction of the maximum probability :math:`|\psi|^2`.
+
+        """
+        peaks_indices, properties_sorted = self.get_peaks_along(axis=axis,
+                                                                height=height,
+                                                                amount=amount)
+        cut_off = fraction * np.max(properties_sorted['peak_heights'])
+        prob = np.abs(self.psi_val) ** 2.0
+        bool_grid = (cut_off <= prob)
+
+        return bool_grid
 
     def get_center_of_mass(self):
         """
@@ -452,9 +505,16 @@ class Schroedinger:
         return np.average(self.get_density(p=2.0).ravel() * self.get_r_vector(),
                           axis=1)
 
-    def get_parity(self):
-        psi_under0, psi_over0 = np.split(self.psi_val, 2)
-        psi_over0_reversed = psi_over0[::-1]
+    def get_parity(self, axis=2):
+        psi_under0, psi_over0 = np.split(self.psi_val, 2, axis=axis)
+        if axis == 0:
+            psi_over0_reversed = psi_over0[::-1]
+        elif axis == 1:
+            psi_over0_reversed = psi_over0[::-1]
+        elif axis == 2:
+            psi_over0_reversed = psi_over0[::-1]
+        else:
+            sys.exit(f"No such axis. Choose 0, 1 or 2 for axis x, y or z.")
 
         parity = self.trapez_integral(np.abs(psi_under0 - psi_over0_reversed) ** 2.0)
 
