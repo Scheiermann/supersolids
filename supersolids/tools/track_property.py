@@ -63,8 +63,7 @@ def property_check(property,
         try:
             return property(*property_args)
         except AttributeError:
-            sys.exit(
-                f"The loaded Schroedinger object has no method named {property_name}.")
+            sys.exit(f"The loaded Schroedinger object has no method named {property_name}.")
     elif callable(property):
         sys.exit(
             f"{property_name} is a function, but flag property_func is not set.")
