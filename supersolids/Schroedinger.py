@@ -482,28 +482,63 @@ class Schroedinger:
 
         return distances
 
-    def get_peak_neighborhood(self, axis=0, height=0.05, amount=4, fraction=0.1):
+    def get_peak_neighborhood(self, axis=0, height=0.05, amount=4, fraction=0.1,
+                              peak_distances_cutoff=0.5):
         """
         Calculates the neighborhood of the peaks,
         which has at least the given fraction of the maximum probability :math:`|\psi|^2`.
 
         """
-        peaks_indices, properties_sorted = self.get_peaks_along(axis=axis,
-                                                                height=height,
-                                                                amount=amount)
+        peaks_sorted_indices, properties_sorted = self.get_peaks_along(axis=axis,
+                                                                       height=height,
+                                                                       amount=amount)
+        distances_indices = np.diff(np.sort(peaks_sorted_indices))
+        # extend one element at beginning and end, according to first/last element
+        distances_indices = np.pad(distances_indices, (1, 1), 'edge')
+
         cut_off = fraction * np.max(properties_sorted['peak_heights'])
         prob = np.abs(self.psi_val) ** 2.0
         bool_grid = (cut_off <= prob)
+        bool_grid_list = []
+        for i, peak_index in enumerate(peaks_sorted_indices):
+            peak_radius = peak_distances_cutoff * np.abs(distances_indices)[i]
+            if axis == 0:
+                bound_left = int(max(peak_index - peak_radius, 0))
+                bound_right = int(min(peak_index + peak_radius, self.Res.x))
+                bool_grid_sliced = bool_grid[bound_left:bound_right, 0:self.Res.y, 0:self.Res.z]
+                pad_right = self.Res.x - bound_right
+                bool_grid_padded = np.pad(bool_grid_sliced, ((bound_left, pad_right),
+                                                             (0, 0),
+                                                             (0, 0)), 'constant')
+            elif axis == 1:
+                bound_left = int(max(peak_index - peak_radius, 0))
+                bound_right = int(min(peak_index + peak_radius, self.Res.y))
+                bool_grid_sliced = bool_grid[0:self.Res.x, bound_left:bound_right, 0:self.Res.z]
+                pad_right = self.Res.y - bound_right
+                bool_grid_padded = np.pad(bool_grid_sliced, ((0, 0),
+                                                             (bound_left, pad_right),
+                                                             (0, 0)), 'constant')
+            elif axis == 2:
+                bound_left = int(max(peak_index - peak_radius, 0))
+                bound_right = int(min(peak_index + peak_radius, self.Res.z))
+                bool_grid_sliced = bool_grid[0:self.Res.x, 0:self.Res.y, bound_left:bound_right]
+                pad_right = self.Res.z - bound_right
+                bool_grid_padded = np.pad(bool_grid_sliced, ((0, 0),
+                                                             (0, 0),
+                                                             (bound_left, pad_right)), 'constant')
+            else:
+                sys.exit("Not implemented yet. Choose axis 0, 1, 2.")
 
-        return bool_grid
+            bool_grid_list.append(bool_grid_padded)
+
+        return bool_grid_list
 
     def get_center_of_mass(self):
         """
         Calculates the center of mass of the System.
 
         """
-        return np.average(self.get_density(p=2.0).ravel() * self.get_r_vector(),
-                          axis=1)
+        return np.average(self.get_density(p=2.0).ravel() * self.get_r_vector(), axis=1)
 
     def get_parity(self, axis=2):
         psi_under0, psi_over0 = np.split(self.psi_val, 2, axis=axis)
@@ -519,6 +554,31 @@ class Schroedinger:
         parity = self.trapez_integral(np.abs(psi_under0 - psi_over0_reversed) ** 2.0)
 
         return parity
+
+    def get_phase_var_neighborhood(self, axis=0, height=0.05, amount=4, fraction=0.1,
+                                   peak_distances_cutoff=0.5):
+        """
+        Calculates the variance of the phase of the System.
+
+        """
+        bool_grid_list = self.get_peak_neighborhood(
+            axis=axis,
+            height=height,
+            amount=amount,
+            fraction=fraction,
+            peak_distances_cutoff=peak_distances_cutoff,
+        )
+        bool_grid = np.logical_or(bool_grid_list[:-1], bool_grid_list[-1])
+
+        prob_cropped = bool_grid * self.get_density(p=2.0)
+        psi_val_cropped = bool_grid * self.psi_val
+        angle = np.angle(psi_val_cropped)
+
+        phase = self.trapez_integral(prob_cropped * (angle + np.pi))
+        phase2 = self.trapez_integral(prob_cropped * (angle + np.pi) ** 2.0)
+        phase_var = np.sqrt(np.abs(phase2 - phase ** 2.0))
+
+        return phase_var
 
     def get_phase_var(self, x0, x1, y0, y1, z0, z1):
         """
