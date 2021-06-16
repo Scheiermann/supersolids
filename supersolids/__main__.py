@@ -22,8 +22,8 @@ import numpy as np
 
 from supersolids.Animation.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
-from supersolids.tools.simulate_case import simulate_case
-from supersolids.tools.cut_1d import prepare_cuts
+from supersolids.helper.simulate_case import simulate_case
+from supersolids.helper.cut_1d import prepare_cuts
 from supersolids.helper import constants
 from supersolids.helper import functions
 from supersolids.helper.Resolution import Resolution, ResAssert
@@ -37,7 +37,8 @@ if __name__ == "__main__":
                         help="Length of timestep to evolve Schrödinger system.")
     parser.add_argument("-Res", metavar="Resolution", type=json.loads,
                         default={"x": 256, "y": 128, "z": 32},
-                        help="Dictionary of resolutions for the box (1D, 2D, 3D). Needs to be 2 ** int.")
+                        help="Dictionary of resolutions for the box (1D, 2D, 3D). "
+                             "Needs to be 2 ** int.")
     parser.add_argument("-Box", metavar="Box", type=json.loads,
                         default={"x0": -10, "x1": 10, "y0": -5, "y1": 5, "z0": -4, "z1": 4},
                         help=("Dictionary for the Box dimensionality. "

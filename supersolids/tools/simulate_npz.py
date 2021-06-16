@@ -23,7 +23,7 @@ from supersolids.Animation.Animation import Animation
 
 from supersolids.Schroedinger import Schroedinger
 from supersolids.helper import functions
-from supersolids.tools.simulate_case import simulate_case
+from supersolids.helper.simulate_case import simulate_case
 from supersolids.helper.Resolution import Resolution
 from supersolids.helper.Box import Box
 
@@ -57,8 +57,9 @@ if __name__ == "__main__":
                         nargs=2, help="Min and max of gauss noise to apply on psi.")
     parser.add_argument("-noise_func", metavar="noise_func", type=functions.lambda_parsed,
                         default=None, help="Function to apply on the range given by noise flag.")
-    parser.add_argument("-neighborhood", type=json.loads, default=[0, 0.05, 4, 0.1, 0.5], action='store',
-                        nargs=5, help="Arguments for function get_peak_neighborhood: "
+    parser.add_argument("-neighborhood", type=json.loads, default=[0, 0.05, 4, 0.1, 0.5],
+                        action='store', nargs=5,
+                        help="Arguments for function get_peak_neighborhood: "
                         "axis, height, amount, fraction, peak_distances_cutoff")
     parser.add_argument("-dir_path", metavar="dir_path", type=str,
                         default="~/supersolids/results", help="Absolute path to save data to")
@@ -289,7 +290,8 @@ if __name__ == "__main__":
                 System.psi_val = System.psi_val[box_offset_steps_x:box_offset_steps_x_end, :, :]
             else:
                 if x_step_new == x_step_old:
-                    # Fill up the new grid points with 0, when adding grid points by changing Box or Res
+                    # Fill up the new grid points with 0,
+                    # when adding grid points by changing Box or Res
                     System.psi_val = np.pad(
                         System.psi_val,
                         ((box_offset_steps_x, Res.x - System_loaded.Res.x - box_offset_steps_x),
@@ -315,7 +317,8 @@ if __name__ == "__main__":
                 System.psi_val = System.psi_val[:, box_offset_steps_y:box_offset_steps_y_end, :]
             else:
                 if y_step_new == y_step_old:
-                    # Fill up the new grid points with 0, when adding grid points by changing Box or Res
+                    # Fill up the new grid points with 0,
+                    # when adding grid points by changing Box or Res
                     System.psi_val = np.pad(
                         System.psi_val,
                         ((0, 0),
@@ -341,7 +344,8 @@ if __name__ == "__main__":
                 System.psi_val = System.psi_val[:, :, box_offset_steps_z:box_offset_steps_z_end]
             else:
                 if z_step_new == z_step_old:
-                    # Fill up the new grid points with 0, when adding grid points by changing Box or Res
+                    # Fill up the new grid points with 0,
+                    # when adding grid points by changing Box or Res
                     System.psi_val = np.pad(
                         System.psi_val,
                         ((0, 0),

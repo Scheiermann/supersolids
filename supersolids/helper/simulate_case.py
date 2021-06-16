@@ -12,15 +12,15 @@ time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 """
 
 from pathlib import Path
+from typing import Tuple
 
 import numpy as np
 from mayavi import mlab
-from typing import Tuple
 
 from supersolids.Animation import Animation, MayaviAnimation, MatplotlibAnimation
 from supersolids.Schroedinger import Schroedinger
-from supersolids.tools import run_time
-from supersolids.tools.cut_1d import cut_1d
+from supersolids.helper import run_time
+from supersolids.helper.cut_1d import cut_1d
 
 
 def simulate_case(System: Schroedinger,
@@ -97,6 +97,8 @@ def simulate_case(System: Schroedinger,
                 System,
                 accuracy=accuracy,
             )
+
+        return System
     else:
         if not offscreen:
             # mayavi for 3D

@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 __all__ = ["Animation",
            "helper",
+           "scripts",
            "tools",
-           "multi_core",
            "Schroedinger",
-           "single_core",
            ]

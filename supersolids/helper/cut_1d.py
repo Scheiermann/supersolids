@@ -12,9 +12,9 @@ time-dependent Schrodinger equation.
 """
 import functools
 from pathlib import Path
+from typing import Callable, Tuple, Optional
 
 import numpy as np
-from typing import Callable, Tuple, Optional
 from matplotlib import pyplot as plt
 
 from supersolids.Schroedinger import Schroedinger
@@ -73,19 +73,16 @@ def cut_1d(System: Schroedinger,
 
     # plot probability cuts of solution, if given
     if psi_sol_3d_cut_x is not None:
-        functools.partial(System.psi_sol, y=slice_indices[1], z=slice_indices[2]),
-        plt.plot(cut_x, psi_sol_3d_cut_x(x=cut_x), "x-", color="tab:cyan",
-                 label="x cut sol")
+        functools.partial(System.psi_sol, y=slice_indices[1], z=slice_indices[2])
+        plt.plot(cut_x, psi_sol_3d_cut_x(x=cut_x), "x-", color="tab:cyan", label="x cut sol")
 
     if psi_sol_3d_cut_y is not None:
-        functools.partial(System.psi_sol, x=slice_indices[0], z=slice_indices[2]),
-        plt.plot(cut_y, psi_sol_3d_cut_y(y=cut_y), "x-", color="tab:green",
-                 label="y cut sol")
+        functools.partial(System.psi_sol, x=slice_indices[0], z=slice_indices[2])
+        plt.plot(cut_y, psi_sol_3d_cut_y(y=cut_y), "x-", color="tab:green", label="y cut sol")
 
     if psi_sol_3d_cut_z is not None:
         functools.partial(System.psi_sol, x=slice_indices[0], y=slice_indices[1])
-        plt.plot(cut_z, psi_sol_3d_cut_z(z=cut_z), "x-", color="tab:olive",
-                 label="z cut sol")
+        plt.plot(cut_z, psi_sol_3d_cut_z(z=cut_z), "x-", color="tab:olive", label="z cut sol")
 
     plt.ylim(y_lim)
     plt.legend()
