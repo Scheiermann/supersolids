@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>supersolids.tools.cut_1d &mdash; supersolids 0.1.26 documentation</title>
+  <title>supersolids.helper.cut_1d &mdash; supersolids 0.1.26 documentation</title>
   
 
   
@@ -140,13 +140,13 @@
     
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.tools.cut_1d</span></code></li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.cut_1d</span></code></li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../../../../_sources/autoapi/supersolids/tools/cut_1d/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../../../_sources/autoapi/supersolids/helper/cut_1d/index.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -159,8 +159,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-supersolids.tools.cut_1d">
-<span id="supersolids-tools-cut-1d"></span><h1><a class="reference internal" href="#module-supersolids.tools.cut_1d" title="supersolids.tools.cut_1d"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.tools.cut_1d</span></code></a><a class="headerlink" href="#module-supersolids.tools.cut_1d" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-supersolids.helper.cut_1d">
+<span id="supersolids-helper-cut-1d"></span><h1><a class="reference internal" href="#module-supersolids.helper.cut_1d" title="supersolids.helper.cut_1d"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.cut_1d</span></code></a><a class="headerlink" href="#module-supersolids.helper.cut_1d" title="Permalink to this headline">¶</a></h1>
 <p>Animation for the numerical solver for the non-linear
 time-dependent Schrodinger equation.</p>
 <div class="section" id="module-contents">
@@ -173,17 +173,17 @@ time-dependent Schrodinger equation.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.cut_1d.cut_1d" title="supersolids.tools.cut_1d.cut_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cut_1d</span></code></a>(System, slice_indices = [0, 0, 0], psi_sol_3d_cut_x = None, psi_sol_3d_cut_y = None, psi_sol_3d_cut_z = None, dir_path = Path(__file__).parent.parent.joinpath('results'), y_lim = (0.0, 1.0))</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.cut_1d.cut_1d" title="supersolids.helper.cut_1d.cut_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cut_1d</span></code></a>(System, slice_indices = [0, 0, 0], psi_sol_3d_cut_x = None, psi_sol_3d_cut_y = None, psi_sol_3d_cut_z = None, dir_path = Path(__file__).parent.parent.joinpath('results'), y_lim = (0.0, 1.0))</p></td>
 <td><p>Creates 1D plots of the probability function of the System <span class="math notranslate nohighlight">\(|\psi|^2\)</span></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.cut_1d.prepare_cuts" title="supersolids.tools.cut_1d.prepare_cuts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_cuts</span></code></a>(func, N, alpha_z, e_dd, a_s_l_ho_ratio)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.cut_1d.prepare_cuts" title="supersolids.helper.cut_1d.prepare_cuts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_cuts</span></code></a>(func, N, alpha_z, e_dd, a_s_l_ho_ratio)</p></td>
 <td><p>Helper function to get <span class="math notranslate nohighlight">\(R_r\)</span> and <span class="math notranslate nohighlight">\(R_z\)</span> and set it for the given func.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
-<dt class="sig sig-object py" id="supersolids.tools.cut_1d.cut_1d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.tools.cut_1d.</span></span><span class="sig-name descname"><span class="pre">cut_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_sol_3d_cut_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_sol_3d_cut_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_sol_3d_cut_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Path(__file__).parent.parent.joinpath('results')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_lim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">1.0)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/cut_1d.html#cut_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.cut_1d.cut_1d" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="supersolids.helper.cut_1d.cut_1d">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.cut_1d.</span></span><span class="sig-name descname"><span class="pre">cut_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_sol_3d_cut_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_sol_3d_cut_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_sol_3d_cut_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Path(__file__).parent.parent.joinpath('results')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_lim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">1.0)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/cut_1d.html#cut_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.cut_1d.cut_1d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates 1D plots of the probability function of the System <span class="math notranslate nohighlight">\(|\psi|^2\)</span>
 and if given of the solution.</p>
 <dl class="field-list simple">
@@ -209,8 +209,8 @@ Max values is for e.g. System.Res.x - 1.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="supersolids.tools.cut_1d.prepare_cuts">
-<span class="sig-prename descclassname"><span class="pre">supersolids.tools.cut_1d.</span></span><span class="sig-name descname"><span class="pre">prepare_cuts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_l_ho_ratio</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/cut_1d.html#prepare_cuts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.cut_1d.prepare_cuts" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="supersolids.helper.cut_1d.prepare_cuts">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.cut_1d.</span></span><span class="sig-name descname"><span class="pre">prepare_cuts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_l_ho_ratio</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/cut_1d.html#prepare_cuts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.cut_1d.prepare_cuts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to get <span class="math notranslate nohighlight">\(R_r\)</span> and <span class="math notranslate nohighlight">\(R_z\)</span> and set it for the given func.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
