@@ -57,10 +57,8 @@ if __name__ == "__main__":
                         nargs=2, help="Min and max of gauss noise to apply on psi.")
     parser.add_argument("-noise_func", metavar="noise_func", type=functions.lambda_parsed,
                         default=None, help="Function to apply on the range given by noise flag.")
-    parser.add_argument("-neighborhood", type=json.loads, default=[0, 0.05, 4, 0.1, 0.5],
-                        action='store', nargs=5,
-                        help="Arguments for function get_peak_neighborhood: "
-                        "axis, height, amount, fraction, peak_distances_cutoff")
+    parser.add_argument("-neighborhood", type=json.loads, action='store', nargs=2,
+                        help="Arguments for function get_peak_neighborhood: prob_min, amount")
     parser.add_argument("-dir_path", metavar="dir_path", type=str,
                         default="~/supersolids/results", help="Absolute path to save data to")
     parser.add_argument("-dir_name_load", metavar="dir_name_load", type=str,
@@ -254,8 +252,10 @@ if __name__ == "__main__":
             # As psi_0_noise needs to be applied on the loaded psi_val and not the initial psi_val
             # we apply noise after loading the old System
             if args.noise is None:
-                # noise_func = np.ones(shape=np.shape(System_loaded.psi_val))
-                noise_func = functools.partial(args.noise_func, gauss=1.0)
+                if args.noise_func:
+                    noise_func = args.noise_func(gauss=1.0, k=1.0)
+                else:
+                    noise_func = np.ones(shape=np.shape(System_loaded.psi_val))
             else:
                 psi_0_noise_3d: np.ndarray = functions.noise_mesh(
                     min=args.noise[0],
@@ -264,25 +264,26 @@ if __name__ == "__main__":
                     )
 
                 if args.noise_func:
-                    noise_func = functools.partial(args.noise_func, gauss=psi_0_noise_3d)
+                    noise_func = args.noise_func(gauss=psi_0_noise_3d, k=1.0)
                 else:
                     noise_func = psi_0_noise_3d
 
-            bool_grid_list = System_loaded.get_peak_neighborhood(
-                axis=args.neighborhood[0],
-                height=args.neighborhood[1],
-                amount=args.neighborhood[2],
-                fraction=args.neighborhood[3],
-                peak_distances_cutoff=args.neighborhood[4],
-            )
+            if args.neighborhood is None:
+                System.psi_val = noise_func * System.psi_val
+            else:
+                bool_grid_list = System_loaded.get_peak_neighborhood(prob_min=args.neighborhood[0],
+                                                                     amount=args.neighborhood[1],
+                                                                     )
 
-            for k in range(0, args.neighborhood[2]):
-                # phase_scrambling = np.exp(-1.0j * k * 2 * np.pi / (args.neighborhood[2] + 1.0))
-                # phase_scramble_on_droplets = np.where(bool_grid_list[k], phase_scrambling,
-                phase_scramble_on_droplets = np.where(bool_grid_list[k], noise_func(k=k),
-                                                      np.ones(shape=np.shape(noise_func)))
-                System.psi_val = phase_scramble_on_droplets * System.psi_val
-                # System.psi_val = noise_func * phase_scramble_on_droplets * System.psi_val
+                for k in range(0, args.neighborhood[1]):
+                    if args.noise_func:
+                        phase_scramble_on_droplets = np.where(bool_grid_list[k], noise_func(k=k),
+                                                              np.ones(shape=np.shape(noise_func)))
+                    else:
+                        phase_scramble_on_droplets = np.where(bool_grid_list[k], noise_func,
+                                                              np.ones(shape=np.shape(noise_func)))
+
+                    System.psi_val = phase_scramble_on_droplets * System.psi_val
 
             # remove the n-th slices, if Res is shrunk down
             if System.Res.x < System_loaded.Res.x:

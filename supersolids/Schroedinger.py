@@ -18,10 +18,74 @@ from pathlib import Path
 import dill
 import numpy as np
 import scipy.signal
+from scipy.ndimage.filters import maximum_filter
+from scipy.ndimage.morphology import generate_binary_structure, binary_erosion
 
 from supersolids.helper import constants, functions, get_path
 from supersolids.helper.Resolution import Resolution
 from supersolids.helper.Box import Box
+
+
+def peaks_sort(peaks_indices, peaks_height, amount):
+    # sort peaks by height
+    zipped_sorted_by_height = zip(
+        *sorted(zip(peaks_indices, peaks_height), key=lambda t: t[1])
+    )
+    a, b = map(np.array, zipped_sorted_by_height)
+
+    # get the highest peaks (the n biggest, where n is amount)
+    peaks_sorted_indices = a[-amount:]
+    peaks_sorted_height = b[-amount:]
+
+    return peaks_sorted_indices, peaks_sorted_height
+
+
+def peaks_sort_along(peaks_indices, peaks_height, amount, axis):
+    _, peaks_sorted_height = peaks_sort(peaks_indices, peaks_height, amount)
+    if axis in [0, 1, 2]:
+        # get the highest peaks in a sorted fashion (the n biggest, where n is amount)
+        sorting_indices = np.argsort(peaks_height)[-amount:]
+        peaks_sorted_indices = peaks_indices[sorting_indices]
+    else:
+        sys.exit(f"No such axis. Choose 0, 1 or 2 for axis x, y or z.")
+
+    return peaks_sorted_indices, peaks_sorted_height
+
+
+def get_peaks(prob):
+    """
+    Takes an image and detect the peaks using the local maximum filter.
+    Returns a boolean mask of the peaks (i.e. 1 when
+    the pixel's value is the neighborhood maximum, 0 otherwise)
+    """
+
+    # define an 8-connected neighborhood
+    neighborhood = generate_binary_structure(3, 3)
+
+    # apply the local maximum filter; all pixel of maximal value
+    # in their neighborhood are set to 1
+    local_max = maximum_filter(prob, footprint=neighborhood) == prob
+    # local_max is a mask that contains the peaks we are
+    # looking for, but also the background.
+    # In order to isolate the peaks we must remove the background from the mask.
+
+    # we create the mask of the background
+    background = (prob == 0)
+
+    # a little technicality: we must erode the background in order to
+    # successfully subtract it form local_max, otherwise a line will
+    # appear along the background border (artifact of the local maximum filter)
+    eroded_background = binary_erosion(background, structure=neighborhood, border_value=1)
+
+    # we obtain the final mask, containing only peaks,
+    # by removing the background from the local_max mask (xor operation)
+    peaks_mask = local_max ^ eroded_background
+
+    peaks_height = prob[peaks_mask]
+    peaks_indices = np.argwhere(peaks_mask)
+
+    return peaks_indices, peaks_height
+
 
 class Schroedinger:
     """
@@ -29,7 +93,7 @@ class Schroedinger:
     non-linear Schrodinger equation for an arbitrary potential:
 
     .. math::
-    
+
        i \\partial_t \psi = [&-\\frac{1}{2} \\nabla ^2
                               + \\frac{1}{2} (x^2 + (y \\alpha_y)^2 + (z \\alpha_z)^2) \\\\
                              &+ g |\psi|^2  + g_{qf} |\psi|^3 + U_{dd}] \psi \\\\
@@ -395,8 +459,8 @@ class Schroedinger:
                                ) / 8.0
 
         else:
-            print(f"Not implemented yet.")
-            pass
+            sys.exit(f"Trapez integral not implemented for dimension {self.dim}, "
+                     "choose dimension smaller than 4.")
 
     def get_r2(self):
         if self.dim == 1:
@@ -406,7 +470,7 @@ class Schroedinger:
         elif self.dim == 3:
             r2 = self.x_mesh ** 2.0 + self.y_mesh ** 2.0 + self.z_mesh ** 2.0
         else:
-            sys.exit("Spatial dimension over 3. This is not implemented.")
+            sys.exit(f"Spatial dimension {self.dim} is over 3. This is not implemented.")
 
         return r2
 
@@ -423,36 +487,30 @@ class Schroedinger:
 
         return r
 
-    def get_peaks_along(self, axis=0, height=0.05, amount=4):
+    def get_peaks_along(self, axis=0, height=0.05):
         prob = np.abs(self.psi_val) ** 2.0
         res_x_middle = int(self.Res.x / 2)
         res_y_middle = int(self.Res.y / 2)
         res_z_middle = int(self.Res.z / 2)
         if axis == 0:
-            peaks, properties = scipy.signal.find_peaks(prob[:, res_y_middle, res_z_middle],
-                                                        height=height)
+            peaks_indices, properties = scipy.signal.find_peaks(prob[:, res_y_middle, res_z_middle],
+                                                                height=height)
         elif axis == 1:
-            peaks, properties = scipy.signal.find_peaks(prob[res_x_middle, :, res_z_middle],
-                                                        height=height)
+            peaks_indices, properties = scipy.signal.find_peaks(prob[res_x_middle, :, res_z_middle],
+                                                                height=height)
         elif axis == 2:
-            peaks, properties = scipy.signal.find_peaks(prob[res_x_middle, res_y_middle, :],
-                                                        height=height)
+            peaks_indices, properties = scipy.signal.find_peaks(prob[res_x_middle, res_y_middle, :],
+                                                                height=height)
         else:
-            peaks, properties = scipy.signal.find_peaks(prob, height=height)
+            sys.exit(f"No such axis (){axis}. Choose 0, 1 or 2 for axis x, y or z.")
 
         # get the highest peaks in a sorted fashion (the n biggest, where n is amount)
-        sorting_indices = np.argsort(properties['peak_heights'])[-amount:]
-        peaks_sorted_indices = peaks[sorting_indices]
+        peaks_height = properties['peak_heights']
 
-        # sort properties in the same fashion as peaks
-        properties_sorted = properties.copy()
-        for key, value in properties.items():
-            properties_sorted[key] = value[sorting_indices]
+        return peaks_indices, peaks_height
 
-        return peaks_sorted_indices, properties_sorted
-
-    def get_peak_positions(self, axis=0, height=0.05, amount=4):
-        peaks_indices, _ = self.get_peaks_along(height=height, amount=amount, axis=axis)
+    def get_peak_positions_along(self, axis=0, height=0.05, amount=4):
+        peaks_indices, _ = self.get_peaks_along(height=height, axis=axis)
         if axis == 0:
             positions = self.Box.lengths()[axis] * (peaks_indices / self.Res.x) + self.Box.x0
         elif axis == 1:
@@ -464,12 +522,12 @@ class Schroedinger:
 
         return positions
 
-    def get_peak_distances(self, axis=0, height=0.05, amount=3):
+    def get_peak_distances_along(self, axis=0, height=0.05):
         """
         Calculates the distances between the peaks in terms of box units.
 
         """
-        peaks_indices, _ = self.get_peaks_along(axis=axis, height=height, amount=amount)
+        peaks_indices, _ = self.get_peaks_along(axis=axis, height=height)
         distances_indices = np.diff(peaks_indices)
         if axis == 0:
             distances = self.Box.lengths()[axis] * (distances_indices / self.Res.x)
@@ -478,30 +536,38 @@ class Schroedinger:
         elif axis == 2:
             distances = self.Box.lengths()[axis] * (distances_indices / self.Res.z)
         else:
-            sys.exit(f"No such axis. Choose 0, 1 or 2 for axis x, y or z.")
+            sys.exit(f"No such axis ({axis}). Choose 0, 1 or 2 for axis x, y or z.")
 
         return distances
 
-    def get_peak_neighborhood(self, axis=0, height=0.05, amount=4, fraction=0.1,
-                              peak_distances_cutoff=0.5):
+    def get_peak_neighborhood_along(self, axis=0, height=0.05, amount=4, fraction=0.1,
+                                    peak_distances_cutoff=0.5):
         """
         Calculates the neighborhood of the peaks,
         which has at least the given fraction of the maximum probability :math:`|\psi|^2`.
 
         """
-        peaks_sorted_indices, properties_sorted = self.get_peaks_along(axis=axis,
-                                                                       height=height,
-                                                                       amount=amount)
-        distances_indices = np.diff(np.sort(peaks_sorted_indices))
-        # extend one element at beginning and end, according to first/last element
-        distances_indices = np.pad(distances_indices, (1, 1), 'edge')
+        peaks_indices, peaks_height = self.get_peaks_along(axis=axis,
+                                                           height=height,
+                                                           )
+        peaks_sorted_indices, peaks_sorted_height = peaks_sort_along(peaks_indices,
+                                                                     peaks_height,
+                                                                     amount,
+                                                                     axis,
+                                                                     )
 
-        cut_off = fraction * np.max(properties_sorted['peak_heights'])
+        distances_indices = np.diff(np.sort(peaks_sorted_indices.T))
+        # extend one element at beginning and end, according to first/last element
+        distances_indices = [np.pad(distances_indices[i], (1, 1), 'edge')
+                             for i in range(0, len(distances_indices))]
+
+        prob_min = fraction * np.max(peaks_sorted_height)
         prob = np.abs(self.psi_val) ** 2.0
-        bool_grid = (cut_off <= prob)
+        bool_grid = (prob_min <= prob)
         bool_grid_list = []
         for i, peak_index in enumerate(peaks_sorted_indices):
-            peak_radius = peak_distances_cutoff * np.abs(distances_indices)[i]
+            # peak_radius = peak_distances_cutoff * np.abs(distances_indices)[i]
+            peak_radius = peak_distances_cutoff * np.abs(np.array(distances_indices).T[i, :])
             if axis == 0:
                 bound_left = int(max(peak_index - peak_radius, 0))
                 bound_right = int(min(peak_index + peak_radius, self.Res.x))
@@ -527,11 +593,70 @@ class Schroedinger:
                                                              (0, 0),
                                                              (bound_left, pad_right)), 'constant')
             else:
-                sys.exit("Not implemented yet. Choose axis 0, 1, 2.")
+                sys.exit("Choose axis from [0, 1, 2] or use get_peak_neighborhood.")
 
             bool_grid_list.append(bool_grid_padded)
 
         return bool_grid_list
+
+    def get_peak_neighborhood(self, prob_min, amount):
+        """
+        Calculates the neighborhood of the peaks,
+        which has at least the given fraction of the maximum probability :math:`|\psi|^2`.
+
+        """
+        prob = np.abs(self.psi_val) ** 2.0
+        peaks_indices, peaks_height = get_peaks(prob)
+        peaks_sorted_indices, peaks_sorted_height = peaks_sort(peaks_indices,
+                                                               peaks_height,
+                                                               amount)
+
+        bool_grid_list = []
+        for i, peak_index in enumerate(peaks_sorted_indices):
+            prob_droplets = np.where(prob >= prob_min, prob, 0)
+            single_droplet, edges = self.extract_droplet(prob_droplets, peaks_sorted_indices[i])
+
+            pad_width = []
+            for j, res_axis in enumerate(self.Res.to_array()):
+                edge_left = np.asarray(edges)[j, 0]
+                edge_right = np.asarray(edges)[j, 1]
+                pad_right = res_axis - edge_right
+                pad_width.append((edge_left, pad_right))
+            bool_grid_padded = np.pad(single_droplet, pad_width, 'constant')
+
+            bool_grid_list.append(bool_grid_padded)
+
+        return bool_grid_list
+
+    def get_droplet_edges(self, prob_droplets, peaks_index_3d, cut_axis):
+        if cut_axis == 0:
+            a = prob_droplets[:, peaks_index_3d[1], peaks_index_3d[2]]
+        elif cut_axis == 1:
+            a = prob_droplets[peaks_index_3d[0], :, peaks_index_3d[2]]
+        elif cut_axis == 2:
+            a = prob_droplets[peaks_index_3d[0], peaks_index_3d[1], :]
+        else:
+            sys.exit("Not implemented. Choose distance_axis 0, 1, 2.")
+
+        zeros = np.ndarray.flatten(np.argwhere(a == 0))
+        zeros_left = zeros[zeros < peaks_index_3d[cut_axis]]
+        zeros_right = zeros[zeros > peaks_index_3d[cut_axis]]
+        edge_left = max(zeros_left)
+        edge_right = min(zeros_right)
+
+        return edge_left, edge_right
+
+    def extract_droplet(self, prob_droplets, peaks_index_3d):
+        edges = []
+        for cut_axis in [0, 1, 2]:
+            edges.append(self.get_droplet_edges(prob_droplets, peaks_index_3d, cut_axis))
+
+        single_droplet = prob_droplets[slice(*edges[0]),
+                                       slice(*edges[1]),
+                                       slice(*edges[2]),
+                                       ]
+
+        return single_droplet, edges
 
     def get_center_of_mass(self):
         """
@@ -549,25 +674,18 @@ class Schroedinger:
         elif axis == 2:
             psi_over0_reversed = psi_over0[::-1]
         else:
-            sys.exit(f"No such axis. Choose 0, 1 or 2 for axis x, y or z.")
+            sys.exit(f"No such axis ({axis}). Choose 0, 1 or 2 for axis x, y or z.")
 
         parity = self.trapez_integral(np.abs(psi_under0 - psi_over0_reversed) ** 2.0)
 
         return parity
 
-    def get_phase_var_neighborhood(self, axis=0, height=0.05, amount=4, fraction=0.1,
-                                   peak_distances_cutoff=0.5):
+    def get_phase_var_neighborhood(self, prob_min, amount):
         """
         Calculates the variance of the phase of the System.
 
         """
-        bool_grid_list = self.get_peak_neighborhood(
-            axis=axis,
-            height=height,
-            amount=amount,
-            fraction=fraction,
-            peak_distances_cutoff=peak_distances_cutoff,
-        )
+        bool_grid_list = self.get_peak_neighborhood(prob_min, amount)
         bool_grid = np.logical_or(bool_grid_list[:-1], bool_grid_list[-1])
 
         prob_cropped = bool_grid * self.get_density(p=2.0)
@@ -662,8 +780,8 @@ class Schroedinger:
                      accuracy: float = 10 ** -6,
                      dir_path: Path = Path.home().joinpath("supersolids", "results"),
                      dir_name_result: str = "",
-                     filename_schroedinger=f"schroedinger.pkl",
-                     filename_steps=f"step_",
+                     filename_schroedinger: str = "schroedinger.pkl",
+                     filename_steps: str = "step_",
                      steps_format: str = "%06d",
                      steps_per_npz: int = 10,
                      frame_start: int = 0,

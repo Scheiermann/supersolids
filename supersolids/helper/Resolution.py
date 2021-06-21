@@ -2,6 +2,9 @@
 
 from typing import Optional, List
 
+import numpy as np
+
+
 class Resolution:
     """
     Specifies the resolution of the simulation in x, y, z directions (1D, 2D, 3D).
@@ -25,8 +28,11 @@ class Resolution:
     def __str__(self) -> List[Optional[float]]:
         return str([self.x, self.y, self.z])
 
+    def to_array(self):
+        return np.array([self.x, self.y, self.z])
+
 
 def ResAssert(Res, a):
-        assert len(a) == len(Res), (
-        f"Dimension of Amplitudes is {len(a)}, but needs to be the same as dimension of Res, "
-        f"which currently is {len(Res)}.")
+    assert len(a) == len(Res), (
+    f"Dimension of Amplitudes is {len(a)}, but needs to be the same as dimension of Res, "
+    f"which currently is {len(Res)}.")
