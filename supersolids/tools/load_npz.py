@@ -13,17 +13,15 @@ time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from mayavi import mlab
 
 from supersolids.Animation.Animation import Animation
-
 from supersolids.Animation import MayaviAnimation
 
-
-# Script runs, if script is run as main script (called by python *.py)
-if __name__ == "__main__":
+def load_npz(args_array):
     parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
                                                  "and create movie.")
     parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
@@ -66,7 +64,7 @@ if __name__ == "__main__":
                              "This is handy as adjusting plots is just stable for stopped "
                              "animation.")
 
-    args = parser.parse_args()
+    args = parser.parse_args(args_array)
     print(f"args: {args}")
     slice_x = args.slice_indices["x"]
     slice_y = args.slice_indices["y"]
@@ -108,3 +106,7 @@ if __name__ == "__main__":
     result_path = MayAnim.create_movie(dir_path=MayAnim.dir_path,
                                        input_data_file_pattern="*.png",
                                        delete_input=args.delete_input)
+
+# Script runs, if script is run as main script (called by python *.py)
+if __name__ == "__main__":
+    load_npz(sys.argv[1:])
