@@ -16,23 +16,30 @@ download_start=$((516 + next_new))
 download_dir_name="movie"
 
 # depending on the server settings, number of connections is limited
-max_parallel_download=1
+max_parallel_download=10
 download_batch=($(seq $max_parallel_download $max_parallel_download $number))
-download_batch+=(max_parallel_download)
+if [ $number -ne  ${download_batch[-1]} ]
+then
+    download_batch+=($number)
+fi
 
 path_anchor="/run/media/dsche/ITP Transfer/joseph_injunction2/real2/"
 
+
+echo ${download_batch[*]}
+
+k=0
 for batch in "${download_batch[@]}"
 do
   #for movie_number in $(eval "echo {001..$number}")
-  for ((j = 0; j < $batch; j++))
+  for ((j = k; j < $batch; j++))
   do
       printf -v movie_number "%03d" $((start + j))
       mkdir "$path_anchor$dir_name$movie_number"
 
-      printf -v movie_number "%03d" $((start + j))
       echo $movie_number
       rsync -P itpx:/bigwork/dscheier/supersolids/results/$download_dir_name$((download_start + j))/* "${path_anchor}${dir_name}${movie_number}" &
   done
-  # wait
+  k=$batch
+  wait
 done
