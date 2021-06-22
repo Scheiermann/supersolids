@@ -617,7 +617,7 @@ class Schroedinger:
             single_droplet, edges = self.extract_droplet(prob_droplets, peaks_sorted_indices[i])
 
             pad_width = []
-            for j, res_axis in enumerate(self.Res.to_array()):
+            for j, res_axis in enumerate(np.array([self.x, self.y, self.z])):
                 edge_left = np.asarray(edges)[j, 0]
                 edge_right = np.asarray(edges)[j, 1]
                 pad_right = res_axis - edge_right
