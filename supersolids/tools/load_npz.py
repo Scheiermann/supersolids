@@ -24,25 +24,24 @@ from supersolids.Animation import MayaviAnimation
 def load_npz(args_array):
     parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
                                                  "and create movie.")
-    parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
+    parser.add_argument("-dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to load data from")
-    parser.add_argument("-dir_name", metavar="dir_name", type=str, default="movie" + "%03d" % 1,
+    parser.add_argument("-dir_name", type=str, default="movie" + "%03d" % 1,
                         help="Name of directory where the files to load lie. "
                              "For example the standard naming convention is movie001")
-    parser.add_argument("-filename_schroedinger", metavar="filename_schroedinger", type=str,
-                        default="schroedinger.pkl",
+    parser.add_argument("-filename_schroedinger", type=str, default="schroedinger.pkl",
                         help="Name of file, where the Schroedinger object is saved")
-    parser.add_argument("-filename_steps", metavar="filename_steps", type=str, default="step_",
-                        help="Name of file, without enumarator for the files. "
+    parser.add_argument("-filename_steps", type=str, default="step_",
+                        help="Name of file, without enumerator for the files. "
                              "For example the standard naming convention is step_000001.npz, "
                              "the string needed is step_")
-    parser.add_argument("-steps_format", metavar="steps_format", type=str, default="%06d",
+    parser.add_argument("-steps_format", type=str, default="%06d",
                         help="Formating string to enumerate the files. "
                              "For example the standard naming convention is step_000001.npz, "
                              "the string needed is percent 06d")
-    parser.add_argument("-steps_per_npz", metavar="steps_per_npz", type=int, default=10,
+    parser.add_argument("-steps_per_npz", type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
-    parser.add_argument("-frame_start", metavar="frame_start", type=int, default=0,
+    parser.add_argument("-frame_start", type=int, default=0,
                         help="Counter of first saved npz.")
     parser.add_argument("-slice_indices", metavar="Indices to slice the plot.", type=json.loads,
                         default={"x": 0, "y": 0, "z": 0},
