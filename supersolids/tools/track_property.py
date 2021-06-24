@@ -48,8 +48,7 @@ def get_property(System: Schroedinger,
     try:
         property = getattr(System, property_name)
     except AttributeError:
-        sys.exit(
-            f"The loaded Schroedinger object has no property named {property_name}.")
+        sys.exit(f"The loaded Schroedinger object has no property named {property_name}.")
 
     return property
 
@@ -65,8 +64,7 @@ def property_check(property,
         except AttributeError:
             sys.exit(f"The loaded Schroedinger object has no method named {property_name}.")
     elif callable(property):
-        sys.exit(
-            f"{property_name} is a function, but flag property_func is not set.")
+        sys.exit(f"{property_name} is a function, but flag property_func is not set.")
     else:
         return property
 
@@ -143,33 +141,25 @@ def property_to_array(property_tuple):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Load old simulations of Schrödinger system and get property.")
-    parser.add_argument("-dir_path", metavar="dir_path", type=str,
+    parser.add_argument("-dir_path", type=str,
                         default="~/supersolids/results",
                         help="Absolute path to load data from")
-    parser.add_argument("-dir_name", metavar="dir_name", type=str,
-                        default="movie" + "%03d" % 1,
+    parser.add_argument("-dir_name", type=str, default="movie" + "%03d" % 1,
                         help="Name of directory where the files to load lie. "
                              "For example the standard naming convention is movie001")
-    parser.add_argument("-filename_schroedinger",
-                        metavar="filename_schroedinger", type=str,
-                        default="schroedinger.pkl",
+    parser.add_argument("-filename_schroedinger", type=str, default="schroedinger.pkl",
                         help="Name of file, where the Schroedinger object is saved")
-    parser.add_argument("-filename_steps", metavar="filename_steps",
-                        type=str, default="step_",
+    parser.add_argument("-filename_steps", type=str, default="step_",
                         help="Name of file, without enumarator for the files. "
                              "For example the standard naming convention is step_000001.npz, "
                              "the string needed is step_")
-    parser.add_argument("-steps_format", metavar="steps_format",
-                        type=str, default="%06d",
+    parser.add_argument("-steps_format", type=str, default="%06d",
                         help="Formating string to enumerate the files. "
                              "For example the standard naming convention is step_000001.npz, "
                              "the string needed is percent 06d")
-    parser.add_argument("-steps_per_npz", metavar="steps_per_npz", type=int,
-                        default=10,
+    parser.add_argument("-steps_per_npz", type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
-    parser.add_argument("-frame_start", metavar="frame_start",
-                        type=int, default=0,
-                        help="Counter of first saved npz.")
+    parser.add_argument("-frame_start", type=int, default=0, help="Counter of first saved npz.")
     parser.add_argument("-property_name", type=str, default="mu",
                         help="Name of property to get from the Schroedinger object.")
     parser.add_argument("--property_func", default=False, action="store_true",
