@@ -72,9 +72,15 @@ if __name__ == "__main__":
                         default="schroedinger.pkl",
                         help="Name of file, where the Schroedinger object is saved")
     parser.add_argument("-filename_npz", metavar="filename_npz",
-                        type=str, default="step_" + "%06d" % 0 + ".npz",
+                        type=str, default="step_" + "%07d" % 0 + ".npz",
                         help="Name of file, where psi_val is saved. "
                              "For example the standard naming convention is step_000001.npz")
+    parser.add_argument("-filename_steps", type=str, default="step_",
+                        help="Name of file, without enumerator for the files. "
+                             "For example the standard naming convention is step_000001.npz, "
+                             "the string needed is step_")
+    parser.add_argument("-steps_format", type=str, default="%07d",
+                        help="Formatting string for the enumeration of steps.")
     parser.add_argument("-steps_per_npz", metavar="steps_per_npz", type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
     parser.add_argument("--offscreen", default=False, action="store_true",
@@ -374,10 +380,13 @@ if __name__ == "__main__":
                 delete_input=True,
                 dir_path=dir_path,
                 dir_name_result=args.dir_name_result,
+                slice_indices=[0, 0, 0],
                 offscreen=args.offscreen,
                 x_lim=(-2.0, 2.0),  # from here just matplotlib
                 y_lim=(-2.0, 2.0),
                 z_lim=(0, 0.5),
+                filename_steps=args.filename_steps,
+                steps_format=args.steps_format,
                 steps_per_npz=args.steps_per_npz,
                 frame_start=frame,
                 )

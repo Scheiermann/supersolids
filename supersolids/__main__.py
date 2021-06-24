@@ -81,6 +81,12 @@ if __name__ == "__main__":
                         help="Option to plot the manually given solution for the wavefunction psi.")
     parser.add_argument("--plot_V", default=False, action="store_true",
                         help="Option to plot the external potential of the system (the trap).")
+    parser.add_argument("-filename_steps", type=str, default="step_",
+                        help="Name of file, without enumerator for the files. "
+                             "For example the standard naming convention is step_000001.npz, "
+                             "the string needed is step_")
+    parser.add_argument("-steps_format", type=str, default="%07d",
+                        help="Formatting string for the enumeration of steps.")
     parser.add_argument("-steps_per_npz", metavar="steps_per_npz",
                         type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
@@ -249,6 +255,8 @@ if __name__ == "__main__":
                                     offscreen=args.offscreen,
                                     x_lim=x_lim, # from here just matplotlib
                                     y_lim=y_lim,
+                                    filename_steps=args.filename_steps,
+                                    steps_format=args.steps_format,
                                     steps_per_npz=args.steps_per_npz,
                                     frame_start=0,
                                     )
