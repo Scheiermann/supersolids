@@ -214,24 +214,6 @@ if __name__ == "__main__":
                 w_z = args.w["w_z"]
                 alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
 
-            V_harmonic = functools.partial(functions.v_harmonic_3d,
-                                           alpha_y=alpha_y,
-                                           alpha_z=alpha_z)
-
-            # -V=None uses harmonic potential with w_x, w_y, w_z.
-            # Used to get access to the function from bash
-            # To get actually no potential use -V="lambda x,y,z: 0"
-            if args.V is None:
-                V_new = (lambda x, y, z: V_harmonic(x, y, z))
-            else:
-                if args.V_reload:
-                    if System_loaded.V is None:
-                        V_new = (lambda x, y, z: args.V(x, y, z))
-                    else:
-                        V_new = (lambda x, y, z: System_loaded.V(x, y, z) + args.V(x, y, z))
-                else:
-                    V_new = (lambda x, y, z: args.V(x, y, z))
-
             System: Schroedinger = Schroedinger(System_loaded.N,
                                                 MyBox,
                                                 Res,
@@ -247,10 +229,31 @@ if __name__ == "__main__":
                                                 imag_time=(not args.real_time),
                                                 mu=System_loaded.mu,
                                                 E=System_loaded.E,
-                                                V=V_new,
+                                                V=(lambda x, y, z: 0),
                                                 V_interaction=System_loaded.V_interaction,
                                                 psi_0_noise=None
                                                 )
+
+            V_harmonic = functools.partial(functions.v_harmonic_3d,
+                                           alpha_y=alpha_y,
+                                           alpha_z=alpha_z)
+            # Load potential V
+            # To get actually no potential use -V="lambda x,y,z: 0"
+            if args.V is None:
+                # -V=None uses harmonic potential with w_x, w_y, w_z.
+                # used to get access to the in-build functions of supersolids package
+                System.V_val = V_harmonic(System.x_mesh, System.y_mesh, System.z_mesh)
+            else:
+                if args.V_reload:
+                    if System_loaded.V is None:
+                        System.V_val = args.V(System.x_mesh, System.y_mesh, System.z_mesh)
+                    else:
+                        System.V_val = System_loaded.V_val + args.V(System.x_mesh,
+                                                                    System.y_mesh,
+                                                                    System.z_mesh)
+                else:
+                    System.V_val = args.V(System.x_mesh, System.y_mesh, System.z_mesh)
+
 
             # Load psi values from System_loaded into System
             System.psi_val = System_loaded.psi_val
