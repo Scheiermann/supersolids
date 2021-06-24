@@ -34,6 +34,7 @@ def simulate_case(System: Schroedinger,
                   x_lim: Tuple[float, float] = (-1.0, 1.0),
                   y_lim: Tuple[float, float] = (-1.0, 1.0),
                   z_lim: Tuple[float, float] = (-1.0, 1.0),
+                  steps_format: str = "%07d",
                   steps_per_npz: int = 10,
                   frame_start: int = 0,
                   ) -> Schroedinger:
@@ -71,6 +72,9 @@ def simulate_case(System: Schroedinger,
     :param y_lim: Limits of plot in y direction
 
     :param z_lim: Limits of plot in z direction
+
+    :param steps_format:
+        Formatting string for the enumeration of steps.
 
     :param steps_per_npz: Number of dt steps skipped between saved npz.
 
@@ -127,8 +131,10 @@ def simulate_case(System: Schroedinger,
             System.simulate_raw(accuracy=accuracy,
                                 dir_path=dir_path,
                                 dir_name_result=dir_name_result,
+                                filename_schroedinger="schroedinger.pkl",
+                                filename_steps="step_",
+                                steps_format=steps_format,
                                 steps_per_npz=steps_per_npz,
                                 frame_start=frame_start,
                                 )
-
         return System
