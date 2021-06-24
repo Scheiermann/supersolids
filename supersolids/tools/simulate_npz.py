@@ -259,7 +259,7 @@ if __name__ == "__main__":
             # we apply noise after loading the old System
             if args.noise is None:
                 if args.noise_func:
-                    noise_func = args.noise_func(gauss=1.0, k=1.0)
+                    noise_func = functools.partial(args.noise_func, gauss=1.0)
                 else:
                     noise_func = np.ones(shape=np.shape(System_loaded.psi_val))
             else:
@@ -270,12 +270,16 @@ if __name__ == "__main__":
                     )
 
                 if args.noise_func:
-                    noise_func = args.noise_func(gauss=psi_0_noise_3d, k=1.0)
+                    noise_func = functools.partial(args.noise_func, gauss=psi_0_noise_3d)
                 else:
                     noise_func = psi_0_noise_3d
 
             if args.neighborhood is None:
-                System.psi_val = noise_func * System.psi_val
+                if args.noise_func:
+                    System.psi_val = noise_func(k=1.0) * System.psi_val
+                else:
+                    System.psi_val = noise_func * System.psi_val
+
             else:
                 bool_grid_list = System_loaded.get_peak_neighborhood(prob_min=args.neighborhood[0],
                                                                      amount=args.neighborhood[1],
