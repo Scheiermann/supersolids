@@ -34,6 +34,8 @@ def simulate_case(System: Schroedinger,
                   x_lim: Tuple[float, float] = (-1.0, 1.0),
                   y_lim: Tuple[float, float] = (-1.0, 1.0),
                   z_lim: Tuple[float, float] = (-1.0, 1.0),
+                  filename_schroedinger: str = "schroedinger.pkl",
+                  filename_steps: str = "step_",
                   steps_format: str = "%07d",
                   steps_per_npz: int = 10,
                   frame_start: int = 0,
@@ -72,6 +74,12 @@ def simulate_case(System: Schroedinger,
     :param y_lim: Limits of plot in y direction
 
     :param z_lim: Limits of plot in z direction
+
+    :param filename_schroedinger: Name of file, where the Schroedinger object is saved
+
+    :param filename_steps: Name of file, without enumerator for the files.
+        For example the standard naming convention is step_000001.npz,
+        the string needed is step_
 
     :param steps_format:
         Formatting string for the enumeration of steps.
@@ -131,8 +139,8 @@ def simulate_case(System: Schroedinger,
             System.simulate_raw(accuracy=accuracy,
                                 dir_path=dir_path,
                                 dir_name_result=dir_name_result,
-                                filename_schroedinger="schroedinger.pkl",
-                                filename_steps="step_",
+                                filename_schroedinger=filename_schroedinger,
+                                filename_steps=filename_steps,
                                 steps_format=steps_format,
                                 steps_per_npz=steps_per_npz,
                                 frame_start=frame_start,
