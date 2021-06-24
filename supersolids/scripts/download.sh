@@ -15,15 +15,25 @@ dir_name="movie"
 download_start=$((516 + next_new))
 download_dir_name="movie"
 
-# depending on the server settings, number of connections is limited
 max_parallel_download=10
+# depending on the server settings, number of connections is limited
+# create array with sequence to batch the number of movies
 download_batch=($(seq $max_parallel_download $max_parallel_download $number))
-if [ $number -ne  ${download_batch[-1]} ]
-then
+if (( ${#download_batch[@]} ));then
+    :
+else
+    # add number to sequence
     download_batch+=($number)
 fi
 
-path_anchor="/run/media/dsche/ITP Transfer/joseph_injunction2/real2/"
+if [ $number -ne  ${download_batch[-1]} ]
+then
+    # add number to sequence
+    download_batch+=($number)
+fi
+
+path_anchor_input="itpx:/bigwork/dscheier/supersolids/results/"
+path_anchor_output="/run/media/dsche/ITP Transfer/j_v_none/half_phase_real/"
 
 
 echo ${download_batch[*]}
@@ -31,14 +41,13 @@ echo ${download_batch[*]}
 k=0
 for batch in "${download_batch[@]}"
 do
-  #for movie_number in $(eval "echo {001..$number}")
   for ((j = k; j < $batch; j++))
   do
       printf -v movie_number "%03d" $((start + j))
-      mkdir "$path_anchor$dir_name$movie_number"
+      mkdir "${path_anchor_output}$dir_name$movie_number"
 
       echo $movie_number
-      rsync -P itpx:/bigwork/dscheier/supersolids/results/$download_dir_name$((download_start + j))/* "${path_anchor}${dir_name}${movie_number}" &
+      rsync -P "${path_anchor_input}$download_dir_name$((download_start + j))/*" "${path_anchor_output}${dir_name}${movie_number}" &
   done
   k=$batch
   wait
