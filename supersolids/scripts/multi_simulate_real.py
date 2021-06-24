@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 
 
-supersolids_version = "0.1.32rc5"
+supersolids_version = "0.1.32rc8"
 
 dir_path = Path("/bigwork/dscheier/supersolids/results/")
 # dir_path = Path("/home/dsche/supersolids/results/")
