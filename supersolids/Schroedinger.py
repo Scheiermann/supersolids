@@ -688,27 +688,32 @@ class Schroedinger:
         bool_grid_list = self.get_peak_neighborhood(prob_min, amount)
         bool_grid = np.logical_or(bool_grid_list[:-1], bool_grid_list[-1])
 
-        prob_cropped = bool_grid * self.get_density(p=2.0)
-        psi_val_cropped = bool_grid * self.psi_val
-        angle = np.angle(psi_val_cropped)
+        norm = self.get_norm(self.get_density(p=2.0))
+        prob = bool_grid * self.get_density(p=2.0) / norm
+        psi_val_bool_grid = bool_grid * self.psi_val
+        angle = np.angle(psi_val_bool_grid)
+        angle_cos = np.cos(angle + np.pi)
 
-        phase = self.trapez_integral(prob_cropped * (angle + np.pi))
-        phase2 = self.trapez_integral(prob_cropped * (angle + np.pi) ** 2.0)
+        phase = self.trapez_integral(prob * angle_cos)
+        phase2 = self.trapez_integral(prob * angle_cos ** 2.0)
         phase_var = np.sqrt(np.abs(phase2 - phase ** 2.0))
 
         return phase_var
 
     def get_phase_var(self, x0, x1, y0, y1, z0, z1):
         """
-        Calculates the variance of the phase of the System.
+        Calculates the variance of the phase of the System by cos(phi).
 
         """
-        prob_cropped = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1]
+        norm = self.get_norm(self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1])
+        prob_cropped = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1] / norm
         psi_val_cropped = self.psi_val[x0:x1, y0:y1, z0:z1]
         angle = np.angle(psi_val_cropped)
+        angle_cos = np.cos(angle + np.pi)
 
-        phase = self.trapez_integral(prob_cropped * (angle + np.pi))
-        phase2 = self.trapez_integral(prob_cropped * (angle + np.pi) ** 2.0)
+        phase = self.trapez_integral(prob_cropped * angle_cos)
+        phase2 = self.trapez_integral(prob_cropped * angle_cos ** 2.0)
+
         phase_var = np.sqrt(np.abs(phase2 - phase ** 2.0))
 
         return phase_var
