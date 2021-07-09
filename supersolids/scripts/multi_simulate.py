@@ -3,9 +3,10 @@ import subprocess
 from pathlib import Path
 import numpy as np
 
+from supersolids.Animation.MayaviAnimation import get_supersolids_version
 
-supersolids_version = "0.1.32rc8"
 
+supersolids_version = get_supersolids_version()
 dir_path = Path("/bigwork/dscheier/supersolids/results/")
 # dir_path = Path("/home/dsche/supersolids/results/")
 
@@ -104,6 +105,7 @@ echo $(which pip3)
 
 /bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids.tools.simulate_npz -Res='{{"x": 256, "y": 128, "z": 32}}' -Box='{{"x0": -10, "x1": 10, "y0": -5, "y1": 5, "z0": -4, "z1": 4}}' -max_timesteps={max_timesteps} -dt={dt} -steps_per_npz={steps_per_npz} -accuracy={accuracy} -dir_name_load={movie_now} -dir_name_result={movie_after} -filename_npz={file_name} --offscreen -dir_path={dir_path} -V='{func}' --V_reload
 
+# -noise_func=lambda gauss, k: np.concatenate((np.ones(shape=(128,128,32)) * np.exp(-1.0j * (1.0 + 2.0 * k * np.pi /4.0)), np.ones(shape=(128,128,32))), axis=0) * gauss
 # -noise -0.1 0.1 -noise_func='lambda x: np.exp(1.0j * x)' --real_time
 # -noise_func=lambda gauss, k: np.exp(-1.0j * (4.0 + k * 2.0 * np.pi /4.0) * gauss) -neighborhood 0.02 4
 """
