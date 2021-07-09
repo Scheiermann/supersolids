@@ -27,74 +27,8 @@ from supersolids.helper.simulate_case import simulate_case
 from supersolids.helper.Resolution import Resolution
 from supersolids.helper.Box import Box
 
-# Script runs, if script is run as main script (called by python *.py)
-if __name__ == "__main__":
-    # Use parser to
-    parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
-                                                 "and continue simulation from there.")
-    parser.add_argument("-dt", metavar="dt", type=float, default=2 * 10 ** -3, nargs="?",
-                        help="Length of timestep to evolve Schrödinger system")
-    parser.add_argument("-Res", metavar="Resolution", type=json.loads, default=None,
-                        help="Dictionary of resolutions for the box (1D, 2D, 3D). "
-                             "Needs to be 2 ** int.")
-    parser.add_argument("-Box", metavar="Box", type=json.loads, default=None,
-                        help=("Dictionary for the Box dimensionality. "
-                              "Two values per dimension to set start and end (1D, 2D, 3D)."))
-    parser.add_argument("-w", metavar="Trap frequency", type=json.loads,
-                        default=None,
-                        help="Frequency of harmonic trap in x, y, z direction. If None, "
-                        "frequency of the loaded System from the npz is taken.")
-    parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int,
-                        default=80001,
-                        help="Simulate until accuracy or maximum of steps of length dt is reached")
-    parser.add_argument("-accuracy", metavar="accuracy", type=float,
-                        default=10 ** -12,
-                        help="Simulate until accuracy or maximum of steps of length dt is reached")
-    parser.add_argument("-V", type=functions.lambda_parsed,
-                        help="Potential as lambda function. For example: "
-                             "-V='lambda x,y,z: 0 * x * y * z'")
-    parser.add_argument("-noise", metavar="noise", type=json.loads, default=None, action='store',
-                        nargs=2, help="Min and max of gauss noise to apply on psi.")
-    parser.add_argument("-noise_func", metavar="noise_func", type=functions.lambda_parsed,
-                        default=None, help="Function to apply on the range given by noise flag.")
-    parser.add_argument("-neighborhood", type=json.loads, action='store', nargs=2,
-                        help="Arguments for function get_peak_neighborhood: prob_min, amount")
-    parser.add_argument("-dir_path", metavar="dir_path", type=str,
-                        default="~/supersolids/results", help="Absolute path to save data to")
-    parser.add_argument("-dir_name_load", metavar="dir_name_load", type=str,
-                        default="movie" + "%03d" % 1,
-                        help="Name of directory where the files to load lie. "
-                             "For example the standard naming convention is movie001")
-    parser.add_argument("-dir_name_result", metavar="dir_name_result", type=str, default="",
-                        help="Name of directory where to save the results at. "
-                             "For example the standard naming convention is movie002")
-    parser.add_argument("-filename_schroedinger", metavar="filename_schroedinger", type=str,
-                        default="schroedinger.pkl",
-                        help="Name of file, where the Schroedinger object is saved")
-    parser.add_argument("-filename_npz", metavar="filename_npz",
-                        type=str, default="step_" + "%07d" % 0 + ".npz",
-                        help="Name of file, where psi_val is saved. "
-                             "For example the standard naming convention is step_000001.npz")
-    parser.add_argument("-filename_steps", type=str, default="step_",
-                        help="Name of file, without enumerator for the files. "
-                             "For example the standard naming convention is step_000001.npz, "
-                             "the string needed is step_")
-    parser.add_argument("-steps_format", type=str, default="%07d",
-                        help="Formatting string for the enumeration of steps.")
-    parser.add_argument("-steps_per_npz", metavar="steps_per_npz", type=int, default=10,
-                        help="Number of dt steps skipped between saved npz.")
-    parser.add_argument("--offscreen", default=False, action="store_true",
-                        help="If not used, interactive animation is shown and saved as mp4."
-                             "If used, Schroedinger is saved as pkl and allows offscreen usage.")
-    parser.add_argument("--V_reload", default=False, action="store_true",
-                        help="If not used, V will be the lambda function provided by the V flag."
-                             "If used, the V is loaded from the provided Schroedinger, "
-                             "plus the lambda function provided by the V flag.")
-    parser.add_argument("--real_time", default=False, action="store_true",
-                        help="Switch for Split-Operator method to use imaginary time or not.")
 
-    args = parser.parse_args()
-    print(f"args: {args}")
+def simulate_npz(args):
 
     try:
         dir_path = Path(args.dir_path).expanduser()
@@ -403,3 +337,79 @@ if __name__ == "__main__":
 
     except FileNotFoundError:
         print(f"File at {schroedinger_path} not found.")
+
+
+def flags(args_array):
+    parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
+                                                 "and continue simulation from there.")
+    parser.add_argument("-dt", metavar="dt", type=float, default=2 * 10 ** -3, nargs="?",
+                        help="Length of timestep to evolve Schrödinger system")
+    parser.add_argument("-Res", metavar="Resolution", type=json.loads, default=None,
+                        help="Dictionary of resolutions for the box (1D, 2D, 3D). "
+                             "Needs to be 2 ** int.")
+    parser.add_argument("-Box", metavar="Box", type=json.loads, default=None,
+                        help=("Dictionary for the Box dimensionality. "
+                              "Two values per dimension to set start and end (1D, 2D, 3D)."))
+    parser.add_argument("-w", metavar="Trap frequency", type=json.loads,
+                        default=None,
+                        help="Frequency of harmonic trap in x, y, z direction. If None, "
+                        "frequency of the loaded System from the npz is taken.")
+    parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int,
+                        default=80001,
+                        help="Simulate until accuracy or maximum of steps of length dt is reached")
+    parser.add_argument("-accuracy", metavar="accuracy", type=float,
+                        default=10 ** -12,
+                        help="Simulate until accuracy or maximum of steps of length dt is reached")
+    parser.add_argument("-V", type=functions.lambda_parsed,
+                        help="Potential as lambda function. For example: "
+                             "-V='lambda x,y,z: 0 * x * y * z'")
+    parser.add_argument("-noise", metavar="noise", type=json.loads, default=None, action='store',
+                        nargs=2, help="Min and max of gauss noise to apply on psi.")
+    parser.add_argument("-noise_func", metavar="noise_func", type=functions.lambda_parsed,
+                        default=None, help="Function to apply on the range given by noise flag.")
+    parser.add_argument("-neighborhood", type=json.loads, action='store', nargs=2,
+                        help="Arguments for function get_peak_neighborhood: prob_min, amount")
+    parser.add_argument("-dir_path", metavar="dir_path", type=str,
+                        default="~/supersolids/results", help="Absolute path to save data to")
+    parser.add_argument("-dir_name_load", metavar="dir_name_load", type=str,
+                        default="movie" + "%03d" % 1,
+                        help="Name of directory where the files to load lie. "
+                             "For example the standard naming convention is movie001")
+    parser.add_argument("-dir_name_result", metavar="dir_name_result", type=str, default="",
+                        help="Name of directory where to save the results at. "
+                             "For example the standard naming convention is movie002")
+    parser.add_argument("-filename_schroedinger", metavar="filename_schroedinger", type=str,
+                        default="schroedinger.pkl",
+                        help="Name of file, where the Schroedinger object is saved")
+    parser.add_argument("-filename_npz", metavar="filename_npz",
+                        type=str, default="step_" + "%07d" % 0 + ".npz",
+                        help="Name of file, where psi_val is saved. "
+                             "For example the standard naming convention is step_000001.npz")
+    parser.add_argument("-filename_steps", type=str, default="step_",
+                        help="Name of file, without enumerator for the files. "
+                             "For example the standard naming convention is step_000001.npz, "
+                             "the string needed is step_")
+    parser.add_argument("-steps_format", type=str, default="%07d",
+                        help="Formatting string for the enumeration of steps.")
+    parser.add_argument("-steps_per_npz", metavar="steps_per_npz", type=int, default=10,
+                        help="Number of dt steps skipped between saved npz.")
+    parser.add_argument("--offscreen", default=False, action="store_true",
+                        help="If not used, interactive animation is shown and saved as mp4."
+                             "If used, Schroedinger is saved as pkl and allows offscreen usage.")
+    parser.add_argument("--V_reload", default=False, action="store_true",
+                        help="If not used, V will be the lambda function provided by the V flag."
+                             "If used, the V is loaded from the provided Schroedinger, "
+                             "plus the lambda function provided by the V flag.")
+    parser.add_argument("--real_time", default=False, action="store_true",
+                        help="Switch for Split-Operator method to use imaginary time or not.")
+
+    args = parser.parse_args(args_array)
+    print(f"args: {args}")
+
+    return args
+
+
+# Script runs, if script is run as main script (called by python *.py)
+if __name__ == "__main__":
+    args = flags(sys.argv[1:])
+    simulate_npz(args)

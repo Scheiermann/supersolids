@@ -21,7 +21,51 @@ from mayavi import mlab
 from supersolids.Animation.Animation import Animation
 from supersolids.Animation import MayaviAnimation
 
-def load_npz(args_array):
+
+def load_npz(args):
+    slice_x = args.slice_indices["x"]
+    slice_y = args.slice_indices["y"]
+    slice_z = args.slice_indices["z"]
+
+    try:
+        dir_path = Path(args.dir_path).expanduser()
+    except Exception:
+        dir_path = args.dir_path
+
+    Anim: Animation = Animation(plot_psi_sol=args.plot_psi_sol,
+                                plot_V=args.plot_V,
+                                alpha_psi=0.8,
+                                alpha_psi_sol=0.5,
+                                alpha_V=0.3,
+                                filename="anim.mp4",
+                                )
+
+    # mayavi for 3D
+    MayAnim = MayaviAnimation.MayaviAnimation(Anim,
+                                              dir_path=dir_path,
+                                              slice_indices=[slice_x, slice_y, slice_z],
+                                              )
+
+    animate_wrapper = mlab.animate(MayAnim.animate_npz, delay=10, ui=args.ui)
+    MayAnimator = animate_wrapper(dir_path=dir_path,
+                                  dir_name=args.dir_name,
+                                  filename_schroedinger=args.filename_schroedinger,
+                                  filename_steps=args.filename_steps,
+                                  steps_format=args.steps_format,
+                                  steps_per_npz=args.steps_per_npz,
+                                  frame_start=args.frame_start,
+                                  arg_slices=args.arg_slices,
+                                  azimuth=args.azimuth,
+                                  elevation=args.elevation,
+                                  )
+    mlab.show()
+
+    result_path = MayAnim.create_movie(dir_path=MayAnim.dir_path,
+                                       input_data_file_pattern="*.png",
+                                       delete_input=args.delete_input)
+
+
+def flags(args_array):
     parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
                                                  "and create movie.")
     parser.add_argument("-dir_path", type=str, default="~/supersolids/results",
@@ -65,47 +109,11 @@ def load_npz(args_array):
 
     args = parser.parse_args(args_array)
     print(f"args: {args}")
-    slice_x = args.slice_indices["x"]
-    slice_y = args.slice_indices["y"]
-    slice_z = args.slice_indices["z"]
 
-    try:
-        dir_path = Path(args.dir_path).expanduser()
-    except Exception:
-        dir_path = args.dir_path
+    return args
 
-    Anim: Animation = Animation(plot_psi_sol=args.plot_psi_sol,
-                                plot_V=args.plot_V,
-                                alpha_psi=0.8,
-                                alpha_psi_sol=0.5,
-                                alpha_V=0.3,
-                                filename="anim.mp4",
-                                )
-
-    # mayavi for 3D
-    MayAnim = MayaviAnimation.MayaviAnimation(Anim,
-                                              dir_path=dir_path,
-                                              slice_indices=[slice_x, slice_y, slice_z],
-                                              )
-
-    animate_wrapper = mlab.animate(MayAnim.animate_npz, delay=10, ui=args.ui)
-    MayAnimator = animate_wrapper(dir_path=dir_path,
-                                  dir_name=args.dir_name,
-                                  filename_schroedinger=args.filename_schroedinger,
-                                  filename_steps=args.filename_steps,
-                                  steps_format=args.steps_format,
-                                  steps_per_npz=args.steps_per_npz,
-                                  frame_start=args.frame_start,
-                                  arg_slices=args.arg_slices,
-                                  azimuth=args.azimuth,
-                                  elevation=args.elevation,
-                                  )
-    mlab.show()
-
-    result_path = MayAnim.create_movie(dir_path=MayAnim.dir_path,
-                                       input_data_file_pattern="*.png",
-                                       delete_input=args.delete_input)
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    load_npz(sys.argv[1:])
+    args = flags(sys.argv[1:])
+    load_npz(args)
