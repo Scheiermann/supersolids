@@ -137,42 +137,17 @@ def property_to_array(property_tuple):
     return property_all
 
 
-# Script runs, if script is run as main script (called by python *.py)
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Load old simulations of Schrödinger system and get property.")
-    parser.add_argument("-dir_path", type=str,
-                        default="~/supersolids/results",
-                        help="Absolute path to load data from")
-    parser.add_argument("-dir_name", type=str, default="movie" + "%03d" % 1,
-                        help="Name of directory where the files to load lie. "
-                             "For example the standard naming convention is movie001")
-    parser.add_argument("-filename_schroedinger", type=str, default="schroedinger.pkl",
-                        help="Name of file, where the Schroedinger object is saved")
-    parser.add_argument("-filename_steps", type=str, default="step_",
-                        help="Name of file, without enumarator for the files. "
-                             "For example the standard naming convention is step_000001.npz, "
-                             "the string needed is step_")
-    parser.add_argument("-steps_format", type=str, default="%06d",
-                        help="Formating string to enumerate the files. "
-                             "For example the standard naming convention is step_000001.npz, "
-                             "the string needed is percent 06d")
-    parser.add_argument("-steps_per_npz", type=int, default=10,
-                        help="Number of dt steps skipped between saved npz.")
-    parser.add_argument("-frame_start", type=int, default=0, help="Counter of first saved npz.")
-    parser.add_argument("-property_name", type=str, default="mu",
-                        help="Name of property to get from the Schroedinger object.")
-    parser.add_argument("--property_func", default=False, action="store_true",
-                        help="If not used, flag property_name will be a interpreted as property of "
-                             "an Schroedinger object."
-                             "If used, flag property_name will be a interpreted as method of an "
-                             "Schroedinger object.")
-    parser.add_argument("--property_args", default=[], type=json.loads,
-                        action='store', nargs="*",
-                        help="Arguments for property_name, if property_func is used.")
+def fft_plot(t, property_all):
+    T = t[-1]
+    N = len(t)
+    sample_rate = N / T
+    freq = np.fft.rfftfreq(len(t), 1.0 / sample_rate)
+    property_fft = np.abs(np.fft.rfft(property_all))
 
-    args = parser.parse_args()
-    print(f"args: {args}")
+    return freq, property_fft
+
+
+def plot_property(args):
 
     dir_path = Path(args.dir_path).expanduser()
     if not dir_path.exists():
@@ -198,19 +173,98 @@ if __name__ == "__main__":
     except Exception:
         dim = 1
 
+    property_length = np.shape(property_all)[0]
+    t = np.arange(property_length) * args.steps_per_npz * args.dt
     if dim == 1:
         plt.plot(property_all, "x-")
+        plt.xlabel(rf"t with dt={args.dt}")
+        plt.ylabel(f"{args.property_name}")
+        plt.grid()
+        plt.title(f"with property_args: {args.property_args}")
+        plt.legend()
+        if args.property_name:
+            plt.savefig(Path(input_path, f"{args.property_name + args.property_filename_suffix}"))
     else:
         labels = []
-        for i in range(0, dim):
-            labels.append(str(i + 1))
-            plt.plot(property_all.T[i], "x-", label=labels[i])
-        plt.legend()
+        if args.subplots:
+            fig, axes = plt.subplots(nrows=np.shape(property_all)[1], ncols=1, squeeze=False, sharex='col')
+            for i, ax in enumerate(plt.gcf().get_axes()):
+                labels.append(str(i))
+                ax.plot(t, property_all.T[i], "x-", label=labels[i])
+                # freq, property_fft = fft_plot(t, property_all.T[i])
+                # ax.plot(freq, property_fft, "x-", label=labels[i])
+                ax.grid()
+                ax.legend()
+            axes[0, 0].figure.text(0.5, 0.04, rf"t with dt={args.dt}", ha="center", va="center")
+            axes[0, 0].figure.text(0.05, 0.5, f"{args.property_name}", ha="center", va="center", rotation=90)
+            plt.suptitle(f"{args.property_name}({','.join(map(str, args.property_args))})")
+            plt.subplots_adjust(left=0.15)
 
-    plt.xlabel(rf"Number of loaded npz ($\propto time$)")
-    plt.ylabel(f"{args.property_name}")
-    plt.grid()
-    plt.title(f"with property_args: {args.property_args}")
-    if args.property_name:
-        plt.savefig(Path(input_path, f"{args.property_name}"))
-    # plt.show()
+            if args.property_name:
+                fig.savefig(Path(input_path, f"{args.property_name + args.property_filename_suffix}"))
+        else:
+            for i in range(0, dim):
+                labels.append(str(i))
+                plt.plot(t, property_all.T[i], "x-", label=labels[i])
+
+                # freq, property_fft = fft_plot(t, property_all)
+                # plt.plot(freq, property_fft, "x-", label=labels[i])
+
+            plt.xlabel(rf"t with dt={args.dt}")
+            plt.ylabel(f"{args.property_name}")
+            plt.grid()
+            plt.title(f"with property_args: {args.property_args}")
+            plt.legend()
+            if args.property_name:
+                plt.savefig(Path(input_path, f"{args.property_name + args.property_filename_suffix}"))
+
+
+def flags(args_array):
+    parser = argparse.ArgumentParser(
+        description="Load old simulations of Schrödinger system and get property.")
+    parser.add_argument("-dt", metavar="dt", type=float, nargs="?", required=True,
+                        help="Length of timestep to evolve Schrödinger system.")
+    parser.add_argument("-dir_path", type=str,
+                        default="~/supersolids/results",
+                        help="Absolute path to load data from")
+    parser.add_argument("-dir_name", type=str, default="movie" + "%03d" % 1,
+                        help="Name of directory where the files to load lie. "
+                             "For example the standard naming convention is movie001")
+    parser.add_argument("-filename_schroedinger", type=str, default="schroedinger.pkl",
+                        help="Name of file, where the Schroedinger object is saved")
+    parser.add_argument("-filename_steps", type=str, default="step_",
+                        help="Name of file, without enumarator for the files. "
+                             "For example the standard naming convention is step_000001.npz, "
+                             "the string needed is step_")
+    parser.add_argument("-steps_format", type=str, default="%06d",
+                        help="Formating string to enumerate the files. "
+                             "For example the standard naming convention is step_000001.npz, "
+                             "the string needed is percent 06d")
+    parser.add_argument("-steps_per_npz", type=int, default=10,
+                        help="Number of dt steps skipped between saved npz.")
+    parser.add_argument("-frame_start", type=int, default=0, help="Counter of first saved npz.")
+    parser.add_argument("-property_filename_suffix", type=str, default="", nargs="?",
+                        help="Suffix to the filename of the property plot.")
+    parser.add_argument("-property_name", type=str, default="mu",
+                        help="Name of property to get from the Schroedinger object.")
+    parser.add_argument("--property_func", default=False, action="store_true",
+                        help="If not used, flag property_name will be a interpreted as property of "
+                             "an Schroedinger object."
+                             "If used, flag property_name will be a interpreted as method of an "
+                             "Schroedinger object.")
+    parser.add_argument("--property_args", type=json.loads, default=[],
+                        action='store', nargs="*",
+                        help="Arguments for property_name, if property_func is used.")
+    parser.add_argument("--subplots", default=False, action="store_true",
+                        help="If used, the dimensions of the property will be plotted in subplots.")
+
+    args = parser.parse_args(args_array)
+    print(f"args: {args}")
+
+    return args
+
+
+# Script runs, if script is run as main script (called by python *.py)
+if __name__ == "__main__":
+    args = flags(sys.argv[1:])
+    plot_property(args)
