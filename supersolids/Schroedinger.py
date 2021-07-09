@@ -394,15 +394,20 @@ class Schroedinger:
 
         return psi_density
 
-    def get_norm(self, p: float = 2.0) -> float:
+    def get_norm(self, func=None, p: float = 2.0) -> float:
         """
         Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D
         (depending on self.dim). For p=2 it is the 2-norm.
 
         :param p: Exponent of :math:`|\psi|`. Use p=2.0 for density.
 
+        :param func: If func is not provided self.get_density(p=p) is used.
+
         :return: :math:`\int |\psi|^p \\mathrm{dV}`
+
         """
+        if func is None:
+            func = self.get_density(p=p)
 
         if self.dim == 1:
             dV: float = self.dx
@@ -413,7 +418,7 @@ class Schroedinger:
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")
 
-        psi_norm: float = np.sum(self.get_density(p=p)) * dV
+        psi_norm: float = np.sum(func) * dV
 
         return psi_norm
 
@@ -474,14 +479,13 @@ class Schroedinger:
 
         return r2
 
-    def get_r_vector(self):
+    def get_mesh_list(self, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
         if self.dim == 1:
-            r = self.x_mesh.ravel()
+            r = self.x_mesh[x0:x1]
         elif self.dim == 2:
-            r = (self.x_mesh.ravel(), self.y_mesh.ravel())
+            r = [self.x_mesh[x0:x1, y0:y1], self.y_mesh[x0:x1, y0:y1]]
         elif self.dim == 3:
-            r = np.array(
-                [self.x_mesh.ravel(), self.y_mesh.ravel(), self.z_mesh.ravel()])
+            r = [self.x_mesh[x0:x1, y0:y1, z0:z1], self.y_mesh[x0:x1, y0:y1, z0:z1], self.z_mesh[x0:x1, y0:y1, z0:z1]]
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")
 
@@ -658,25 +662,56 @@ class Schroedinger:
 
         return single_droplet, edges
 
-    def get_center_of_mass(self):
+    def slice_default(self, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
+        if (x0 is None) and (x1 is None):
+            x0 = self.Box.x0
+            x1 = self.Box.x1
+        else:
+            if (x0 < 0) or ((x0 or x1) > self.Res.x):
+                sys.exit(f"ERROR: Slice indices ({x0}, {x1}) for x out of bound. "
+                         f"Bounds are (0, {self.Res.x})\n")
+
+        if (y0 is None) and (y1 is None):
+            y0 = self.Box.y0
+            y1 = self.Box.y1
+        else:
+            if (y0 < 0) or ((y0 or y1) > self.Res.y):
+                sys.exit(f"ERROR: Slice indices ({y0}, {y1}) for y out of bound. "
+                         f"Bounds are (0, {self.Res.y})\n")
+
+        if (z0 is None) and (z1 is None):
+            z0 = self.Box.z0
+            z1 = self.Box.z1
+        else:
+            if (z0 < 0) or ((z0 or z1) > self.Res.z):
+                sys.exit(f"ERROR: Slice indices ({z0}, {z1}) for z out of bound. "
+                         f"Bounds are (0, {self.Res.z})\n")
+
+        return x0, x1, y0, y1, z0, z1
+
+    def get_center_of_mass(self, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
         """
         Calculates the center of mass of the System.
 
         """
-        return np.average(self.get_density(p=2.0).ravel() * self.get_r_vector(), axis=1)
 
-    def get_parity(self, axis=2):
+        x0, x1, y0, y1, z0, z1 = self.slice_default(x0, x1, y0, y1, z0, z1)
+        prob = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1]
+        r = self.get_mesh_list(x0, x1, y0, y1, z0, z1)
+        center_of_mass_along_axis = [prob * r_i for r_i in r]
+        com = [np.average(com_along_axis) for com_along_axis in center_of_mass_along_axis]
+        return com
+
+    def get_parity(self, axis=2, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
+        x0, x1, y0, y1, z0, z1 = self.slice_default(x0, x1, y0, y1, z0, z1)
         psi_under0, psi_over0 = np.split(self.psi_val, 2, axis=axis)
-        if axis == 0:
-            psi_over0_reversed = psi_over0[::-1]
-        elif axis == 1:
-            psi_over0_reversed = psi_over0[::-1]
-        elif axis == 2:
+
+        if axis in [0, 1, 2]:
             psi_over0_reversed = psi_over0[::-1]
         else:
             sys.exit(f"No such axis ({axis}). Choose 0, 1 or 2 for axis x, y or z.")
 
-        parity = self.trapez_integral(np.abs(psi_under0 - psi_over0_reversed) ** 2.0)
+        parity = self.trapez_integral(np.abs(psi_under0[x0:x1, y0:y1, z0:z1] - psi_over0_reversed[x0:x1, y0:y1, z0:z1]) ** 2.0)
 
         return parity
 
@@ -705,7 +740,8 @@ class Schroedinger:
         Calculates the variance of the phase of the System by cos(phi).
 
         """
-        norm = self.get_norm(self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1])
+        norm = self.get_norm(func=self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1])
+
         prob_cropped = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1] / norm
         psi_val_cropped = self.psi_val[x0:x1, y0:y1, z0:z1]
         angle = np.angle(psi_val_cropped)
