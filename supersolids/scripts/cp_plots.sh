@@ -3,7 +3,8 @@
 path_anchor_input="/mnt/extern/joseph_injunction2/real_phase_half/"
 path_anchor_output="/mnt/extern/joseph_injunction2/real_phase_half/graphs/"
 
-filename="get_phase_var"
+filename_in="get_center_of_mass"
+filename_out="get_center_of_mass"
 filename_extension=".png"
 
 start=631
@@ -16,5 +17,5 @@ do
     mkdir "${path_anchor_output}"
 
     echo $movie_number
-    cp "${path_anchor_input}$dir_name${movie_number}/$filename${filename_extension}" "${path_anchor_output}$filename${movie_number}${filename_extension}"
+    cp "${path_anchor_input}$dir_name${movie_number}/${filename_in}${filename_extension}" "${path_anchor_output}${filename_out}${movie_number}${filename_extension}"
 done
