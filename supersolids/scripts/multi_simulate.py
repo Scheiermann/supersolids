@@ -103,7 +103,18 @@ echo $(which pip3)
 /bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
 # /bigwork/dscheier/miniconda3/bin/pip3 install -i https://pypi.org/simple/supersolids=={supersolids_version}
 
-/bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids.tools.simulate_npz -Res='{{"x": 256, "y": 128, "z": 32}}' -Box='{{"x0": -10, "x1": 10, "y0": -5, "y1": 5, "z0": -4, "z1": 4}}' -max_timesteps={max_timesteps} -dt={dt} -steps_per_npz={steps_per_npz} -accuracy={accuracy} -dir_name_load={movie_now} -dir_name_result={movie_after} -filename_npz={file_name} --offscreen -dir_path={dir_path} -V='{func}' --V_reload
+/bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids.tools.simulate_npz \
+-Res='{{"x": 256, "y": 128, "z": 32}}' \
+-Box='{{"x0": -10, "x1": 10, "y0": -5, "y1": 5, "z0": -4, "z1": 4}}' \
+-max_timesteps={max_timesteps} -dt={dt} -steps_per_npz={steps_per_npz} -accuracy={accuracy} \
+-dir_name_load={movie_now} -dir_name_result={movie_after} -filename_npz={file_name} \
+-dir_path={dir_path} -V='{func}' \
+--offscreen \
+--V_reload \
+-noise_func=lambda gauss, k: np.concatenate(
+(np.exp(-1.0j * np.mgrid[-10: 10: complex(0, 256), -5: 5: complex(0, 128), -4: 4: complex(0, 32)][1][:128, :128, :] * (1.0 + 2.0 * k * np.pi /4.0)),
+np.exp(1.0j * np.mgrid[-10: 10: complex(0, 256), -5: 5: complex(0, 128), -4: 4: complex(0, 32)][1][128:, :, :] * (1.0 + 2.0 * k * np.pi /4.0))),
+axis=0) * gauss
 
 # -noise_func=lambda gauss, k: np.concatenate((np.ones(shape=(128,128,32)) * np.exp(-1.0j * (1.0 + 2.0 * k * np.pi /4.0)), np.ones(shape=(128,128,32))), axis=0) * gauss
 # -noise -0.1 0.1 -noise_func='lambda x: np.exp(1.0j * x)' --real_time
