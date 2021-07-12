@@ -43,6 +43,7 @@ func_path_list = []
 dir_path_func_list = []
 for v in np.arange(v_start, v_end, v_step):
     for d in np.arange(d_start, d_end, d_step):
+        func_list.append([])
         v_string = round(v, ndigits=5)
         d_string = round(d, ndigits=5)
 
@@ -53,7 +54,7 @@ for v in np.arange(v_start, v_end, v_step):
         # func = f"lambda x, y, z: {v_string} * np.sin( (np.pi*x/{d_string}) )"
         func = f"lambda x, y, z: {v_string} * np.exp(-((x ** 2.0) /{d_string} ** 2.0) )"
 
-        func_list.append(func)
+        func_list[j_counter].append(func)
 
         movie_after = f"{movie_string}{counting_format % movie_number_after}"
 
@@ -140,7 +141,8 @@ for i, v_0 in enumerate(np.arange(v_start, v_end, v_step)):
                 dir_path_func.mkdir(mode=0o751)
 
             with open(func_path, "a") as func_file:
-                func_file.write(f"{func}")
+                func_string = '\n'.join(func)
+                func_file.write(f"{func_string}")
 
         j_counter += 1
 
