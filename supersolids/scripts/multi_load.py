@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from supersolids.tools.load_npz import load_npz
+from supersolids.tools.load_npz import load_npz, flags
 
 
 def string_float(s):
@@ -11,7 +11,7 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    dir_path = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/real2/")
+    path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_fix_0.01/")
 
     frame_start = 1210000
     # frame_start = 1510000
@@ -33,17 +33,24 @@ if __name__ == "__main__":
 
     for i in range(movie_start, movie_end + 1):
         command = ["python", "-m", "supersolids.tools.load_npz"]
-        flags_non_split = f"""-dir_path={dir_path.as_posix()}"""
-        flags = f"""-dir_name={movie_string}{counting_format % i} -frame_start={frame_start} -steps_per_npz={steps_per_npz} -steps_format={steps_format} -slice_indices={{"x":127,"y":63,"z":15}} -azimuth={azimuth} -elevation={elevation}"""
+        flags_given = [f"-dir_path={path_anchor_input}",
+                 f"-dir_name={movie_string}{counting_format % i}",
+                 f"-frame_start={frame_start}",
+                 f"-steps_per_npz={steps_per_npz}",
+                 f"-steps_format={steps_format}",
+                 f'-slice_indices={{"x":127,"y":63,"z":15}}',
+                 f"-azimuth={azimuth}",
+                 f"-elevation={elevation}"]
 
         if arg_slices:
-            flags += " --arg_slices"
+            flags_given.append("--arg_slices")
         if plot_V:
-            flags += " --plot_V"
+            flags_given.append("--plot_V")
         if ui:
-            flags += " --ui"
+            flags_given.append("--ui")
 
-        flags_splitted = flags.split(" ") + [flags_non_split]
+        flags_parsed = " ".join(flags_given)
 
-        print(flags_splitted)
-        load_npz(flags_splitted)
+        print(flags_given)
+        args = flags(flags_given)
+        load_npz(args)
