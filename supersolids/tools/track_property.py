@@ -137,18 +137,7 @@ def property_to_array(property_tuple):
     return property_all
 
 
-def fft_plot(t, property_all):
-    T = t[-1]
-    N = len(t)
-    sample_rate = N / T
-    freq = np.fft.rfftfreq(len(t), 1.0 / sample_rate)
-    property_fft = np.abs(np.fft.rfft(property_all))
-
-    return freq, property_fft
-
-
-def plot_property(args):
-
+def plot_property(args, func=functions.identity):
     dir_path = Path(args.dir_path).expanduser()
     if not dir_path.exists():
         sys.exit(f"Path given to load from does not exist. Correct the input via dir_path flag.")
@@ -190,14 +179,13 @@ def plot_property(args):
             fig, axes = plt.subplots(nrows=np.shape(property_all)[1], ncols=1, squeeze=False, sharex='col')
             for i, ax in enumerate(plt.gcf().get_axes()):
                 labels.append(str(i))
-                ax.plot(t, property_all.T[i], "x-", label=labels[i])
-                # freq, property_fft = fft_plot(t, property_all.T[i])
-                # ax.plot(freq, property_fft, "x-", label=labels[i])
+                x_range, y_range = func(t, property_all.T[i])
+                ax.plot(x_range, y_range, "x-", label=labels[i])
                 ax.grid()
                 ax.legend()
             axes[0, 0].figure.text(0.5, 0.04, rf"t with dt={args.dt}", ha="center", va="center")
             axes[0, 0].figure.text(0.05, 0.5, f"{args.property_name}", ha="center", va="center", rotation=90)
-            plt.suptitle(f"{args.property_name}({','.join(map(str, args.property_args))})")
+            plt.suptitle(f"{args.property_name}({', '.join(map(str, args.property_args))})")
             plt.subplots_adjust(left=0.15)
 
             if args.property_name:
@@ -205,10 +193,8 @@ def plot_property(args):
         else:
             for i in range(0, dim):
                 labels.append(str(i))
-                plt.plot(t, property_all.T[i], "x-", label=labels[i])
-
-                # freq, property_fft = fft_plot(t, property_all)
-                # plt.plot(freq, property_fft, "x-", label=labels[i])
+                x_range, y_range = func(t, property_all.T[i])
+                plt.plot(x_range, y_range, "x-", label=labels[i])
 
             plt.xlabel(rf"t with dt={args.dt}")
             plt.ylabel(f"{args.property_name}")
@@ -257,6 +243,13 @@ def flags(args_array):
                         help="Arguments for property_name, if property_func is used.")
     parser.add_argument("--subplots", default=False, action="store_true",
                         help="If used, the dimensions of the property will be plotted in subplots.")
+    parser.add_argument("-inbuild_func", type=functions.lambda_parsed,
+                        help="Function to construct new properties "
+                             "from t and the in-build property_name.")
+    parser.add_argument("-func", type=functions.lambda_parsed,
+                        help="User-defined function to construct new properties "
+                             "from t and the in-build property_name. "
+                             "It is called with func(t, property_all.T[i])")
 
     args = parser.parse_args(args_array)
     print(f"args: {args}")
@@ -267,4 +260,14 @@ def flags(args_array):
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     args = flags(sys.argv[1:])
-    plot_property(args)
+    # func gets gets the arguments: t, property_all.T[i]
+    if args.inbuild_func and args.func:
+        sys.exit(f"ERROR: Choose inbuild_func or func.\n")
+    elif args.inbuild_func:
+        plot_property(args, func=args.inbuild_func)
+    else:
+        if args.func:
+            plot_property(args, func=args.func)
+        else:
+            # if nothing provided, use identity
+            plot_property(args)
