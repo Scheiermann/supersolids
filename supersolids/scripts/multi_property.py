@@ -62,22 +62,40 @@ if __name__ == "__main__":
     # we want 2S=D, so that the peaks distance equals the distance between max and min of sin
     # delta = s * 2.0
 
-    property_args_parsed = " ".join(map(str, property_args))
     for i in range(movie_start, movie_end + 1):
         command = ["python", "-m", "supersolids.tools.track_property"]
-        flags = f"""-dt={dt} -dir_name={movie_string}{counting_format % i} -frame_start={frame_start} -steps_per_npz={steps_per_npz} -steps_format={steps_format} -property_name={property_name} -property_filename_suffix={property_filename_suffix}"""
-        if property_func:
-            flags += " --property_func"
-        if property_args_parsed:
-            flags += f" --property_args {property_args_parsed}"
-        if subplots:
-            flags += f" --subplots"
+        flags = [f"-dt={dt}",
+                 f"-dir_path={path_anchor_input}",
+                 f"-dir_name={dir_name}{counting_format % i}",
+                 f"-frame_start={frame_start}",
+                 f"-steps_per_npz={steps_per_npz}",
+                 f"-steps_format={steps_format}",
+                 f"-property_name={property_name}",
+                 f"-property_filename_suffix={property_filename_suffix}"]
+        flags_no_split = []
 
-        flags_nosplit = f"""-dir_path={dir_path}"""
-        command.extend([flags_nosplit] + flags.split(" "))
+        if property_func:
+            flags.append("--property_func")
+        if property_args:
+            property_args_parsed = list(map(str, property_args))
+            flags.append(f"--property_args")
+            flags += property_args_parsed
+        if subplots:
+            flags.append(f"--subplots")
+        if inbuild_func:
+            flags_no_split.append(f"-inbuild_func={inbuild_func}")
+        if func:
+            flags_no_split.append(f"-func={func}")
+
+        flags_all = flags + flags_no_split
+        # command needs flags to be provided as list
+        command.extend(flags_all)
 
         print(command)
         p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=False)
-        out, err = p.communicate(flags.encode())
+
+        # communicate needs flags to be provided as string seperated by " ".
+        flags_parsed = " ".join(flags_all)
+        out, err = p.communicate(flags_parsed.encode())
         print(f"out:\n{out}\n")
         print(f"err:\n{err}\n")
