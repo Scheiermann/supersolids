@@ -699,7 +699,7 @@ class Schroedinger:
         prob = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1]
         r = self.get_mesh_list(x0, x1, y0, y1, z0, z1)
         center_of_mass_along_axis = [prob * r_i for r_i in r]
-        com = [np.average(com_along_axis) for com_along_axis in center_of_mass_along_axis]
+        com = [self.trapez_integral(com_along_axis) / self.get_norm(prob) for com_along_axis in center_of_mass_along_axis]
         return com
 
     def get_parity(self, axis=2, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
