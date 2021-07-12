@@ -24,6 +24,7 @@ class Resolution:
     Specifies the resolution of the simulation in x, y, z directions (1D, 2D, 3D).
 
     """
+
     def __init__(self,
                  x: float,
                  y: Optional[float] = None,
@@ -49,17 +50,20 @@ class Box:
     Needs to be given in pairs (x0, x1), (y0, y1), (z0, z1).
 
     """
+
     def __init__(self,
                  x0: float, x1: float,
                  y0: Optional[float] = None, y1: Optional[float] = None,
                  z0: Optional[float] = None, z1: Optional[float] = None):
         dim = 1
         if (y0 is None) or (y1 is None):
-            assert (y0 is None) or (y1 is None) is None, "y0 and y1 needs to be given in combination."
+            assert (y0 is None) or (
+                        y1 is None) is None, "y0 and y1 needs to be given in combination."
         else:
             dim = dim + 1
         if (z0 is None) or (z1 is None):
-            assert (z0 is None) or (z1 is None) is None, "z0 and z1 needs to be given in combination."
+            assert (z0 is None) or (
+                        z1 is None) is None, "z0 and z1 needs to be given in combination."
         else:
             dim = dim + 1
 
@@ -106,7 +110,7 @@ def BoxResAssert(Res, Box):
 
 
 def aResAssert(Res, a):
-        assert len(a) == len(Res), (
+    assert len(a) == len(Res), (
         f"Dimension of Amplitudes is {len(a)}, but needs "
         f"to be the same as dimension of Res, "
         f"which currently is {len(Res)}.")
