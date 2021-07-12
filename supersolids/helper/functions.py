@@ -120,6 +120,20 @@ def lambda_parsed(s):
     return eval(s, globals())
 
 
+def identity(*args):
+    return args
+
+
+def fft_plot(t, property_all):
+    T = t[-1]
+    N = len(t)
+    sample_rate = N / T
+    freq = np.fft.rfftfreq(len(t), 1.0 / sample_rate)
+    property_fft = np.abs(np.fft.rfft(property_all))
+
+    return freq, property_fft
+
+
 def get_meshgrid(x, y):
     x_mesh, y_mesh = np.meshgrid(x, y)
     pos = np.empty(x_mesh.shape + (2,))
