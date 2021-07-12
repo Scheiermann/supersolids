@@ -73,7 +73,6 @@ if __name__ == "__main__":
                  f"-steps_format={steps_format}",
                  f"-property_name={property_name}",
                  f"-property_filename_suffix={property_filename_suffix}"]
-        flags_no_split = []
 
         if property_func:
             flags.append("--property_func")
@@ -84,19 +83,18 @@ if __name__ == "__main__":
         if subplots:
             flags.append(f"--subplots")
         if inbuild_func:
-            flags_no_split.append(f"-inbuild_func={inbuild_func}")
+            flags.append(f"-inbuild_func={inbuild_func}")
         if func:
-            flags_no_split.append(f"-func={func}")
+            flags.append(f"-func={func}")
 
-        flags_all = flags + flags_no_split
         # command needs flags to be provided as list
-        command.extend(flags_all)
+        command.extend(flags)
 
         print(command)
         p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=False)
 
         # communicate needs flags to be provided as string seperated by " ".
-        flags_parsed = " ".join(flags_all)
+        flags_parsed = " ".join(flags)
         out, err = p.communicate(flags_parsed.encode())
         print(f"out:\n{out}\n")
         print(f"err:\n{err}\n")
