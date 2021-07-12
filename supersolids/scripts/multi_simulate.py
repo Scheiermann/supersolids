@@ -3,10 +3,7 @@ import subprocess
 from pathlib import Path
 import numpy as np
 
-from supersolids.Animation.MayaviAnimation import get_supersolids_version
-
-
-supersolids_version = get_supersolids_version()
+supersolids_version = "0.1.32rc12"
 dir_path = Path("/bigwork/dscheier/supersolids/results/")
 # dir_path = Path("/home/dsche/supersolids/results/")
 
