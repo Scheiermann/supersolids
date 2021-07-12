@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import subprocess
 from pathlib import Path
+from supersolids.scripts.cp_plots import cp_plots
 
 
 def string_float(s):
@@ -99,3 +100,10 @@ if __name__ == "__main__":
         out, err = p.communicate(flags_parsed.encode())
         print(f"out:\n{out}\n")
         print(f"err:\n{err}\n")
+
+    # copy results from all movies into one directory (to compare them easier in image slideshows)
+    path_anchor_output = Path(path_anchor_input, "graphs", property_name + dir_suffix)
+    cp_plots(movie_start, (movie_end - movie_start) + 1,
+             path_anchor_input, dir_name, property_name + property_filename_suffix,
+             path_anchor_output, property_name + property_filename_suffix,
+             counting_format, filename_extension=".png")
