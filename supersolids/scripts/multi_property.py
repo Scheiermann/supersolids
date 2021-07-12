@@ -9,10 +9,10 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    # dir_path = Path("/home/dsche/supersolids/results/jospeh_injunction/real_global/")
-    # dir_path = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_1.0/")
-    # dir_path = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_0.1/")
-    dir_path = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_0.01/")
+    # path_anchor_input = Path("/home/dsche/supersolids/results/jospeh_injunction/real_global/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_1.0/")
+    path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_0.1/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_0.01/")
 
     frame_start = 1610000
     # frame_start = 1210000
@@ -24,14 +24,22 @@ if __name__ == "__main__":
     movie_start = 745
     movie_end = 764
 
-    movie_string = "movie"
+    dt = 0.0002
+
+    dir_name = "movie"
     counting_format = "%03d"
 
     steps_format = "%07d"
 
-    property_filename_suffix = "_left"
+    dir_suffix = "_right"
 
-    dt = 0.0002
+    file_suffix = "_fft"
+    inbuild_func = "fft_plot"
+    # inbuild_func = ""
+    # func = "lambda x, y: (x, y)"
+    func = ""
+
+    property_filename_suffix = dir_suffix + file_suffix
 
     subplots = True
     property_func = True
