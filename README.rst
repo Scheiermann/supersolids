@@ -13,23 +13,15 @@ Installing
 ----------
 For the animation to work, **ffmpeg** needs to be installed on your system.
 
-For **python3.9** currently there is no vtk wheel for python3.9, so you need to build it from source or use my build:
- * git clone https://github.com/Scheiermann/vtk_python39_wheel.
- * Go to the directory vtk_python39_wheel/, where the wheel lies (\*.whl).
-Use this wheel to install, e.g:
- * pip install vtk-9.0.20210105-cp39-cp39-linux_x86_64.whl
- * Then install mayavi (pip install mayavi or also build it from source, as there could be incapabilities with vtk9).
-
 pip
 ---
-For **python3.9** follow the instructions above, then continue with (else do the following):
  * pip install supersolids
 
 Archlinux
 ---------
-It is provided in the AUR under https://aur.archlinux.org/python-supersolids.git
- * For **python3.9** follow the instructions above, then remove mayavi from the dependencies and run "makepkg -sic".
- * For **python3.8** remove the dependecies in the PKGBUILD and uncomment the pip install lines instead.
+It is provided in the AUR
+ * git clone https://aur.archlinux.org/python-supersolids.git
+ * Run "makepkg -sic", where the PKGBUILD lies
 
 Windows
 -------
