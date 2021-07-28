@@ -79,7 +79,7 @@ def flags(args_array):
                         help="Name of file, without enumerator for the files. "
                              "For example the standard naming convention is step_000001.npz, "
                              "the string needed is step_")
-    parser.add_argument("-steps_format", type=str, default="%06d",
+    parser.add_argument("-steps_format", type=str, default="%07d",
                         help="Formatting string to enumerate the files. "
                              "For example the standard naming convention is step_000001.npz, "
                              "the string needed is percent 06d")
