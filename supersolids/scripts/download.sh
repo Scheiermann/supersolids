@@ -43,11 +43,12 @@ for batch in "${download_batch[@]}"
 do
   for ((j = k; j < $batch; j++))
   do
-      printf -v movie_number "%03d" $((start + j))
-      mkdir "${path_anchor_output}$dir_name$movie_number"
+      printf -v movie_number_in "%03d" $((download_start + j))
+      printf -v movie_number_output "%03d" $((start + j))
+      mkdir "${path_anchor_output}$dir_name$movie_number_output"
 
-      echo $movie_number
-      rsync -P "${path_anchor_input}$download_dir_name$((download_start + j))/*" "${path_anchor_output}${dir_name}${movie_number}" &
+      echo $movie_number_output
+      rsync -P "${path_anchor_input}$download_dir_name${movie_number_in}/*" "${path_anchor_output}${dir_name}${movie_number_output}" &
   done
   k=$batch
   wait
