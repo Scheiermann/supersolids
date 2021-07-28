@@ -2,6 +2,7 @@
 import fnmatch
 from pathlib import Path
 
+import numpy as np
 from fabric import Connection
 
 
@@ -10,6 +11,7 @@ if __name__ == "__main__":
     path_anchor_output = Path("/run/media/dsche/ITP Transfer/")
 
     take_last = 30
+    # take_last = np.inf
 
     movie_string = "movie"
     counting_format = "%03d"
