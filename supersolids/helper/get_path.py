@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 from pathlib import Path
 from typing import Tuple
 
@@ -23,17 +24,13 @@ def get_path(dir_path: Path,
     # "movie" and "%03d" strings are hardcoded
     # in mayavi movie_maker _update_subdir
     if file_pattern:
+        # for files
         existing = sorted([x for x in dir_path.glob(dir_name + "*") if x.is_file()])
-        try:
-            last_str_part = existing[-1].name.split(file_pattern)[0]
-            try:
-                last_index: int = int(last_str_part.split(dir_name)[1])
-            except IndexError as e:
-                print(f"Old file not found. Setting last_index={last_index}.")
-        except IndexError as e:
-            last_index = 0
-            print(f"No file found in directory {dir_name}* at path {dir_path}.")
+        last_index = get_step_index(existing[-1],
+                                    filename_prefix=dir_name,
+                                    file_pattern=file_pattern)
     else:
+        # for dirs
         existing = sorted([x for x in dir_path.glob(dir_name + "*") if x.is_dir()])
 
         try:
@@ -46,3 +43,18 @@ def get_path(dir_path: Path,
 
     return input_path, last_index, dir_name, counting_format
 
+
+def get_step_index(dir_path, filename_prefix="step_", file_pattern=".npz"):
+    try:
+        last_str_part = dir_path.name.split(file_pattern)[0]
+        try:
+            last_index: int = int(last_str_part.split(filename_prefix)[1])
+        except IndexError as e:
+            last_index = 0
+            print(f"Old file not found. Setting last_index={last_index}.")
+    except IndexError as e:
+        last_index = 0
+        print(f"No file found in directory {filename_prefix}* "
+              f"at path {dir_path}.")
+
+    return last_index
