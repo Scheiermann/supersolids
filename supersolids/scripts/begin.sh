@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #==================================================
- #PBS -N 1.33rc2
+ #PBS -N 1.33rc3
  #PBS -M daniel.scheiermann@stud.uni-hannover.de
  #PBS -d /bigwork/dscheier/
  #PBS -e /bigwork/dscheier/error.txt
@@ -33,9 +33,9 @@ conda activate /bigwork/dscheier/miniconda3/envs/solids
 echo $CONDA_PREFIX
 echo $(which python3)
 echo $(which pip3)
-/bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids==0.1.33rc2
+/bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids==0.1.33rc3
 
-dir_path=/bigwork/dscheier/supersolids/results/
+dir_path="/bigwork/dscheier/supersolids/results/"
 steps_per_npz=10000
 steps_format="%07d"
 
@@ -43,7 +43,7 @@ steps_format="%07d"
 # movie_number_after=1
 # movie_after_string="movie00"
 # movie_after="$movie_after_string$((movie_number_after))"
-# dir_path_after=/bigwork/dscheier/supersolids/results/$movie_after/
+# dir_path_after="/bigwork/dscheier/supersolids/results/$movie_after/"
 
 /bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids \
 -N=50000 \
@@ -52,12 +52,13 @@ steps_format="%07d"
 -max_timesteps=1500001 \
 -dt=0.0002 \
 -steps_per_npz=$steps_per_npz \
--steps_format='{"$steps_format"}' \
+-steps_format="${steps_format}" \
 -a='{"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}' \
--dir_path=$dir_path \
+-dir_path="${dir_path}" \
 -a_s=0.000000004656 \
 -w_y=518.36 \
 -accuracy=0.0 \
+-noise 0.8 1.2 \
 --offscreen
 
 # -w_y=518.36
@@ -77,9 +78,11 @@ simulate_exit="$?"
 if [ $simulate_exit != 1 ]; then
     printf "\nCreate the animation to the simulation\n"
 #    /bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids.tools.load_npz \
-#    -frame_start=$file_number \
+#    -frame_start=$frame_start \
+#    -dir_path="${dir_path_after}" \
 #    -dir_name=$movie_after \
 #    -steps_per_npz=$steps_per_npz \
+#    -slice_indices='{"x":127,"y":63,"z":15}' \
 #    --plot_V
 else
     printf "\nsimulate_npz ended with sys.exit(1)\n"
