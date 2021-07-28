@@ -9,12 +9,11 @@
 Functions for Potential and initial wave function :math:`\psi_0`
 
 """
+from pathlib import Path
 import sys
 import zipfile
 
 import dill
-from pathlib import Path
-
 import numpy as np
 from ffmpeg import input
 from mayavi import mlab
@@ -33,7 +32,7 @@ def get_supersolids_version():
         supersolids_version = pkg_resources.get_distribution(
             "supersolids").version
     else:
-        supersolids_version = "unkown"
+        supersolids_version = "unknown"
 
     return supersolids_version
 
