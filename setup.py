@@ -14,7 +14,7 @@ with open(path.join(this_directory, "README.rst"), encoding="utf-8") as f:
 
 setup(
     name="supersolids",
-    version="0.1.33",
+    version="0.1.33rc1",
     packages=find_packages(),
     package_data={"supersolids": []},
     url="https://github.com/Scheiermann/supersolids",
@@ -22,6 +22,7 @@ setup(
     author="Scheiermann",
     author_email="daniel.scheiermann@stud.uni-hannover.de",
     install_requires=["dill",
+                      "fabric",
                       "ffmpeg-python",
                       "matplotlib",
                       "numpy",
