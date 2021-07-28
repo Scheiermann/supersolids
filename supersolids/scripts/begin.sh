@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #==================================================
- #PBS -N 1.32rc7-a85
+ #PBS -N 1.33rc2
  #PBS -M daniel.scheiermann@stud.uni-hannover.de
  #PBS -d /bigwork/dscheier/
  #PBS -e /bigwork/dscheier/error.txt
@@ -33,11 +33,11 @@ conda activate /bigwork/dscheier/miniconda3/envs/solids
 echo $CONDA_PREFIX
 echo $(which python3)
 echo $(which pip3)
-/bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids==0.1.32rc7
+/bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids==0.1.33rc2
 
 dir_path=/bigwork/dscheier/supersolids/results/
-steps_per_npz=1000
-steps_format="%06d"
+steps_per_npz=10000
+steps_format="%07d"
 
 # file_number=0
 # movie_number_after=1
@@ -45,7 +45,21 @@ steps_format="%06d"
 # movie_after="$movie_after_string$((movie_number_after))"
 # dir_path_after=/bigwork/dscheier/supersolids/results/$movie_after/
 
-/bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids -N=50000 -Res='{"x":256, "y":128, "z":32}' -Box='{"x0":-10, "x1":10, "y0":-5, "y1":5, "z0":-4, "z1":4}' -max_timesteps=1150001 -dt=0.0002 -steps_per_npz=$steps_per_npz -steps_format='{"$steps_format"}' -a='{"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}' --offscreen -dir_path=$dir_path -a_s=0.000000004498 -w_y=518.36 -accuracy=0.0
+/bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids \
+-N=50000 \
+-Box='{"x0":-10, "x1":10, "y0":-5, "y1":5, "z0":-4, "z1":4}' \
+-Res='{"x":256, "y":128, "z":32}' \
+-max_timesteps=1500001 \
+-dt=0.0002 \
+-steps_per_npz=$steps_per_npz \
+-steps_format='{"$steps_format"}' \
+-a='{"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}' \
+-dir_path=$dir_path \
+-a_s=0.000000004656 \
+-w_y=518.36 \
+-accuracy=0.0 \
+--offscreen
+
 # -w_y=518.36
 # -w_y=518.36 # w_y = 2 * np.pi * 82.50 # alpha_t=0.4 # get some 1D and all 2D, while bigger N
 # -w_y=531.62 # w_y = 2 * np.pi * 84.61 # alpha_t=0.39
@@ -62,7 +76,11 @@ simulate_exit="$?"
 # if simulation did not exit with 1, continue with animation creation
 if [ $simulate_exit != 1 ]; then
     printf "\nCreate the animation to the simulation\n"
-    # /bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids.tools.load_npz -frame_start=$file_number -dir_name=$movie_after -steps_per_npz=$steps_per_npz --plot_V
+#    /bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids.tools.load_npz \
+#    -frame_start=$file_number \
+#    -dir_name=$movie_after \
+#    -steps_per_npz=$steps_per_npz \
+#    --plot_V
 else
     printf "\nsimulate_npz ended with sys.exit(1)\n"
 fi
