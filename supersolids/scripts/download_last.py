@@ -2,7 +2,6 @@
 import fnmatch
 from pathlib import Path
 
-import numpy as np
 from fabric import Connection
 
 
@@ -10,8 +9,8 @@ if __name__ == "__main__":
     path_anchor_input = Path("/bigwork/dscheier/supersolids/results/")
     path_anchor_output = Path("/run/media/dsche/ITP Transfer/")
 
-    take_last = 30
-    # take_last = np.inf
+    # take_last = 30
+    take_last = None
 
     movie_string = "movie"
     counting_format = "%03d"
@@ -60,7 +59,10 @@ if __name__ == "__main__":
                 except FileNotFoundError:
                     print(f"{path_in} not found. Skipping.")
                     continue
-                files = files_all[-take_last:]
+                if take_last is None:
+                    files = files_all
+                else:
+                    files = files_all[-take_last:]
 
                 for file in files:
                     result = c.get(str(Path(path_in, file)), local=str(Path(path_out, file)))
