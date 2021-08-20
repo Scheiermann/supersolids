@@ -52,7 +52,7 @@ for v in np.arange(v_start, v_end, v_step):
         # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi/4.0) + (np.pi*x/{d_string}) )"
         # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi*x/{d_string}) )"
         V = f"lambda x, y, z: {v_string} * np.exp(-((x ** 2.0) /{d_string} ** 2.0) )"
-        func_list[j_counter].append(V)
+        func_list[j_counter].append(f"-noise_func='{V}' ")
 
         noise_func = f"lambda gauss, k: 1.0"
         # noise_func=f"lambda gauss, k: np.concatenate(\
@@ -128,10 +128,6 @@ echo $(which pip3)
 -V='{V}' \
 --offscreen \
 --V_reload \
--noise_func=lambda gauss, k: np.concatenate(
-(np.exp(-1.0j * np.mgrid[-10: 10: complex(0, 256), -5: 5: complex(0, 128), -4: 4: complex(0, 32)][1][:128, :128, :] * (1.0 + 2.0 * k * np.pi /4.0)),
-np.exp(1.0j * np.mgrid[-10: 10: complex(0, 256), -5: 5: complex(0, 128), -4: 4: complex(0, 32)][1][128:, :, :] * (1.0 + 2.0 * k * np.pi /4.0))),
-axis=0) * gauss
 
 # --real_time
 # -neighborhood 0.02 4
