@@ -2,6 +2,7 @@
 import subprocess
 from pathlib import Path
 import numpy as np
+import time
 
 
 def dic2str(dic):
@@ -13,15 +14,15 @@ def dic2str(dic):
 
 xvfb_display = 98
 supersolids_version = "0.1.33rc8"
-dir_path = Path("/bigwork/dscheier/supersolids/results/begin/")
-# dir_path = Path("/home/dsche/supersolids/results/begin/")
+dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/")
+# dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
-steps_per_npz = 10000
+steps_per_npz = 50000
 steps_format = "%07d"
 
 movie_string = "movie"
 counting_format = "%03d"
-movie_number = 5
+movie_number = 1
 
 Box = {"x0": -10, "x1": 10, "y0": -5, "y1": 5, "z0": -4, "z1": 4}
 Res = {"x": 256, "y": 128, "z": 32}
@@ -33,7 +34,7 @@ w_x_freq = 33.0
 a_s = 0.000000004656
 a = {"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}
 
-max_timesteps = 700001
+max_timesteps = 1500001
 dt = 0.0002
 steps_per_npz = 1000
 accuracy = 0.0
@@ -49,10 +50,8 @@ alpha_step = 0.05
 func_filename = "distort.txt"
 
 j_counter = 0
-print(dic2str(a))
-print(dic2str(Box))
-print(dic2str(Res))
 
+movie_list = []
 func_list = []
 func_path_list = []
 dir_path_func_list = []
@@ -75,6 +74,7 @@ for v in np.arange(N_start, N_end, N_step):
 
         movie_number_after = movie_number + j_counter
         movie_after = f"{movie_string}{counting_format % movie_number_after}"
+        movie_list.append(movie_after)
         dir_path_func = Path(dir_path, movie_after)
         dir_path_func_list.append(dir_path_func)
         func_path = Path(dir_path_func, func_filename)
@@ -84,9 +84,9 @@ for v in np.arange(N_start, N_end, N_step):
 #==================================================
 #PBS -N {supersolids_version}_v{v_string}dx{d_string}
 #PBS -M daniel.scheiermann@itp.uni-hannover.de
-#PBS -d /bigwork/dscheier/
-#PBS -e /bigwork/dscheier/error.txt
-#PBS -o /bigwork/dscheier/output.txt
+#PBS -d /bigwork/dscheier/supersolids/supersolids/results/
+#PBS -e /bigwork/dscheier/supersolids/supersolids/results/error_$PBS_JOBID.txt
+#PBS -o /bigwork/dscheier/supersolids/supersolids/results/output_$PBS_JOBID.txt
 #PBS -l nodes=1:ppn=1:ws
 #PBS -l walltime=200:00:00
 #PBS -l mem=5GB
@@ -154,6 +154,26 @@ echo $(which pip3)
 
         j_counter += 1
 
+        existing_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
+        existing_dirnames = list(map(lambda path: path.name, existing_dirs))
+        print(f"{movie_after}")
+        while not movie_after in existing_dirnames:
+            print(f"{existing_dirs}")
+            print(f"{existing_dirnames}")
+            print(f"Directory for {movie_after} not created yet. Waiting 3 seconds.")
+            time.sleep(3)
+            existing_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
+            existing_dirnames = list(map(lambda path: path.name, existing_dirs))
+
+
+movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
+movie_dirnames = list(map(lambda path: path.name, movie_dirs))
+while not all(movie_list) in movie_dirnames:
+    print(f"{movie_dirnames}")
+    print(f"Not all directories for movies created.  Waiting 5 seconds.")
+    time.sleep(5)
+    movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
+    movie_dirnames = list(map(lambda path: path.name, movie_dirs))
 
 j_counter = 0
 # put distort.txt with the used V for every movie
