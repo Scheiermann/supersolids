@@ -52,7 +52,7 @@ for v in np.arange(v_start, v_end, v_step):
         # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi/4.0) + (np.pi*x/{d_string}) )"
         # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi*x/{d_string}) )"
         V = f"lambda x, y, z: {v_string} * np.exp(-((x ** 2.0) /{d_string} ** 2.0) )"
-        func_list[j_counter].append(f"-noise_func='{V}' ")
+        func_list[j_counter].append(f"-V='{V}' ")
 
         noise_func = f"lambda gauss, k: 1.0"
         # noise_func=f"lambda gauss, k: np.concatenate(\
