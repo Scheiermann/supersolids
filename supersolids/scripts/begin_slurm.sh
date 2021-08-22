@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-supersolids_version=0.1.33rc7
+supersolids_version=0.1.33rc8
 #==================================================
-#SBATCH --job-name 0.1.33rc7-begin
+#SBATCH --job-name 0.1.33rc8-begin
 #SBATCH --workdir /bigwork/dscheier/supersolids/supersolids/results/
 #SBATCH -e error-$SLURM_JOBID.txt
 #SBATCH -o output-$SLURM_JOBID.txt
@@ -39,7 +39,7 @@ echo $(which pip3)
 /bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids==${supersolids_version}
 # /bigwork/dscheier/miniconda3/bin/pip3 install -i https://pypi.org/simple/supersolids==${supersolids_version}
 
-dir_path="/bigwork/dscheier/supersolids/supersolids/results/"
+dir_path="/bigwork/dscheier/supersolids/supersolids/results/begin/"
 steps_per_npz=100
 steps_format="%07d"
 
