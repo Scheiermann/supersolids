@@ -17,9 +17,6 @@ supersolids_version = "0.1.33rc8"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/")
 # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
-steps_per_npz = 50000
-steps_format = "%07d"
-
 movie_string = "movie"
 counting_format = "%03d"
 movie_number = 1
@@ -36,6 +33,8 @@ a = {"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}
 
 max_timesteps = 1500001
 dt = 0.0002
+steps_per_npz = 50000
+steps_format = "%07d"
 steps_per_npz = 1000
 accuracy = 0.0
 
@@ -169,6 +168,7 @@ echo $(which pip3)
 movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
 movie_dirnames = list(map(lambda path: path.name, movie_dirs))
 while not all(movie_list) in movie_dirnames:
+    print(f"{movie_list}")
     print(f"{movie_dirnames}")
     print(f"Not all directories for movies created.  Waiting 5 seconds.")
     time.sleep(5)
