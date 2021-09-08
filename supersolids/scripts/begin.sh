@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #==================================================
  #PBS -N 1.33rc4
- #PBS -M daniel.scheiermann@stud.uni-hannover.de
+ #PBS -M daniel.scheiermann@itp.uni-hannover.de
  #PBS -d /bigwork/dscheier/
  #PBS -e /bigwork/dscheier/error.txt
  #PBS -o /bigwork/dscheier/output.txt
  #PBS -l nodes=1:ppn=1:ws
  #PBS -l walltime=99:00:00
- #PBS -l mem=5GB
- #PBS -l vmem=5GB
+ #PBS -l mem=4GB
+ #PBS -l vmem=4GB
 
 
 # >>> conda initialize >>>
