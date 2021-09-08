@@ -301,7 +301,17 @@ class MayaviAnimation(Animation.Animation):
                 # get the psi_val of Schroedinger at other timesteps (t!=0)
                 psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
                 with open(psi_val_path, "rb") as f:
-                    psi_val_pkl = np.load(file=f)["psi_val"]
+                    System.psi_val = np.load(file=f)["psi_val"]
+
+                try:
+                    # load SchroedingerSummary
+                    system_summary_path = Path(input_path,
+                        "SchroedingerSummary_" + steps_format % frame + ".pkl")
+                    with open(system_summary_path, "rb") as f:
+                        SystemSummary: SchroedingerSummary = dill.load(file=f)
+                        SystemSummary.copy_to(System)
+                except Exception:
+                    print(f"{system_summary_path} not found.")
 
                 text = get_legend(System, frame, supersolids_version)
 
