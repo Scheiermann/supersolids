@@ -6,8 +6,8 @@ from fabric import Connection
 
 
 if __name__ == "__main__":
-    path_anchor_input = Path("/bigwork/dscheier/supersolids/results/")
-    path_anchor_output = Path("/run/media/dsche/ITP Transfer/")
+    path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/")
+    path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_alpha/")
 
     # take_last = 30
     take_last = None
@@ -20,6 +20,8 @@ if __name__ == "__main__":
     filename_steps = "step_"
     steps_format = "%07d"
     filename_pattern = ".npz"
+    filename_number_regex = '*'
+    # filename_number_regex = '*0000'
 
     filename_singles = ["schroedinger.pkl", "distort.txt"]
     download_steps = True
@@ -28,14 +30,22 @@ if __name__ == "__main__":
         path_in = Path(path_anchor_input, movie_string + f"{counting_format % i}")
         path_out = Path(path_anchor_output, movie_string + f"{counting_format % i}")
 
-        print(f"path_in: {path_in}")
+        print(f"\npath_in: {path_in}")
         with Connection('itpx') as c:
             # Create a results dir, if there is none
             if not path_out.is_dir():
                 path_out.mkdir(parents=True)
 
             if filename_singles:
-                for filename_single in filename_singles:
+                print(path_out)
+                files_single_already_there = sorted([
+                    x for x in filename_singles if Path(path_out, x).is_file()
+                    ])
+
+                print(files_single_already_there)
+                filenames_singles_new = [x for x in filename_singles if (x not in files_single_already_there)]
+                print(f"Possible files to download: {filenames_singles_new}")
+                for filename_single in filenames_singles_new:
                     try:
                         file_single = fnmatch.filter(c.sftp().listdir(path=str(path_in)),
                                                      filename_single)
@@ -55,7 +65,9 @@ if __name__ == "__main__":
             if download_steps:
                 try:
                     files_all = sorted(fnmatch.filter(c.sftp().listdir(path=str(path_in)),
-                                                      filename_steps + '*' + filename_pattern))
+                                                      filename_steps
+                                                      + filename_number_regex
+                                                      + filename_pattern))
                 except FileNotFoundError:
                     print(f"{path_in} not found. Skipping.")
                     continue
@@ -64,5 +76,15 @@ if __name__ == "__main__":
                 else:
                     files = files_all[-take_last:]
 
-                for file in files:
+                files_already_there = sorted([x.name for x
+                                              in path_out.glob(filename_steps
+                                                               + filename_number_regex
+                                                               + filename_pattern)
+                                              if x.is_file()])
+
+                files_new = [x for x in files if (x not in files_already_there)]
+                print("Downloading:")
+                print(files_new)
+
+                for file in files_new:
                     result = c.get(str(Path(path_in, file)), local=str(Path(path_out, file)))
