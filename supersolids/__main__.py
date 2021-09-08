@@ -66,6 +66,9 @@ if __name__ == "__main__":
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to save data to")
+    parser.add_argument("-dir_name_result", type=str, default="",
+                        help="Name of directory where to save the results at. "
+                             "For example the standard naming convention is movie002")
     parser.add_argument("-V", type=functions.lambda_parsed,
                         help="Potential as lambda function. For example: "
                              "-V='lambda x,y,z: 10 * x * y'")
@@ -251,6 +254,7 @@ if __name__ == "__main__":
                                     accuracy=args.accuracy,
                                     delete_input=False,
                                     dir_path=dir_path,
+                                    dir_name_result=args.dir_name_result,
                                     slice_indices=slice_indices, # from here just mayavi
                                     offscreen=args.offscreen,
                                     x_lim=x_lim, # from here just matplotlib

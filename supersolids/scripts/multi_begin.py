@@ -73,6 +73,7 @@ for v in np.arange(N_start, N_end, N_step):
 
         movie_number_after = movie_number + j_counter
         movie_after = f"{movie_string}{counting_format % movie_number_after}"
+        dir_name_result = movie_after
         movie_list.append(movie_after)
         dir_path_func = Path(dir_path, movie_after)
         dir_path_func_list.append(dir_path_func)
@@ -127,6 +128,7 @@ echo $(which pip3)
 -steps_per_npz={steps_per_npz} \
 -steps_format={steps_format} \
 -dir_path={dir_path} \
+-dir_name_result={dir_name_result} \
 -a={dic2str(a)} \
 -a_s={a_s} \
 -w_y={w_y} \
