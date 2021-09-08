@@ -30,7 +30,7 @@ class Animation:
         """
         Base class with configured properties for the animation.
 
-        :param Res: functoins.Res
+        :param Res: functions.Res
             Number of grid points in x, y, z direction.
             Needs to have half size of box dictionary.
             Keywords x, y, z are used.
