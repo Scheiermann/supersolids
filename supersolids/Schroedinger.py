@@ -21,6 +21,7 @@ import scipy.signal
 from scipy.ndimage.filters import maximum_filter
 from scipy.ndimage.morphology import generate_binary_structure, binary_erosion
 
+from supersolids.SchroedingerSummary import SchroedingerSummary
 from supersolids.helper import constants, functions, get_path
 from supersolids.helper.Resolution import Resolution
 from supersolids.helper.Box import Box
@@ -852,6 +853,14 @@ class Schroedinger:
         for frame in range(frame_start, frame_end):
             mu_old = self.mu
             self.time_step()
+
+            SystemSummary: SchroedingerSummary = SchroedingerSummary(self)
+
+            # save SchroedingerSummary not Schroedinger to save disk space
+            if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
+                with open(Path(input_path, "SchroedingerSummary_" + steps_format % frame + ".pkl"),
+                          "wb") as f:
+                    dill.dump(obj=SystemSummary, file=f)
 
             # save psi_val after steps_per_pickle steps of dt (to save disk space)
             if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):

@@ -20,6 +20,7 @@ from mayavi import mlab
 
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
+from supersolids.SchroedingerSummary import SchroedingerSummary
 from supersolids.helper import functions, constants, get_path
 
 
@@ -38,6 +39,10 @@ def get_supersolids_version():
 
 
 def get_legend(System, frame, supersolids_version, mu_rel=None):
+    if System.t != 0.0:
+        t = System.dt * frame
+    else:
+        t = System.t
     # Update legend (especially time)
     text = (f"version={supersolids_version}, "
             f"N={System.N}, "
@@ -53,10 +58,10 @@ def get_legend(System, frame, supersolids_version, mu_rel=None):
             f"w_y/2pi={System.w_y / (2 * np.pi):05.02f}, "
             f"w_z/2pi={System.w_z / (2 * np.pi):05.02f}, "
             f"imag_time={System.imag_time}, "
-            f"t={System.dt * frame:07.05f}, "
+            f"t={t:07.05f}, "
             f"processed={frame / System.max_timesteps:05.03f}%, "
-            f"E={System.E:+05.03f}, "
-            f"mu={System.mu:+05.03f}, "
+            f"E={System.E:05.06f}, "
+            f"mu={System.mu:05.06f}, "
             )
     if mu_rel is not None:
         text = text + f"mu_rel={mu_rel:+05.05e}"
