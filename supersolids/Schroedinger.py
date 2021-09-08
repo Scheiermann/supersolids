@@ -164,7 +164,7 @@ class Schroedinger:
         self.g: float = g
         self.g_qf: float = g_qf
         self.e_dd: float = e_dd
-        self.imag_time: float = imag_time
+        self.imag_time: bool = imag_time
 
         assert self.Box.dim == self.Res.dim, (f"Dimension of Box ({self.Box.dim}) and "
                                               f"Res ({self.Res.dim}) needs to be equal.")
