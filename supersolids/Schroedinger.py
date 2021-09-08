@@ -170,10 +170,7 @@ class Schroedinger:
                                               f"Res ({self.Res.dim}) needs to be equal.")
         self.dim: int = self.Box.dim
 
-        # mu = - ln(N) / (2 * dtau), where N is the norm of the :math:`\psi`
         self.mu: float = mu
-
-        # E = mu - 0.5 * g * integral psi_val ** 2
         self.E: float = E
 
         self.psi: Callable = psi_0
