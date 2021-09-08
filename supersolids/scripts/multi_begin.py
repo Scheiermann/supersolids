@@ -167,7 +167,7 @@ echo $(which pip3)
 
 movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
 movie_dirnames = list(map(lambda path: path.name, movie_dirs))
-while not all(movie_list) in movie_dirnames:
+while not all(item in movie_dirnames for item in movie_list):
     print(f"{movie_list}")
     print(f"{movie_dirnames}")
     print(f"Not all directories for movies created.  Waiting 5 seconds.")
