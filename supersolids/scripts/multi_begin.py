@@ -88,8 +88,8 @@ for v in np.arange(N_start, N_end, N_step):
 #PBS -o /bigwork/dscheier/supersolids/supersolids/results/output_$PBS_JOBID.txt
 #PBS -l nodes=1:ppn=1:ws
 #PBS -l walltime=200:00:00
-#PBS -l mem=5GB
-#PBS -l vmem=5GB
+#PBS -l mem=4GB
+#PBS -l vmem=4GB
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
