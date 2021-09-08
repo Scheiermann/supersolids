@@ -369,37 +369,60 @@ class Schroedinger:
 
         return psi_density
 
-    def get_norm(self, func=None, p: float = 2.0) -> float:
+    def volume_element(self, fourier_space: bool = False):
+        if self.dim == 1:
+            if fourier_space:
+                dV: float = self.dkx
+            else:
+                dV: float = self.dx
+        elif self.dim == 2:
+            if fourier_space:
+                dV: float = self.dkx * self.dky
+            else:
+                dV: float = self.dx * self.dy
+        elif self.dim == 3:
+            if fourier_space:
+                dV: float = self.dkx * self.dky * self.dkz
+            else:
+                dV: float = self.dx * self.dy * self.dz
+        else:
+            sys.exit("Spatial dimension over 3. This is not implemented.")
+
+        return dV
+
+    def sum_dV(self, func, fourier_space: bool = False):
+        psi_norm: float = np.sum(func) * self.volume_element(fourier_space=fourier_space)
+
+        return psi_norm
+
+    def get_norm(self, func=None, p: float = 2.0, fourier_space: bool = False) -> float:
         """
         Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D
         (depending on self.dim). For p=2 it is the 2-norm.
 
+        :param func: If func is not provided self.get_density(p=p) is used.
+
         :param p: Exponent of :math:`|\psi|`. Use p=2.0 for density.
 
-        :param func: If func is not provided self.get_density(p=p) is used.
+        :param fourier_space: Flag to use fourier volume element as dV,
+        so:math:`\\mathrm{dV} = \\mathrm{d}^3 k`.
 
         :return: :math:`\int |\psi|^p \\mathrm{dV}`
 
         """
         if func is None:
             func = self.get_density(p=p)
-
-        if self.dim == 1:
-            dV: float = self.dx
-        elif self.dim == 2:
-            dV = self.dx * self.dy
-        elif self.dim == 3:
-            dV = self.dx * self.dy * self.dz
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")
 
-        psi_norm: float = np.sum(func) * dV
+        psi_norm: float = self.sum_dV(func, fourier_space=fourier_space)
 
         return psi_norm
 
     def trapez_integral(self, func_val: Callable) -> float:
         """
-        Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D
+        Calculates the integral over func_val. If :math:`func_val = |\psi|^p`, then
+        :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D
         (depending on self.dim) by using the trapez rule.
 
         For 1D: :math:`h (f(a) + f(a+h)) / 2`
@@ -414,12 +437,12 @@ class Schroedinger:
         :return: :math:`\int |\psi|^p \\mathrm{dV}` according to trapez rule
         """
 
+        # TODO: Implement fourier_space (remember fftfreq ordering of func_val)
+        dV = self.volume_element()
         if self.dim == 1:
-            dV: float = self.dx
             return dV * np.sum(func_val[0:-1] + func_val[1:]) / 2.0
 
         elif self.dim == 2:
-            dV = self.dx * self.dy
             return dV * np.sum(func_val[0:-1, 0:-1]
                                + func_val[0:-1, 1:]
                                + func_val[1:, 0:-1]
@@ -427,7 +450,6 @@ class Schroedinger:
                                ) / 4.0
 
         elif self.dim == 3:
-            dV = self.dx * self.dy * self.dz
             return dV * np.sum(func_val[0:-1, 0:-1, 0:-1]
                                + func_val[0:-1, 0:-1, 1:]
                                + func_val[0:-1, 1:, 0:-1]
@@ -697,7 +719,7 @@ class Schroedinger:
         bool_grid_list = self.get_peak_neighborhood(prob_min, number_of_peaks)
         bool_grid = np.logical_or(bool_grid_list[:-1], bool_grid_list[-1])
 
-        norm = self.get_norm(self.get_density(p=2.0))
+        norm = self.get_norm()
         prob = bool_grid * self.get_density(p=2.0) / norm
         psi_val_bool_grid = bool_grid * self.psi_val
         angle = np.angle(psi_val_bool_grid)
@@ -714,7 +736,7 @@ class Schroedinger:
         Calculates the variance of the phase of the System by cos(phi).
 
         """
-        norm = self.get_norm(func=self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1])
+        norm = self.get_norm(func=self.psi_val[x0:x1, y0:y1, z0:z1])
 
         prob_cropped = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1] / norm
         psi_val_cropped = self.psi_val[x0:x1, y0:y1, z0:z1]
