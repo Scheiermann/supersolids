@@ -26,25 +26,25 @@ from supersolids.helper.Resolution import Resolution
 from supersolids.helper.Box import Box
 
 
-def peaks_sort(peaks_indices, peaks_height, amount):
+def peaks_sort(peaks_indices, peaks_height, number_of_peaks):
     # sort peaks by height
     zipped_sorted_by_height = zip(
         *sorted(zip(peaks_indices, peaks_height), key=lambda t: t[1])
     )
     a, b = map(np.array, zipped_sorted_by_height)
 
-    # get the highest peaks (the n biggest, where n is amount)
-    peaks_sorted_indices = a[-amount:]
-    peaks_sorted_height = b[-amount:]
+    # get the highest peaks (the n biggest, where n is number_of_peaks)
+    peaks_sorted_indices = a[-number_of_peaks:]
+    peaks_sorted_height = b[-number_of_peaks:]
 
     return peaks_sorted_indices, peaks_sorted_height
 
 
-def peaks_sort_along(peaks_indices, peaks_height, amount, axis):
-    _, peaks_sorted_height = peaks_sort(peaks_indices, peaks_height, amount)
+def peaks_sort_along(peaks_indices, peaks_height, number_of_peaks, axis):
+    _, peaks_sorted_height = peaks_sort(peaks_indices, peaks_height, number_of_peaks)
     if axis in [0, 1, 2]:
-        # get the highest peaks in a sorted fashion (the n biggest, where n is amount)
-        sorting_indices = np.argsort(peaks_height)[-amount:]
+        # get the highest peaks in a sorted fashion (the n biggest, where n is number_of_peaks)
+        sorting_indices = np.argsort(peaks_height)[-number_of_peaks:]
         peaks_sorted_indices = peaks_indices[sorting_indices]
     else:
         sys.exit(f"No such axis. Choose 0, 1 or 2 for axis x, y or z.")
@@ -508,12 +508,12 @@ class Schroedinger:
         else:
             sys.exit(f"No such axis (){axis}. Choose 0, 1 or 2 for axis x, y or z.")
 
-        # get the highest peaks in a sorted fashion (the n biggest, where n is amount)
+        # get the highest peaks in a sorted fashion (the n biggest, where n is number_of_peaks)
         peaks_height = properties['peak_heights']
 
         return peaks_indices, peaks_height
 
-    def get_peak_positions_along(self, axis=0, height=0.05, amount=4):
+    def get_peak_positions_along(self, axis=0, height=0.05, number_of_peaks=4):
         peaks_indices, _ = self.get_peaks_along(height=height, axis=axis)
         if axis == 0:
             positions = self.Box.lengths()[axis] * (peaks_indices / self.Res.x) + self.Box.x0
@@ -544,7 +544,7 @@ class Schroedinger:
 
         return distances
 
-    def get_peak_neighborhood_along(self, axis=0, height=0.05, amount=4, fraction=0.1,
+    def get_peak_neighborhood_along(self, axis=0, height=0.05, number_of_peaks=4, fraction=0.1,
                                     peak_distances_cutoff=0.5):
         """
         Calculates the neighborhood of the peaks,
@@ -556,7 +556,7 @@ class Schroedinger:
                                                            )
         peaks_sorted_indices, peaks_sorted_height = peaks_sort_along(peaks_indices,
                                                                      peaks_height,
-                                                                     amount,
+                                                                     number_of_peaks,
                                                                      axis,
                                                                      )
 
@@ -603,7 +603,7 @@ class Schroedinger:
 
         return bool_grid_list
 
-    def get_peak_neighborhood(self, prob_min, amount):
+    def get_peak_neighborhood(self, prob_min, number_of_peaks):
         """
         Calculates the neighborhood of the peaks,
         which has at least the given fraction of the maximum probability :math:`|\psi|^2`.
@@ -613,7 +613,7 @@ class Schroedinger:
         peaks_indices, peaks_height = get_peaks(prob)
         peaks_sorted_indices, peaks_sorted_height = peaks_sort(peaks_indices,
                                                                peaks_height,
-                                                               amount)
+                                                               number_of_peaks)
 
         bool_grid_list = []
         for i, peak_index in enumerate(peaks_sorted_indices):
@@ -715,12 +715,12 @@ class Schroedinger:
 
         return parity
 
-    def get_phase_var_neighborhood(self, prob_min, amount):
+    def get_phase_var_neighborhood(self, prob_min, number_of_peaks):
         """
         Calculates the variance of the phase of the System.
 
         """
-        bool_grid_list = self.get_peak_neighborhood(prob_min, amount)
+        bool_grid_list = self.get_peak_neighborhood(prob_min, number_of_peaks)
         bool_grid = np.logical_or(bool_grid_list[:-1], bool_grid_list[-1])
 
         norm = self.get_norm(self.get_density(p=2.0))
