@@ -14,7 +14,6 @@ dt = 0.0002
 steps_per_npz = 1000
 accuracy = 0.0
 
-# 0.12 in radian is 7°, for small-angle approximation
 v_start = 2.0
 v_end = 33.0
 v_step = 10.0
@@ -83,8 +82,8 @@ for v in np.arange(v_start, v_end, v_step):
 #PBS -o /bigwork/dscheier/output.txt
 #PBS -l nodes=1:ppn=1:ws
 #PBS -l walltime=24:00:00
-#PBS -l mem=5GB
-#PBS -l vmem=5GB
+#PBS -l mem=4GB
+#PBS -l vmem=4GB
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
