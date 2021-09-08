@@ -222,9 +222,8 @@ class Schroedinger:
                 box_y_len = self.Box.y1 - self.Box.y0
                 self.y: np.ndarray = np.linspace(self.Box.y0, self.Box.y1, self.Res.y)
                 self.dy: float = box_y_len / self.Res.y
-                self.dky: float = np.pi / (box_y_len / 2.0)
-                self.ky: np.ndarray = np.fft.fftfreq(self.Res.y,
-                    d=1.0 / (self.dky * self.Res.y))
+                self.dky: float = 2.0 * np.pi / box_y_len
+                self.ky: np.ndarray = np.fft.fftfreq(self.Res.y, d=1.0 / (self.dky * self.Res.y))
 
             except KeyError:
                 sys.exit(
@@ -238,9 +237,8 @@ class Schroedinger:
                 box_z_len = MyBox.z1 - MyBox.z0
                 self.z: np.ndarray = np.linspace(self.Box.z0, self.Box.z1, self.Res.z)
                 self.dz: float = box_z_len / self.Res.z
-                self.dkz: float = np.pi / (box_z_len / 2.0)
-                self.kz: np.ndarray = np.fft.fftfreq(self.Res.z,
-                    d=1.0 / (self.dkz * self.Res.z))
+                self.dkz: float = 2.0 * np.pi / box_z_len
+                self.kz: np.ndarray = np.fft.fftfreq(self.Res.z, d=1.0 / (self.dkz * self.Res.z))
 
             except KeyError:
                 sys.exit(f"Keys z0, z1 of box needed, but it has the keys: {self.Box.keys()}, "
