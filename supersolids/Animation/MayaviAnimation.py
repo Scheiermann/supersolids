@@ -287,7 +287,7 @@ class MayaviAnimation(Animation.Animation):
         print("Load schroedinger")
         with open(Path(input_path, filename_schroedinger), "rb") as f:
             # WARNING: this is just the input Schroedinger at t=0
-            System = dill.load(file=f)
+            System: Schroedinger = dill.load(file=f)
 
         prob_plot, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot = self.prepare(System)
 
@@ -333,11 +333,11 @@ class MayaviAnimation(Animation.Animation):
                 title.set(text=text)
 
                 # Update plot functions
-                prob_3d = np.abs(psi_val_pkl) ** 2
+                prob_3d = System.get_density(p=2.0)
                 prob_plot.mlab_source.trait_set(scalars=prob_3d)
 
                 if arg_slices:
-                    psi_arg = np.angle(psi_val_pkl) + np.pi
+                    psi_arg = np.angle(System.psi_val) + np.pi
                     slice_x_plot.mlab_source.trait_set(scalars=psi_arg)
                     slice_y_plot.mlab_source.trait_set(scalars=psi_arg)
                     slice_z_plot.mlab_source.trait_set(scalars=psi_arg)
