@@ -90,7 +90,7 @@ def get_peaks(prob):
 class Schroedinger:
     """
     Implements a numerical solution of the dimensionless time-dependent
-    non-linear Schrodinger equation for an arbitrary potential:
+    non-linear Schroedinger equation for an arbitrary potential:
 
     .. math::
 
@@ -98,7 +98,7 @@ class Schroedinger:
                               + \\frac{1}{2} (x^2 + (y \\alpha_y)^2 + (z \\alpha_z)^2) \\\\
                              &+ g |\psi|^2  + g_{qf} |\psi|^3 + U_{dd}] \psi \\\\
 
-    With :math:`U_{dd} = \\mathcal{F}^{-1}(\\mathcal{F}(H_{pot} \psi) \epsilon_{dd} g ((3 k_z / k^2) - 1))`
+    With :math:`U_{dd} = \\mathcal{F}^{-1}(\\mathcal{F}(H_{pot} \psi) \epsilon_{dd} g (3 (k_z / k)^2 - 1))`
 
     The split operator method with the Trotter-Suzuki approximation
     for the commutator relation (:math:`H = H_{pot} + H_{kin}`) is used.
