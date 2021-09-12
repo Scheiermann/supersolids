@@ -228,17 +228,20 @@ def psi_gauss_2d_pdf(pos, mu=np.array(
 
     return z_mesh
 
-
-def psi_gauss_2d(x, y, a: float = 1.0, x_0: float = 0.0,
-                 y_0: float = 0.0, k_0: float = 0.0):
+def psi_gauss_2d(x, y,
+                 a_x: float = 1.0, a_y: float = 1.0,
+                 x_0: float = 0.0, y_0: float = 0.0,
+                 k_0: float = 0.0):
     """
-    Gaussian wave packet of width a and momentum k_0, centered at x_0
+    Gaussian wave packet of width a and momentum k_0, centered at x_0, y_0
 
     :param x: mathematical variable
 
     :param y: mathematical variable
 
-    :param a: Amplitude of pulse
+    :param a_x: Stretching factor in x direction (np.sqrt(2) * std_deviation)
+
+    :param a_y: Stretching factor in y direction (np.sqrt(2) * std_deviation)
 
     :param x_0: Mean spatial x of pulse
 
@@ -248,8 +251,12 @@ def psi_gauss_2d(x, y, a: float = 1.0, x_0: float = 0.0,
 
     """
 
-    return (a * np.sqrt(np.pi) ** (-0.5)
-            * np.exp(-0.5 * (((x - x_0) ** 2 + (y - y_0) ** 2) / (a ** 2))
+    return (
+            (a_x * a_y * np.pi) ** -0.5
+            * np.exp(-0.5 * (
+                             ((x - x_0) / a_x) ** 2.0
+                             + ((y - y_0) / a_y) ** 2.0
+                            )
                      + 1j * x * k_0)
             )
 
