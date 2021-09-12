@@ -60,8 +60,8 @@ if __name__ == "__main__":
     parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int, default=80001,
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-a", metavar="Amplitude", type=json.loads,
-                        default={"a_x": 3.5, "a_y": 1.5, "a_z": 1.2},
-                        help="Psi amplitudes in x, y, z direction for the 3d gauss packet")
+                        default={"a_x": 1.0, "a_y": 1.0, "a_z": 1.0},
+                        help="Psi amplitudes in x, y, z direction for the gauss packet")
     parser.add_argument("-mu", metavar="Mean psi_0", type=json.loads,
                         default={"mu_x": 0.0, "mu_y": 0.0, "mu_z": 0.0},
                         help="Mean values in x, y, z direction for the gauss packet")
