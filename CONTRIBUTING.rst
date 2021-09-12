@@ -1,14 +1,6 @@
 Contributing
 ------------
 |
-| If you want to use special Latex packages add them in tex/preamble.tex
-|
-| To add more text, pleas edit **tex/text.tex**.
-|
-| **Before committing**, make sure it compiles:
-| Go to the directory **tex**, here **main.tex** lies.
-| To compile run **two times** the command **pdflatex main.tex**.
-|
 | 1. **Fork** the repository. Here is a guide how to do this:
 |   https://help.github.com/en/github/getting-started-with-github/fork-a-repo
 | 2. Before you make changes, make sure you **synchronized** with the repository.
