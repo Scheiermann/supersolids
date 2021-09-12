@@ -238,15 +238,15 @@ if __name__ == "__main__":
                                 alpha_V=0.3,
                                 camera_r_func=functools.partial(
                                     functions.camera_func_r,
-                                    r_0=40.0, phi_0=45.0, z_0=50.0,
+                                    r_0=10.0, phi_0=45.0, z_0=50.0,
                                     r_per_frame=0.0),
                                 camera_phi_func=functools.partial(
                                     functions.camera_func_phi,
-                                    r_0=40.0, phi_0=45.0, z_0=50.0,
+                                    r_0=10.0, phi_0=45.0, z_0=50.0,
                                     phi_per_frame=5.0),
                                 camera_z_func=functools.partial(
                                     functions.camera_func_z,
-                                    r_0=40.0, phi_0=45.0, z_0=50.0,
+                                    r_0=10.0, phi_0=45.0, z_0=50.0,
                                     z_per_frame=0.0),
                                 filename="anim.mp4",
                                 )
