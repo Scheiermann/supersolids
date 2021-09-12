@@ -178,7 +178,10 @@ def g_qf_helper(m: float = 164 * constants.u_in_kg,
                 a_dd: float = 130.0 * constants.a_0,
                 w_x: float = 2.0 * np.pi * 30.0):
     l_ho = get_l_ho(m, w_x)
-    e_dd = a_dd / a_s
+    if a_s == 0.0 and a_dd == 0.0:
+        e_dd = 0.0
+    else:
+        e_dd = a_dd / a_s
     a_s_l_ho_ratio = a_s / l_ho
 
     return a_s_l_ho_ratio, e_dd
