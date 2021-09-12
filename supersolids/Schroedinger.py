@@ -415,6 +415,12 @@ class Schroedinger:
         else:
             func = np.abs(func) ** p
 
+        if fourier_space:
+            func_norm = ((np.sqrt(2.0 * np.pi) ** float(self.dim))
+                         * (1 / self.volume_element(fourier_space=fourier_space))
+                         * (1 / self.psi_val.size))
+            func = func * func_norm
+
         psi_norm: float = self.sum_dV(func, fourier_space=fourier_space)
 
         return psi_norm
