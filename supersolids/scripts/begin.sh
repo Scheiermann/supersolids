@@ -59,6 +59,7 @@ steps_format="%07d"
 -w_y=518.36 \
 -accuracy=0.0 \
 -noise 0.8 1.2 \
+--V_interaction \
 --offscreen
 
 # -w_y=518.36

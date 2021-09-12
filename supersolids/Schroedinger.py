@@ -810,10 +810,23 @@ class Schroedinger:
         psi_quintic_int = self.get_norm(p=5.0)
 
         self.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
-        U_dd_int = self.trapez_integral(U_dd * psi_2)
+
+        psi_val_k = np.fft.fftn(self.psi_val)
+        psi_norm_k: float = self.get_norm(psi_val_k, fourier_space=True)
+        psi_val_k = psi_val_k / np.sqrt(psi_norm_k)
+        E_kin = self.get_norm(0.5 * self.k_squared * psi_val_k, fourier_space=True)
+
+        E_U_dd = (1 / np.sqrt(2.0 * np.pi) ** 3.0) * self.sum_dV(
+            self.V_k_val * np.abs(np.fft.fftn(psi_2)) ** 2.0)
+
+        if self.V_interaction:
+            V_interaction_bit = 1.0
+        else:
+            V_interaction_bit = 0.0
+
         self.E = (self.mu - 0.5 * self.g * psi_quadratic_int
-                          - 0.5 * U_dd_int
-                          - (3.0 / 5.0) * self.g_qf * psi_quintic_int)
+                  - 0.5 * E_U_dd * V_interaction_bit
+                  - (3.0 / 5.0) * self.g_qf * psi_quintic_int)
 
     def simulate_raw(self,
                      accuracy: float = 10 ** -6,

@@ -81,6 +81,8 @@ if __name__ == "__main__":
     parser.add_argument("--V_none", default=False, action="store_true",
                         help="If not used, a gauss potential is used."
                              "If used, no potential is used.")
+    parser.add_argument("--V_interaction", default=False, action="store_true",
+                        help="Just for 3D case. Use to apply V_3d_ddi (Dipol-Dipol-Interaction).")
     parser.add_argument("--real_time", default=False, action="store_true",
                         help="Switch for Split-Operator method to use imaginary time or not.")
     parser.add_argument("--plot_psi_sol", default=False, action="store_true",
@@ -190,7 +192,10 @@ if __name__ == "__main__":
         V_trap = V_3d
         psi_0 = psi_0_3d
         psi_sol = psi_sol_3d
-        V_interaction = V_3d_ddi
+        if args.V_interaction:
+            V_interaction = V_3d_ddi
+        else:
+            V_interaction = None
     else:
         sys.exit("Spatial dimension over 3. This is not implemented.")
 
