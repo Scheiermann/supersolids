@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
-path_anchor_input="itpx:/bigwork/dscheier/supersolids/results/joseph_injunction2/"
-path_anchor_output="/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_fix_1.0/"
+# author: Daniel Scheiermann
+# email: daniel.scheiermann@itp.uni-hannover.de
+# license: MIT
+# Please feel free to use and modify this, but keep the above information.
+
+path_anchor_input="itpx:/bigwork/dscheier/supersolids/results/"
+path_anchor_output="/run/media/dsche/ITP Transfer/"
 
 # next_new allows to point to different movies of one batched simulation
 next_new=0

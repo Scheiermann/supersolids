@@ -1,11 +1,17 @@
 #!/usr/bin/env python
+
+# author: Daniel Scheiermann
+# email: daniel.scheiermann@itp.uni-hannover.de
+# license: MIT
+# Please feel free to use and modify this, but keep the above information.
+
 import subprocess
 from pathlib import Path
 import numpy as np
 
-supersolids_version = "0.1.33rc8"
-dir_path = Path("/bigwork/dscheier/supersolids/results/")
-# dir_path = Path("/home/dsche/supersolids/results/")
+supersolids_version = "0.1.33rc9"
+# dir_path = Path("/bigwork/dscheier/supersolids/results/")
+dir_path = Path("/home/dsche/supersolids/supersolids/results/begin_alpha/")
 
 xvfb_display = 98
 

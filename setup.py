@@ -14,13 +14,13 @@ with open(path.join(this_directory, "README.rst"), encoding="utf-8") as f:
 
 setup(
     name="supersolids",
-    version="0.1.33rc8",
+    version="0.1.33rc9",
     packages=find_packages(),
     package_data={"supersolids": []},
     url="https://github.com/Scheiermann/supersolids",
     license="MIT",
     author="Scheiermann",
-    author_email="daniel.scheiermann@stud.uni-hannover.de",
+    author_email="daniel.scheiermann@itp.uni-hannover.de",
     install_requires=["dill>0.3.1",
                       "fabric",
                       "ffmpeg-python",

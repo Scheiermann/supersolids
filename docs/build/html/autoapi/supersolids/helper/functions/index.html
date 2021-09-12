@@ -231,8 +231,8 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_2d_pdf" title="supersolids.helper.functions.psi_gauss_2d_pdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_2d_pdf</span></code></a>(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]]))</p></td>
 <td><p>Gives values according to gaus dirstribution (2D)</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_2d" title="supersolids.helper.functions.psi_gauss_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_2d</span></code></a>(x, y, a = 1.0, x_0 = 0.0, y_0 = 0.0, k_0 = 0.0)</p></td>
-<td><p>Gaussian wave packet of width a and momentum k_0, centered at x_0</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_2d" title="supersolids.helper.functions.psi_gauss_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_2d</span></code></a>(x, y, a_x = 1.0, a_y = 1.0, x_0 = 0.0, y_0 = 0.0, k_0 = 0.0)</p></td>
+<td><p>Gaussian wave packet of width a and momentum k_0, centered at x_0, y_0</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_3d" title="supersolids.helper.functions.psi_gauss_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_3d</span></code></a>(x, y, z, a_x = 1.0, a_y = 1.0, a_z = 1.0, x_0 = 0.0, y_0 = 0.0, z_0 = 0.0, k_0 = 0.0)</p></td>
 <td><p>Gaussian wave packet of width a and momentum k_0, centered at x_0</p></td>
@@ -561,14 +561,15 @@ with meshgrid of x,y as input</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.psi_gauss_2d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_gauss_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_gauss_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_gauss_2d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gaussian wave packet of width a and momentum k_0, centered at x_0</p>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_gauss_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_gauss_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_gauss_2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gaussian wave packet of width a and momentum k_0, centered at x_0, y_0</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – mathematical variable</p></li>
 <li><p><strong>y</strong> – mathematical variable</p></li>
-<li><p><strong>a</strong> (<em>float</em>) – Amplitude of pulse</p></li>
+<li><p><strong>a_x</strong> (<em>float</em>) – Stretching factor in x direction (np.sqrt(2) * std_deviation)</p></li>
+<li><p><strong>a_y</strong> (<em>float</em>) – Stretching factor in y direction (np.sqrt(2) * std_deviation)</p></li>
 <li><p><strong>x_0</strong> (<em>float</em>) – Mean spatial x of pulse</p></li>
 <li><p><strong>y_0</strong> (<em>float</em>) – Mean spatial y of pulse</p></li>
 <li><p><strong>k_0</strong> (<em>float</em>) – Group velocity of pulse</p></li>
@@ -587,9 +588,9 @@ with meshgrid of x,y as input</p></li>
 <li><p><strong>x</strong> – mathematical variable</p></li>
 <li><p><strong>y</strong> – mathematical variable</p></li>
 <li><p><strong>z</strong> – mathematical variable</p></li>
-<li><p><strong>a_x</strong> (<em>float</em>) – Stretching factor in x direction</p></li>
-<li><p><strong>a_y</strong> (<em>float</em>) – Stretching factor in y direction</p></li>
-<li><p><strong>a_z</strong> (<em>float</em>) – Stretching factor in z direction</p></li>
+<li><p><strong>a_x</strong> (<em>float</em>) – Stretching factor in x direction (np.sqrt(2) * std_deviation)</p></li>
+<li><p><strong>a_y</strong> (<em>float</em>) – Stretching factor in y direction (np.sqrt(2) * std_deviation)</p></li>
+<li><p><strong>a_z</strong> (<em>float</em>) – Stretching factor in z direction (np.sqrt(2) * std_deviation)</p></li>
 <li><p><strong>x_0</strong> (<em>float</em>) – Mean spatial x of pulse</p></li>
 <li><p><strong>y_0</strong> (<em>float</em>) – Mean spatial y of pulse</p></li>
 <li><p><strong>z_0</strong> (<em>float</em>) – Mean spatial z of pulse</p></li>

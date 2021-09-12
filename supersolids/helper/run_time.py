@@ -2,7 +2,7 @@
 
 
 # author: Daniel Scheiermann
-# email: daniel.scheiermann@stud.uni-hannover.de
+# email: daniel.scheiermann@itp.uni-hannover.de
 # license: MIT
 # Please feel free to use and modify this, but keep the above information.
 
