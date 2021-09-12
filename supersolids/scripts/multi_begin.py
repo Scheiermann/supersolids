@@ -134,6 +134,7 @@ echo $(which pip3)
 -w_y={w_y} \
 -accuracy={accuracy} \
 -noise {' '.join(map(str, noise))} \
+--V_interaction \
 --offscreen
 """
 
