@@ -277,11 +277,11 @@ def psi_gauss_3d(x, y, z,
 
     :param z: mathematical variable
 
-    :param a_x: Stretching factor in x direction
+    :param a_x: Stretching factor in x direction (np.sqrt(2) * std_deviation)
 
-    :param a_y: Stretching factor in y direction
+    :param a_y: Stretching factor in y direction (np.sqrt(2) * std_deviation)
 
-    :param a_z: Stretching factor in z direction
+    :param a_z: Stretching factor in z direction (np.sqrt(2) * std_deviation)
 
     :param x_0: Mean spatial x of pulse
 
@@ -293,11 +293,11 @@ def psi_gauss_3d(x, y, z,
 
     """
 
-    return ((a_x * a_y * a_z * np.pi ** (3.0 / 2.0)) ** (-0.5)
+    return ((a_x * a_y * a_z * np.pi ** (3.0 / 2.0)) ** -0.5
             * np.exp(-0.5 * (
-                    ((x - x_0) / a_x) ** 2
-                    + ((y - y_0) / a_y) ** 2
-                    + ((z - z_0) / a_z) ** 2)
+                    ((x - x_0) / a_x) ** 2.0
+                    + ((y - y_0) / a_y) ** 2.0
+                    + ((z - z_0) / a_z) ** 2.0)
                      + 1j * x * k_0))
 
 
