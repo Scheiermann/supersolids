@@ -32,7 +32,7 @@ class Resolution:
         return np.array([self.x, self.y, self.z])
 
 
-def ResAssert(Res, a):
+def ResAssert(Res, a, name="Amplitudes"):
     assert len(a) == len(Res), (
-    f"Dimension of Amplitudes is {len(a)}, but needs to be the same as dimension of Res, "
+    f"Dimension of {name} is {len(a)}, but needs to be the same as dimension of Res, "
     f"which currently is {len(Res)}.")

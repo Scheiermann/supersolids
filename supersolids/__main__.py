@@ -62,6 +62,9 @@ if __name__ == "__main__":
     parser.add_argument("-a", metavar="Amplitude", type=json.loads,
                         default={"a_x": 3.5, "a_y": 1.5, "a_z": 1.2},
                         help="Psi amplitudes in x, y, z direction for the 3d gauss packet")
+    parser.add_argument("-mu", metavar="Mean psi_0", type=json.loads,
+                        default={"mu_x": 0.0, "mu_y": 0.0, "mu_z": 0.0},
+                        help="Mean values in x, y, z direction for the gauss packet")
     parser.add_argument("-accuracy", metavar="accuracy", type=float, default=10 ** -12,
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
@@ -102,6 +105,7 @@ if __name__ == "__main__":
 
     BoxResAssert(args.Res, args.Box)
     ResAssert(args.Res, args.a)
+    ResAssert(args.Res, args.mu, name="means (mu)")
     Res = Resolution(**args.Res)
 
     MyBox = Box(**args.Box)
@@ -129,17 +133,18 @@ if __name__ == "__main__":
     # psi_0_1d = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
     a_len = len(args.a)
     if a_len == 1:
-        psi_0_1d = functools.partial(functions.psi_gauss_1d, a=args.a["a_x"], x_0=2.0, k_0=0.0)
+        psi_0_1d = functools.partial(functions.psi_gauss_1d, a=args.a["a_x"],
+                                     x_0=args.mu["mu_x"], k_0=0.0)
     elif a_len == 2:
         psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf,
-                                     mu=[0.0, 0.0],
+                                     mu=[args.mu["mu_x"], args.mu["mu_y"]],
                                      var=np.array([[args.a["a_x"], 0.0], [0.0, args.a["a_y"]]])
                                      )
     else:
         psi_0_3d = functools.partial(
             functions.psi_gauss_3d,
             a_x=args.a["a_x"], a_y=args.a["a_y"], a_z=args.a["a_z"],
-            x_0=0.0, y_0=0.0, z_0=0.0,
+            x_0=args.mu["mu_x"], y_0=args.mu["mu_y"], z_0=args.mu["mu_z"],
             k_0=0.0)
         # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
 
