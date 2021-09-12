@@ -10,10 +10,7 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    # path_anchor_input = Path("/home/dsche/supersolids/results/jospeh_injunction/real_global/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_1.0/")
-    path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_0.1/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_0.01/")
+    path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_alpha/")
 
     frame_start = 1130000
     steps_per_npz = 10000
