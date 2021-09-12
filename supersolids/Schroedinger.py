@@ -635,6 +635,39 @@ class Schroedinger:
 
         return bool_grid_list
 
+    def get_N_in_droplets(self, prob_min, number_of_peaks):
+        """
+
+        Parameters
+        ----------
+        prob_min :
+        number_of_peaks :
+
+        Returns
+        -------
+        The first number_of_peaks entries are the number of particles in droplets
+        (defined by :math:`|\psi|^2 > \\mathrm{prob_min}`) on the x-axis from left to right.
+        The last entry is the sum of particles of those droplets.
+
+        """
+        bool_grid_list = self.get_peak_neighborhood(
+            prob_min=prob_min,
+            number_of_peaks=number_of_peaks,
+        )
+
+        N_in_droplets = []
+        for k in range(0, number_of_peaks):
+            psi_val_droplets = np.where(bool_grid_list[k],
+                                        self.psi_val,
+                                        np.zeros(shape=np.shape(self.psi_val)))
+
+            droplets_density = self.trapez_integral(np.abs(psi_val_droplets) ** 2.0)
+            N_in_droplets.append(self.N * droplets_density)
+
+        N_in_droplets.append(np.sum(N_in_droplets))
+
+        return N_in_droplets
+
     def get_droplet_edges(self, prob_droplets, peaks_index_3d, cut_axis):
         if cut_axis == 0:
             a = prob_droplets[:, peaks_index_3d[1], peaks_index_3d[2]]
