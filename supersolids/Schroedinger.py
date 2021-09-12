@@ -199,7 +199,7 @@ class Schroedinger:
         try:
             box_x_len = (self.Box.x1 - self.Box.x0)
             self.x: np.ndarray = np.linspace(self.Box.x0, self.Box.x1, self.Res.x)
-            self.dx: float = (box_x_len / self.Res.x)
+            self.dx: float = box_x_len / float(self.Res.x - 1)
             self.dkx: float = 2.0 * np.pi / box_x_len
             self.kx: np.ndarray = np.fft.fftfreq(self.Res.x, d=1.0 / (self.dkx * self.Res.x))
 
@@ -222,7 +222,7 @@ class Schroedinger:
             try:
                 box_y_len = self.Box.y1 - self.Box.y0
                 self.y: np.ndarray = np.linspace(self.Box.y0, self.Box.y1, self.Res.y)
-                self.dy: float = box_y_len / self.Res.y
+                self.dy: float = box_y_len / float(self.Res.y - 1)
                 self.dky: float = 2.0 * np.pi / box_y_len
                 self.ky: np.ndarray = np.fft.fftfreq(self.Res.y, d=1.0 / (self.dky * self.Res.y))
 
@@ -237,7 +237,7 @@ class Schroedinger:
             try:
                 box_z_len = MyBox.z1 - MyBox.z0
                 self.z: np.ndarray = np.linspace(self.Box.z0, self.Box.z1, self.Res.z)
-                self.dz: float = box_z_len / self.Res.z
+                self.dz: float = box_z_len / float(self.Res.z - 1)
                 self.dkz: float = 2.0 * np.pi / box_z_len
                 self.kz: np.ndarray = np.fft.fftfreq(self.Res.z, d=1.0 / (self.dkz * self.Res.z))
 
