@@ -265,8 +265,7 @@ class Schroedinger:
                 self.psi_sol_val: np.ndarray = self.psi_sol(self.x)
 
             self.k_squared: np.ndarray = self.kx ** 2.0
-            self.H_kin: np.ndarray = np.exp(
-                self.U * (0.5 * self.k_squared) * self.dt)
+            self.H_kin: np.ndarray = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 
             if V_interaction is None:
                 # For no interaction the identity is needed with respect to 2D
@@ -403,12 +402,12 @@ class Schroedinger:
 
         :param func: If func is not provided self.get_density(p=p) is used.
 
-        :param p: Exponent of :math:`|\psi|`. Use p=2.0 for density.
+        :param p: Exponent of |\psi|. Use p=2.0 for density.
 
         :param fourier_space: Flag to use fourier volume element as dV,
-        so:math:`\\mathrm{dV} = \\mathrm{d}^3 k`.
+        so dV = d^3 k.
 
-        :return: :math:`\int |\psi|^p \\mathrm{dV}`
+        :return: \int |\psi|^p dV
 
         """
         if func is None:
