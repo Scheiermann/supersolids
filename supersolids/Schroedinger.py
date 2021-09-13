@@ -855,7 +855,7 @@ class Schroedinger:
         E_kin = self.get_norm(0.5 * self.k_squared * psi_val_k, fourier_space=True)
 
         E_U_dd = (1 / np.sqrt(2.0 * np.pi) ** 3.0) * self.sum_dV(
-            self.V_k_val * np.abs(np.fft.fftn(psi_2)) ** 2.0)
+            self.V_k_val * np.abs(np.fft.fftn(psi_2)) ** 2.0, fourier_space=True)
 
         if self.V_interaction:
             V_interaction_bit = 1.0
