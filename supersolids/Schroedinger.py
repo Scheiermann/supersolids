@@ -189,13 +189,18 @@ class Schroedinger:
         if psi_sol is None:
             self.psi_sol = None
         else:
-            self.psi_sol: Callable = functools.partial(psi_sol, g=self.g)
+            if callable(psi_sol):
+                self.psi_sol: Callable = functools.partial(psi_sol, g=self.g)
+            else:
+                self.psi_sol = psi_sol
 
         if mu_sol is None:
             self.mu_sol = None
         else:
-            self.mu_sol: Callable = mu_sol(self.g)
-
+            if callable(mu_sol):
+                self.mu_sol: Callable = mu_sol(self.g)
+            else:
+                self.mu_sol = mu_sol
         try:
             box_x_len = (self.Box.x1 - self.Box.x0)
             self.x: np.ndarray = np.linspace(self.Box.x0, self.Box.x1, self.Res.x)
@@ -271,6 +276,11 @@ class Schroedinger:
                 # For no interaction the identity is needed with respect to 2D
                 # * 2D (array with 1.0 everywhere)
                 self.V_k_val: np.ndarray = np.full(self.psi_val.shape, 1.0)
+            else:
+                if callable(V_interaction):
+                    self.V_k_val = V_interaction(self.kx, g=self.g)
+                else:
+                    self.V_k_val = V_interaction
 
         elif self.dim == 2:
             self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
@@ -333,9 +343,11 @@ class Schroedinger:
             if self.psi_sol is None:
                 self.psi_sol_val = None
             else:
-                self.psi_sol_val = self.psi_sol(self.x_mesh, self.y_mesh, self.z_mesh)
-                print(f"Norm for psi_sol (trapez integral): "
-                      f"{self.trapez_integral(np.abs(self.psi_sol_val) ** 2.0)}")
+                if callable(self.psi_sol):
+                    self.psi_sol_val = self.psi_sol(self.x_mesh, self.y_mesh, self.z_mesh)
+                    if self.psi_sol_val is not None:
+                        print(f"Norm for psi_sol (trapez integral): "
+                              f"{self.trapez_integral(np.abs(self.psi_sol_val) ** 2.0)}")
 
             kx_mesh, ky_mesh, kz_mesh, _ = functions.get_meshgrid_3d(self.kx, self.ky, self.kz)
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
@@ -349,7 +361,8 @@ class Schroedinger:
                 # * 2D (array with 1.0 everywhere)
                 self.V_k_val = np.full(self.psi_val.shape, 1.0)
             else:
-                self.V_k_val = V_interaction(kx_mesh, ky_mesh, kz_mesh)
+                if callable(V_interaction):
+                    self.V_k_val = V_interaction(kx_mesh, ky_mesh, kz_mesh)
 
         # attributes for animation
         self.t: float = 0.0
