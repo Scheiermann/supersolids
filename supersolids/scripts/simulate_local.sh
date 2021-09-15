@@ -8,11 +8,13 @@ steps_per_npz=1000
 accuracy=0.0
 
 file_start="step_"
-file_number=850000
+file2_start="2-step_"
+file_number_load=850000
 file_format="%07d"
 file_pattern=".npz"
-printf -v file_number_formatted ${file_format} ${file_number}
-file_name="${file_start}${file_number_formatted}${file_pattern}"
+printf -v file_number_formatted ${file_format} ${file_number_load}
+filename_npz="${file_start}${file_number_formatted}${file_pattern}"
+filename2_npz="${file2_start}${file_number_formatted}${file_pattern}"
 
 movie_string="movie"
 movie_format="%03d"
@@ -35,8 +37,9 @@ python -m supersolids.tools.simulate_npz \
 -accuracy=${accuracy} \
 -dir_name_load=${movie_now} \
 -dir_name_result=${movie_after} \
--filename_npz=${file_name} \
--dir_path=${dir_path} \
+-filename_npz=${filename_npz} \
+-filename2_npz=${filename2_npz} \
+-dir_path="${dir_path}" \
 --offscreen \
 --V_reload \
 --real_time
