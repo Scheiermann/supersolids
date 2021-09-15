@@ -259,7 +259,7 @@ The approximation is needed because of the Baker-Campell-Hausdorff formula.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.Schroedinger.Schroedinger.get_density">
-<span class="sig-name descname"><span class="pre">get_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/Schroedinger.html#Schroedinger.get_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.get_density" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/Schroedinger.html#Schroedinger.get_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.get_density" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates <span class="math notranslate nohighlight">\(|\psi|^p\)</span> for 1D, 2D or 3D (depending on self.dim).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -276,7 +276,7 @@ The approximation is needed because of the Baker-Campell-Hausdorff formula.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.Schroedinger.Schroedinger.volume_element">
-<span class="sig-name descname"><span class="pre">volume_element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fourier_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.volume_element" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">volume_element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fourier_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/Schroedinger.html#Schroedinger.volume_element"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.volume_element" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>fourier_space</strong> (<em>bool</em>) – </p>
@@ -286,10 +286,13 @@ The approximation is needed because of the Baker-Campell-Hausdorff formula.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.Schroedinger.Schroedinger.sum_dV">
-<span class="sig-name descname"><span class="pre">sum_dV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fourier_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.sum_dV" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sum_dV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fourier_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/Schroedinger.html#Schroedinger.sum_dV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.sum_dV" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fourier_space</strong> (<em>bool</em>) – </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fourier_space</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>dV</strong> (<em>float</em>) – </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -393,7 +396,7 @@ which has at least the given fraction of the maximum probability <span class="ma
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.Schroedinger.Schroedinger.get_N_in_droplets">
-<span class="sig-name descname"><span class="pre">get_N_in_droplets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_peaks</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.get_N_in_droplets" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_N_in_droplets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_peaks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/Schroedinger.html#Schroedinger.get_N_in_droplets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.get_N_in_droplets" title="Permalink to this definition">¶</a></dt>
 <dd><p>prob_min :
 number_of_peaks :</p>
 <p>The first number_of_peaks entries are the number of particles in droplets
@@ -450,6 +453,31 @@ split operator method with the Trotter-Suzuki approximation.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.Schroedinger.Schroedinger.use_summary">
+<span class="sig-name descname"><span class="pre">use_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/Schroedinger.html#Schroedinger.use_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.use_summary" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>summary_name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.Schroedinger.Schroedinger.load_summary">
+<span class="sig-name descname"><span class="pre">load_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/Schroedinger.html#Schroedinger.load_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.load_summary" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>summary_name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.Schroedinger.Schroedinger.save_psi_val">
+<span class="sig-name descname"><span class="pre">save_psi_val</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/Schroedinger.html#Schroedinger.save_psi_val"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Schroedinger.Schroedinger.save_psi_val" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.Schroedinger.Schroedinger.simulate_raw">

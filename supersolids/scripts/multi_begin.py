@@ -13,7 +13,7 @@ def dic2str(dic):
 
 
 xvfb_display = 98
-supersolids_version = "0.1.33rc9"
+supersolids_version = "0.1.33rc10"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/")
 # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 

@@ -11,7 +11,7 @@
 #SBATCH --mem=4G
 #SBATCH --mem-per-cpu=4G
 
-supersolids_version=0.1.33rc9
+supersolids_version=0.1.33rc10
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!

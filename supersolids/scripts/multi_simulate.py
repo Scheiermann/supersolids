@@ -9,7 +9,7 @@ import subprocess
 from pathlib import Path
 import numpy as np
 
-supersolids_version = "0.1.33rc9"
+supersolids_version = "0.1.33rc10"
 # dir_path = Path("/bigwork/dscheier/supersolids/results/")
 dir_path = Path("/home/dsche/supersolids/supersolids/results/begin_alpha/")
 

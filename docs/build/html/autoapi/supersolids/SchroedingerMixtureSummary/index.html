@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>supersolids.SchroedingerSummary &mdash; supersolids 0.1.26 documentation</title>
+  <title>supersolids.SchroedingerMixtureSummary &mdash; supersolids 0.1.26 documentation</title>
   
 
   
@@ -139,13 +139,13 @@
     
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.SchroedingerSummary</span></code></li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.SchroedingerMixtureSummary</span></code></li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../../../_sources/autoapi/supersolids/SchroedingerSummary/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../../_sources/autoapi/supersolids/SchroedingerMixtureSummary/index.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -158,8 +158,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-supersolids.SchroedingerSummary">
-<span id="supersolids-schroedingersummary"></span><h1><a class="reference internal" href="#module-supersolids.SchroedingerSummary" title="supersolids.SchroedingerSummary"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.SchroedingerSummary</span></code></a><a class="headerlink" href="#module-supersolids.SchroedingerSummary" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-supersolids.SchroedingerMixtureSummary">
+<span id="supersolids-schroedingermixturesummary"></span><h1><a class="reference internal" href="#module-supersolids.SchroedingerMixtureSummary" title="supersolids.SchroedingerMixtureSummary"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.SchroedingerMixtureSummary</span></code></a><a class="headerlink" href="#module-supersolids.SchroedingerMixtureSummary" title="Permalink to this headline">¶</a></h1>
 <p>Numerical solver for non-linear time-dependent Schrodinger equation.</p>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
@@ -171,19 +171,20 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.SchroedingerSummary.SchroedingerSummary" title="supersolids.SchroedingerSummary.SchroedingerSummary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SchroedingerSummary</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.SchroedingerMixtureSummary.SchroedingerMixtureSummary" title="supersolids.SchroedingerMixtureSummary.SchroedingerMixtureSummary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SchroedingerMixtureSummary</span></code></a></p></td>
 <td><p>Saves the properties of a Schroedinger system without the arrays,</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py class">
-<dt class="sig sig-object py" id="supersolids.SchroedingerSummary.SchroedingerSummary">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">supersolids.SchroedingerSummary.</span></span><span class="sig-name descname"><span class="pre">SchroedingerSummary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">System</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerSummary.html#SchroedingerSummary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerSummary.SchroedingerSummary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Saves the properties of a Schroedinger system without the arrays,
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixtureSummary.SchroedingerMixtureSummary">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">supersolids.SchroedingerMixtureSummary.</span></span><span class="sig-name descname"><span class="pre">SchroedingerMixtureSummary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">SystemMixture</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixtureSummary.html#SchroedingerMixtureSummary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixtureSummary.SchroedingerMixtureSummary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../SchroedingerSummary/index.html#supersolids.SchroedingerSummary.SchroedingerSummary" title="supersolids.SchroedingerSummary.SchroedingerSummary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">supersolids.SchroedingerSummary.SchroedingerSummary</span></code></a></p>
+<p>Saves the properties of a Schroedinger system without the arrays,
 to save disk space when saving it with dill (pickle).</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="supersolids.SchroedingerSummary.SchroedingerSummary.copy_to">
-<span class="sig-name descname"><span class="pre">copy_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerSummary.html#SchroedingerSummary.copy_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerSummary.SchroedingerSummary.copy_to" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixtureSummary.SchroedingerMixtureSummary.copy_to">
+<span class="sig-name descname"><span class="pre">copy_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixtureSummary.html#SchroedingerMixtureSummary.copy_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixtureSummary.SchroedingerMixtureSummary.copy_to" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
