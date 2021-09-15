@@ -178,6 +178,7 @@ if __name__ == "__main__":
         V_trap = V_1d
         psi_0 = psi_0_1d
         psi_sol = psi_sol_1d
+        mu_sol = functions.mu_1d
         V_interaction = None
     elif Res.dim == 2:
         x_lim = (MyBox.x0, MyBox.x1)
@@ -185,6 +186,7 @@ if __name__ == "__main__":
         V_trap = V_2d
         psi_0 = psi_0_2d
         psi_sol = psi_sol_2d
+        mu_sol = functions.mu_2d
         V_interaction = None
     elif Res.dim == 3:
         x_lim = (MyBox.x0, MyBox.x1) # arbitrary as not used (mayavi vs matplotlib)
@@ -192,6 +194,7 @@ if __name__ == "__main__":
         V_trap = V_3d
         psi_0 = psi_0_3d
         psi_sol = psi_sol_3d
+        mu_sol = functions.mu_3d
         if args.V_interaction:
             V_interaction = V_3d_ddi
         else:
@@ -207,49 +210,48 @@ if __name__ == "__main__":
         else:
             V = V_trap
 
-    System: Schroedinger = Schroedinger(args.N,
-                                        MyBox,
-                                        Res,
-                                        max_timesteps=args.max_timesteps,
-                                        dt=args.dt,
-                                        g=g,
-                                        g_qf=g_qf,
-                                        w_x=args.w_x,
-                                        w_y=args.w_y,
-                                        w_z=args.w_z,
-                                        e_dd=e_dd,
-                                        a_s=args.a_s,
-                                        imag_time=(not args.real_time),
-                                        mu=1.1,
-                                        E=1.0,
-                                        psi_0=psi_0,
-                                        V=V,
-                                        V_interaction=V_interaction,
-                                        psi_sol=psi_sol,
-                                        mu_sol=functions.mu_3d,
-                                        psi_0_noise=psi_0_noise_3d,
-                                        )
+    SchroedingerInput: Schroedinger = Schroedinger(
+        args.N,
+        MyBox,
+        Res,
+        max_timesteps=args.max_timesteps,
+        dt=args.dt,
+        g=g,
+        g_qf=g_qf,
+        w_x=args.w_x,
+        w_y=args.w_y,
+        w_z=args.w_z,
+        e_dd=e_dd,
+        a_s=args.a_s,
+        imag_time=(not args.real_time),
+        mu=1.1,
+        E=1.0,
+        psi_0=psi_0,
+        V=V,
+        V_interaction=V_interaction,
+        psi_sol=psi_sol,
+        mu_sol=mu_sol,
+        psi_0_noise=psi_0_noise_3d,
+        )
 
-    Anim: Animation = Animation(Res=System.Res,
-                                plot_psi_sol=args.plot_psi_sol,
-                                plot_V=args.plot_V,
-                                alpha_psi=0.8,
-                                alpha_psi_sol=0.5,
-                                alpha_V=0.3,
-                                camera_r_func=functools.partial(
-                                    functions.camera_func_r,
-                                    r_0=10.0, phi_0=45.0, z_0=50.0,
-                                    r_per_frame=0.0),
-                                camera_phi_func=functools.partial(
-                                    functions.camera_func_phi,
-                                    r_0=10.0, phi_0=45.0, z_0=50.0,
-                                    phi_per_frame=5.0),
-                                camera_z_func=functools.partial(
-                                    functions.camera_func_z,
-                                    r_0=10.0, phi_0=45.0, z_0=50.0,
-                                    z_per_frame=0.0),
-                                filename="anim.mp4",
-                                )
+    Anim: Animation = Animation(
+        Res=SchroedingerInput.Res,
+        plot_psi_sol=args.plot_psi_sol,
+        plot_V=args.plot_V,
+        alpha_psi=0.8,
+        alpha_psi_sol=0.5,
+        alpha_V=0.3,
+        camera_r_func=functools.partial(functions.camera_func_r,
+                                        r_0=10.0, phi_0=45.0, z_0=50.0,
+                                        r_per_frame=0.0),
+        camera_phi_func=functools.partial(functions.camera_func_phi,
+                                          r_0=10.0, phi_0=45.0, z_0=50.0,
+                                          phi_per_frame=5.0),
+        camera_z_func=functools.partial(functions.camera_func_z,
+                                        r_0=10.0, phi_0=45.0, z_0=50.0,
+                                        z_per_frame=0.0),
+        filename="anim.mp4",
+        )
 
     if MyBox.dim == 3:
         slice_indices = [int(Res.x / 2), int(Res.y / 2), int(Res.z / 2)]
@@ -259,20 +261,20 @@ if __name__ == "__main__":
     # TODO: get mayavi lim to work
     # 3D works in single core mode
     SystemResult: Schroedinger = simulate_case(
-                                    System,
-                                    Anim,
-                                    accuracy=args.accuracy,
-                                    delete_input=False,
-                                    dir_path=dir_path,
-                                    dir_name_result=args.dir_name_result,
-                                    slice_indices=slice_indices, # from here just mayavi
-                                    offscreen=args.offscreen,
-                                    x_lim=x_lim, # from here just matplotlib
-                                    y_lim=y_lim,
-                                    filename_steps=args.filename_steps,
-                                    steps_format=args.steps_format,
-                                    steps_per_npz=args.steps_per_npz,
-                                    frame_start=0,
-                                    )
+        SchroedingerInput,
+        Anim,
+        accuracy=args.accuracy,
+        delete_input=False,
+        dir_path=dir_path,
+        dir_name_result=args.dir_name_result,
+        slice_indices=slice_indices, # from here just mayavi
+        offscreen=args.offscreen,
+        x_lim=x_lim, # from here just matplotlib
+        y_lim=y_lim,
+        filename_steps=args.filename_steps,
+        steps_format=args.steps_format,
+        steps_per_npz=args.steps_per_npz,
+        frame_start=0,
+        )
 
     print("Single core done")
