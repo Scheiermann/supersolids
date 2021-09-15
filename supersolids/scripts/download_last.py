@@ -12,6 +12,7 @@ from fabric import Connection
 
 
 if __name__ == "__main__":
+    ssh_hostname = 'xanthe'
     path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/")
     path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_alpha/")
 
@@ -37,7 +38,7 @@ if __name__ == "__main__":
         path_out = Path(path_anchor_output, movie_string + f"{counting_format % i}")
 
         print(f"\npath_in: {path_in}")
-        with Connection('itpx') as c:
+        with Connection(ssh_hostname) as c:
             # Create a results dir, if there is none
             if not path_out.is_dir():
                 path_out.mkdir(parents=True)
