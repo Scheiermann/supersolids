@@ -5,9 +5,12 @@ steps_per_npz=1
 steps_format="%07d"
 
 frame_start=0
-movie_number_after=2
-movie_after_string="movie00"
-movie_after="$movie_after_string$((movie_number_after))"
+movie_number_result=17
+movie_string="movie"
+movie_format="%03d"
+printf -v movie_number_formatted ${movie_format} ${movie_number_result}
+dir_name_result=$movie_string$movie_number_formatted
+
 dir_path_after="/run/media/dsche/ITP Transfer/test/"
 
 python -m supersolids \
@@ -20,6 +23,7 @@ python -m supersolids \
 -steps_format="${steps_format}" \
 -a='{"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}' \
 -dir_path="${dir_path}" \
+-dir_name_result="${dir_name_result}" \
 -a_s=0.000000004656 \
 -w_y=518.36 \
 -accuracy=0.0 \
