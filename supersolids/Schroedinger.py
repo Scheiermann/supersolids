@@ -148,6 +148,11 @@ class Schroedinger:
         """
         assert isinstance(Res, Resolution), (f"box: {type(Res)} is not type {type(Resolution)}")
 
+        # TODO: needed but destroys back compatiblity to old npz
+        #       (fork needed, accumulate those to do it in one go)
+        # self.psi_0_noise: np.ndarray = psi_0_noise
+        # self.name: str = "SchroedingerSummary_"
+
         self.N: int = N
         self.w_x: float = w_x
         self.w_y: float = w_y
@@ -156,8 +161,7 @@ class Schroedinger:
         self.Res: Resolution = Res
         self.max_timesteps: int = max_timesteps
 
-        assert isinstance(MyBox, Box), (
-            f"box: {type(MyBox)} is not type {type(Box)}")
+        assert isinstance(MyBox, Box), (f"box: {type(MyBox)} is not type {type(Box)}")
 
         self.Box: Box = MyBox
         self.dt: float = dt
