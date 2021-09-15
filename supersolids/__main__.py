@@ -22,6 +22,7 @@ import numpy as np
 
 from supersolids.Animation.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
+from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper.simulate_case import simulate_case
 from supersolids.helper.cut_1d import prepare_cuts
 from supersolids.helper import constants
@@ -98,6 +99,8 @@ if __name__ == "__main__":
     parser.add_argument("-steps_per_npz", metavar="steps_per_npz",
                         type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
+    parser.add_argument("--mixture", default=False, action="store_true",
+                        help="Use to simulate a SchroedingerMixture.")
     parser.add_argument("--offscreen", default=False, action="store_true",
                         help="If flag is not used, interactive animation is "
                              "shown and saved as mp4, else Schroedinger is "
@@ -257,6 +260,24 @@ if __name__ == "__main__":
         slice_indices = [int(Res.x / 2), int(Res.y / 2), int(Res.z / 2)]
     else:
         slice_indices = [None, None, None]
+
+    if args.mixture:
+        SchroedingerInput: SchroedingerMixture = SchroedingerMixture(
+            System=SchroedingerInput,
+            a_11_bohr=95.0,
+            a_12_bohr=95.0,
+            a_22_bohr=95.0,
+            N2=0.5,
+            m1=1.0,
+            m2=1.0,
+            mu_1=9.93,
+            mu_2=9.93,
+            psi_0_noise=psi_0_noise_3d,
+            psi2_0=functions.psi_gauss_3d,
+            psi2_0_noise=psi_0_noise_3d,
+            mu_sol=mu_sol,
+            input_path=Path("~/Documents/itp/master/supersolids/supersolids/").expanduser(),
+            )
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode

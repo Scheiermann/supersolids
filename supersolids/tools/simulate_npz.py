@@ -15,6 +15,7 @@ import functools
 import json
 import sys
 from pathlib import Path
+from typing import Optional
 
 import dill
 import numpy as np
@@ -22,6 +23,7 @@ import numpy as np
 from supersolids.Animation.Animation import Animation
 
 from supersolids.Schroedinger import Schroedinger
+from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper import functions
 from supersolids.helper.simulate_case import simulate_case
 from supersolids.helper.Resolution import Resolution
@@ -38,26 +40,34 @@ def simulate_npz(args):
     input_path = Path(dir_path, args.dir_name_load)
     schroedinger_path = Path(input_path, args.filename_schroedinger)
     psi_val_path = Path(input_path, args.filename_npz)
+    psi2_val_path = Path(input_path, args.filename2_npz)
 
-    Anim: Animation = Animation(plot_psi_sol=False,
-                                plot_V=False,
-                                alpha_psi=0.8,
-                                alpha_psi_sol=0.5,
-                                alpha_V=0.3,
-                                filename="anim.mp4",
-                                )
+    Anim: Animation = Animation(
+        plot_psi_sol=False,
+        plot_V=False,
+        alpha_psi=0.8,
+        alpha_psi_sol=0.5,
+        alpha_V=0.3,
+        filename="anim.mp4",
+        )
 
     try:
         print("\nLoad schroedinger")
         with open(schroedinger_path, "rb") as f:
             # WARNING: this is just the input Schroedinger at t=0
-            System_loaded = dill.load(file=f)
+            System_loaded: Schroedinger = dill.load(file=f)
+
+        SystemSummary, summary_name = System_loaded.use_summary(summary_name=args.summary_name)
 
         print(f"File at {schroedinger_path} loaded.")
         try:
             # get the psi_val of Schroedinger at other timesteps (t!=0)
             with open(psi_val_path, "rb") as f:
                 System_loaded.psi_val = np.load(file=f)["psi_val"]
+
+            if isinstance(System_loaded, SchroedingerMixture):
+                with open(psi2_val_path, "rb") as f:
+                    System_loaded.psi2_val = np.load(file=f)["psi2_val"]
 
             # get the frame number as it encodes the number steps dt,
             # so System.t can be reconstructed
@@ -148,25 +158,44 @@ def simulate_npz(args):
                 w_z = args.w["w_z"]
                 alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
 
-            System: Schroedinger = Schroedinger(System_loaded.N,
-                                                MyBox,
-                                                Res,
-                                                max_timesteps=args.max_timesteps,
-                                                dt=args.dt,
-                                                g=System_loaded.g,
-                                                g_qf=System_loaded.g_qf,
-                                                w_x=w_x,
-                                                w_y=w_y,
-                                                w_z=w_z,
-                                                a_s=System_loaded.a_s,
-                                                e_dd=System_loaded.e_dd,
-                                                imag_time=(not args.real_time),
-                                                mu=System_loaded.mu,
-                                                E=System_loaded.E,
-                                                V=(lambda x, y, z: 0),
-                                                V_interaction=System_loaded.V_interaction,
-                                                psi_0_noise=None
-                                                )
+            SchroedingerInput: Schroedinger = Schroedinger(
+                System_loaded.N,
+                MyBox,
+                Res,
+                max_timesteps=args.max_timesteps,
+                dt=args.dt,
+                g=System_loaded.g,
+                g_qf=System_loaded.g_qf,
+                w_x=w_x,
+                w_y=w_y,
+                w_z=w_z,
+                a_s=System_loaded.a_s,
+                e_dd=System_loaded.e_dd,
+                imag_time=(not args.real_time),
+                mu=System_loaded.mu,
+                E=System_loaded.E,
+                V=(lambda x, y, z: 0),
+                V_interaction=System_loaded.V_interaction,
+                psi_0_noise=None
+                )
+
+            if isinstance(System_loaded, SchroedingerMixture):
+                SchroedingerInput: SchroedingerMixture = SchroedingerMixture(
+                    System=SchroedingerInput,
+                    a_11_bohr=System_loaded.a_11_bohr,
+                    a_12_bohr=System_loaded.a_12_bohr,
+                    a_22_bohr=System_loaded.a_22_bohr,
+                    N2=System_loaded.N2,
+                    m1=System_loaded.m1,
+                    m2=System_loaded.m2,
+                    mu_1=System_loaded.mu_1,
+                    mu_2=System_loaded.mu_2,
+                    psi_0_noise=None, # when continuing to simulate, no extra noise should be added
+                    psi2_0=System_loaded.psi2_0,
+                    psi2_0_noise=System_loaded.psi2_0_noise,
+                    mu_sol=System_loaded.mu_sol,
+                    input_path=System_loaded.input_path,
+                )
 
             V_harmonic = functools.partial(functions.v_harmonic_3d,
                                            alpha_y=alpha_y,
@@ -176,21 +205,21 @@ def simulate_npz(args):
             if args.V is None:
                 # -V=None uses harmonic potential with w_x, w_y, w_z.
                 # used to get access to the in-build functions of supersolids package
-                System.V_val = V_harmonic(System.x_mesh, System.y_mesh, System.z_mesh)
+                SchroedingerInput.V_val = V_harmonic(SchroedingerInput.x_mesh, SchroedingerInput.y_mesh, SchroedingerInput.z_mesh)
             else:
                 if args.V_reload:
                     if System_loaded.V is None:
-                        System.V_val = args.V(System.x_mesh, System.y_mesh, System.z_mesh)
+                        SchroedingerInput.V_val = args.V(SchroedingerInput.x_mesh, SchroedingerInput.y_mesh, SchroedingerInput.z_mesh)
                     else:
-                        System.V_val = System_loaded.V_val + args.V(System.x_mesh,
-                                                                    System.y_mesh,
-                                                                    System.z_mesh)
+                        SchroedingerInput.V_val = System_loaded.V_val + args.V(SchroedingerInput.x_mesh,
+                                                                    SchroedingerInput.y_mesh,
+                                                                    SchroedingerInput.z_mesh)
                 else:
-                    System.V_val = args.V(System.x_mesh, System.y_mesh, System.z_mesh)
+                    SchroedingerInput.V_val = args.V(SchroedingerInput.x_mesh, SchroedingerInput.y_mesh, SchroedingerInput.z_mesh)
 
 
             # Load psi values from System_loaded into System
-            System.psi_val = System_loaded.psi_val
+            SchroedingerInput.psi_val = System_loaded.psi_val
 
             # As psi_0_noise needs to be applied on the loaded psi_val and not the initial psi_val
             # we apply noise after loading the old System
@@ -213,9 +242,9 @@ def simulate_npz(args):
 
             if args.neighborhood is None:
                 if args.noise_func:
-                    System.psi_val = noise_func(k=1.0) * System.psi_val
+                    SchroedingerInput.psi_val = noise_func(k=1.0) * SchroedingerInput.psi_val
                 else:
-                    System.psi_val = noise_func * System.psi_val
+                    SchroedingerInput.psi_val = noise_func * SchroedingerInput.psi_val
 
             else:
                 bool_grid_list = System_loaded.get_peak_neighborhood(prob_min=args.neighborhood[0],
@@ -230,84 +259,84 @@ def simulate_npz(args):
                         phase_scramble_on_droplets = np.where(bool_grid_list[k], noise_func,
                                                               np.ones(shape=np.shape(noise_func)))
 
-                    System.psi_val = phase_scramble_on_droplets * System.psi_val
+                    SchroedingerInput.psi_val = phase_scramble_on_droplets * SchroedingerInput.psi_val
 
             # remove the n-th slices, if Res is shrunk down
-            if System.Res.x < System_loaded.Res.x:
-                x_shrink = int(System_loaded.Res.x / System.Res.x)
-                System.psi_val = System.psi_val[box_offset_steps_x:box_offset_steps_x_end, :, :]
+            if SchroedingerInput.Res.x < System_loaded.Res.x:
+                x_shrink = int(System_loaded.Res.x / SchroedingerInput.Res.x)
+                SchroedingerInput.psi_val = SchroedingerInput.psi_val[box_offset_steps_x:box_offset_steps_x_end, :, :]
             else:
                 if x_step_new == x_step_old:
                     # Fill up the new grid points with 0,
                     # when adding grid points by changing Box or Res
-                    System.psi_val = np.pad(
-                        System.psi_val,
+                    SchroedingerInput.psi_val = np.pad(
+                        SchroedingerInput.psi_val,
                         ((box_offset_steps_x, Res.x - System_loaded.Res.x - box_offset_steps_x),
                          (0, 0),
                          (0, 0))
                     )
                 else:
-                    box_offset_new_x_end = np.abs(System_loaded.Box.x1 - System.Box.x1)
+                    box_offset_new_x_end = np.abs(System_loaded.Box.x1 - SchroedingerInput.Box.x1)
                     box_offset_new_steps_x_end = int(box_offset_new_x_end / x_step_new)
                     box_offset_new_steps_x = int(box_offset_x / x_step_new)
                     discard_n_th_x = int(x_step_new / x_step_old)
-                    psi_loaded_lower_res_x = System.psi_val[::discard_n_th_x, :, :]
+                    psi_loaded_lower_res_x = SchroedingerInput.psi_val[::discard_n_th_x, :, :]
 
-                    System.psi_val = np.pad(
+                    SchroedingerInput.psi_val = np.pad(
                         psi_loaded_lower_res_x,
                         ((box_offset_new_steps_x, box_offset_new_steps_x_end),
                          (0, 0),
                          (0, 0))
                     )
 
-            if System.Res.y < System_loaded.Res.y:
-                y_shrink = int(System_loaded.Res.y / System.Res.y)
-                System.psi_val = System.psi_val[:, box_offset_steps_y:box_offset_steps_y_end, :]
+            if SchroedingerInput.Res.y < System_loaded.Res.y:
+                y_shrink = int(System_loaded.Res.y / SchroedingerInput.Res.y)
+                SchroedingerInput.psi_val = SchroedingerInput.psi_val[:, box_offset_steps_y:box_offset_steps_y_end, :]
             else:
                 if y_step_new == y_step_old:
                     # Fill up the new grid points with 0,
                     # when adding grid points by changing Box or Res
-                    System.psi_val = np.pad(
-                        System.psi_val,
+                    SchroedingerInput.psi_val = np.pad(
+                        SchroedingerInput.psi_val,
                         ((0, 0),
                          (box_offset_steps_y, Res.y - System_loaded.Res.y - box_offset_steps_y),
                          (0, 0))
                     )
                 else:
-                    box_offset_new_y_end = np.abs(System_loaded.Box.y1 - System.Box.y1)
+                    box_offset_new_y_end = np.abs(System_loaded.Box.y1 - SchroedingerInput.Box.y1)
                     box_offset_new_steps_y_end = int(box_offset_new_y_end / y_step_new)
                     box_offset_new_steps_y = int(box_offset_y / y_step_new)
                     discard_n_th_y = int(y_step_new / y_step_old)
-                    psi_loaded_lower_res_y = System.psi_val[:, ::discard_n_th_y, :]
+                    psi_loaded_lower_res_y = SchroedingerInput.psi_val[:, ::discard_n_th_y, :]
 
-                    System.psi_val = np.pad(
+                    SchroedingerInput.psi_val = np.pad(
                         psi_loaded_lower_res_y,
                         ((0, 0),
                          (box_offset_new_steps_y, box_offset_new_steps_y_end),
                          (0, 0))
                     )
 
-            if System.Res.z < System_loaded.Res.z:
-                z_shrink = int(System_loaded.Res.z / System.Res.z)
-                System.psi_val = System.psi_val[:, :, box_offset_steps_z:box_offset_steps_z_end]
+            if SchroedingerInput.Res.z < System_loaded.Res.z:
+                z_shrink = int(System_loaded.Res.z / SchroedingerInput.Res.z)
+                SchroedingerInput.psi_val = SchroedingerInput.psi_val[:, :, box_offset_steps_z:box_offset_steps_z_end]
             else:
                 if z_step_new == z_step_old:
                     # Fill up the new grid points with 0,
                     # when adding grid points by changing Box or Res
-                    System.psi_val = np.pad(
-                        System.psi_val,
+                    SchroedingerInput.psi_val = np.pad(
+                        SchroedingerInput.psi_val,
                         ((0, 0),
                          (0, 0),
                          (box_offset_steps_z, Res.z - System_loaded.Res.z - box_offset_steps_z))
                     )
                 else:
-                    box_offset_new_z_end = np.abs(System_loaded.Box.z1 - System.Box.z1)
+                    box_offset_new_z_end = np.abs(System_loaded.Box.z1 - SchroedingerInput.Box.z1)
                     box_offset_new_steps_z_end = int(box_offset_new_z_end / z_step_new)
                     box_offset_new_steps_z = int(box_offset_z / z_step_new)
                     discard_n_th_z = int(z_step_new / z_step_old)
-                    psi_loaded_lower_res_z = System.psi_val[:, :, :discard_n_th_z]
+                    psi_loaded_lower_res_z = SchroedingerInput.psi_val[:, :, :discard_n_th_z]
 
-                    System.psi_val = np.pad(
+                    SchroedingerInput.psi_val = np.pad(
                         psi_loaded_lower_res_z,
                         ((0, 0),
                          (0, 0),
@@ -315,7 +344,7 @@ def simulate_npz(args):
                     )
 
             SystemResult: Schroedinger = simulate_case(
-                System=System,
+                System=SchroedingerInput,
                 Anim=Anim,
                 accuracy=args.accuracy,
                 delete_input=True,
@@ -375,9 +404,14 @@ def flags(args_array):
                              "For example the standard naming convention is movie002")
     parser.add_argument("-filename_schroedinger", type=str, default="schroedinger.pkl",
                         help="Name of file, where the Schroedinger object is saved")
+    parser.add_argument("-summary_name", type=Optional[str], default=None,
+                        help="Filename prefix of Summary for example SchroedingerMixtureSummary_")
     parser.add_argument("-filename_npz", type=str, default="step_" + "%07d" % 0 + ".npz",
                         help="Name of file, where psi_val is saved. "
                              "For example the standard naming convention is step_000001.npz")
+    parser.add_argument("-filename2_npz", type=str, default="2-step_" + "%07d" % 0 + ".npz",
+                        help="Name of file, where psi2_val is saved. "
+                             "For example the standard naming convention is 2-step_000001.npz")
     parser.add_argument("-filename_steps", type=str, default="step_",
                         help="Name of file, without enumerator for the files. "
                              "For example the standard naming convention is step_000001.npz, "

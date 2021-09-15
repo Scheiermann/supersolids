@@ -12,6 +12,7 @@ Functions for Potential and initial wave function :math:`\psi_0`
 from pathlib import Path
 import sys
 import zipfile
+from typing import Optional
 
 import dill
 import numpy as np
@@ -20,7 +21,7 @@ from mayavi import mlab
 
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
-from supersolids.SchroedingerSummary import SchroedingerSummary
+from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper import functions, constants, get_path
 
 
@@ -185,18 +186,31 @@ class MayaviAnimation(Animation.Animation):
         return input_path
 
     def prepare(self, System: Schroedinger):
-        prob_3d = np.abs(System.psi_val) ** 2
-        prob_plot = mlab.contour3d(System.x_mesh,
+        prob1_3d = np.abs(System.psi_val) ** 2.0
+        prob1_plot = mlab.contour3d(System.x_mesh,
                                    System.y_mesh,
                                    System.z_mesh,
-                                   prob_3d,
+                                   prob1_3d,
                                    colormap="spectral",
                                    opacity=self.alpha_psi,
                                    transparent=True)
+
+        prob_plots = [prob1_plot]
+        if isinstance(System, SchroedingerMixture):
+            prob2_3d = np.abs(System.psi2_val) ** 2.0
+            prob2_plot = mlab.contour3d(System.x_mesh,
+                                        System.y_mesh,
+                                        System.z_mesh,
+                                        prob2_3d,
+                                        colormap="spectral",
+                                        opacity=self.alpha_psi,
+                                        transparent=True)
+            prob_plots.append(prob2_plot)
+
         slice_x_plot = mlab.volume_slice(System.x_mesh,
                                          System.y_mesh,
                                          System.z_mesh,
-                                         prob_3d,
+                                         prob1_3d,
                                          colormap="spectral",
                                          plane_orientation="x_axes",
                                          slice_index=self.slice_indices[0],
@@ -205,7 +219,7 @@ class MayaviAnimation(Animation.Animation):
         slice_y_plot = mlab.volume_slice(System.x_mesh,
                                          System.y_mesh,
                                          System.z_mesh,
-                                         prob_3d,
+                                         prob1_3d,
                                          colormap="spectral",
                                          plane_orientation="y_axes",
                                          slice_index=self.slice_indices[1],
@@ -214,7 +228,7 @@ class MayaviAnimation(Animation.Animation):
         slice_z_plot = mlab.volume_slice(System.x_mesh,
                                          System.y_mesh,
                                          System.z_mesh,
-                                         prob_3d,
+                                         prob1_3d,
                                          colormap="spectral",
                                          plane_orientation="z_axes",
                                          slice_index=self.slice_indices[2],
@@ -248,7 +262,7 @@ class MayaviAnimation(Animation.Animation):
 
         axes_style()
 
-        return prob_plot, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot
+        return prob_plots, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot
 
     # @mlab.animate(delay=10, ui=True)
     def animate_npz(self,
@@ -256,12 +270,14 @@ class MayaviAnimation(Animation.Animation):
                     dir_name: str = None,
                     filename_schroedinger: str = f"schroedinger.pkl",
                     filename_steps: str = f"step_",
+                    filename_steps2: str = f"2-step_",
                     steps_format: str = "%06d",
                     steps_per_npz: int = 10,
                     frame_start: int = 0,
                     arg_slices: bool = False,
                     azimuth: float = 0.0,
                     elevation: float = 0.0,
+                    summary_name: Optional[str] = None,
                     ):
 
         supersolids_version = get_supersolids_version()
@@ -289,7 +305,7 @@ class MayaviAnimation(Animation.Animation):
             # WARNING: this is just the input Schroedinger at t=0
             System: Schroedinger = dill.load(file=f)
 
-        prob_plot, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot = self.prepare(System)
+        prob_plots, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot = self.prepare(System)
 
         yield
 
@@ -303,15 +319,13 @@ class MayaviAnimation(Animation.Animation):
                 with open(psi_val_path, "rb") as f:
                     System.psi_val = np.load(file=f)["psi_val"]
 
-                try:
-                    # load SchroedingerSummary
-                    system_summary_path = Path(input_path,
-                        "SchroedingerSummary_" + steps_format % frame + ".pkl")
-                    with open(system_summary_path, "rb") as f:
-                        SystemSummary: SchroedingerSummary = dill.load(file=f)
-                        SystemSummary.copy_to(System)
-                except Exception:
-                    print(f"{system_summary_path} not found.")
+                if isinstance(System, SchroedingerMixture):
+                    psi2_val_path = Path(input_path, filename_steps2 + steps_format % frame + ".npz")
+                    with open(psi2_val_path, "rb") as f:
+                        System.psi2_val = np.load(file=f)["psi2_val"]
+
+                System = System.load_summary(input_path, steps_format, frame,
+                                             summary_name=summary_name)
 
                 text = get_legend(System, frame, supersolids_version)
 
@@ -333,8 +347,14 @@ class MayaviAnimation(Animation.Animation):
                 title.set(text=text)
 
                 # Update plot functions
-                prob_3d = System.get_density(p=2.0)
-                prob_plot.mlab_source.trait_set(scalars=prob_3d)
+                density1: np.ndarray = System.get_density(func=System.psi_val, p=2.0)
+                densities = [density1]
+                if isinstance(System, SchroedingerMixture):
+                    density2: np.ndarray = System.get_density(func=System.psi2_val, p=2.0)
+                    densities.append(density2)
+
+                for prob_plot, density in zip(prob_plots, densities):
+                    prob_plot.mlab_source.trait_set(scalars=density)
 
                 if arg_slices:
                     psi_arg = np.angle(System.psi_val) + np.pi
@@ -342,9 +362,9 @@ class MayaviAnimation(Animation.Animation):
                     slice_y_plot.mlab_source.trait_set(scalars=psi_arg)
                     slice_z_plot.mlab_source.trait_set(scalars=psi_arg)
                 else:
-                    slice_x_plot.mlab_source.trait_set(scalars=prob_3d)
-                    slice_y_plot.mlab_source.trait_set(scalars=prob_3d)
-                    slice_z_plot.mlab_source.trait_set(scalars=prob_3d)
+                    slice_x_plot.mlab_source.trait_set(scalars=density1)
+                    slice_y_plot.mlab_source.trait_set(scalars=density1)
+                    slice_z_plot.mlab_source.trait_set(scalars=density1)
 
                 yield
 
@@ -392,7 +412,7 @@ class MayaviAnimation(Animation.Animation):
             of camera functions off.
 
         """
-        prob_plot, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot = self.prepare(System)
+        prob_plots, slice_x_plot, slice_y_plot, slice_z_plot, V_plot, psi_sol_plot = self.prepare(System)
 
         supersolids_version = get_supersolids_version()
 
@@ -453,11 +473,18 @@ class MayaviAnimation(Animation.Animation):
             title.set(text=text)
 
             # Update plot functions
-            prob_3d = np.abs(System.psi_val) ** 2
-            slice_x_plot.mlab_source.trait_set(scalars=prob_3d)
-            slice_y_plot.mlab_source.trait_set(scalars=prob_3d)
-            slice_z_plot.mlab_source.trait_set(scalars=prob_3d)
-            prob_plot.mlab_source.trait_set(scalars=prob_3d)
+            density1: np.ndarray = System.get_density(func=System.psi_val, p=2.0)
+            densities = [density1]
+            if isinstance(System, SchroedingerMixture):
+                density2: np.ndarray = System.get_density(func=System.psi2_val, p=2.0)
+                densities.append(density2)
+
+            for prob_plot, density in zip(prob_plots, densities):
+                prob_plot.mlab_source.trait_set(scalars=density)
+
+            slice_x_plot.mlab_source.trait_set(scalars=density1)
+            slice_y_plot.mlab_source.trait_set(scalars=density1)
+            slice_z_plot.mlab_source.trait_set(scalars=density1)
 
             yield
 

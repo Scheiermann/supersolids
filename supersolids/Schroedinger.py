@@ -890,6 +890,33 @@ class Schroedinger:
                   - 0.5 * E_U_dd * V_interaction_bit
                   - (3.0 / 5.0) * self.g_qf * psi_quintic_int)
 
+    def use_summary(self, summary_name: Optional[str] = None):
+        if summary_name is None:
+            summary_name = "SchroedingerSummary_"
+
+        Summary: SchroedingerSummary = SchroedingerSummary(self)
+
+        return Summary, summary_name
+
+    def load_summary(self, input_path, steps_format, frame, summary_name: Optional[str] = None):
+        if summary_name is None:
+            summary_name = "SchroedingerSummary_"
+
+        try:
+            # load SchroedingerSummary
+            system_summary_path = Path(input_path, summary_name + steps_format % frame + ".pkl")
+            with open(system_summary_path, "rb") as f:
+                SystemSummary: SchroedingerSummary = dill.load(file=f)
+                SystemSummary.copy_to(self)
+        except Exception:
+            print(f"{system_summary_path} not found.")
+
+        return self
+
+    def save_psi_val(self, input_path, filename_steps, steps_format, frame):
+        with open(Path(input_path, filename_steps + steps_format % frame + ".npz"), "wb") as g:
+            np.savez_compressed(g, psi_val=self.psi_val)
+
     def simulate_raw(self,
                      accuracy: float = 10 ** -6,
                      dir_path: Path = Path.home().joinpath("supersolids", "results"),
@@ -929,19 +956,17 @@ class Schroedinger:
             mu_old = self.mu
             self.time_step()
 
-            SystemSummary: SchroedingerSummary = SchroedingerSummary(self)
+            SystemSummary, summary_name = self.use_summary()
 
             # save SchroedingerSummary not Schroedinger to save disk space
             if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
-                with open(Path(input_path, "SchroedingerSummary_" + steps_format % frame + ".pkl"),
+                with open(Path(input_path, summary_name + steps_format % frame + ".pkl"),
                           "wb") as f:
                     dill.dump(obj=SystemSummary, file=f)
 
-            # save psi_val after steps_per_pickle steps of dt (to save disk space)
+            # save psi_val after steps_per_npz steps of dt (to save disk space)
             if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
-                with open(Path(input_path, filename_steps + steps_format % frame + ".npz"),
-                          "wb") as g:
-                    np.savez_compressed(g, psi_val=self.psi_val)
+                self.save_psi_val(input_path, filename_steps, steps_format, frame)
 
             print(f"t={self.t:07.05f}, mu_rel={mu_rel:+05.05e}, "
                   f"processed={(frame - frame_start) / self.max_timesteps:05.03f}%")
