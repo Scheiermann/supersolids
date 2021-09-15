@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --job-name 0.1.33rc8-begin
+#SBATCH --job-name 0.1.33rc10-begin
 #SBATCH -D /bigwork/dscheier/supersolids/supersolids/results/
 #SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
 #SBATCH --mail-type=BEGIN,END,FAIL

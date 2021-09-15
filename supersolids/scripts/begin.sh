@@ -10,6 +10,7 @@
  #PBS -l mem=4GB
  #PBS -l vmem=4GB
 
+supersolids_version=0.1.33rc10
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -33,7 +34,7 @@ conda activate /bigwork/dscheier/miniconda3/envs/solids
 echo $CONDA_PREFIX
 echo $(which python3)
 echo $(which pip3)
-/bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids==0.1.33rc3
+/bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids==${supersolids_version}
 
 dir_path="/bigwork/dscheier/supersolids/results/"
 steps_per_npz=10000
