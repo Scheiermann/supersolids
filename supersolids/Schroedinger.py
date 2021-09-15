@@ -367,7 +367,7 @@ class Schroedinger:
         # attributes for animation
         self.t: float = 0.0
 
-    def get_density(self, p: float = 2.0) -> np.ndarray:
+    def get_density(self, func=None, p: float = 2.0) -> np.ndarray:
         """
         Calculates :math:`|\psi|^p` for 1D, 2D or 3D (depending on self.dim).
 
@@ -376,7 +376,11 @@ class Schroedinger:
         :return: :math:`|\psi|^p`
         """
         if self.dim <= 3:
-            psi_density: np.ndarray = np.abs(self.psi_val) ** p
+            if func is None:
+                psi_density: np.ndarray = np.abs(self.psi_val) ** p
+            else:
+                psi_density: np.ndarray = np.abs(func) ** p
+
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")
 
