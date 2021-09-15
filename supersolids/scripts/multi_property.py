@@ -10,20 +10,13 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    # path_anchor_input = Path("/home/dsche/supersolids/results/jospeh_injunction/real_global/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_1.0/")
-    path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_0.1/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_0.01/")
+    path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_alpha/")
 
-    frame_start = 1610000
-    # frame_start = 1210000
-    steps_per_npz = 1000
-    # movie_start = 695
-    # movie_end = 714
-    # movie_start = 720
-    # movie_end = 739
-    movie_start = 745
-    movie_end = 764
+    frame_start = 1130000
+    steps_per_npz = 10000
+
+    movie_start = 1
+    movie_end = 40
 
     dt = 0.0002
 
@@ -32,19 +25,21 @@ if __name__ == "__main__":
 
     steps_format = "%07d"
 
-    dir_suffix = "_right"
+    dir_suffix = ""
+    # dir_suffix = "_right"
 
-    file_suffix = "_fft"
-    inbuild_func = "fft_plot"
-    # inbuild_func = ""
-    # func = "lambda x, y: (x, y)"
-    func = ""
+    file_suffix = ""
+    # file_suffix = "_fft"
+    # inbuild_func = "fft_plot"
+    inbuild_func = ""
+    func = "lambda x, y: (x, y)"
+    # func = ""
 
     property_filename_suffix = dir_suffix + file_suffix
 
     subplots = True
     property_func = True
-    property_name = "get_center_of_mass"
+    # property_name = "get_center_of_mass"
     # property_name = "get_parity"
     # property_name = "get_peak_distances_along"
     # property_name = "get_peak_positions"
@@ -53,17 +48,26 @@ if __name__ == "__main__":
 
     # property_name = "get_phase_var"
     # property_args = [0, 256, 0, 128, 0, 32]
-    property_args = [0, 128, 0, 128, 0, 32]
+    # property_args = [0, 128, 0, 128, 0, 32]
     # property_args = [128, 256, 0, 128, 0, 32]
 
     # property_name = "get_phase_var_neighborhood"
     # [prob_min, amount]
     # property_args = [0.02, 4]
 
+    property_name = "get_N_in_droplets"
+    number_of_peaks = [5, 4, 1, 1, 1, 1, 1, 1,
+                       5, 4, 3, 1, 1, 1, 1, 1,
+                       5, 5, 3, 1, 1, 1, 1, 1,
+                       5, 5, 4, 1, 1, 1, 1, 1,
+                       6, 5, 6, 3, 1, 1, 1, 1,
+                       ]
+
     # we want 2S=D, so that the peaks distance equals the distance between max and min of sin
     # delta = s * 2.0
 
-    for i in range(movie_start, movie_end + 1):
+    for peak_index, i in enumerate(range(movie_start, movie_end + 1)):
+        property_args = [0.00725, number_of_peaks[peak_index]]
         command = ["python", "-m", "supersolids.tools.track_property"]
         flags = [f"-dt={dt}",
                  f"-dir_path={path_anchor_input}",

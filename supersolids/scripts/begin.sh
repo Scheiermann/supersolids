@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #==================================================
- #PBS -N 1.33rc4
- #PBS -M daniel.scheiermann@stud.uni-hannover.de
+ #PBS -N 1.33rc10
+ #PBS -M daniel.scheiermann@itp.uni-hannover.de
  #PBS -d /bigwork/dscheier/
  #PBS -e /bigwork/dscheier/error.txt
  #PBS -o /bigwork/dscheier/output.txt
  #PBS -l nodes=1:ppn=1:ws
  #PBS -l walltime=99:00:00
- #PBS -l mem=5GB
- #PBS -l vmem=5GB
+ #PBS -l mem=4GB
+ #PBS -l vmem=4GB
 
 
 # >>> conda initialize >>>
@@ -59,6 +59,7 @@ steps_format="%07d"
 -w_y=518.36 \
 -accuracy=0.0 \
 -noise 0.8 1.2 \
+--V_interaction \
 --offscreen
 
 # -w_y=518.36

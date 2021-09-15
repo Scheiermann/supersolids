@@ -4,4 +4,5 @@ __all__ = ["Animation",
            "scripts",
            "tools",
            "Schroedinger",
+           "SchroedingerSummary",
            ]

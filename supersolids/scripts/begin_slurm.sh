@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
-supersolids_version=0.1.33rc8
-#==================================================
 #SBATCH --job-name 0.1.33rc8-begin
-#SBATCH --workdir /bigwork/dscheier/supersolids/supersolids/results/
-#SBATCH -e error-$SLURM_JOBID.txt
-#SBATCH -o output-$SLURM_JOBID.txt
-#SBATCH -M daniel.scheiermann@itp.uni-hannover.de
+#SBATCH -D /bigwork/dscheier/supersolids/supersolids/results/
+#SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH -o output-%j.out
+#SBATCH -e error-%j.out
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH -t 0-24:00:00
-#SBATCH --mem=5GB
-#SBATCH --mem-per-cpu=5GB
+#SBATCH -t 0-00:24:00
+#SBATCH --mem=4G
+#SBATCH --mem-per-cpu=4G
+
+supersolids_version=0.1.33rc10
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -57,6 +58,7 @@ steps_format="%07d"
 -w_y=518.36 \
 -accuracy=0.0 \
 -noise 0.8 1.2 \
+--V_interaction \
 --offscreen
 
 # -w_y=518.36

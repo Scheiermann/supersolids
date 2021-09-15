@@ -13,7 +13,7 @@ def dic2str(dic):
 
 
 xvfb_display = 98
-supersolids_version = "0.1.33rc8"
+supersolids_version = "0.1.33rc10"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/")
 # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
@@ -73,6 +73,7 @@ for v in np.arange(N_start, N_end, N_step):
 
         movie_number_after = movie_number + j_counter
         movie_after = f"{movie_string}{counting_format % movie_number_after}"
+        dir_name_result = movie_after
         movie_list.append(movie_after)
         dir_path_func = Path(dir_path, movie_after)
         dir_path_func_list.append(dir_path_func)
@@ -88,8 +89,8 @@ for v in np.arange(N_start, N_end, N_step):
 #PBS -o /bigwork/dscheier/supersolids/supersolids/results/output_$PBS_JOBID.txt
 #PBS -l nodes=1:ppn=1:ws
 #PBS -l walltime=200:00:00
-#PBS -l mem=5GB
-#PBS -l vmem=5GB
+#PBS -l mem=4GB
+#PBS -l vmem=4GB
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -127,11 +128,13 @@ echo $(which pip3)
 -steps_per_npz={steps_per_npz} \
 -steps_format={steps_format} \
 -dir_path={dir_path} \
+-dir_name_result={dir_name_result} \
 -a={dic2str(a)} \
 -a_s={a_s} \
 -w_y={w_y} \
 -accuracy={accuracy} \
 -noise {' '.join(map(str, noise))} \
+--V_interaction \
 --offscreen
 """
 
@@ -167,7 +170,7 @@ echo $(which pip3)
 
 movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
 movie_dirnames = list(map(lambda path: path.name, movie_dirs))
-while not all(movie_list) in movie_dirnames:
+while not all(item in movie_dirnames for item in movie_list):
     print(f"{movie_list}")
     print(f"{movie_dirnames}")
     print(f"Not all directories for movies created.  Waiting 5 seconds.")

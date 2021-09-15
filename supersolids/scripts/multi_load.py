@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+# author: Daniel Scheiermann
+# email: daniel.scheiermann@itp.uni-hannover.de
+# license: MIT
+# Please feel free to use and modify this, but keep the above information.
+
 from pathlib import Path
 import numpy as np
 
@@ -14,7 +19,10 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_fix_0.01/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_fix_0.01/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/scissor/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/test/")
+    path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_alpha/")
 
     take_last = 30
     # take_last = np.inf
@@ -33,7 +41,7 @@ if __name__ == "__main__":
     azimuth = 0.0
     elevation = 0.0
 
-    arg_slices = True
+    arg_slices = False
     plot_V = True
     ui = False
 

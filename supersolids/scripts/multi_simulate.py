@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+
+# author: Daniel Scheiermann
+# email: daniel.scheiermann@itp.uni-hannover.de
+# license: MIT
+# Please feel free to use and modify this, but keep the above information.
+
 import subprocess
 from pathlib import Path
 import numpy as np
@@ -11,7 +17,7 @@ def dic2str(dic):
     return dic_str_single_quote_wrapped
 
 
-supersolids_version = "0.1.33rc8"
+supersolids_version = "0.1.33rc10"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/")
 # dir_path = Path("/home/dsche/supersolids/results/")
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # author: Daniel Scheiermann
-# email: daniel.scheiermann@stud.uni-hannover.de
+# email: daniel.scheiermann@itp.uni-hannover.de
 # license: MIT
 # Please feel free to use and modify this, but keep the above information.
 
@@ -18,6 +18,7 @@ import scipy.constants as sci_const
 
 a_0: float = sci_const.physical_constants["Bohr radius"][0]
 u_in_kg: float = sci_const.physical_constants["atomic mass constant"][0]
+mu_bohr: float = sci_const.physical_constants["Bohr magneton"][0]
 
 if __name__ == "__main__":
     a_0 = sci_const.physical_constants["Bohr radius"][0]

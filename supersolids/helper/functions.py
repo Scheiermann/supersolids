@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # author: Daniel Scheiermann
-# email: daniel.scheiermann@stud.uni-hannover.de
+# email: daniel.scheiermann@itp.uni-hannover.de
 # license: MIT
 # Please feel free to use and modify this, but keep the above information.
 
@@ -178,7 +178,10 @@ def g_qf_helper(m: float = 164 * constants.u_in_kg,
                 a_dd: float = 130.0 * constants.a_0,
                 w_x: float = 2.0 * np.pi * 30.0):
     l_ho = get_l_ho(m, w_x)
-    e_dd = a_dd / a_s
+    if a_s == 0.0 and a_dd == 0.0:
+        e_dd = 0.0
+    else:
+        e_dd = a_dd / a_s
     a_s_l_ho_ratio = a_s / l_ho
 
     return a_s_l_ho_ratio, e_dd
@@ -228,17 +231,20 @@ def psi_gauss_2d_pdf(pos, mu=np.array(
 
     return z_mesh
 
-
-def psi_gauss_2d(x, y, a: float = 1.0, x_0: float = 0.0,
-                 y_0: float = 0.0, k_0: float = 0.0):
+def psi_gauss_2d(x, y,
+                 a_x: float = 1.0, a_y: float = 1.0,
+                 x_0: float = 0.0, y_0: float = 0.0,
+                 k_0: float = 0.0):
     """
-    Gaussian wave packet of width a and momentum k_0, centered at x_0
+    Gaussian wave packet of width a and momentum k_0, centered at x_0, y_0
 
     :param x: mathematical variable
 
     :param y: mathematical variable
 
-    :param a: Amplitude of pulse
+    :param a_x: Stretching factor in x direction (np.sqrt(2) * std_deviation)
+
+    :param a_y: Stretching factor in y direction (np.sqrt(2) * std_deviation)
 
     :param x_0: Mean spatial x of pulse
 
@@ -248,8 +254,12 @@ def psi_gauss_2d(x, y, a: float = 1.0, x_0: float = 0.0,
 
     """
 
-    return (a * np.sqrt(np.pi) ** (-0.5)
-            * np.exp(-0.5 * (((x - x_0) ** 2 + (y - y_0) ** 2) / (a ** 2))
+    return (
+            (a_x * a_y * np.pi) ** -0.5
+            * np.exp(-0.5 * (
+                             ((x - x_0) / a_x) ** 2.0
+                             + ((y - y_0) / a_y) ** 2.0
+                            )
                      + 1j * x * k_0)
             )
 
@@ -267,11 +277,11 @@ def psi_gauss_3d(x, y, z,
 
     :param z: mathematical variable
 
-    :param a_x: Stretching factor in x direction
+    :param a_x: Stretching factor in x direction (np.sqrt(2) * std_deviation)
 
-    :param a_y: Stretching factor in y direction
+    :param a_y: Stretching factor in y direction (np.sqrt(2) * std_deviation)
 
-    :param a_z: Stretching factor in z direction
+    :param a_z: Stretching factor in z direction (np.sqrt(2) * std_deviation)
 
     :param x_0: Mean spatial x of pulse
 
@@ -283,11 +293,11 @@ def psi_gauss_3d(x, y, z,
 
     """
 
-    return ((a_x * a_y * a_z * np.pi ** (3.0 / 2.0)) ** (-0.5)
+    return ((a_x * a_y * a_z * np.pi ** (3.0 / 2.0)) ** -0.5
             * np.exp(-0.5 * (
-                    ((x - x_0) / a_x) ** 2
-                    + ((y - y_0) / a_y) ** 2
-                    + ((z - z_0) / a_z) ** 2)
+                    ((x - x_0) / a_x) ** 2.0
+                    + ((y - y_0) / a_y) ** 2.0
+                    + ((z - z_0) / a_z) ** 2.0)
                      + 1j * x * k_0))
 
 
@@ -377,6 +387,7 @@ def thomas_fermi_1d(x, g: float = 0.0):
         return mu * (1 - ((x ** 2) / (2 * mu))) / g
 
     else:
+        print(f"Thomas-Fermi not possible for g=0.0. But you specified g={g}. Returning None.")
         return None
 
 
@@ -402,6 +413,7 @@ def thomas_fermi_2d(x, y, g: float = 0.0):
         return mu * (1 - ((x ** 2 + y ** 2) / (2 * mu))) / g
 
     else:
+        print(f"Thomas-Fermi not possible for g=0.0. But you specified g={g}. Returning None.")
         return None
 
 
@@ -436,6 +448,7 @@ def thomas_fermi_3d(x, y, z, g: float = 0.0):
         return mu * (1 - ((x ** 2 + y ** 2 + z ** 2) / (2 * mu))) / g
 
     else:
+        print(f"Thomas-Fermi not possible for g=0.0. But you specified g={g}. Returning None.")
         return None
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # author: Daniel Scheiermann
-# email: daniel.scheiermann@stud.uni-hannover.de
+# email: daniel.scheiermann@itp.uni-hannover.de
 # license: MIT
 # Please feel free to use and modify this, but keep the above information.
 
@@ -170,7 +170,7 @@ def plot_property(args, func=functions.identity):
         plt.ylabel(f"{args.property_name}")
         plt.grid()
         plt.title(f"with property_args: {args.property_args}")
-        plt.legend()
+        # plt.legend()
         if args.property_name:
             plt.savefig(Path(input_path, f"{args.property_name + args.property_filename_suffix}"))
     else:

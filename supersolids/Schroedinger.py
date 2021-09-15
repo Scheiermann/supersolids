@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # author: Daniel Scheiermann
-# email: daniel.scheiermann@stud.uni-hannover.de
+# email: daniel.scheiermann@itp.uni-hannover.de
 # license: MIT
 # Please feel free to use and modify this, but keep the above information.
 
@@ -21,30 +21,29 @@ import scipy.signal
 from scipy.ndimage.filters import maximum_filter
 from scipy.ndimage.morphology import generate_binary_structure, binary_erosion
 
+from supersolids.SchroedingerSummary import SchroedingerSummary
 from supersolids.helper import constants, functions, get_path
 from supersolids.helper.Resolution import Resolution
 from supersolids.helper.Box import Box
 
 
-def peaks_sort(peaks_indices, peaks_height, amount):
+def peaks_sort(peaks_indices, peaks_height, number_of_peaks):
     # sort peaks by height
-    zipped_sorted_by_height = zip(
-        *sorted(zip(peaks_indices, peaks_height), key=lambda t: t[1])
-    )
+    zipped_sorted_by_height = zip(*sorted(zip(peaks_indices, peaks_height), key=lambda t: t[1]))
     a, b = map(np.array, zipped_sorted_by_height)
 
-    # get the highest peaks (the n biggest, where n is amount)
-    peaks_sorted_indices = a[-amount:]
-    peaks_sorted_height = b[-amount:]
+    # get the highest peaks (the n biggest, where n is number_of_peaks)
+    peaks_sorted_indices = a[-number_of_peaks:]
+    peaks_sorted_height = b[-number_of_peaks:]
 
     return peaks_sorted_indices, peaks_sorted_height
 
 
-def peaks_sort_along(peaks_indices, peaks_height, amount, axis):
-    _, peaks_sorted_height = peaks_sort(peaks_indices, peaks_height, amount)
+def peaks_sort_along(peaks_indices, peaks_height, number_of_peaks, axis):
+    _, peaks_sorted_height = peaks_sort(peaks_indices, peaks_height, number_of_peaks)
     if axis in [0, 1, 2]:
-        # get the highest peaks in a sorted fashion (the n biggest, where n is amount)
-        sorting_indices = np.argsort(peaks_height)[-amount:]
+        # get the highest peaks in a sorted fashion (the n biggest, where n is number_of_peaks)
+        sorting_indices = np.argsort(peaks_height)[-number_of_peaks:]
         peaks_sorted_indices = peaks_indices[sorting_indices]
     else:
         sys.exit(f"No such axis. Choose 0, 1 or 2 for axis x, y or z.")
@@ -90,7 +89,7 @@ def get_peaks(prob):
 class Schroedinger:
     """
     Implements a numerical solution of the dimensionless time-dependent
-    non-linear Schrodinger equation for an arbitrary potential:
+    non-linear Schroedinger equation for an arbitrary potential:
 
     .. math::
 
@@ -98,7 +97,7 @@ class Schroedinger:
                               + \\frac{1}{2} (x^2 + (y \\alpha_y)^2 + (z \\alpha_z)^2) \\\\
                              &+ g |\psi|^2  + g_{qf} |\psi|^3 + U_{dd}] \psi \\\\
 
-    With :math:`U_{dd} = \\mathcal{F}^{-1}(\\mathcal{F}(H_{pot} \psi) \epsilon_{dd} g ((3 k_z / k^2) - 1))`
+    With :math:`U_{dd} = \\mathcal{F}^{-1}(\\mathcal{F}(H_{pot} \psi) \epsilon_{dd} g (3 (k_z / k)^2 - 1))`
 
     The split operator method with the Trotter-Suzuki approximation
     for the commutator relation (:math:`H = H_{pot} + H_{kin}`) is used.
@@ -149,6 +148,11 @@ class Schroedinger:
         """
         assert isinstance(Res, Resolution), (f"box: {type(Res)} is not type {type(Resolution)}")
 
+        # TODO: needed but destroys back compatiblity to old npz
+        #       (fork needed, accumulate those to do it in one go)
+        # self.psi_0_noise: np.ndarray = psi_0_noise
+        # self.name: str = "SchroedingerSummary_"
+
         self.N: int = N
         self.w_x: float = w_x
         self.w_y: float = w_y
@@ -157,8 +161,7 @@ class Schroedinger:
         self.Res: Resolution = Res
         self.max_timesteps: int = max_timesteps
 
-        assert isinstance(MyBox, Box), (
-            f"box: {type(MyBox)} is not type {type(Box)}")
+        assert isinstance(MyBox, Box), (f"box: {type(MyBox)} is not type {type(Box)}")
 
         self.Box: Box = MyBox
         self.dt: float = dt
@@ -166,17 +169,13 @@ class Schroedinger:
         self.g: float = g
         self.g_qf: float = g_qf
         self.e_dd: float = e_dd
-        self.imag_time: float = imag_time
+        self.imag_time: bool = imag_time
 
-        assert self.Box.dim == self.Res.dim, (
-            f"Dimension of Box ({self.Box.dim}) and "
-            f"Res ({self.Res.dim}) needs to be equal.")
+        assert self.Box.dim == self.Res.dim, (f"Dimension of Box ({self.Box.dim}) and "
+                                              f"Res ({self.Res.dim}) needs to be equal.")
         self.dim: int = self.Box.dim
 
-        # mu = - ln(N) / (2 * dtau), where N is the norm of the :math:`\psi`
         self.mu: float = mu
-
-        # E = mu - 0.5 * g * integral psi_val ** 2
         self.E: float = E
 
         self.psi: Callable = psi_0
@@ -194,22 +193,24 @@ class Schroedinger:
         if psi_sol is None:
             self.psi_sol = None
         else:
-            self.psi_sol: Callable = functools.partial(psi_sol, g=self.g)
+            if callable(psi_sol):
+                self.psi_sol: Callable = functools.partial(psi_sol, g=self.g)
+            else:
+                self.psi_sol = psi_sol
 
         if mu_sol is None:
             self.mu_sol = None
         else:
-            self.mu_sol: Callable = mu_sol(self.g)
-
+            if callable(mu_sol):
+                self.mu_sol: Callable = mu_sol(self.g)
+            else:
+                self.mu_sol = mu_sol
         try:
             box_x_len = (self.Box.x1 - self.Box.x0)
-            self.x: np.ndarray = np.linspace(self.Box.x0,
-                                             self.Box.x1,
-                                             self.Res.x)
-            self.dx: float = (box_x_len / self.Res.x)
-            self.dkx: float = np.pi / (box_x_len / 2.0)
-            self.kx: np.ndarray = np.fft.fftfreq(self.Res.x,
-                d=1.0 / (self.dkx * self.Res.x))
+            self.x: np.ndarray = np.linspace(self.Box.x0, self.Box.x1, self.Res.x)
+            self.dx: float = box_x_len / float(self.Res.x - 1)
+            self.dkx: float = 2.0 * np.pi / box_x_len
+            self.kx: np.ndarray = np.fft.fftfreq(self.Res.x, d=1.0 / (self.dkx * self.Res.x))
 
         except KeyError:
             sys.exit(
@@ -229,13 +230,10 @@ class Schroedinger:
         if self.dim >= 2:
             try:
                 box_y_len = self.Box.y1 - self.Box.y0
-                self.y: np.ndarray = np.linspace(self.Box.y0,
-                                                 self.Box.y1,
-                                                 self.Res.y)
-                self.dy: float = box_y_len / self.Res.y
-                self.dky: float = np.pi / (box_y_len / 2.0)
-                self.ky: np.ndarray = np.fft.fftfreq(self.Res.y,
-                    d=1.0 / (self.dky * self.Res.y))
+                self.y: np.ndarray = np.linspace(self.Box.y0, self.Box.y1, self.Res.y)
+                self.dy: float = box_y_len / float(self.Res.y - 1)
+                self.dky: float = 2.0 * np.pi / box_y_len
+                self.ky: np.ndarray = np.fft.fftfreq(self.Res.y, d=1.0 / (self.dky * self.Res.y))
 
             except KeyError:
                 sys.exit(
@@ -247,20 +245,14 @@ class Schroedinger:
         if self.dim >= 3:
             try:
                 box_z_len = MyBox.z1 - MyBox.z0
-                self.z: np.ndarray = np.linspace(self.Box.z0,
-                                                 self.Box.z1,
-                                                 self.Res.z)
-                self.dz: float = box_z_len / self.Res.z
-                self.dkz: float = np.pi / (box_z_len / 2.0)
-                self.kz: np.ndarray = np.fft.fftfreq(self.Res.z,
-                    d=1.0 / (self.dkz * self.Res.z))
+                self.z: np.ndarray = np.linspace(self.Box.z0, self.Box.z1, self.Res.z)
+                self.dz: float = box_z_len / float(self.Res.z - 1)
+                self.dkz: float = 2.0 * np.pi / box_z_len
+                self.kz: np.ndarray = np.fft.fftfreq(self.Res.z, d=1.0 / (self.dkz * self.Res.z))
 
             except KeyError:
-                sys.exit(
-                    f"Keys z0, z1 of box needed, "
-                    f"but it has the keys: {self.Box.keys()}, "
-                    f"Key z of res needed, "
-                    f"but it has the keys: {self.Res.keys()}")
+                sys.exit(f"Keys z0, z1 of box needed, but it has the keys: {self.Box.keys()}, "
+                         f"Key z of res needed, but it has the keys: {self.Res.keys()}")
 
         if self.dim > 3:
             sys.exit("Spatial dimension over 3. This is not implemented.")
@@ -282,17 +274,20 @@ class Schroedinger:
                 self.psi_sol_val: np.ndarray = self.psi_sol(self.x)
 
             self.k_squared: np.ndarray = self.kx ** 2.0
-            self.H_kin: np.ndarray = np.exp(
-                self.U * (0.5 * self.k_squared) * self.dt)
+            self.H_kin: np.ndarray = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 
             if V_interaction is None:
                 # For no interaction the identity is needed with respect to 2D
                 # * 2D (array with 1.0 everywhere)
                 self.V_k_val: np.ndarray = np.full(self.psi_val.shape, 1.0)
+            else:
+                if callable(V_interaction):
+                    self.V_k_val = V_interaction(self.kx, g=self.g)
+                else:
+                    self.V_k_val = V_interaction
 
         elif self.dim == 2:
-            self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x,
-                                                                        self.y)
+            self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
 
             if psi_0_noise is None:
                 self.psi_val = self.psi(self.pos)
@@ -342,9 +337,7 @@ class Schroedinger:
             if psi_0_noise is None:
                 self.psi_val = self.psi(self.x_mesh, self.y_mesh, self.z_mesh)
             else:
-                self.psi_val = psi_0_noise * self.psi(self.x_mesh,
-                                                      self.y_mesh,
-                                                      self.z_mesh)
+                self.psi_val = psi_0_noise * self.psi(self.x_mesh, self.y_mesh, self.z_mesh)
 
             if V is None:
                 self.V_val = 0.0
@@ -354,15 +347,13 @@ class Schroedinger:
             if self.psi_sol is None:
                 self.psi_sol_val = None
             else:
-                self.psi_sol_val = self.psi_sol(self.x_mesh,
-                                                self.y_mesh,
-                                                self.z_mesh)
-                print(f"Norm for psi_sol (trapez integral): "
-                      f"{self.trapez_integral(np.abs(self.psi_sol_val) ** 2.0)}")
+                if callable(self.psi_sol):
+                    self.psi_sol_val = self.psi_sol(self.x_mesh, self.y_mesh, self.z_mesh)
+                    if self.psi_sol_val is not None:
+                        print(f"Norm for psi_sol (trapez integral): "
+                              f"{self.trapez_integral(np.abs(self.psi_sol_val) ** 2.0)}")
 
-            kx_mesh, ky_mesh, kz_mesh, _ = functions.get_meshgrid_3d(self.kx,
-                                                                     self.ky,
-                                                                     self.kz)
+            kx_mesh, ky_mesh, kz_mesh, _ = functions.get_meshgrid_3d(self.kx, self.ky, self.kz)
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
 
             # here a number (U) is multiplied elementwise with an (1D, 2D or
@@ -374,12 +365,13 @@ class Schroedinger:
                 # * 2D (array with 1.0 everywhere)
                 self.V_k_val = np.full(self.psi_val.shape, 1.0)
             else:
-                self.V_k_val = V_interaction(kx_mesh, ky_mesh, kz_mesh)
+                if callable(V_interaction):
+                    self.V_k_val = V_interaction(kx_mesh, ky_mesh, kz_mesh)
 
         # attributes for animation
         self.t: float = 0.0
 
-    def get_density(self, p: float = 2.0) -> np.ndarray:
+    def get_density(self, func=None, p: float = 2.0) -> np.ndarray:
         """
         Calculates :math:`|\psi|^p` for 1D, 2D or 3D (depending on self.dim).
 
@@ -388,43 +380,79 @@ class Schroedinger:
         :return: :math:`|\psi|^p`
         """
         if self.dim <= 3:
-            psi_density: np.ndarray = np.abs(self.psi_val) ** p
+            if func is None:
+                psi_density: np.ndarray = np.abs(self.psi_val) ** p
+            else:
+                psi_density: np.ndarray = np.abs(func) ** p
+
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")
 
         return psi_density
 
-    def get_norm(self, func=None, p: float = 2.0) -> float:
-        """
-        Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D
-        (depending on self.dim). For p=2 it is the 2-norm.
-
-        :param p: Exponent of :math:`|\psi|`. Use p=2.0 for density.
-
-        :param func: If func is not provided self.get_density(p=p) is used.
-
-        :return: :math:`\int |\psi|^p \\mathrm{dV}`
-
-        """
-        if func is None:
-            func = self.get_density(p=p)
-
+    def volume_element(self, fourier_space: bool = False):
         if self.dim == 1:
-            dV: float = self.dx
+            if fourier_space:
+                dV: float = self.dkx
+            else:
+                dV: float = self.dx
         elif self.dim == 2:
-            dV = self.dx * self.dy
+            if fourier_space:
+                dV: float = self.dkx * self.dky
+            else:
+                dV: float = self.dx * self.dy
         elif self.dim == 3:
-            dV = self.dx * self.dy * self.dz
+            if fourier_space:
+                dV: float = self.dkx * self.dky * self.dkz
+            else:
+                dV: float = self.dx * self.dy * self.dz
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")
+
+        return dV
+
+    def sum_dV(self, func, fourier_space: bool = False, dV: float = None):
+        if dV is None:
+            dV = self.volume_element(fourier_space=fourier_space)
 
         psi_norm: float = np.sum(func) * dV
 
         return psi_norm
 
-    def trapez_integral(self, func_val: Callable) -> float:
+    def get_norm(self, func=None, p: float = 2.0, fourier_space: bool = False) -> float:
         """
         Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D
+        (depending on self.dim). For p=2 it is the 2-norm.
+
+        :param func: If func is not provided self.get_density(p=p) is used.
+
+        :param p: Exponent of |\psi|. Use p=2.0 for density.
+
+        :param fourier_space: Flag to use fourier volume element as dV,
+        so dV = d^3 k.
+
+        :return: \int |\psi|^p dV
+
+        """
+        if func is None:
+            func = self.get_density(p=p)
+        else:
+            func = np.abs(func) ** p
+
+        if fourier_space:
+            func_norm = ((np.sqrt(2.0 * np.pi) ** float(self.dim))
+                         * (1 / self.volume_element(fourier_space=fourier_space))
+                         * (1 / self.psi_val.size))
+            func = func * func_norm
+
+        psi_norm: float = self.sum_dV(func, fourier_space=fourier_space)
+
+        return psi_norm
+
+    def trapez_integral(self, func_val: Callable) -> float:
+        """
+        Calculates the integral over func_val. If :math:`func_val = |\psi|^p`, then
+        :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D
         (depending on self.dim) by using the trapez rule.
 
         For 1D: :math:`h (f(a) + f(a+h)) / 2`
@@ -439,12 +467,12 @@ class Schroedinger:
         :return: :math:`\int |\psi|^p \\mathrm{dV}` according to trapez rule
         """
 
+        # TODO: Implement fourier_space (remember fftfreq ordering of func_val)
+        dV = self.volume_element()
         if self.dim == 1:
-            dV: float = self.dx
             return dV * np.sum(func_val[0:-1] + func_val[1:]) / 2.0
 
         elif self.dim == 2:
-            dV = self.dx * self.dy
             return dV * np.sum(func_val[0:-1, 0:-1]
                                + func_val[0:-1, 1:]
                                + func_val[1:, 0:-1]
@@ -452,7 +480,6 @@ class Schroedinger:
                                ) / 4.0
 
         elif self.dim == 3:
-            dV = self.dx * self.dy * self.dz
             return dV * np.sum(func_val[0:-1, 0:-1, 0:-1]
                                + func_val[0:-1, 0:-1, 1:]
                                + func_val[0:-1, 1:, 0:-1]
@@ -485,7 +512,9 @@ class Schroedinger:
         elif self.dim == 2:
             r = [self.x_mesh[x0:x1, y0:y1], self.y_mesh[x0:x1, y0:y1]]
         elif self.dim == 3:
-            r = [self.x_mesh[x0:x1, y0:y1, z0:z1], self.y_mesh[x0:x1, y0:y1, z0:z1], self.z_mesh[x0:x1, y0:y1, z0:z1]]
+            r = [self.x_mesh[x0:x1, y0:y1, z0:z1],
+                 self.y_mesh[x0:x1, y0:y1, z0:z1],
+                 self.z_mesh[x0:x1, y0:y1, z0:z1]]
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")
 
@@ -508,12 +537,12 @@ class Schroedinger:
         else:
             sys.exit(f"No such axis (){axis}. Choose 0, 1 or 2 for axis x, y or z.")
 
-        # get the highest peaks in a sorted fashion (the n biggest, where n is amount)
+        # get the highest peaks in a sorted fashion (the n biggest, where n is number_of_peaks)
         peaks_height = properties['peak_heights']
 
         return peaks_indices, peaks_height
 
-    def get_peak_positions_along(self, axis=0, height=0.05, amount=4):
+    def get_peak_positions_along(self, axis=0, height=0.05, number_of_peaks=4):
         peaks_indices, _ = self.get_peaks_along(height=height, axis=axis)
         if axis == 0:
             positions = self.Box.lengths()[axis] * (peaks_indices / self.Res.x) + self.Box.x0
@@ -544,19 +573,17 @@ class Schroedinger:
 
         return distances
 
-    def get_peak_neighborhood_along(self, axis=0, height=0.05, amount=4, fraction=0.1,
+    def get_peak_neighborhood_along(self, axis=0, height=0.05, number_of_peaks=4, fraction=0.1,
                                     peak_distances_cutoff=0.5):
         """
         Calculates the neighborhood of the peaks,
         which has at least the given fraction of the maximum probability :math:`|\psi|^2`.
 
         """
-        peaks_indices, peaks_height = self.get_peaks_along(axis=axis,
-                                                           height=height,
-                                                           )
+        peaks_indices, peaks_height = self.get_peaks_along(axis=axis, height=height)
         peaks_sorted_indices, peaks_sorted_height = peaks_sort_along(peaks_indices,
                                                                      peaks_height,
-                                                                     amount,
+                                                                     number_of_peaks,
                                                                      axis,
                                                                      )
 
@@ -603,7 +630,7 @@ class Schroedinger:
 
         return bool_grid_list
 
-    def get_peak_neighborhood(self, prob_min, amount):
+    def get_peak_neighborhood(self, prob_min, number_of_peaks):
         """
         Calculates the neighborhood of the peaks,
         which has at least the given fraction of the maximum probability :math:`|\psi|^2`.
@@ -613,7 +640,7 @@ class Schroedinger:
         peaks_indices, peaks_height = get_peaks(prob)
         peaks_sorted_indices, peaks_sorted_height = peaks_sort(peaks_indices,
                                                                peaks_height,
-                                                               amount)
+                                                               number_of_peaks)
 
         bool_grid_list = []
         for i, peak_index in enumerate(peaks_sorted_indices):
@@ -631,6 +658,39 @@ class Schroedinger:
             bool_grid_list.append(bool_grid_padded)
 
         return bool_grid_list
+
+    def get_N_in_droplets(self, prob_min, number_of_peaks):
+        """
+
+        Parameters
+        ----------
+        prob_min :
+        number_of_peaks :
+
+        Returns
+        -------
+        The first number_of_peaks entries are the number of particles in droplets
+        (defined by :math:`|\psi|^2 > \\mathrm{prob_min}`) on the x-axis from left to right.
+        The last entry is the sum of particles of those droplets.
+
+        """
+        bool_grid_list = self.get_peak_neighborhood(
+            prob_min=prob_min,
+            number_of_peaks=number_of_peaks,
+        )
+
+        N_in_droplets = []
+        for k in range(0, number_of_peaks):
+            psi_val_droplets = np.where(bool_grid_list[k],
+                                        self.psi_val,
+                                        np.zeros(shape=np.shape(self.psi_val)))
+
+            droplets_density = self.trapez_integral(np.abs(psi_val_droplets) ** 2.0)
+            N_in_droplets.append(self.N * droplets_density)
+
+        N_in_droplets.append(np.sum(N_in_droplets))
+
+        return N_in_droplets
 
     def get_droplet_edges(self, prob_droplets, peaks_index_3d, cut_axis):
         if cut_axis == 0:
@@ -655,10 +715,7 @@ class Schroedinger:
         for cut_axis in [0, 1, 2]:
             edges.append(self.get_droplet_edges(prob_droplets, peaks_index_3d, cut_axis))
 
-        single_droplet = prob_droplets[slice(*edges[0]),
-                                       slice(*edges[1]),
-                                       slice(*edges[2]),
-                                       ]
+        single_droplet = prob_droplets[slice(*edges[0]), slice(*edges[1]), slice(*edges[2])]
 
         return single_droplet, edges
 
@@ -699,7 +756,8 @@ class Schroedinger:
         prob = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1]
         r = self.get_mesh_list(x0, x1, y0, y1, z0, z1)
         center_of_mass_along_axis = [prob * r_i for r_i in r]
-        com = [self.trapez_integral(com_along_axis) / self.get_norm(prob) for com_along_axis in center_of_mass_along_axis]
+        com = [self.trapez_integral(com_along_axis) / self.trapez_integral(prob) for com_along_axis in
+               center_of_mass_along_axis]
         return com
 
     def get_parity(self, axis=2, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
@@ -711,19 +769,20 @@ class Schroedinger:
         else:
             sys.exit(f"No such axis ({axis}). Choose 0, 1 or 2 for axis x, y or z.")
 
-        parity = self.trapez_integral(np.abs(psi_under0[x0:x1, y0:y1, z0:z1] - psi_over0_reversed[x0:x1, y0:y1, z0:z1]) ** 2.0)
+        parity = self.trapez_integral(np.abs(
+            psi_under0[x0:x1, y0:y1, z0:z1] - psi_over0_reversed[x0:x1, y0:y1, z0:z1]) ** 2.0)
 
         return parity
 
-    def get_phase_var_neighborhood(self, prob_min, amount):
+    def get_phase_var_neighborhood(self, prob_min, number_of_peaks):
         """
         Calculates the variance of the phase of the System.
 
         """
-        bool_grid_list = self.get_peak_neighborhood(prob_min, amount)
+        bool_grid_list = self.get_peak_neighborhood(prob_min, number_of_peaks)
         bool_grid = np.logical_or(bool_grid_list[:-1], bool_grid_list[-1])
 
-        norm = self.get_norm(self.get_density(p=2.0))
+        norm = self.get_norm()
         prob = bool_grid * self.get_density(p=2.0) / norm
         psi_val_bool_grid = bool_grid * self.psi_val
         angle = np.angle(psi_val_bool_grid)
@@ -740,7 +799,7 @@ class Schroedinger:
         Calculates the variance of the phase of the System by cos(phi).
 
         """
-        norm = self.get_norm(func=self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1])
+        norm = self.get_norm(func=self.psi_val[x0:x1, y0:y1, z0:z1])
 
         prob_cropped = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1] / norm
         psi_val_cropped = self.psi_val[x0:x1, y0:y1, z0:z1]
@@ -768,6 +827,7 @@ class Schroedinger:
         psi_2: np.ndarray = self.get_density(p=2.0)
         psi_3: np.ndarray = self.get_density(p=3.0)
         U_dd: np.ndarray = np.fft.ifftn(self.V_k_val * np.fft.fftn(psi_2))
+
         # update H_pot before use
         H_pot: np.ndarray = np.exp(self.U
                                    * (0.5 * self.dt)
@@ -812,10 +872,50 @@ class Schroedinger:
         psi_quintic_int = self.get_norm(p=5.0)
 
         self.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
-        U_dd_int = self.trapez_integral(U_dd * psi_2)
+
+        psi_val_k = np.fft.fftn(self.psi_val)
+        psi_norm_k: float = self.get_norm(psi_val_k, fourier_space=True)
+        psi_val_k = psi_val_k / np.sqrt(psi_norm_k)
+        E_kin = self.get_norm(0.5 * self.k_squared * psi_val_k, fourier_space=True)
+
+        E_U_dd = (1 / np.sqrt(2.0 * np.pi) ** 3.0) * self.sum_dV(
+            self.V_k_val * np.abs(np.fft.fftn(psi_2)) ** 2.0, fourier_space=True)
+
+        if self.V_interaction:
+            V_interaction_bit = 1.0
+        else:
+            V_interaction_bit = 0.0
+
         self.E = (self.mu - 0.5 * self.g * psi_quadratic_int
-                          - 0.5 * U_dd_int
-                          - (3.0 / 5.0) * self.g_qf * psi_quintic_int)
+                  - 0.5 * E_U_dd * V_interaction_bit
+                  - (3.0 / 5.0) * self.g_qf * psi_quintic_int)
+
+    def use_summary(self, summary_name: Optional[str] = None):
+        if summary_name is None:
+            summary_name = "SchroedingerSummary_"
+
+        Summary: SchroedingerSummary = SchroedingerSummary(self)
+
+        return Summary, summary_name
+
+    def load_summary(self, input_path, steps_format, frame, summary_name: Optional[str] = None):
+        if summary_name is None:
+            summary_name = "SchroedingerSummary_"
+
+        try:
+            # load SchroedingerSummary
+            system_summary_path = Path(input_path, summary_name + steps_format % frame + ".pkl")
+            with open(system_summary_path, "rb") as f:
+                SystemSummary: SchroedingerSummary = dill.load(file=f)
+                SystemSummary.copy_to(self)
+        except Exception:
+            print(f"{system_summary_path} not found.")
+
+        return self
+
+    def save_psi_val(self, input_path, filename_steps, steps_format, frame):
+        with open(Path(input_path, filename_steps + steps_format % frame + ".npz"), "wb") as g:
+            np.savez_compressed(g, psi_val=self.psi_val)
 
     def simulate_raw(self,
                      accuracy: float = 10 ** -6,
@@ -856,11 +956,17 @@ class Schroedinger:
             mu_old = self.mu
             self.time_step()
 
-            # save psi_val after steps_per_pickle steps of dt (to save disk space)
+            SystemSummary, summary_name = self.use_summary()
+
+            # save SchroedingerSummary not Schroedinger to save disk space
             if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
-                with open(Path(input_path, filename_steps + steps_format % frame + ".npz"),
-                          "wb") as g:
-                    np.savez_compressed(g, psi_val=self.psi_val)
+                with open(Path(input_path, summary_name + steps_format % frame + ".pkl"),
+                          "wb") as f:
+                    dill.dump(obj=SystemSummary, file=f)
+
+            # save psi_val after steps_per_npz steps of dt (to save disk space)
+            if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
+                self.save_psi_val(input_path, filename_steps, steps_format, frame)
 
             print(f"t={self.t:07.05f}, mu_rel={mu_rel:+05.05e}, "
                   f"processed={(frame - frame_start) / self.max_timesteps:05.03f}%")

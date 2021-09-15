@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # author: Daniel Scheiermann
-# email: daniel.scheiermann@stud.uni-hannover.de
+# email: daniel.scheiermann@itp.uni-hannover.de
 # license: MIT
 # Please feel free to use and modify this, but keep the above information.
 
@@ -30,7 +30,7 @@ class Animation:
         """
         Base class with configured properties for the animation.
 
-        :param Res: functoins.Res
+        :param Res: functions.Res
             Number of grid points in x, y, z direction.
             Needs to have half size of box dictionary.
             Keywords x, y, z are used.

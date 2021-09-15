@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # author: Daniel Scheiermann
-# email: daniel.scheiermann@stud.uni-hannover.de
+# email: daniel.scheiermann@itp.uni-hannover.de
 # license: MIT
 # Please feel free to use and modify this, but keep the above information.
 
@@ -22,6 +22,7 @@ import numpy as np
 
 from supersolids.Animation.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
+from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper.simulate_case import simulate_case
 from supersolids.helper.cut_1d import prepare_cuts
 from supersolids.helper import constants
@@ -60,12 +61,18 @@ if __name__ == "__main__":
     parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int, default=80001,
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-a", metavar="Amplitude", type=json.loads,
-                        default={"a_x": 3.5, "a_y": 1.5, "a_z": 1.2},
-                        help="Psi amplitudes in x, y, z direction for the 3d gauss packet")
+                        default={"a_x": 1.0, "a_y": 1.0, "a_z": 1.0},
+                        help="Psi amplitudes in x, y, z direction for the gauss packet")
+    parser.add_argument("-mu", metavar="Mean psi_0", type=json.loads,
+                        default={"mu_x": 0.0, "mu_y": 0.0, "mu_z": 0.0},
+                        help="Mean values in x, y, z direction for the gauss packet")
     parser.add_argument("-accuracy", metavar="accuracy", type=float, default=10 ** -12,
                         help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-dir_path", metavar="dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to save data to")
+    parser.add_argument("-dir_name_result", type=str, default="",
+                        help="Name of directory where to save the results at. "
+                             "For example the standard naming convention is movie002")
     parser.add_argument("-V", type=functions.lambda_parsed,
                         help="Potential as lambda function. For example: "
                              "-V='lambda x,y,z: 10 * x * y'")
@@ -75,6 +82,8 @@ if __name__ == "__main__":
     parser.add_argument("--V_none", default=False, action="store_true",
                         help="If not used, a gauss potential is used."
                              "If used, no potential is used.")
+    parser.add_argument("--V_interaction", default=False, action="store_true",
+                        help="Just for 3D case. Use to apply V_3d_ddi (Dipol-Dipol-Interaction).")
     parser.add_argument("--real_time", default=False, action="store_true",
                         help="Switch for Split-Operator method to use imaginary time or not.")
     parser.add_argument("--plot_psi_sol", default=False, action="store_true",
@@ -90,6 +99,8 @@ if __name__ == "__main__":
     parser.add_argument("-steps_per_npz", metavar="steps_per_npz",
                         type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
+    parser.add_argument("--mixture", default=False, action="store_true",
+                        help="Use to simulate a SchroedingerMixture.")
     parser.add_argument("--offscreen", default=False, action="store_true",
                         help="If flag is not used, interactive animation is "
                              "shown and saved as mp4, else Schroedinger is "
@@ -99,6 +110,7 @@ if __name__ == "__main__":
 
     BoxResAssert(args.Res, args.Box)
     ResAssert(args.Res, args.a)
+    ResAssert(args.Res, args.mu, name="means (mu)")
     Res = Resolution(**args.Res)
 
     MyBox = Box(**args.Box)
@@ -126,17 +138,18 @@ if __name__ == "__main__":
     # psi_0_1d = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
     a_len = len(args.a)
     if a_len == 1:
-        psi_0_1d = functools.partial(functions.psi_gauss_1d, a=args.a["a_x"], x_0=2.0, k_0=0.0)
+        psi_0_1d = functools.partial(functions.psi_gauss_1d, a=args.a["a_x"],
+                                     x_0=args.mu["mu_x"], k_0=0.0)
     elif a_len == 2:
         psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf,
-                                     mu=[0.0, 0.0],
+                                     mu=[args.mu["mu_x"], args.mu["mu_y"]],
                                      var=np.array([[args.a["a_x"], 0.0], [0.0, args.a["a_y"]]])
                                      )
     else:
         psi_0_3d = functools.partial(
             functions.psi_gauss_3d,
             a_x=args.a["a_x"], a_y=args.a["a_y"], a_z=args.a["a_z"],
-            x_0=0.0, y_0=0.0, z_0=0.0,
+            x_0=args.mu["mu_x"], y_0=args.mu["mu_y"], z_0=args.mu["mu_z"],
             k_0=0.0)
         # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
 
@@ -168,6 +181,7 @@ if __name__ == "__main__":
         V_trap = V_1d
         psi_0 = psi_0_1d
         psi_sol = psi_sol_1d
+        mu_sol = functions.mu_1d
         V_interaction = None
     elif Res.dim == 2:
         x_lim = (MyBox.x0, MyBox.x1)
@@ -175,6 +189,7 @@ if __name__ == "__main__":
         V_trap = V_2d
         psi_0 = psi_0_2d
         psi_sol = psi_sol_2d
+        mu_sol = functions.mu_2d
         V_interaction = None
     elif Res.dim == 3:
         x_lim = (MyBox.x0, MyBox.x1) # arbitrary as not used (mayavi vs matplotlib)
@@ -182,7 +197,11 @@ if __name__ == "__main__":
         V_trap = V_3d
         psi_0 = psi_0_3d
         psi_sol = psi_sol_3d
-        V_interaction = V_3d_ddi
+        mu_sol = functions.mu_3d
+        if args.V_interaction:
+            V_interaction = V_3d_ddi
+        else:
+            V_interaction = None
     else:
         sys.exit("Spatial dimension over 3. This is not implemented.")
 
@@ -194,71 +213,89 @@ if __name__ == "__main__":
         else:
             V = V_trap
 
-    System: Schroedinger = Schroedinger(args.N,
-                                        MyBox,
-                                        Res,
-                                        max_timesteps=args.max_timesteps,
-                                        dt=args.dt,
-                                        g=g,
-                                        g_qf=g_qf,
-                                        w_x=args.w_x,
-                                        w_y=args.w_y,
-                                        w_z=args.w_z,
-                                        e_dd=e_dd,
-                                        a_s=args.a_s,
-                                        imag_time=(not args.real_time),
-                                        mu=1.1,
-                                        E=1.0,
-                                        psi_0=psi_0,
-                                        V=V,
-                                        V_interaction=V_interaction,
-                                        psi_sol=psi_sol,
-                                        mu_sol=functions.mu_3d,
-                                        psi_0_noise=psi_0_noise_3d,
-                                        )
+    SchroedingerInput: Schroedinger = Schroedinger(
+        args.N,
+        MyBox,
+        Res,
+        max_timesteps=args.max_timesteps,
+        dt=args.dt,
+        g=g,
+        g_qf=g_qf,
+        w_x=args.w_x,
+        w_y=args.w_y,
+        w_z=args.w_z,
+        e_dd=e_dd,
+        a_s=args.a_s,
+        imag_time=(not args.real_time),
+        mu=1.1,
+        E=1.0,
+        psi_0=psi_0,
+        V=V,
+        V_interaction=V_interaction,
+        psi_sol=psi_sol,
+        mu_sol=mu_sol,
+        psi_0_noise=psi_0_noise_3d,
+        )
 
-    Anim: Animation = Animation(Res=System.Res,
-                                plot_psi_sol=args.plot_psi_sol,
-                                plot_V=args.plot_V,
-                                alpha_psi=0.8,
-                                alpha_psi_sol=0.5,
-                                alpha_V=0.3,
-                                camera_r_func=functools.partial(
-                                    functions.camera_func_r,
-                                    r_0=40.0, phi_0=45.0, z_0=50.0,
-                                    r_per_frame=0.0),
-                                camera_phi_func=functools.partial(
-                                    functions.camera_func_phi,
-                                    r_0=40.0, phi_0=45.0, z_0=50.0,
-                                    phi_per_frame=5.0),
-                                camera_z_func=functools.partial(
-                                    functions.camera_func_z,
-                                    r_0=40.0, phi_0=45.0, z_0=50.0,
-                                    z_per_frame=0.0),
-                                filename="anim.mp4",
-                                )
+    Anim: Animation = Animation(
+        Res=SchroedingerInput.Res,
+        plot_psi_sol=args.plot_psi_sol,
+        plot_V=args.plot_V,
+        alpha_psi=0.8,
+        alpha_psi_sol=0.5,
+        alpha_V=0.3,
+        camera_r_func=functools.partial(functions.camera_func_r,
+                                        r_0=10.0, phi_0=45.0, z_0=50.0,
+                                        r_per_frame=0.0),
+        camera_phi_func=functools.partial(functions.camera_func_phi,
+                                          r_0=10.0, phi_0=45.0, z_0=50.0,
+                                          phi_per_frame=5.0),
+        camera_z_func=functools.partial(functions.camera_func_z,
+                                        r_0=10.0, phi_0=45.0, z_0=50.0,
+                                        z_per_frame=0.0),
+        filename="anim.mp4",
+        )
 
     if MyBox.dim == 3:
         slice_indices = [int(Res.x / 2), int(Res.y / 2), int(Res.z / 2)]
     else:
         slice_indices = [None, None, None]
 
+    if args.mixture:
+        SchroedingerInput: SchroedingerMixture = SchroedingerMixture(
+            System=SchroedingerInput,
+            a_11_bohr=95.0,
+            a_12_bohr=95.0,
+            a_22_bohr=95.0,
+            N2=0.5,
+            m1=1.0,
+            m2=1.0,
+            mu_1=9.93,
+            mu_2=9.93,
+            psi_0_noise=psi_0_noise_3d,
+            psi2_0=functions.psi_gauss_3d,
+            psi2_0_noise=psi_0_noise_3d,
+            mu_sol=mu_sol,
+            input_path=Path("~/Documents/itp/master/supersolids/supersolids/").expanduser(),
+            )
+
     # TODO: get mayavi lim to work
     # 3D works in single core mode
     SystemResult: Schroedinger = simulate_case(
-                                    System,
-                                    Anim,
-                                    accuracy=args.accuracy,
-                                    delete_input=False,
-                                    dir_path=dir_path,
-                                    slice_indices=slice_indices, # from here just mayavi
-                                    offscreen=args.offscreen,
-                                    x_lim=x_lim, # from here just matplotlib
-                                    y_lim=y_lim,
-                                    filename_steps=args.filename_steps,
-                                    steps_format=args.steps_format,
-                                    steps_per_npz=args.steps_per_npz,
-                                    frame_start=0,
-                                    )
+        SchroedingerInput,
+        Anim,
+        accuracy=args.accuracy,
+        delete_input=False,
+        dir_path=dir_path,
+        dir_name_result=args.dir_name_result,
+        slice_indices=slice_indices, # from here just mayavi
+        offscreen=args.offscreen,
+        x_lim=x_lim, # from here just matplotlib
+        y_lim=y_lim,
+        filename_steps=args.filename_steps,
+        steps_format=args.steps_format,
+        steps_per_npz=args.steps_per_npz,
+        frame_start=0,
+        )
 
     print("Single core done")
