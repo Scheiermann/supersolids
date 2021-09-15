@@ -387,6 +387,7 @@ def thomas_fermi_1d(x, g: float = 0.0):
         return mu * (1 - ((x ** 2) / (2 * mu))) / g
 
     else:
+        print(f"Thomas-Fermi not possible for g=0.0. But you specified g={g}. Returning None.")
         return None
 
 
@@ -412,6 +413,7 @@ def thomas_fermi_2d(x, y, g: float = 0.0):
         return mu * (1 - ((x ** 2 + y ** 2) / (2 * mu))) / g
 
     else:
+        print(f"Thomas-Fermi not possible for g=0.0. But you specified g={g}. Returning None.")
         return None
 
 
@@ -446,6 +448,7 @@ def thomas_fermi_3d(x, y, z, g: float = 0.0):
         return mu * (1 - ((x ** 2 + y ** 2 + z ** 2) / (2 * mu))) / g
 
     else:
+        print(f"Thomas-Fermi not possible for g=0.0. But you specified g={g}. Returning None.")
         return None
 
 
