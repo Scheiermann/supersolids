@@ -407,8 +407,11 @@ class Schroedinger:
 
         return dV
 
-    def sum_dV(self, func, fourier_space: bool = False):
-        psi_norm: float = np.sum(func) * self.volume_element(fourier_space=fourier_space)
+    def sum_dV(self, func, fourier_space: bool = False, dV: float = None):
+        if dV is None:
+            dV = self.volume_element(fourier_space=fourier_space)
+
+        psi_norm: float = np.sum(func) * dV
 
         return psi_norm
 
