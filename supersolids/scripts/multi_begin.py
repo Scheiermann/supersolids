@@ -4,22 +4,24 @@ from pathlib import Path
 import numpy as np
 import time
 
-
-def dic2str(dic):
-    dic_str = str(dic).replace("\'", "\"")
-    dic_str_single_quote_wrapped = f"'{dic_str}'"
-
-    return dic_str_single_quote_wrapped
+from supersolids.helper.dict2str import dic2str
 
 
 xvfb_display = 98
-supersolids_version = "0.1.33rc10"
-dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/")
+supersolids_version = "0.1.34rc1"
+dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture/")
 # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
 movie_string = "movie"
 counting_format = "%03d"
 movie_number = 1
+
+N = 65000
+a11 = 95.0
+
+m_list = [164.0, 164.0]
+mu_list = [10.0, 9.0]
+
 
 Box = {"x0": -10, "x1": 10, "y0": -5, "y1": 5, "z0": -4, "z1": 4}
 Res = {"x": 256, "y": 128, "z": 32}
@@ -29,7 +31,10 @@ noise = [0.8, 1.2]
 accuracy = 0.0
 w_x_freq = 33.0
 a_s = 0.000000004656
-a = {"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}
+# a = {"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}
+
+# for mixtures
+a = {"a_x": 2.2, "a_y": 1.5, "a_z": 1.0}
 
 max_timesteps = 1500001
 dt = 0.0002
@@ -38,13 +43,13 @@ steps_format = "%07d"
 steps_per_npz = 1000
 accuracy = 0.0
 
-N_start = 40000
-N_end = 61000
+N_start = 10000
+N_end = 60000
 N_step = 5000
 
 alpha_start = 0.3
-alpha_end = 0.66
-alpha_step = 0.05
+alpha_end = 1.3
+alpha_step = 0.1
 
 func_filename = "distort.txt"
 
@@ -59,9 +64,14 @@ for v in np.arange(N_start, N_end, N_step):
         func_list.append([])
         v_string = round(v, ndigits=5)
         d_string = round(d, ndigits=5)
-        N = v_string
+        N2 = v_string
+        N_list = [N - N2, N2]
 
-        w_y = 2.0 * np.pi * (w_x_freq / d_string)
+        # a_s_list in triu (triangle upper matrix) form: a11, a12, a22
+        a_s_list = [a11, d_string * a11, a11]
+
+        # w_y = 2.0 * np.pi * (w_x_freq / d_string)
+        # -w_y={w_y} \
 
         # d_string = 0.0001 * 10.0 ** round(d, ndigits=5)
 
@@ -82,7 +92,7 @@ for v in np.arange(N_start, N_end, N_step):
 
         heredoc = f"""#!/bin/bash
 #==================================================
-#PBS -N {supersolids_version}_v{v_string}dx{d_string}
+#PBS -N {supersolids_version}_N2_{v_string}a12_{d_string}
 #PBS -M daniel.scheiermann@itp.uni-hannover.de
 #PBS -d /bigwork/dscheier/supersolids/supersolids/results/
 #PBS -e /bigwork/dscheier/supersolids/supersolids/results/error_$PBS_JOBID.txt
@@ -120,7 +130,6 @@ echo $(which pip3)
 # /bigwork/dscheier/miniconda3/bin/pip3 install -i https://pypi.org/simple/supersolids=={supersolids_version}
 
 /bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids \
--N={N} \
 -Box={dic2str(Box)} \
 -Res={dic2str(Res)} \
 -max_timesteps={max_timesteps} \
@@ -130,12 +139,16 @@ echo $(which pip3)
 -dir_path={dir_path} \
 -dir_name_result={dir_name_result} \
 -a={dic2str(a)} \
--a_s={a_s} \
--w_y={w_y} \
 -accuracy={accuracy} \
 -noise {' '.join(map(str, noise))} \
+--N_list {' '.join(map(str, N_list))} \
+--m_list {' '.join(map(str, m_list))} \
+--mu_list {' '.join(map(str, mu_list))} \
+--a_s_list {' '.join(map(str, a_s_list))} \
 --V_interaction \
---offscreen
+--offscreen \
+--mixture
+
 """
 
         func_list[j_counter].append(f"N={N}")
@@ -144,7 +157,7 @@ echo $(which pip3)
         func_list[j_counter].append(f"dt={dt}")
         func_list[j_counter].append(f"a_s={a_s}")
         func_list[j_counter].append(f"a={a}")
-        func_list[j_counter].append(f"w_y={w_y}")
+        # func_list[j_counter].append(f"w_y={w_y}")
         func_list[j_counter].append(f"noise={noise}")
         func_list[j_counter].append(f"steps_per_npz={steps_per_npz}")
 
