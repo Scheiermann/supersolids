@@ -44,14 +44,20 @@ if __name__ == "__main__":
                         default={"x0": -10, "x1": 10, "y0": -5, "y1": 5, "z0": -4, "z1": 4},
                         help=("Dictionary for the Box dimensionality. "
                               "Two values per dimension to set start and end (1D, 2D, 3D)."))
-    parser.add_argument("-N", metavar="N", type=int, default=6 * 10 ** 4,
-                        help="Number of particles in box")
-    parser.add_argument("-m", metavar="m", type=int, default=164.0 * constants.u_in_kg,
-                        help="Mass of a particle")
+    parser.add_argument("-l_0", metavar="l_0", type=float, default=None,
+                        help="Help constant for dimensionless formulation of equations.")
+    parser.add_argument("--N_list", metavar="N", type=int, nargs="+", default=6 * 10 ** 4,
+                        help="Number of particles in box per mixture")
+    parser.add_argument("--m_list", metavar="m",  type=float, nargs="+", default=[164.0],
+                        help="Mass of a particles in atomic mass unit (u) per mixture")
+    parser.add_argument("--mu_list", metavar="mu",  type=float, nargs="+", default=[1.0],
+                        help="Mass of a particles in mu_0 per mixture")
+    parser.add_argument("--a_s_list", metavar="a_s", type=float, nargs="+", default=[85.0],
+                        help="Constant a_s per mixture-mixture interaction in a upper triangle "
+                             "matrix e.g. for 2 mixtures, the index combinations are [11, 12, 22].")
     parser.add_argument("-a_dd", metavar="a_dd", type=float, default=130.0 * constants.a_0,
-                        help="Constant a_dd")
-    parser.add_argument("-a_s", metavar="a_s", type=float, default=85.0 * constants.a_0,
-                        help="Constant a_s")
+                        help="Constant a_dd (Ignored for mixtures, "
+                             "as mu_list is used to construct the values)")
     parser.add_argument("-w_x", metavar="w_x", type=float, default=2.0 * np.pi * 33.0,
                         help="Frequency of harmonic trap in x direction")
     parser.add_argument("-w_y", metavar="w_y", type=float, default=2.0 * np.pi * 80.0,
@@ -84,12 +90,29 @@ if __name__ == "__main__":
                              "If used, no potential is used.")
     parser.add_argument("--V_interaction", default=False, action="store_true",
                         help="Just for 3D case. Use to apply V_3d_ddi (Dipol-Dipol-Interaction).")
+    parser.add_argument("--V_interaction_cut_x", default=[], nargs="+",
+                        help="Min and max values for x to cut V_3d_ddi (Dipol-Dipol-Interaction).")
+    parser.add_argument("--V_interaction_cut_y", default=[], nargs="+",
+                        help="Min and max values for y to cut V_3d_ddi (Dipol-Dipol-Interaction).")
+    parser.add_argument("--V_interaction_cut_z", default=[], nargs="+",
+                        help="Min and max values for z to cut V_3d_ddi (Dipol-Dipol-Interaction).")
     parser.add_argument("--real_time", default=False, action="store_true",
                         help="Switch for Split-Operator method to use imaginary time or not.")
-    parser.add_argument("--plot_psi_sol", default=False, action="store_true",
+    parser.add_argument("--plot_psi_list", default=None, nargs="+",
+                        help="Option to plot the list of wavefunctions psi.")
+    parser.add_argument("--plot_psi_sol_list", default=None, nargs="+",
                         help="Option to plot the manually given solution for the wavefunction psi.")
     parser.add_argument("--plot_V", default=False, action="store_true",
                         help="Option to plot the external potential of the system (the trap).")
+    parser.add_argument("-script_name", type=str, default="script",
+                        help="Name of file, where to save args of the running simulate_npz")
+    parser.add_argument("-script_number_regex", type=str, default="*",
+                        help="Regex to find files in method reload_files.")
+    parser.add_argument("--script_extensions", default=None, nargs="+",
+                        help="List to reload different files extensions at the same time.")
+    parser.add_argument("-script_extensions_index", type=int, default=0,
+                        help="Index of list of flag script_extension, which is used to get the "
+                             "script_list from which the counter is deduced.")
     parser.add_argument("-filename_steps", type=str, default="step_",
                         help="Name of file, without enumerator for the files. "
                              "For example the standard naming convention is step_000001.npz, "
@@ -105,8 +128,23 @@ if __name__ == "__main__":
                         help="If flag is not used, interactive animation is "
                              "shown and saved as mp4, else Schroedinger is "
                              "saved as pkl and allows offscreen usage.")
+
     args = parser.parse_args()
-    print(f"args: {args}")
+    print(f"args: {args}\n")
+
+    # apply units to input
+    m_list = [m * constants.u_in_kg for m in args.m_list]
+    mu_list = [mu * constants.mu_0 for mu in args.mu_list]
+    a_s_list = [a_s * constants.a_0 for a_s in args.a_s_list]
+    if args.l_0 is None:
+        # x harmonic oscillator length
+        # l_0 = np.sqrt(constants.hbar / (m_list[0] * args.w_x))
+        l_0 = 1.0 / constants.u_in_kg
+    else:
+        l_0 = args.l_0
+
+    dimensionless_factor = constants.hbar ** 2.0 / (m_list[0] * l_0 ** 2.0)
+    a_dd_factor = (m_list[0] / constants.hbar ** 2.0) * (constants.mu_0 / (12.0 * np.pi))
 
     BoxResAssert(args.Res, args.Box)
     ResAssert(args.Res, args.a)
@@ -115,15 +153,43 @@ if __name__ == "__main__":
 
     MyBox = Box(**args.Box)
 
+    cut_ratio = 0.95
+    if not args.V_interaction_cut_x:
+        V_interaction_cut_x = [cut_ratio * MyBox.x0, cut_ratio * MyBox.x1]
+    else:
+        V_interaction_cut_x = list(map(float, args.V_interaction_cut_x))
+
+    if not args.V_interaction_cut_y:
+        V_interaction_cut_y = [cut_ratio * MyBox.y0, cut_ratio * MyBox.y1]
+    else:
+        V_interaction_cut_y = list(map(float, args.V_interaction_cut_y))
+
+    if not args.V_interaction_cut_z:
+        V_interaction_cut_z = [cut_ratio * MyBox.z0, cut_ratio * MyBox.z1]
+    else:
+        V_interaction_cut_z = list(map(float, args.V_interaction_cut_z))
+
     try:
         dir_path = Path(args.dir_path).expanduser()
     except Exception:
         dir_path = args.dir_path
 
+    if args.mixture:
+        a_s_array, a_dd_array = functions.get_parameters_mixture(l_0,
+                                                                 mu_list,
+                                                                 a_s_list,
+                                                                 a_dd_factor,
+                                                                 )
+
+        print(f"g_array:\n{a_s_array}")
+        print(f"U_dd_factor_array:\n{a_dd_array}\n")
+    else:
+        g, g_qf, e_dd, a_s_l_ho_ratio = functions.get_parameters(
+            N=args.N, m=m_list[0], a_s=args.a_s, a_dd=args.a_dd, w_x=args.w_x)
+        print(f"g, g_qf, e_dd: {g, g_qf, e_dd}")
+
     alpha_y, alpha_z = functions.get_alphas(w_x=args.w_x, w_y=args.w_y, w_z=args.w_z)
-    g, g_qf, e_dd, a_s_l_ho_ratio = functions.get_parameters(
-        N=args.N, m=args.m, a_s=args.a_s, a_dd=args.a_dd, w_x=args.w_x)
-    print(f"g, g_qf, e_dd, alpha_y, alpha_z: {g, g_qf, e_dd, alpha_y, alpha_z}")
+    print(f"alpha_y, alpha_z: {alpha_y, alpha_z}")
 
     # Define functions (needed for the Schroedinger equation)
     # (e.g. potential: V, initial wave function: psi_0)
@@ -131,8 +197,13 @@ if __name__ == "__main__":
     V_2d = functools.partial(functions.v_harmonic_2d, alpha_y=alpha_y)
     V_3d = functools.partial(functions.v_harmonic_3d, alpha_y=alpha_y, alpha_z=alpha_z)
 
-    V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
-                                 r_cut=1.0 * MyBox.min_length() / 2.0)
+    V_3d_ddi = functools.partial(functions.get_V_k_val_ddi3,
+                                 x_cut=V_interaction_cut_x,
+                                 y_cut=V_interaction_cut_y,
+                                 z_cut=V_interaction_cut_z)
+    # V_3d_ddi = functools.partial(functions.get_V_k_val_ddi,
+    #                               rho_cut=0.8 * max(MyBox.lengths()[:2]),
+    #                               z_cut=0.8 * MyBox.lengths()[2])
 
     # functools.partial sets all arguments except x, y, z,
     # psi_0_1d = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
@@ -149,6 +220,11 @@ if __name__ == "__main__":
         psi_0_3d = functools.partial(
             functions.psi_gauss_3d,
             a_x=args.a["a_x"], a_y=args.a["a_y"], a_z=args.a["a_z"],
+            x_0=args.mu["mu_x"], y_0=args.mu["mu_y"], z_0=args.mu["mu_z"],
+            k_0=0.0)
+        psi_0_3d_2 = functools.partial(
+            functions.psi_gauss_3d,
+            a_x=0.5 * args.a["a_x"], a_y=0.5 * args.a["a_y"], a_z=1.5 * args.a["a_z"],
             x_0=args.mu["mu_x"], y_0=args.mu["mu_y"], z_0=args.mu["mu_z"],
             k_0=0.0)
         # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
@@ -169,9 +245,12 @@ if __name__ == "__main__":
 
     # psi_sol_3d = functions.thomas_fermi_3d
     if MyBox.dim == 3:
-        psi_sol_3d: Optional[Callable] = prepare_cuts(functions.density_in_trap,
-                                                      args.N, alpha_z, e_dd,
-                                                      a_s_l_ho_ratio)
+        if args.mixture:
+            psi_sol_3d = None
+        else:
+            psi_sol_3d: Optional[Callable] = prepare_cuts(functions.density_in_trap,
+                                                          args.N, alpha_z, e_dd,
+                                                          a_s_l_ho_ratio)
     else:
         psi_sol_3d = None
 
@@ -213,29 +292,56 @@ if __name__ == "__main__":
         else:
             V = V_trap
 
-    SchroedingerInput: Schroedinger = Schroedinger(
-        args.N,
-        MyBox,
-        Res,
-        max_timesteps=args.max_timesteps,
-        dt=args.dt,
-        g=g,
-        g_qf=g_qf,
-        w_x=args.w_x,
-        w_y=args.w_y,
-        w_z=args.w_z,
-        e_dd=e_dd,
-        a_s=args.a_s,
-        imag_time=(not args.real_time),
-        mu=1.1,
-        E=1.0,
-        psi_0=psi_0,
-        V=V,
-        V_interaction=V_interaction,
-        psi_sol=psi_sol,
-        mu_sol=mu_sol,
-        psi_0_noise=psi_0_noise_3d,
-        )
+    if args.mixture:
+        SchroedingerInput: SchroedingerMixture = SchroedingerMixture(
+            MyBox,
+            Res,
+            max_timesteps=args.max_timesteps,
+            dt=args.dt,
+            N_list=args.N_list,
+            m_list=m_list,
+            a_s_array=a_s_array,
+            a_dd_array=a_dd_array,
+            dt_func=None,
+            w_x=args.w_x,
+            w_y=args.w_y,
+            w_z=args.w_z,
+            imag_time=(not args.real_time),
+            mu_arr=None,
+            E=1.0,
+            V=V,
+            V_interaction=V_interaction,
+            psi_0_list=[psi_0, psi_0_3d_2],
+            psi_0_noise_list=[psi_0_noise_3d, psi_0_noise_3d],
+            psi_sol_list=[functions.thomas_fermi_3d, functions.thomas_fermi_3d],
+            mu_sol_list=[functions.mu_3d, functions.mu_3d],
+            input_path=Path("~/Documents/itp/master/supersolids/supersolids/").expanduser(),
+            )
+    else:
+        SchroedingerInput: Schroedinger = Schroedinger(
+            args.N_list[0],
+            MyBox,
+            Res,
+            max_timesteps=args.max_timesteps,
+            dt=args.dt,
+            dt_func=None,
+            g=g,
+            g_qf=g_qf,
+            w_x=args.w_x,
+            w_y=args.w_y,
+            w_z=args.w_z,
+            e_dd=e_dd,
+            a_s=args.a_s,
+            imag_time=(not args.real_time),
+            mu_arr=1.1,
+            E=1.0,
+            psi_0=psi_0,
+            V=V,
+            V_interaction=V_interaction,
+            psi_sol=psi_sol,
+            mu_sol=mu_sol,
+            psi_0_noise=psi_0_noise_3d,
+            )
 
     Anim: Animation = Animation(
         Res=SchroedingerInput.Res,
@@ -260,24 +366,6 @@ if __name__ == "__main__":
     else:
         slice_indices = [None, None, None]
 
-    if args.mixture:
-        SchroedingerInput: SchroedingerMixture = SchroedingerMixture(
-            System=SchroedingerInput,
-            a_11_bohr=95.0,
-            a_12_bohr=95.0,
-            a_22_bohr=95.0,
-            N2=0.5,
-            m1=1.0,
-            m2=1.0,
-            mu_1=9.93,
-            mu_2=9.93,
-            psi_0_noise=psi_0_noise_3d,
-            psi2_0=functions.psi_gauss_3d,
-            psi2_0_noise=psi_0_noise_3d,
-            mu_sol=mu_sol,
-            input_path=Path("~/Documents/itp/master/supersolids/supersolids/").expanduser(),
-            )
-
     # TODO: get mayavi lim to work
     # 3D works in single core mode
     SystemResult: Schroedinger = simulate_case(
@@ -295,6 +383,11 @@ if __name__ == "__main__":
         steps_format=args.steps_format,
         steps_per_npz=args.steps_per_npz,
         frame_start=0,
+        script_name=args.script_name,
+        script_args=args,
+        script_number_regex=args.script_number_regex,
+        script_extensions=args.script_extensions,
+        script_extensions_index=args.script_extensions_index,
         )
 
     print("Single core done")

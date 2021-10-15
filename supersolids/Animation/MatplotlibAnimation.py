@@ -32,10 +32,10 @@ class MatplotlibAnimation(Animation.Animation):
 
         """
         super().__init__(Res=Anim.Res,
-                         plot_psi_sol=Anim.plot_psi_sol,
+                         plot_psi_sol=Anim.plot_psi_sol_list,
                          plot_V=Anim.plot_V,
-                         alpha_psi=Anim.alpha_psi,
-                         alpha_psi_sol=Anim.alpha_psi_sol,
+                         alpha_psi_list=Anim.alpha_psi_list,
+                         alpha_psi_sol_list=Anim.alpha_psi_sol_list,
                          alpha_V=Anim.alpha_V,
                          camera_r_func=Anim.camera_r_func,
                          camera_phi_func=Anim.camera_phi_func,
@@ -271,9 +271,9 @@ class MatplotlibAnimation(Animation.Animation):
                 for contour in self.psi_z_line.collections:
                     contour.remove()
 
-            mu_old = System.mu
+            mu_old = System.mu_arr
             System.time_step()
-            mu_rel = np.abs((System.mu - mu_old) / System.mu)
+            mu_rel = np.abs((System.mu_arr - mu_old) / System.mu_arr)
             print(f"mu_rel: {mu_rel}")
             if mu_rel < accuracy:
                 print(f"accuracy reached: {mu_rel}")
@@ -286,7 +286,7 @@ class MatplotlibAnimation(Animation.Animation):
             self.psi_line.set_data(System.x, np.abs(System.psi_val) ** 2.0)
             if self.plot_V:
                 self.V_line.set_data(self.V_pos, self.V_plot_val)
-            if self.plot_psi_sol:
+            if self.plot_psi_sol_list:
                 self.psi_sol_line.set_data(System.x, System.psi_sol_val)
         elif System.dim == 2:
             if frame_index >= 1:
@@ -317,7 +317,7 @@ class MatplotlibAnimation(Animation.Animation):
                                                      linewidth=5,
                                                      rstride=1,
                                                      cstride=1,
-                                                     alpha=self.alpha_psi
+                                                     alpha=self.alpha_psi_list
                                                      )
 
                 cmap = cm.coolwarm
