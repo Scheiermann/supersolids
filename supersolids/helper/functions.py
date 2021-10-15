@@ -780,7 +780,8 @@ def get_R_rz(kappa: float, e_dd: float, N: int, a_s_l_ho_ratio: float):
 
 def get_kappa(alpha_z: float, e_dd: float,
               x_min: float = 3.0, x_max: float = 5.0, res: int = 1000):
-    kappa_array: np.ndarray = np.linspace(x_min, x_max, res)
+    kappa_array: np.ndarray = np.linspace(x_min, x_max, res,
+                                          endpoint=False)
     y = func_125(kappa_array, alpha_z, e_dd)
     if y[-1] > 0:
         kappa_root = min(kappa_array[y >= 0.0])
@@ -792,7 +793,7 @@ def get_kappa(alpha_z: float, e_dd: float,
 
 def density_in_trap(x: float, y: float, z: float,
                     R_r: float, R_z: float, g: float = 0.0):
-    r = np.sqrt(x ** 2 + y ** 2)
+    r = np.sqrt(x ** 2.0 + y ** 2.0)
     n_0 = 15.0 / (8.0 * np.pi * R_z * R_r ** 2.0)
     a = (r / R_r) ** 2.0 + (z / R_z) ** 2.0
 
@@ -930,6 +931,6 @@ if __name__ == '__main__':
 
     # testing for 2d plot
     L = 10
-    x = np.linspace(-L, L, resolution)
-    y = np.linspace(-L, L, resolution)
+    x = np.linspace(-L, L, resolution, endpoint=False)
+    y = np.linspace(-L, L, resolution, endpoint=False)
     x_mesh, y_mesh, pos = get_meshgrid(x, y)
