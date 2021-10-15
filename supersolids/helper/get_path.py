@@ -44,17 +44,34 @@ def get_path(dir_path: Path,
     return input_path, last_index, dir_name, counting_format
 
 
+def get_step_index_from_list(dir_paths, filename_prefix="step_", file_pattern=".npz"):
+    try:
+        if isinstance(dir_paths, list):
+            # dir_paths has just one path
+            dir_path = dir_paths[-1]
+        else:
+            # dir_paths has just one path
+            dir_path = dir_paths
+
+        last_index = get_step_index(dir_path,
+                                    filename_prefix=filename_prefix,
+                                    file_pattern=file_pattern)
+
+    except Exception as e:
+        last_index = 0
+        print(f"Could not extract last_index: {e}. Setting last_index={last_index}.")
+
+    return last_index
+
+
 def get_step_index(dir_path, filename_prefix="step_", file_pattern=".npz"):
     try:
         last_str_part = dir_path.name.split(file_pattern)[0]
-        try:
-            last_index: int = int(last_str_part.split(filename_prefix)[1])
-        except IndexError as e:
-            last_index = 0
-            print(f"Old file not found. Setting last_index={last_index}.")
-    except IndexError as e:
+        last_index: int = int(last_str_part.split(filename_prefix)[1])
+    except Exception as e:
         last_index = 0
-        print(f"No file found in directory {filename_prefix}* "
-              f"at path {dir_path}.")
+        print(f"Could not extract last_index from {dir_path} "
+              f"and filename_prefix {filename_prefix}: {e}\n"
+              f"Setting last_index={last_index}.")
 
     return last_index
