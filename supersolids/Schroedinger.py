@@ -149,24 +149,20 @@ class Schroedinger:
         :param max_timesteps: Maximum timesteps  with length dt for the animation.
 
         """
-        assert isinstance(Res, Resolution), (f"box: {type(Res)} is not type {type(Resolution)}")
+        self.name: str = "SchroedingerSummary_"
+        self.t: float = 0.0
 
-        # TODO: needed but destroys back compatiblity to old npz
-        #       (fork needed, accumulate those to do it in one go)
-        # self.psi_0_noise: np.ndarray = psi_0_noise
-        # self.name: str = "SchroedingerSummary_"
+        self.Res, self.Box = functions.check_ResBox(Res, MyBox)
+        self.dim: int = self.Box.dim
 
         self.N: int = N
         self.w_x: float = w_x
         self.w_y: float = w_y
         self.w_z: float = w_z
         self.a_s: float = a_s
-        self.Res: Resolution = Res
+
         self.max_timesteps: int = max_timesteps
 
-        assert isinstance(MyBox, Box), (f"box: {type(MyBox)} is not type {type(Box)}")
-
-        self.Box: Box = MyBox
         self.dt: float = dt
         self.dt_func: Optional[Callable] = dt_func
         self.g: float = g
@@ -294,9 +290,10 @@ class Schroedinger:
             kx_mesh, ky_mesh, kz_mesh, _ = functions.get_meshgrid_3d(self.kx, self.ky, self.kz)
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
 
-            # here a number (U) is multiplied elementwise with an (1D, 2D or
-            # 3D) array (k_squared)
-            self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
+            if V is None:
+                self.V_val = 0.0
+            else:
+                self.V_val = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
 
             if V_interaction is None:
                 # For no interaction the identity is needed with respect to 2D
@@ -304,10 +301,10 @@ class Schroedinger:
                 self.V_k_val = np.full(self.psi_val.shape, 1.0)
             else:
                 if callable(V_interaction):
-                    self.V_k_val = V_interaction(kx_mesh, ky_mesh, kz_mesh)
+                    self.V_k_val = V_interaction(kx_mesh, ky_mesh, kz_mesh, self.z_mesh)
 
-        # attributes for animation
-        self.t: float = 0.0
+        # here a number (U) is multiplied elementwise with an (1D, 2D or 3D) array (k_squared)
+        self.H_kin: np.ndarray = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 
     def get_density(self, func=None, p: float = 2.0) -> np.ndarray:
         """
@@ -828,20 +825,14 @@ class Schroedinger:
                   - (3.0 / 5.0) * self.g_qf * psi_quintic_int)
 
     def use_summary(self, summary_name: Optional[str] = None):
-        if summary_name is None:
-            summary_name = "SchroedingerSummary_"
-
         Summary: SchroedingerSummary = SchroedingerSummary(self)
 
         return Summary, summary_name
 
-    def load_summary(self, input_path, steps_format, frame, summary_name: Optional[str] = None):
-        if summary_name is None:
-            summary_name = "SchroedingerSummary_"
-
+    def load_summary(self, input_path, steps_format, frame):
         try:
             # load SchroedingerSummary
-            system_summary_path = Path(input_path, summary_name + steps_format % frame + ".pkl")
+            system_summary_path = Path(input_path, self.name + steps_format % frame + ".pkl")
             with open(system_summary_path, "rb") as f:
                 SystemSummary: SchroedingerSummary = dill.load(file=f)
                 SystemSummary.copy_to(self)
@@ -930,7 +921,7 @@ class Schroedinger:
 
             # save SchroedingerSummary not Schroedinger to save disk space
             if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
-                with open(Path(input_path, summary_name + steps_format % frame + ".pkl"),
+                with open(Path(input_path, self.name + steps_format % frame + ".pkl"),
                           "wb") as f:
                     dill.dump(obj=SystemSummary, file=f)
 
