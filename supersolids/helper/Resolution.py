@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import sys
 from typing import Optional, List
 
 import numpy as np
@@ -30,6 +30,13 @@ class Resolution:
 
     def to_array(self):
         return np.array([self.x, self.y, self.z])
+
+    def get_bounds_by_index(self, index):
+        res_arr = self.to_array()
+        if 0 <= index <= len(res_arr):
+            return res_arr[index]
+        else:
+            sys.exit(f"Res index is not possible: {index}")
 
 
 def ResAssert(Res, a, name="Amplitudes"):
