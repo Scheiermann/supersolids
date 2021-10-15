@@ -137,6 +137,91 @@ def get_meshgrid_3d(x, y, z):
     return x_mesh, y_mesh, z_mesh, pos
 
 
+def check_provided_lists(number_of_mixtures: int,
+                         a_s_array: np.ndarray,
+                         a_dd_array: np.ndarray,
+                         ):
+    combinations = list(
+                        itertools.combinations_with_replacement(
+                            range(1, number_of_mixtures + 1),
+                            number_of_mixtures
+                            )
+                        )
+    print(f"a_s and a_dd need to be provided as a list with the given order of combinations: "
+          f"{combinations}.")
+
+    if len(a_s_array) != len(combinations):
+        sys.exit(f"a_s: {a_s_array} does not have the same length as combinations.")
+
+    if len(a_dd_array) != len(combinations):
+        sys.exit(f"a_dd: {a_dd_array} does not have the same length as combinations.")
+
+
+def generate_a_dd(mu_list: list,
+                  a_dd_factor: float,
+                  ):
+    number_of_mixtures = len(mu_list)
+    mu_combinations = list(
+        itertools.combinations_with_replacement(
+            mu_list,
+            number_of_mixtures
+        )
+    )
+
+    mu_prod_combinations = np.fromiter(map(np.prod, mu_combinations), dtype=float)
+    a_dd_list = mu_prod_combinations * a_dd_factor
+
+    return a_dd_list
+
+
+def get_parameters_mixture(l_0: float,
+                           mu_list: list,
+                           a_s_list: list,
+                           a_dd_factor: float,
+                           ) -> (np.ndarray, np.ndarray):
+    number_of_mixtures = len(mu_list)
+    a_dd_list = generate_a_dd(mu_list, a_dd_factor)
+    check_provided_lists(number_of_mixtures, a_s_list, a_dd_list)
+
+    a_s_array = dimensionless(combinations2array(number_of_mixtures, a_s_list), l_0)
+    a_dd_array = dimensionless(combinations2array(number_of_mixtures, a_dd_list), l_0)
+
+    a_s_array_dimless = dimensionless(a_s_array, l_0)
+    a_dd_array_dimless = dimensionless(a_dd_array, l_0)
+
+    return a_s_array_dimless, a_dd_array_dimless
+
+
+def dimensionless(arr, l_0):
+    return arr / l_0
+
+
+def combinations2array(number_of_mixtures: int,
+                       combinations_list: list,
+                       ) -> np.ndarray:
+    triu_indeces = np.triu_indices(number_of_mixtures)
+    triu = np.zeros(shape=(number_of_mixtures, number_of_mixtures))
+    triu[triu_indeces] = combinations_list
+    arr = symmetric_mat(triu)
+
+    return arr
+
+
+def symmetric_mat(arr: np.ndarray) -> np.ndarray:
+    return arr + arr.T - np.diag(arr.diagonal())
+
+
+def w_dimensionsless(dimensionless_factor: float,
+                     w_x: float = 2.0 * np.pi * 30.0,
+                     w_y: float = 2.0 * np.pi * 30.0,
+                     w_z: float = 2.0 * np.pi * 30.0,
+                     ) -> (float, float, float):
+    w_x_dimensionless = w_x * dimensionless_factor
+    w_y_dimensionless = w_y * dimensionless_factor
+    w_z_dimensionless = w_z * dimensionless_factor
+
+    return w_x_dimensionless, w_y_dimensionless, w_z_dimensionless
+
 def get_parameters(N: int = 10 ** 4,
                    m: float = 164 * constants.u_in_kg,
                    a_s: float = 90.0 * constants.a_0,
