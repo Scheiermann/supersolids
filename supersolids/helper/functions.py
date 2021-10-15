@@ -609,6 +609,133 @@ def dipol_dipol_interaction(kx_mesh: float,
     return V_k_val
 
 
+def get_V_k_val_ddi(kx_mesh, ky_mesh, kz_mesh,
+                    z_mesh, rho_cut: float = 1.0, z_cut: float = 1.0):
+    """
+    Explicit calculation of the Fourier transform with the cylindrical cut-off
+
+    """
+    k_rho2_mesh = kx_mesh ** 2.0 + ky_mesh ** 2.0
+    k_rho_mesh = np.sqrt(k_rho2_mesh)
+    k_r2_mesh = k_rho2_mesh + kz_mesh ** 2.0
+
+    # remove artifical singularity
+    k_r2_singular_free = np.where(k_r2_mesh == 0.0, 1.0, k_r2_mesh)
+    cos2a = kz_mesh ** 2.0 / k_r2_singular_free
+
+    sin2a = 1 - cos2a
+    sinacosa = np.sqrt(sin2a * cos2a)
+    term1 = cos2a - 1.0 / 3.0
+    term2 = np.exp(-z_cut * k_rho_mesh) * (sin2a * np.cos(z_cut * kz_mesh)
+                                           - sinacosa * np.sin(z_cut * kz_mesh)
+                                           )
+    term3 = quad(get_rho_integral(k_rho_mesh, kz_mesh, z_mesh, rho_cut), 0.0, z_cut)
+    return 4.0 * np.pi * (term1 + term2 + term3)
+
+
+def get_rho_integral(k_rho_mesh: float,
+                     kz_mesh: float,
+                     z_mesh: float,
+                     rho_cut: float = 1.0,
+                     ):
+    shape = kz_mesh.shape
+
+    r_bound = 2000.0 * rho_cut
+    # r_bound = np.inf
+
+    with run_time(name="quad bessel_func"):
+        it = np.nditer([z_mesh, k_rho_mesh, kz_mesh, None], flags=['external_loop'])
+
+        with it:
+            for z1, k_rho1, kz1, out in it:
+                for z, k_rho, kz in zip(z1, k_rho1, kz1):
+                    out[...] = quad(bessel_func(z, k_rho, kz), rho_cut, r_bound)[0]
+
+        result = np.array(out).reshape(shape)
+
+    return result
+
+
+def get_rho_integral1(kx_mesh: float,
+                      ky_mesh: float,
+                      kz_mesh: float,
+                      z_mesh: float,
+                      rho_cut: float = 1.0,
+                      z_cut: float = 1.0):
+    shape = kx_mesh.shape
+    k_rho_mesh = np.sqrt(kx_mesh ** 2.0 + ky_mesh ** 2.0)
+
+    result = []
+    with run_time(name="quad bessel_func list"):
+        it = np.nditer([z_mesh, kz_mesh, k_rho_mesh], flags=['multi_index'])
+        for z, kz, k_rho in it:
+            # print(f"triple: {z}, {kz}, {k_rho}")
+            print(it.multi_index)
+            result.append(quad(bessel_func(z, k_rho, kz), rho_cut, np.inf)[0])
+        result = np.array(result).reshape(kz_mesh.shape)
+
+    return result
+
+
+def get_V_k_val_ddi2(x_mesh: float,
+                     y_mesh: float,
+                     z_mesh: float,
+                     rho_cut: float = 1.0,
+                     z_cut: float = 1.0):
+    with run_time(name="fft V_ddi"):
+        rho2_mesh = x_mesh ** 2.0 + y_mesh ** 2.0
+        rho_mesh = np.sqrt(rho2_mesh)
+        r_mesh = np.sqrt(rho2_mesh + z_mesh ** 2.0)
+        cos_theta = z_mesh / r_mesh
+
+        ddi = (1.0 - cos_theta ** 2.0) / (r_mesh ** 3.0)
+        zeros = np.zeros(shape=ddi.shape)
+        cond_cylinder = np.logical_and(np.abs(z_mesh) < z_cut, rho_mesh < rho_cut)
+        ddi_cut = np.where(cond_cylinder, ddi, zeros)
+
+        V_k_val = np.fft.fftn(ddi_cut)
+
+        V_k_val_real = V_k_val.real
+
+    return V_k_val_real
+
+
+def get_V_k_val_ddi3(x_mesh: float,
+                     y_mesh: float,
+                     z_mesh: float,
+                     x_cut: List[float],
+                     y_cut: List[float],
+                     z_cut: List[float]):
+    with run_time(name="fft V_ddi xyz cut"):
+        r_mesh = np.sqrt(x_mesh ** 2.0 + y_mesh ** 2.0 + z_mesh ** 2.0)
+
+        r_mesh_singular_free = np.where(r_mesh == 0.0, 1.0, r_mesh)
+        cos_theta = z_mesh / r_mesh_singular_free
+
+        ddi = (1.0 - 3.0 * cos_theta ** 2.0) / (r_mesh ** 3.0)
+        zeros = np.zeros(shape=ddi.shape)
+        cond_x = (x_cut[0] < x_mesh) & (x_mesh < x_cut[1])
+        cond_y = (y_cut[0] < y_mesh) & (y_mesh < y_cut[1])
+        cond_z = (z_cut[0] < z_mesh) & (z_mesh < z_cut[1])
+        cond_xyz_cut = cond_x & cond_y & cond_z
+        ddi_cut = np.where(cond_xyz_cut, ddi, zeros)
+
+        V_k_val = np.fft.fftn(ddi_cut)
+
+        V_k_val_real = V_k_val.real
+
+    return V_k_val_real
+
+
+def bessel_func(z, k_rho, kz):
+    bessel = lambda rho: (
+        - np.cos(kz * z) * rho
+        * (rho ** 2.0 - 2.0 * z ** 2.0) / ((rho ** 2.0 + z ** 2.0) ** 2.5) * jv(0, rho * k_rho)
+        )
+
+    return bessel
+
+
 def f_kappa(kappa: np.ndarray, epsilon: float = 10 ** -10) -> float:
     k2_1 = (kappa ** 2.0 - 1.0 + epsilon)
     result = ((2.0 * kappa ** 2.0 + 1.0) - (3.0 * kappa ** 2.0) * atan_special(
