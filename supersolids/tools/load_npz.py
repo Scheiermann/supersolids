@@ -32,10 +32,9 @@ def load_npz(flag_args):
     except Exception:
         dir_path = flag_args.dir_path
 
-    Anim: Animation = Animation(plot_psi_sol=flag_args.plot_psi_sol,
-                                plot_V=flag_args.plot_V,
-                                alpha_psi=0.8,
-                                alpha_psi_sol=0.5,
+    Anim: Animation = Animation(plot_V=flag_args.plot_V,
+                                alpha_psi_list=flag_args.alpha_psi_list,
+                                alpha_psi_sol_list=flag_args.alpha_psi_sol_list,
                                 alpha_V=0.3,
                                 filename="anim.mp4",
                                 )
@@ -57,6 +56,7 @@ def load_npz(flag_args):
                                   arg_slices=flag_args.arg_slices,
                                   azimuth=flag_args.azimuth,
                                   elevation=flag_args.elevation,
+                                  mixture_slice_index=flag_args.mixture_slice_index,
                                   )
     mlab.show()
 
@@ -90,10 +90,14 @@ def flags(args_array):
     parser.add_argument("-slice_indices", metavar="Indices to slice the plot.", type=json.loads,
                         default={"x": 0, "y": 0, "z": 0},
                         help="Indices to slice the plot in x, y, z direction.")
+    parser.add_argument("-mixture_slice_index", type=int, default=0,
+                        help="Index of mixture to take slices from.")
     parser.add_argument("-azimuth", type=float, default=0.0, help="Phi angle in x-y-plane.")
     parser.add_argument("-elevation", type=float, default=0.0, help="Zenith angle theta in z-axis.")
-    parser.add_argument("--plot_psi_sol", default=False, action="store_true",
-                        help="Option to plot the manually given solution for the wave function psi")
+    parser.add_argument("--alpha_psi_list", default=None, nargs="+",
+                        help="Option to adjust the transparency of the list of plots.")
+    parser.add_argument("--alpha_psi_sol_list", default=None, nargs="+",
+                        help="Option to adjust the transparency of the list of plots.")
     parser.add_argument("--plot_V", default=False, action="store_true",
                         help="Option to plot the external potential of the system (the trap)")
     parser.add_argument("--delete_input", default=False, action="store_true",
