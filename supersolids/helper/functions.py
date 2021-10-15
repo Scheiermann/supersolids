@@ -254,11 +254,18 @@ def g_qf_helper(m: float = 164 * constants.u_in_kg,
     return a_s_l_ho_ratio, e_dd
 
 
+def new_int(epsilon_dd: float):
+    func = lambda u: (1 + epsilon_dd * (3 * u ** 2.0 - 1.0)) ** 2.5
+    integral = quad(func, 0.0, 1.0)[0]
+
+    return integral
+
+
 def get_g_qf(N: int, a_s_l_ho_ratio: float, epsilon_dd: float):
     g_qf = (32.0 / (3.0 * np.sqrt(np.pi))
             * 4.0 * np.pi * a_s_l_ho_ratio ** (5.0 / 2.0)
             * N ** (3.0 / 2.0)
-            * (1.0 + (3.0 / 2.0) * epsilon_dd ** 2.0))
+            * new_int(epsilon_dd))
 
     return g_qf
 
