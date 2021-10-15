@@ -69,9 +69,9 @@ def simulate_npz(args):
                     with open(psi_val_path, "rb") as f:
                         System_loaded.psi_val = np.load(file=f)["psi_val"]
 
-            if isinstance(System_loaded, SchroedingerMixture):
-                with open(psi2_val_path, "rb") as f:
-                    System_loaded.psi2_val = np.load(file=f)["psi2_val"]
+                    if isinstance(System_loaded, SchroedingerMixture):
+                        with open(psi2_val_path, "rb") as f:
+                            System_loaded.psi2_val = np.load(file=f)["psi2_val"]
 
             # get the frame number as it encodes the number steps dt,
             # so System.t can be reconstructed
@@ -162,44 +162,52 @@ def simulate_npz(args):
                 w_z = args.w["w_z"]
                 alpha_y, alpha_z = functions.get_alphas(w_x=w_x, w_y=w_y, w_z=w_z)
 
-            SchroedingerInput: Schroedinger = Schroedinger(
-                System_loaded.N,
-                MyBox,
-                Res,
-                max_timesteps=args.max_timesteps,
-                dt=args.dt,
-                g=System_loaded.g,
-                g_qf=System_loaded.g_qf,
-                w_x=w_x,
-                w_y=w_y,
-                w_z=w_z,
-                a_s=System_loaded.a_s,
-                e_dd=System_loaded.e_dd,
-                imag_time=(not args.real_time),
-                mu=System_loaded.mu,
-                E=System_loaded.E,
-                V=(lambda x, y, z: 0),
-                V_interaction=System_loaded.V_interaction,
-                psi_0_noise=None
-                )
-
             if isinstance(System_loaded, SchroedingerMixture):
                 SchroedingerInput: SchroedingerMixture = SchroedingerMixture(
-                    System=SchroedingerInput,
-                    a_11_bohr=System_loaded.a_11_bohr,
-                    a_12_bohr=System_loaded.a_12_bohr,
-                    a_22_bohr=System_loaded.a_22_bohr,
-                    N2=System_loaded.N2,
-                    m1=System_loaded.m1,
-                    m2=System_loaded.m2,
-                    mu_1=System_loaded.mu_1,
-                    mu_2=System_loaded.mu_2,
-                    psi_0_noise=None, # when continuing to simulate, no extra noise should be added
-                    psi2_0=System_loaded.psi2_0,
-                    psi2_0_noise=System_loaded.psi2_0_noise,
-                    mu_sol=System_loaded.mu_sol,
+                    MyBox,
+                    Res,
+                    args.max_timesteps,
+                    args.dt,
+                    System_loaded.N_list,
+                    System_loaded.m_list,
+                    System_loaded.a_s_array,
+                    System_loaded.a_dd_array,
+                    System_loaded.dt_func,
+                    w_x=w_x,
+                    w_y=w_y,
+                    w_z=w_z,
+                    imag_time=(not args.real_time),
+                    mu_arr=System_loaded.mu_arr,
+                    E=System_loaded.E,
+                    V=(lambda x, y, z: 0),
+                    V_interaction=System_loaded.V_interaction,
+                    psi_0_list=System_loaded.psi_0_list,
+                    psi_0_noise_list=[None],
+                    psi_sol_list=System_loaded.psi_sol_list,
+                    mu_sol_list=System_loaded.mu_sol_list,
                     input_path=System_loaded.input_path,
                 )
+            else:
+                SchroedingerInput: Schroedinger = Schroedinger(
+                    System_loaded.N,
+                    MyBox,
+                    Res,
+                    max_timesteps=args.max_timesteps,
+                    dt=args.dt,
+                    g=System_loaded.g,
+                    g_qf=System_loaded.g_qf,
+                    w_x=w_x,
+                    w_y=w_y,
+                    w_z=w_z,
+                    a_s=System_loaded.a_s,
+                    e_dd=System_loaded.e_dd,
+                    imag_time=(not args.real_time),
+                    mu_arr=System_loaded.mu_arr,
+                    E=System_loaded.E,
+                    V=(lambda x, y, z: 0),
+                    V_interaction=System_loaded.V_interaction,
+                    psi_0_noise=None
+                    )
 
             V_harmonic = functools.partial(functions.v_harmonic_3d,
                                            alpha_y=alpha_y,
@@ -209,143 +217,168 @@ def simulate_npz(args):
             if args.V is None:
                 # -V=None uses harmonic potential with w_x, w_y, w_z.
                 # used to get access to the in-build functions of supersolids package
-                SchroedingerInput.V_val = V_harmonic(SchroedingerInput.x_mesh, SchroedingerInput.y_mesh, SchroedingerInput.z_mesh)
+                SchroedingerInput.V_val = V_harmonic(SchroedingerInput.x_mesh,
+                                                     SchroedingerInput.y_mesh,
+                                                     SchroedingerInput.z_mesh)
             else:
                 if args.V_reload:
                     if System_loaded.V is None:
-                        SchroedingerInput.V_val = args.V(SchroedingerInput.x_mesh, SchroedingerInput.y_mesh, SchroedingerInput.z_mesh)
+                        SchroedingerInput.V_val = args.V(SchroedingerInput.x_mesh,
+                                                         SchroedingerInput.y_mesh,
+                                                         SchroedingerInput.z_mesh)
                     else:
-                        SchroedingerInput.V_val = System_loaded.V_val + args.V(SchroedingerInput.x_mesh,
-                                                                    SchroedingerInput.y_mesh,
-                                                                    SchroedingerInput.z_mesh)
+                        SchroedingerInput.V_val = (System_loaded.V_val
+                                                   + args.V(SchroedingerInput.x_mesh,
+                                                            SchroedingerInput.y_mesh,
+                                                            SchroedingerInput.z_mesh)
+                                                   )
                 else:
-                    SchroedingerInput.V_val = args.V(SchroedingerInput.x_mesh, SchroedingerInput.y_mesh, SchroedingerInput.z_mesh)
-
+                    SchroedingerInput.V_val = args.V(SchroedingerInput.x_mesh,
+                                                     SchroedingerInput.y_mesh,
+                                                     SchroedingerInput.z_mesh)
 
             # Load psi values from System_loaded into System
-            SchroedingerInput.psi_val = System_loaded.psi_val
+            if isinstance(System_loaded, SchroedingerMixture):
+                SchroedingerInput.psi_val_list = System_loaded.psi_val_list
+                psi_shape = np.shape(SchroedingerInput.psi_val_list[0])
+            else:
+                SchroedingerInput.psi_val = System_loaded.psi_val
+                psi_shape = np.shape(SchroedingerInput.psi_val)
 
             # As psi_0_noise needs to be applied on the loaded psi_val and not the initial psi_val
             # we apply noise after loading the old System
-            if args.noise is None:
-                if args.noise_func:
-                    noise_func = functools.partial(args.noise_func, gauss=1.0)
-                else:
-                    noise_func = np.ones(shape=np.shape(System_loaded.psi_val))
-            else:
-                psi_0_noise_3d: np.ndarray = functions.noise_mesh(
-                    min=args.noise[0],
-                    max=args.noise[1],
-                    shape=(Res.x, Res.y, Res.z)
-                    )
-
-                if args.noise_func:
-                    noise_func = functools.partial(args.noise_func, gauss=psi_0_noise_3d)
-                else:
-                    noise_func = psi_0_noise_3d
-
-            if args.neighborhood is None:
-                if args.noise_func:
-                    SchroedingerInput.psi_val = noise_func(k=1.0) * SchroedingerInput.psi_val
-                else:
-                    SchroedingerInput.psi_val = noise_func * SchroedingerInput.psi_val
-
-            else:
-                bool_grid_list = System_loaded.get_peak_neighborhood(prob_min=args.neighborhood[0],
-                                                                     amount=args.neighborhood[1],
-                                                                     )
-
-                for k in range(0, args.neighborhood[1]):
-                    if args.noise_func:
-                        phase_scramble_on_droplets = np.where(bool_grid_list[k], noise_func(k=k),
-                                                              np.ones(shape=np.shape(noise_func)))
+            noise_func_list: list[Optional[Callable]] = []
+            for noise_func in args.noise_func:
+                if args.noise is None:
+                    if noise_func:
+                        noise_func_list.append(functools.partial(noise_func, gauss=1.0))
                     else:
-                        phase_scramble_on_droplets = np.where(bool_grid_list[k], noise_func,
-                                                              np.ones(shape=np.shape(noise_func)))
-
-                    SchroedingerInput.psi_val = phase_scramble_on_droplets * SchroedingerInput.psi_val
-
-            # remove the n-th slices, if Res is shrunk down
-            if SchroedingerInput.Res.x < System_loaded.Res.x:
-                x_shrink = int(System_loaded.Res.x / SchroedingerInput.Res.x)
-                SchroedingerInput.psi_val = SchroedingerInput.psi_val[box_offset_steps_x:box_offset_steps_x_end, :, :]
-            else:
-                if x_step_new == x_step_old:
-                    # Fill up the new grid points with 0,
-                    # when adding grid points by changing Box or Res
-                    SchroedingerInput.psi_val = np.pad(
-                        SchroedingerInput.psi_val,
-                        ((box_offset_steps_x, Res.x - System_loaded.Res.x - box_offset_steps_x),
-                         (0, 0),
-                         (0, 0))
-                    )
+                        noise_func_list.append(np.ones(shape=psi_shape))
                 else:
-                    box_offset_new_x_end = np.abs(System_loaded.Box.x1 - SchroedingerInput.Box.x1)
-                    box_offset_new_steps_x_end = int(box_offset_new_x_end / x_step_new)
-                    box_offset_new_steps_x = int(box_offset_x / x_step_new)
-                    discard_n_th_x = int(x_step_new / x_step_old)
-                    psi_loaded_lower_res_x = SchroedingerInput.psi_val[::discard_n_th_x, :, :]
+                    psi_0_noise_3d: np.ndarray = functions.noise_mesh(
+                        min=args.noise[0],
+                        max=args.noise[1],
+                        shape=(Res.x, Res.y, Res.z)
+                        )
 
-                    SchroedingerInput.psi_val = np.pad(
-                        psi_loaded_lower_res_x,
-                        ((box_offset_new_steps_x, box_offset_new_steps_x_end),
-                         (0, 0),
-                         (0, 0))
-                    )
+                    if args.noise_func:
+                        noise_func_list.append(functools.partial(noise_func, gauss=psi_0_noise_3d))
+                    else:
+                        noise_func_list.append(psi_0_noise_3d)
 
-            if SchroedingerInput.Res.y < System_loaded.Res.y:
-                y_shrink = int(System_loaded.Res.y / SchroedingerInput.Res.y)
-                SchroedingerInput.psi_val = SchroedingerInput.psi_val[:, box_offset_steps_y:box_offset_steps_y_end, :]
-            else:
-                if y_step_new == y_step_old:
-                    # Fill up the new grid points with 0,
-                    # when adding grid points by changing Box or Res
-                    SchroedingerInput.psi_val = np.pad(
-                        SchroedingerInput.psi_val,
-                        ((0, 0),
-                         (box_offset_steps_y, Res.y - System_loaded.Res.y - box_offset_steps_y),
-                         (0, 0))
-                    )
+            for i, noise_func in enumerate(noise_func_list):
+                if args.neighborhood is None:
+                    if args.noise_func and (not args.load_script):
+                            SchroedingerInput.psi_val_list[i] = noise_func(k=1.0) * SchroedingerInput.psi_val_list[i]
+                    else:
+                        SchroedingerInput.psi_val_list[i] = noise_func * SchroedingerInput.psi_val_list[i]
+
                 else:
-                    box_offset_new_y_end = np.abs(System_loaded.Box.y1 - SchroedingerInput.Box.y1)
-                    box_offset_new_steps_y_end = int(box_offset_new_y_end / y_step_new)
-                    box_offset_new_steps_y = int(box_offset_y / y_step_new)
-                    discard_n_th_y = int(y_step_new / y_step_old)
-                    psi_loaded_lower_res_y = SchroedingerInput.psi_val[:, ::discard_n_th_y, :]
+                    bool_grid_list = System_loaded.get_peak_neighborhood(
+                        prob_min=args.neighborhood[0],
+                        number_of_peaks=args.neighborhood[1],
+                        )
 
-                    SchroedingerInput.psi_val = np.pad(
-                        psi_loaded_lower_res_y,
-                        ((0, 0),
-                         (box_offset_new_steps_y, box_offset_new_steps_y_end),
-                         (0, 0))
-                    )
+                    for k in range(0, args.neighborhood[1]):
+                        if args.noise_func:
+                            phase_scramble_on_droplets = np.where(bool_grid_list[k], noise_func(k=k),
+                                                                  np.ones(shape=np.shape(noise_func)))
+                        else:
+                            phase_scramble_on_droplets = np.where(bool_grid_list[k], noise_func,
+                                                                  np.ones(shape=np.shape(noise_func)))
 
-            if SchroedingerInput.Res.z < System_loaded.Res.z:
-                z_shrink = int(System_loaded.Res.z / SchroedingerInput.Res.z)
-                SchroedingerInput.psi_val = SchroedingerInput.psi_val[:, :, box_offset_steps_z:box_offset_steps_z_end]
-            else:
-                if z_step_new == z_step_old:
-                    # Fill up the new grid points with 0,
-                    # when adding grid points by changing Box or Res
-                    SchroedingerInput.psi_val = np.pad(
-                        SchroedingerInput.psi_val,
-                        ((0, 0),
-                         (0, 0),
-                         (box_offset_steps_z, Res.z - System_loaded.Res.z - box_offset_steps_z))
-                    )
+                        SchroedingerInput.psi_val_list[i] = phase_scramble_on_droplets * SchroedingerInput.psi_val_list[i]
+
+                # remove the n-th slices, if Res is shrunk down
+                if SchroedingerInput.Res.x < System_loaded.Res.x:
+                    x_shrink = int(System_loaded.Res.x / SchroedingerInput.Res.x)
+                    SchroedingerInput.psi_val_list[i] = SchroedingerInput.psi_val_list[i][
+                        box_offset_steps_x:box_offset_steps_x_end,
+                        :,
+                        :]
                 else:
-                    box_offset_new_z_end = np.abs(System_loaded.Box.z1 - SchroedingerInput.Box.z1)
-                    box_offset_new_steps_z_end = int(box_offset_new_z_end / z_step_new)
-                    box_offset_new_steps_z = int(box_offset_z / z_step_new)
-                    discard_n_th_z = int(z_step_new / z_step_old)
-                    psi_loaded_lower_res_z = SchroedingerInput.psi_val[:, :, :discard_n_th_z]
+                    if x_step_new == x_step_old:
+                        # Fill up the new grid points with 0,
+                        # when adding grid points by changing Box or Res
+                        SchroedingerInput.psi_val_list[i] = np.pad(
+                            SchroedingerInput.psi_val_list[i],
+                            ((box_offset_steps_x, Res.x - System_loaded.Res.x - box_offset_steps_x),
+                             (0, 0),
+                             (0, 0))
+                        )
+                    else:
+                        box_offset_new_x_end = np.abs(System_loaded.Box.x1 - SchroedingerInput.Box.x1)
+                        box_offset_new_steps_x_end = int(box_offset_new_x_end / x_step_new)
+                        box_offset_new_steps_x = int(box_offset_x / x_step_new)
+                        discard_n_th_x = int(x_step_new / x_step_old)
+                        psi_loaded_lower_res_x = SchroedingerInput.psi_val_list[i][::discard_n_th_x, :, :]
 
-                    SchroedingerInput.psi_val = np.pad(
-                        psi_loaded_lower_res_z,
-                        ((0, 0),
-                         (0, 0),
-                         (box_offset_new_steps_z, box_offset_new_steps_z_end))
-                    )
+                        SchroedingerInput.psi_val_list[i] = np.pad(
+                            psi_loaded_lower_res_x,
+                            ((box_offset_new_steps_x, box_offset_new_steps_x_end),
+                             (0, 0),
+                             (0, 0))
+                        )
+
+                if SchroedingerInput.Res.y < System_loaded.Res.y:
+                    y_shrink = int(System_loaded.Res.y / SchroedingerInput.Res.y)
+                    SchroedingerInput.psi_val_list[i] = SchroedingerInput.psi_val_list[i][
+                        :,
+                        box_offset_steps_y:box_offset_steps_y_end,
+                        :]
+                else:
+                    if y_step_new == y_step_old:
+                        # Fill up the new grid points with 0,
+                        # when adding grid points by changing Box or Res
+                        SchroedingerInput.psi_val_list[i] = np.pad(
+                            SchroedingerInput.psi_val_list[i],
+                            ((0, 0),
+                             (box_offset_steps_y, Res.y - System_loaded.Res.y - box_offset_steps_y),
+                             (0, 0))
+                        )
+                    else:
+                        box_offset_new_y_end = np.abs(System_loaded.Box.y1 - SchroedingerInput.Box.y1)
+                        box_offset_new_steps_y_end = int(box_offset_new_y_end / y_step_new)
+                        box_offset_new_steps_y = int(box_offset_y / y_step_new)
+                        discard_n_th_y = int(y_step_new / y_step_old)
+                        psi_loaded_lower_res_y = SchroedingerInput.psi_val_list[i][:, ::discard_n_th_y, :]
+
+                        SchroedingerInput.psi_val_list[i] = np.pad(
+                            psi_loaded_lower_res_y,
+                            ((0, 0),
+                             (box_offset_new_steps_y, box_offset_new_steps_y_end),
+                             (0, 0))
+                        )
+
+                if SchroedingerInput.Res.z < System_loaded.Res.z:
+                    z_shrink = int(System_loaded.Res.z / SchroedingerInput.Res.z)
+                    SchroedingerInput.psi_val_list[i] = SchroedingerInput.psi_val_list[i][
+                        :,
+                        :,
+                        box_offset_steps_z:box_offset_steps_z_end]
+                else:
+                    if z_step_new == z_step_old:
+                        # Fill up the new grid points with 0,
+                        # when adding grid points by changing Box or Res
+                        SchroedingerInput.psi_val_list[i] = np.pad(
+                            SchroedingerInput.psi_val_list[i],
+                            ((0, 0),
+                             (0, 0),
+                             (box_offset_steps_z, Res.z - System_loaded.Res.z - box_offset_steps_z))
+                        )
+                    else:
+                        box_offset_new_z_end = np.abs(System_loaded.Box.z1 - SchroedingerInput.Box.z1)
+                        box_offset_new_steps_z_end = int(box_offset_new_z_end / z_step_new)
+                        box_offset_new_steps_z = int(box_offset_z / z_step_new)
+                        discard_n_th_z = int(z_step_new / z_step_old)
+                        psi_loaded_lower_res_z = SchroedingerInput.psi_val_list[i][:, :, :discard_n_th_z]
+
+                        SchroedingerInput.psi_val_list[i] = np.pad(
+                            psi_loaded_lower_res_z,
+                            ((0, 0),
+                             (0, 0),
+                             (box_offset_new_steps_z, box_offset_new_steps_z_end))
+                        )
 
             SystemResult: Schroedinger = simulate_case(
                 System=SchroedingerInput,
@@ -398,11 +431,13 @@ def flags(args_array):
                              "-V='lambda x,y,z: 0 * x * y * z'")
     parser.add_argument("-noise", type=json.loads, default=None, action='store',
                         nargs=2, help="Min and max of gauss noise to apply on psi.")
-    parser.add_argument("-noise_func", type=functions.lambda_parsed,
-                        default=None, help="Function to apply on the range given by noise flag.")
+    parser.add_argument("--noise_func", type=functions.lambda_parsed, nargs="+",
+                        default=[], help="Function to apply on the range given by noise flag.")
     parser.add_argument("-neighborhood", type=json.loads, action='store', nargs=2,
-                        help="Arguments for function get_peak_neighborhood: prob_min, amount")
-    parser.add_argument("-dir_path", type=str, default="~/supersolids/results", help="Absolute path to save data to")
+                        help="Arguments for function get_peak_neighborhood: "
+                             "prob_min, number_of_peaks")
+    parser.add_argument("-dir_path", type=str, default="~/supersolids/results",
+                        help="Absolute path to save data to")
     parser.add_argument("-dir_name_load", type=str, default="movie" + "%03d" % 1,
                         help="Name of directory where the files to load lie. "
                              "For example the standard naming convention is movie001")
