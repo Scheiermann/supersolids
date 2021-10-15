@@ -112,7 +112,7 @@ if __name__ == "__main__":
                                         e_dd=e_dd,
                                         a_s=a_s,
                                         imag_time=True,
-                                        mu=1.1,
+                                        mu_arr=1.1,
                                         E=1.0,
                                         psi_0=psi_0_3d,
                                         V=V_3d,

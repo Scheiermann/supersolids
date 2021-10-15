@@ -35,7 +35,7 @@ if __name__ == "__main__":
         N=N, m=m, a_s=a_s, a_dd=a_dd, w_x=w_x)
     print(f"g, g_qf, epsilon_dd: {g, g_qf, e_dd}")
 
-    kappa: np.ndarray = np.linspace(0.0, 5.0, 1000)
+    kappa: np.ndarray = np.linspace(0.0, 5.0, 1000, endpoint=False)
 
     y = functions.func_125(kappa, alpha_z, e_dd)
     plt.title("Plot func_125 to determine $\kappa$ as the roots")
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     print(f"R_r: {R_r}")
     print(f"R_z: {R_z}")
 
-    r = R_r * np.linspace(-2.0, 2.0, 1000)
+    r = R_r * np.linspace(-2.0, 2.0, 1000, endpoint=False)
     n_r = functions.density_in_trap_r(r, z=0.0, R_r=R_r, R_z=R_z)
     plt.title(rf"Plot density_in_trap along r in z=0.0 with $\kappa$={kappa_root:3f})")
     plt.plot(r, n_r, "x-", label=r"Density in trap $\eta$")

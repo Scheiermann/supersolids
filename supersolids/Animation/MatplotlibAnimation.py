@@ -172,7 +172,8 @@ class MatplotlibAnimation(Animation.Animation):
 
             V_pos = np.linspace(range_in_box[0],
                                 range_in_box[-1],
-                                System.Res.x)
+                                System.Res.x,
+                                endpoint=False)
             V_plot_val = System.V(V_pos)
 
         elif System.dim == 2:
@@ -185,10 +186,12 @@ class MatplotlibAnimation(Animation.Animation):
 
             x = np.linspace(range_in_box[:, 0].min(),
                             range_in_box[:, 0].max(),
-                            System.Res.x)
+                            System.Res.x,
+                            endpoint=False)
             y = np.linspace(range_in_box[:, 1].min(),
                             range_in_box[:, 1].max(),
-                            System.Res.y)
+                            System.Res.y,
+                            endpoint=False)
             _, _, V_pos = functions.get_meshgrid(x, y)
             V_plot_val = System.V(V_pos)
 
@@ -304,7 +307,7 @@ class MatplotlibAnimation(Animation.Animation):
                 # the boundary conditions. Essentially we just zoom.
                 psi_pos, psi_val = crop_pos_to_limits(self.ax,
                                                       System.pos,
-                                                      System.psi,
+                                                      System.psi_0,
                                                       func_val=System.psi_val)
                 psi_prob = np.abs(psi_val) ** 2.0
                 self.psi_line = self.ax.plot_surface(psi_pos[:, :, 0],
@@ -555,10 +558,12 @@ def get_V_plot_values(ax, pos, V, resolution: int, reserve: float = 1.0):
 
     x = np.linspace(range_in_box[:, 0].min(),
                     range_in_box[:, 0].max(),
-                    resolution)
+                    resolution,
+                    endpoint=False)
     y = np.linspace(range_in_box[:, 1].min(),
                     range_in_box[:, 1].max(),
-                    resolution)
+                    resolution,
+                    endpoint=False)
     _, _, V_pos = functions.get_meshgrid(x, y)
     V_plot_val = V(V_pos)
 
