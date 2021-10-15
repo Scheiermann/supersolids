@@ -123,7 +123,7 @@ class Schroedinger:
                  a_s: float = 85.0 * constants.a_0,
                  e_dd: float = 1.0,
                  imag_time: bool = True,
-                 mu: float = 1.1,
+                 mu_arr: np.ndarray = np.array([1.1]),
                  E: float = 1.0,
                  psi_0: Callable = functions.psi_gauss_3d,
                  psi_0_noise: np.ndarray = functions.noise_mesh,
@@ -174,11 +174,7 @@ class Schroedinger:
         self.e_dd: float = e_dd
         self.imag_time: bool = imag_time
 
-        assert self.Box.dim == self.Res.dim, (f"Dimension of Box ({self.Box.dim}) and "
-                                              f"Res ({self.Res.dim}) needs to be equal.")
-        self.dim: int = self.Box.dim
-
-        self.mu: float = mu
+        self.mu_arr: np.ndarray = mu_arr
         self.E: float = E
 
         self.psi_0: Callable = psi_0
@@ -813,23 +809,22 @@ class Schroedinger:
         psi_quadratic_int = self.get_norm(p=4.0)
         psi_quintic_int = self.get_norm(p=5.0)
 
-        self.mu = - np.log(psi_norm_after_evolution) / (2.0 * self.dt)
+        self.mu_arr = np.array([-np.log(psi_norm_after_evolution)
+                                / (2.0 * self.dt)])
 
         psi_val_k = np.fft.fftn(self.psi_val)
         psi_norm_k: float = self.get_norm(psi_val_k, fourier_space=True)
         psi_val_k = psi_val_k / np.sqrt(psi_norm_k)
         E_kin = self.get_norm(0.5 * self.k_squared * psi_val_k, fourier_space=True)
 
-        E_U_dd = (1 / np.sqrt(2.0 * np.pi) ** 3.0) * self.sum_dV(
-            self.V_k_val * np.abs(np.fft.fftn(psi_2)) ** 2.0, fourier_space=True)
-
         if self.V_interaction:
-            V_interaction_bit = 1.0
+            E_U_dd = (1 / np.sqrt(2.0 * np.pi) ** 3.0) * self.sum_dV(
+                self.V_k_val * np.abs(np.fft.fftn(psi_2)) ** 2.0, fourier_space=True)
         else:
-            V_interaction_bit = 0.0
+            E_U_dd = 0.0
 
-        self.E = (self.mu - 0.5 * self.g * psi_quadratic_int
-                  - 0.5 * E_U_dd * V_interaction_bit
+        self.E = (self.mu_arr - 0.5 * self.g * psi_quadratic_int
+                  - 0.5 * E_U_dd
                   - (3.0 / 5.0) * self.g_qf * psi_quintic_int)
 
     def use_summary(self, summary_name: Optional[str] = None):
@@ -886,7 +881,7 @@ class Schroedinger:
             dir_path.mkdir(parents=True)
 
         # Initialize mu_rel
-        mu_rel = self.mu
+        mu_rel = self.mu_arr
 
         if dir_name_result == "":
             _, last_index, dir_name, counting_format = get_path.get_path(dir_path)
@@ -928,7 +923,7 @@ class Schroedinger:
 
         frame_end = frame_start + self.max_timesteps
         for frame in range(frame_start, frame_end):
-            mu_old = self.mu
+            mu_old = np.copy(self.mu_arr)
             self.time_step()
 
             SystemSummary, summary_name = self.use_summary()
@@ -943,20 +938,20 @@ class Schroedinger:
             if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
                 self.save_psi_val(input_path, filename_steps, steps_format, frame)
 
-            print(f"t={self.t:07.05f}, mu_rel={mu_rel:+05.05e}, "
+            print(f"t={self.t:07.05f}, mu_rel={mu_rel}, "
                   f"processed={(frame - frame_start) / self.max_timesteps:05.03f}%")
 
-            mu_rel = np.abs((self.mu - mu_old) / self.mu)
+            mu_rel = np.abs((self.mu_arr - mu_old) / self.mu_arr)
 
             # Stop animation when accuracy is reached
-            if mu_rel < accuracy:
+            if np.all(np.where(mu_rel < accuracy, True, False)):
                 print(f"Accuracy reached: {mu_rel}")
                 break
 
-            elif np.isnan(mu_rel) and np.isnan(self.mu):
-                assert np.isnan(self.E), ("E should be nan, when mu is nan."
-                                          "Then the system is divergent.")
+            elif np.any(np.isnan(mu_rel) & np.isnan(self.mu_arr)):
                 print(f"Accuracy NOT reached! System diverged.")
+                assert np.any(np.isnan(self.E)), ("E should be nan, when mu is nan."
+                                                  "Then the system is divergent.")
                 break
 
             if frame == (self.max_timesteps - 1):
