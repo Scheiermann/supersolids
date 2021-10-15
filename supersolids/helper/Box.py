@@ -9,8 +9,10 @@
 Functions for Potential and initial wave function :math:`\psi_0`
 
 """
-
+import sys
 from typing import Optional, List
+
+import numpy as np
 
 
 class Box:
@@ -44,8 +46,18 @@ class Box:
         self.z0 = z0
         self.z1 = z1
 
-    def __str__(self) -> List[Optional[float]]:
+    def __str__(self) -> str:
         return str([self.x0, self.x1, self.y0, self.y1, self.z0, self.z1])
+
+    def to_array(self) -> np.ndarray:
+        return np.array([self.x0, self.x1, self.y0, self.y1, self.z0, self.z1])
+
+    def get_bounds_by_index(self, index):
+        box_arr = self.to_array()
+        if 0 <= index <= int(len(box_arr) / 2):
+            return box_arr[2 * index], box_arr[2 * index + 1]
+        else:
+            sys.exit(f"Box index is not possible: {index}")
 
     def lengths(self) -> List[float]:
         """
