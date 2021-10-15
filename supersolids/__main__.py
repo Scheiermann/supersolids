@@ -239,10 +239,9 @@ if __name__ == "__main__":
 
     Anim: Animation = Animation(
         Res=SchroedingerInput.Res,
-        plot_psi_sol=args.plot_psi_sol,
         plot_V=args.plot_V,
-        alpha_psi=0.8,
-        alpha_psi_sol=0.5,
+        alpha_psi_list=[],
+        alpha_psi_sol_list=[],
         alpha_V=0.3,
         camera_r_func=functools.partial(functions.camera_func_r,
                                         r_0=10.0, phi_0=45.0, z_0=50.0,
