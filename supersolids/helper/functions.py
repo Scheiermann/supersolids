@@ -569,14 +569,23 @@ def v_harmonic_3d(x, y, z, alpha_y: float = 1.0, alpha_z: float = 1.0):
 
 def get_r_cut(k_mesh: np.ndarray, r_cut: float = 1.0):
     kr_singular = k_mesh * r_cut
-    kr = np.where(kr_singular == 0.0, 10 ** -8, kr_singular)
 
-    r_cut = (1.0
-             + (3.0 / kr ** 2.0) * np.cos(kr)
-             - (3.0 / kr ** 3.0) * np.sin(kr)
-             )
+    # remove known singularity at [0, 0, 0], for calculation
+    if kr_singular[0, 0, 0] == 0.0:
+        kr_singular[0, 0, 0] = 1.0
+    else:
+        print(f"WARNING: kr_singular[0, 0, 0] = {kr_singular[0, 0, 0]}, but expected 0.")
 
-    return r_cut
+    # FFT of a symmetric box-function
+    r_cut_mesh = (1.0
+                  + (3.0 / kr_singular ** 2.0) * np.cos(kr_singular)
+                  - (3.0 / kr_singular ** 3.0) * np.sin(kr_singular))
+
+    # set known value at [0, 0, 0]
+    if r_cut_mesh[0, 0, 0]:
+        r_cut_mesh[0, 0, 0] = 0.0
+
+    return r_cut_mesh
 
 
 def dipol_dipol_interaction(kx_mesh: float,
@@ -590,14 +599,12 @@ def dipol_dipol_interaction(kx_mesh: float,
     k_squared_singular_free = np.where(k_squared == 0.0, 1.0, k_squared)
 
     k_mesh: np.ndarray = np.sqrt(k_squared)
-    r_cut: np.ndarray = get_r_cut(k_mesh, r_cut=r_cut)
+    r_cut_mesh: np.ndarray = get_r_cut(k_mesh, r_cut=r_cut)
 
-    r_cut[np.isnan(r_cut)] = 0.0
-
-    V_k_val = r_cut * ((factor / k_squared_singular_free) - 1.0)
+    V_k_val = r_cut_mesh * ((factor / k_squared_singular_free) - 1.0)
 
     # Remove singularities (at this point there should not be any)
-    V_k_val[np.isnan(V_k_val)] = 0.0
+    # V_k_val[np.isnan(V_k_val)] = 0.0
 
     return V_k_val
 
