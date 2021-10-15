@@ -209,57 +209,18 @@ class Schroedinger:
                 self.mu_sol: Callable = mu_sol(self.g)
             else:
                 self.mu_sol = mu_sol
-        try:
-            box_x_len = (self.Box.x1 - self.Box.x0)
-            self.x: np.ndarray = np.linspace(self.Box.x0, self.Box.x1, self.Res.x)
-            self.dx: float = box_x_len / float(self.Res.x - 1)
-            self.dkx: float = 2.0 * np.pi / box_x_len
-            self.kx: np.ndarray = np.fft.fftfreq(self.Res.x, d=1.0 / (self.dkx * self.Res.x))
 
-        except KeyError:
-            sys.exit(
-                f"Keys x0, x1 of box needed, "
-                f"but it has the keys: {self.Box.keys()}, "
-                f"Key x of res needed, "
-                f"but it has the keys: {self.Res.keys()}")
+        self.x, self.dx, self.kx, self.dkx = functions.get_grid_helper(self.Res, self.Box, 0)
+        if self.dim >= 2:
+            self.y, self.dy, self.ky, self.dky = functions.get_grid_helper(self.Res, self.Box, 1)
+        if self.dim >= 3:
+            self.z, self.dz, self.kz, self.dkz = functions.get_grid_helper(self.Res, self.Box, 2)
 
         if imag_time:
             # Convention: $e^{-iH} = e^{UH}$
             self.U: complex = -1.0
         else:
             self.U = -1.0j
-
-        # Add attributes as soon as they are needed (e.g. for dimension 3, all
-        # besides the error are needed)
-        if self.dim >= 2:
-            try:
-                box_y_len = self.Box.y1 - self.Box.y0
-                self.y: np.ndarray = np.linspace(self.Box.y0, self.Box.y1, self.Res.y)
-                self.dy: float = box_y_len / float(self.Res.y - 1)
-                self.dky: float = 2.0 * np.pi / box_y_len
-                self.ky: np.ndarray = np.fft.fftfreq(self.Res.y, d=1.0 / (self.dky * self.Res.y))
-
-            except KeyError:
-                sys.exit(
-                    f"Keys y0, y1 of box needed, "
-                    f"but it has the keys: {self.Box.keys()}, "
-                    f"Key y of res needed, "
-                    f"but it has the keys: {self.Res.keys()}")
-
-        if self.dim >= 3:
-            try:
-                box_z_len = MyBox.z1 - MyBox.z0
-                self.z: np.ndarray = np.linspace(self.Box.z0, self.Box.z1, self.Res.z)
-                self.dz: float = box_z_len / float(self.Res.z - 1)
-                self.dkz: float = 2.0 * np.pi / box_z_len
-                self.kz: np.ndarray = np.fft.fftfreq(self.Res.z, d=1.0 / (self.dkz * self.Res.z))
-
-            except KeyError:
-                sys.exit(f"Keys z0, z1 of box needed, but it has the keys: {self.Box.keys()}, "
-                         f"Key z of res needed, but it has the keys: {self.Res.keys()}")
-
-        if self.dim > 3:
-            sys.exit("Spatial dimension over 3. This is not implemented.")
 
         if self.dim == 1:
             if psi_0_noise is None:
@@ -278,7 +239,6 @@ class Schroedinger:
                 self.psi_sol_val: np.ndarray = self.psi_sol(self.x)
 
             self.k_squared: np.ndarray = self.kx ** 2.0
-            self.H_kin: np.ndarray = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 
             if V_interaction is None:
                 # For no interaction the identity is needed with respect to 2D
@@ -310,9 +270,6 @@ class Schroedinger:
 
             kx_mesh, ky_mesh, _ = functions.get_meshgrid(self.kx, self.ky)
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0
-            # here a number (U) is multiplied elementwise with an (1D, 2D or
-            # 3D) array (k_squared)
-            self.H_kin = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 
             if V_interaction is None:
                 # For no interaction the identity is needed with respect to 2D
@@ -322,21 +279,7 @@ class Schroedinger:
                 self.V_k_val = V_interaction(kx_mesh, ky_mesh, g=self.g)
 
         elif self.dim == 3:
-            try:
-                self.x_mesh, self.y_mesh, self.z_mesh = np.mgrid[
-                                                        self.Box.x0: self.Box.x1:
-                                                        complex(0, self.Res.x),
-                                                        self.Box.y0: self.Box.y1:
-                                                        complex(0, self.Res.y),
-                                                        self.Box.z0: self.Box.z1:
-                                                        complex(0, self.Res.z)
-                                                        ]
-            except KeyError:
-                sys.exit(
-                    f"Keys x0, x1, y0, y1, z0, z1 of box needed, "
-                    f"but it has the keys: {self.Box.keys()}, "
-                    f"Keys x, y, z of res needed, "
-                    f"but it has the keys: {self.Res.keys()}")
+            self.x_mesh, self.y_mesh, self.z_mesh = functions.get_grid(self.Res, self.Box)
 
             if psi_0_noise is None:
                 self.psi_val = self.psi_0(self.x_mesh, self.y_mesh, self.z_mesh)
