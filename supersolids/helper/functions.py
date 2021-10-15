@@ -11,92 +11,74 @@ Functions for Potential and initial wave function :math:`\psi_0`
 """
 
 import functools
+import itertools
+import sys
 
 import numpy as np
+from scipy.integrate import quad
+from scipy.special import jv
 from scipy import stats
 from typing import Tuple, Callable, Optional, List
 
 from supersolids.helper import constants
+from supersolids.helper.run_time import run_time
+from supersolids.helper.Box import Box
+from supersolids.helper.Resolution import Resolution
 
 
-class Resolution:
-    """
-    Specifies the resolution of the simulation in x, y, z directions (1D, 2D, 3D).
+def check_ResBox(Res: Resolution, MyBox: Box):
+    assert isinstance(Res, Resolution), f"Res: {type(Res)} is not type {type(Resolution)}"
+    assert isinstance(MyBox, Box), f"box: {type(MyBox)} is not type {type(Box)}"
+    assert MyBox.dim == Res.dim, (f"Dimension of Box ({MyBox.dim}) and "
+                                  f"Res ({Res.dim}) needs to be equal.")
 
-    """
+    if Res.dim > 3:
+        sys.exit("Spatial dimension over 3. This is not implemented.")
 
-    def __init__(self,
-                 x: float,
-                 y: Optional[float] = None,
-                 z: Optional[float] = None):
-        dim = 1
-        if y is not None:
-            dim = dim + 1
-        if z is not None:
-            dim = dim + 1
-
-        self.dim = dim
-        self.x = x
-        self.y = y
-        self.z = z
-
-    def __str__(self) -> List[Optional[float]]:
-        return str([self.x, self.y, self.z])
+    return Res, MyBox
 
 
-class Box:
-    """
-    Specifies the ranges in which the simulation is calculated (1D, 2D or 3D).
-    Needs to be given in pairs (x0, x1), (y0, y1), (z0, z1).
+def get_grid_helper(Res: Resolution, MyBox: Box, index: int):
+    try:
+        x0, x1 = MyBox.get_bounds_by_index(index)
+        res = Res.get_bounds_by_index(index)
+        box_len = x1 - x0
+        x: np.ndarray = np.linspace(x0, x1, res, endpoint=False)
+        dx: float = box_len / float(res - 1)
+        dkx: float = 2.0 * np.pi / box_len
+        kx: np.ndarray = np.fft.fftfreq(res, d=1.0 / (dkx * res))
 
-    """
+    except KeyError:
+        sys.exit(
+            f"Keys x0, x1 of box needed, "
+            f"but it has the keys: {MyBox.keys()}, "
+            f"Key x of res needed, "
+            f"but it has the keys: {Res.keys()}")
 
-    def __init__(self,
-                 x0: float, x1: float,
-                 y0: Optional[float] = None, y1: Optional[float] = None,
-                 z0: Optional[float] = None, z1: Optional[float] = None):
-        dim = 1
-        if (y0 is None) or (y1 is None):
-            assert (y0 is None) or (
-                        y1 is None) is None, "y0 and y1 needs to be given in combination."
-        else:
-            dim = dim + 1
-        if (z0 is None) or (z1 is None):
-            assert (z0 is None) or (
-                        z1 is None) is None, "z0 and z1 needs to be given in combination."
-        else:
-            dim = dim + 1
+    return x, dx, kx, dkx
 
-        self.dim = dim
-        self.x0: float = x0
-        self.x1: float = x1
-        self.y0 = y0
-        self.y1 = y1
-        self.z0 = z0
-        self.z1 = z1
 
-    def __str__(self) -> List[Optional[float]]:
-        return str([self.x0, self.x1, self.y0, self.y1, self.z0, self.z1])
+def get_grid(Res: Resolution, MyBox: Box):
+    x0, x1 = MyBox.get_bounds_by_index(0)
+    res_x = Res.get_bounds_by_index(0)
+    y0, y1 = MyBox.get_bounds_by_index(1)
+    res_y = Res.get_bounds_by_index(1)
+    z0, z1 = MyBox.get_bounds_by_index(2)
+    res_z = Res.get_bounds_by_index(2)
 
-    def lengths(self) -> List[float]:
-        """
-        Calculates the box lengths in the directions available in order [x, y, z]
+    try:
+        x_mesh, y_mesh, z_mesh = np.mgrid[x0: x1: complex(0, res_x),
+                                          y0: y1: complex(0, res_y),
+                                          z0: z1: complex(0, res_z)
+                                          ]
+    except KeyError:
+        sys.exit(
+            f"Keys x0, x1, y0, y1, z0, z1 of box needed, "
+            f"but it has the keys: {MyBox.keys()}, "
+            f"Keys x, y, z of res needed, "
+            f"but it has the keys: {Res.keys()}")
 
-        :return: List of the box length in the directions available in order [x, y, z]
-        """
-        if (self.y0 is None) and (self.z0 is None):
-            box_lengths = [(self.x1 - self.x0)]
-        elif self.z0 is None:
-            box_lengths = [(self.x1 - self.x0), (self.y1 - self.y0)]
-        else:
-            box_lengths = [(self.x1 - self.x0),
-                           (self.y1 - self.y0),
-                           (self.z1 - self.z0)]
-
-        return box_lengths
-
-    def min_length(self):
-        return min(self.lengths())
+    return x_mesh, y_mesh, z_mesh
 
 
 def BoxResAssert(Res, Box):
@@ -230,6 +212,7 @@ def psi_gauss_2d_pdf(pos, mu=np.array(
     z_mesh = rv.pdf(pos)
 
     return z_mesh
+
 
 def psi_gauss_2d(x, y,
                  a_x: float = 1.0, a_y: float = 1.0,
