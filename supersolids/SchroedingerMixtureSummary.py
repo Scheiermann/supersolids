@@ -10,14 +10,16 @@ Numerical solver for non-linear time-dependent Schrodinger equation.
 
 """
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, Optional, List
 
 import numpy as np
 
 from supersolids.SchroedingerSummary import SchroedingerSummary
+from supersolids.helper.Box import Box
+from supersolids.helper.Resolution import Resolution
 
 
-class SchroedingerMixtureSummary(SchroedingerSummary):
+class SchroedingerMixtureSummary:
     """
     Saves the properties of a Schroedinger system without the arrays,
     to save disk space when saving it with dill (pickle).
@@ -28,29 +30,53 @@ class SchroedingerMixtureSummary(SchroedingerSummary):
         Schrödinger equations for the specified system.
 
         """
-        super().__init__(SystemMixture)
+        self.name: str = SystemMixture.name
+        self.t: float = SystemMixture.t
+        self.Box: Box = SystemMixture.Box
+        self.Res: Resolution = SystemMixture.Res
+        self.max_timesteps: int = SystemMixture.max_timesteps
+        self.dt: float = SystemMixture.dt
+        self.dt_func: Optional[Callable] = SystemMixture.dt_func
+        self.N_list: List[float] = SystemMixture.N_list
+        self.m_list: List[float] = SystemMixture.m_list
+        self.g_array: np.ndarray = SystemMixture.a_s_array
+        self.U_dd_factor_array: np.ndarray = SystemMixture.a_dd_array
+        self.w_x: float = SystemMixture.w_x
+        self.w_y: float = SystemMixture.w_y
+        self.w_z: float = SystemMixture.w_z
+        self.imag_time: bool = SystemMixture.imag_time
+        self.dim: int = SystemMixture.dim
+        self.mu: float = SystemMixture.mu_arr
+        self.E: float = SystemMixture.E
+        self.V: Callable = SystemMixture.V
+        self.V_interaction: Callable = SystemMixture.V_interaction
+        self.psi_0_list: List[np.ndarray] = SystemMixture.psi_0_list
+        self.psi_sol_list: List[Optional[Callable]] = SystemMixture.psi_sol_list
+        self.mu_sol_list: List[Optional[Callable]] = SystemMixture.mu_sol_list
+        self.input_path: Path = SystemMixture.input_path
 
-        self.a_11_bohr = SystemMixture.a_11_bohr
-        self.a_12_bohr = SystemMixture.a_12_bohr
-        self.a_22_bohr = SystemMixture.a_22_bohr
-        self.N2 = SystemMixture.N2
-        self.m1 = SystemMixture.m1
-        self.m2 = SystemMixture.m2
-        self.mu_1 = SystemMixture.mu_1
-        self.mu_2 = SystemMixture.mu_2
-        self.psi2_0 = SystemMixture.psi2_0
-        self.psi2_0_noise = SystemMixture.psi2_0_noise
-        self.input_path = SystemMixture.input_path
-
-    def copy_to(self, System):
-        System.a_11_bohr: float = self.a_11_bohr
-        System.a_12_bohr: float = self.a_12_bohr
-        System.a_22_bohr: float = self.a_22_bohr
-        System.N2: float = self.N2
-        System.m1: float = self.m1
-        System.m2: float = self.m2
-        System.mu_1: float = self.mu_1
-        System.mu_2: float = self.mu_2
-        System.psi2_0: Callable = self.psi2_0
-        System.psi2_0_noise: np.ndarray = self.psi2_0_noise
-        System.input_path: Path = self.input_path
+    def copy_to(self, SystemMixture):
+        SystemMixture.name: str = self.name
+        SystemMixture.t: float = self.t
+        SystemMixture.Box: Box = self.Box
+        SystemMixture.Res: Resolution = self.Res
+        SystemMixture.max_timesteps: int = self.max_timesteps
+        SystemMixture.dt: float = self.dt
+        SystemMixture.dt_func: Optional[Callable] = self.dt_func
+        SystemMixture.N_list: List[float] = self.N_list
+        SystemMixture.m_list: List[float] = self.m_list
+        SystemMixture.a_s_array: np.ndarray = self.g_array
+        SystemMixture.a_dd_array: np.ndarray = self.U_dd_factor_array
+        SystemMixture.w_x: float = self.w_x
+        SystemMixture.w_y: float = self.w_y
+        SystemMixture.w_z: float = self.w_z
+        SystemMixture.imag_time: bool = self.imag_time
+        SystemMixture.dim: int = self.dim
+        SystemMixture.mu_arr: np.ndarray = self.mu_arr
+        SystemMixture.E: float = self.E
+        SystemMixture.V: Callable = self.V
+        SystemMixture.V_interaction: Callable = self.V_interaction
+        SystemMixture.psi_0_list: List[np.ndarray] = self.psi_0_list
+        SystemMixture.psi_sol_list: List[Optional[Callable]] = self.psi_sol_list
+        SystemMixture.mu_sol_list: List[Optional[Callable]] = self.mu_sol_list
+        SystemMixture.input_path: Path = self.input_path

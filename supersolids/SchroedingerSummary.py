@@ -12,7 +12,6 @@ Numerical solver for non-linear time-dependent Schrodinger equation.
 
 from typing import Callable, Optional
 
-# from supersolids.Schroedinger import Schroedinger
 from supersolids.helper.Box import Box
 from supersolids.helper.Resolution import Resolution
 
@@ -32,6 +31,7 @@ class SchroedingerSummary:
                                                     f"is not type {type(Resolution)}")
         assert isinstance(System.Box, Box), (f"box: {type(System.Box)} is not type {type(Box)}")
 
+        self.name: str = System.name
         self.t: float = System.t
         self.N: int = System.N
         self.Box: Box = System.Box
@@ -48,15 +48,16 @@ class SchroedingerSummary:
         self.e_dd: float = System.e_dd
         self.imag_time: bool = System.imag_time
         self.dim: int = System.dim
-        self.mu: float = System.mu
+        self.mu: float = System.mu_arr
         self.E: float = System.E
-        self.psi: Callable = System.psi
+        self.psi_0: Callable = System.psi_0
         self.V: Callable = System.V
         self.V_interaction: Callable = System.V_interaction
         self.psi_sol: Optional[Callable] = System.psi_sol
         self.mu_sol: Optional[Callable] = System.mu_sol
 
     def copy_to(self, System):
+        System.name: str = self.name
         System.t: float = self.t
         System.N: int = self.N
         System.Box: Box = self.Box
@@ -73,9 +74,9 @@ class SchroedingerSummary:
         System.e_dd: float = self.e_dd
         System.imag_time: bool = self.imag_time
         System.dim: int = self.dim
-        System.mu: float = self.mu
+        System.mu_arr: float = self.mu_arr
         System.E: float = self.E
-        System.psi: Callable = self.psi
+        System.psi_0: Callable = self.psi_0
         System.V: Callable = self.V
         System.V_interaction: Callable = self.V_interaction
         System.psi_sol: Optional[Callable] = self.psi_sol
