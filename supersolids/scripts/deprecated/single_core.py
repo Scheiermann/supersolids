@@ -125,8 +125,8 @@ if __name__ == "__main__":
     Anim: Animation = Animation(Res=System.Res,
                                 plot_psi_sol=False,
                                 plot_V=False,
-                                alpha_psi=0.8,
-                                alpha_psi_sol=0.5,
+                                alpha_psi_list=[0.8],
+                                alpha_psi_sol_list=[0.5],
                                 alpha_V=0.3,
                                 camera_r_func=functools.partial(
                                     functions.camera_func_r,

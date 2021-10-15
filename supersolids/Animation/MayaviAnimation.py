@@ -96,10 +96,9 @@ class MayaviAnimation(Animation.Animation):
 
         """
         super().__init__(Res=Anim.Res,
-                         plot_psi_sol=Anim.plot_psi_sol,
                          plot_V=Anim.plot_V,
-                         alpha_psi=Anim.alpha_psi,
-                         alpha_psi_sol=Anim.alpha_psi_sol,
+                         alpha_psi_list=Anim.alpha_psi_list,
+                         alpha_psi_sol_list=Anim.alpha_psi_sol_list,
                          alpha_V=Anim.alpha_V,
                          camera_r_func=Anim.camera_r_func,
                          camera_phi_func=Anim.camera_phi_func,
@@ -242,7 +241,7 @@ class MayaviAnimation(Animation.Animation):
                                               System.z_mesh,
                                               System.psi_sol_val,
                                               colormap="cool",
-                                              opacity=self.alpha_psi_sol,
+                                              opacity=self.alpha_psi_sol_list[0],
                                               transparent=True)
             else:
                 psi_sol_plot = None

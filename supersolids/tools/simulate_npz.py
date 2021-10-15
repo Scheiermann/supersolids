@@ -42,10 +42,9 @@ def simulate_npz(args):
     psi2_val_path = Path(input_path, args.filename2_npz)
 
     Anim: Animation = Animation(
-        plot_psi_sol=False,
         plot_V=False,
-        alpha_psi=0.8,
-        alpha_psi_sol=0.5,
+        alpha_psi_list=[0.8],
+        alpha_psi_sol_list=[0.5],
         alpha_V=0.3,
         filename="anim.mp4",
         )
