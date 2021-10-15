@@ -12,7 +12,7 @@ Numerical solver for non-linear time-dependent Schrodinger equation.
 
 import functools
 import sys
-from typing import Callable, Union, Optional
+from typing import Callable, Union, Optional, List
 from pathlib import Path
 
 import dill
@@ -25,6 +25,9 @@ from supersolids.SchroedingerSummary import SchroedingerSummary
 from supersolids.helper import constants, functions, get_path
 from supersolids.helper.Resolution import Resolution
 from supersolids.helper.Box import Box
+from supersolids.helper.get_path import get_step_index_from_list
+from supersolids.helper.load_script import reload_files
+from supersolids.helper.save_script import save_script
 
 
 def peaks_sort(peaks_indices, peaks_height, number_of_peaks):
@@ -123,11 +126,11 @@ class Schroedinger:
                  mu: float = 1.1,
                  E: float = 1.0,
                  psi_0: Callable = functions.psi_gauss_3d,
+                 psi_0_noise: np.ndarray = functions.noise_mesh,
                  V: Optional[Callable] = functions.v_harmonic_3d,
                  V_interaction: Optional[Callable] = None,
                  psi_sol: Optional[Callable] = functions.thomas_fermi_3d,
                  mu_sol: Optional[Callable] = functions.mu_3d,
-                 psi_0_noise: np.ndarray = functions.noise_mesh,
                  ) -> None:
         """
         Schrödinger equations for the specified system.
@@ -916,13 +919,22 @@ class Schroedinger:
     def simulate_raw(self,
                      accuracy: float = 10 ** -6,
                      dir_path: Path = Path.home().joinpath("supersolids", "results"),
+                     dir_name_load: str = "",
                      dir_name_result: str = "",
                      filename_schroedinger: str = "schroedinger.pkl",
                      filename_steps: str = "step_",
                      steps_format: str = "%07d",
                      steps_per_npz: int = 10,
                      frame_start: int = 0,
+                     script_name: str = "script",
+                     script_args: str = "",
+                     script_number_regex: str = '*',
+                     script_extensions: Optional[List[str]] = None,
+                     script_extensions_index: int = 0,
                      ):
+        if script_extensions is None:
+            script_extensions = [".pkl", ".txt"]
+            script_extensions_index = 0
 
         print(f"Accuracy goal: {accuracy}")
 
@@ -942,6 +954,30 @@ class Schroedinger:
         # Create a movie dir, if there is none
         if not input_path.is_dir():
             input_path.mkdir(parents=True)
+
+        # per default index 0 takes list with pkl
+        script_list = reload_files(
+            dir_path, dir_name_load, input_path, script_name,
+            script_number_regex=script_number_regex,
+            script_extensions=script_extensions
+            )[script_extensions_index]
+
+        script_count_old = get_step_index_from_list(
+            script_list,
+            filename_prefix=script_name+"_",
+            file_pattern=script_extensions[script_extensions_index]
+            )
+
+        # per default index 0 takes list with pkl
+        filename_schroedinger_prefix = filename_schroedinger.split(".")[0]
+        schroedinger_list = reload_files(
+            dir_path, dir_name_load, input_path, filename_schroedinger_prefix,
+            script_number_regex="*",
+            script_extensions=script_extensions
+            )[script_extensions_index]
+
+        save_script(script_count_old, input_path, script_name, script_args, txt_version=True)
+        save_script(script_count_old, input_path, filename_schroedinger_prefix, self)
 
         # save used Schroedinger
         with open(Path(input_path, filename_schroedinger), "wb") as f:

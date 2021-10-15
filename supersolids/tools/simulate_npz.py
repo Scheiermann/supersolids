@@ -15,7 +15,7 @@ import functools
 import json
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Callable
 
 import dill
 import numpy as np
@@ -31,7 +31,6 @@ from supersolids.helper.Box import Box
 
 
 def simulate_npz(args):
-
     try:
         dir_path = Path(args.dir_path).expanduser()
     except Exception:
@@ -61,9 +60,15 @@ def simulate_npz(args):
 
         print(f"File at {schroedinger_path} loaded.")
         try:
-            # get the psi_val of Schroedinger at other timesteps (t!=0)
-            with open(psi_val_path, "rb") as f:
-                System_loaded.psi_val = np.load(file=f)["psi_val"]
+            if not args.load_script:
+                if isinstance(System_loaded, SchroedingerMixture):
+                    # get the psi_val of Schroedinger at other timesteps (t!=0)
+                    with open(psi_val_path, "rb") as f:
+                        System_loaded.psi_val_list = np.load(file=f)["psi_val_list"]
+                else:
+                    # get the psi_val of Schroedinger at other timesteps (t!=0)
+                    with open(psi_val_path, "rb") as f:
+                        System_loaded.psi_val = np.load(file=f)["psi_val"]
 
             if isinstance(System_loaded, SchroedingerMixture):
                 with open(psi2_val_path, "rb") as f:
@@ -349,6 +354,7 @@ def simulate_npz(args):
                 accuracy=args.accuracy,
                 delete_input=True,
                 dir_path=dir_path,
+                dir_name_load=args.dir_name_load,
                 dir_name_result=args.dir_name_result,
                 slice_indices=[0, 0, 0],
                 offscreen=args.offscreen,
@@ -359,6 +365,8 @@ def simulate_npz(args):
                 steps_format=args.steps_format,
                 steps_per_npz=args.steps_per_npz,
                 frame_start=frame,
+                script_name=args.script_name,
+                script_args=args,
                 )
 
         except FileNotFoundError:
@@ -402,6 +410,8 @@ def flags(args_array):
     parser.add_argument("-dir_name_result", type=str, default="",
                         help="Name of directory where to save the results at. "
                              "For example the standard naming convention is movie002")
+    parser.add_argument("-script_name", type=str, default="script",
+                        help="Name of file, where to save args of the running simulate_npz")
     parser.add_argument("-filename_schroedinger", type=str, default="schroedinger.pkl",
                         help="Name of file, where the Schroedinger object is saved")
     parser.add_argument("-summary_name", type=Optional[str], default=None,
@@ -429,6 +439,50 @@ def flags(args_array):
                              "plus the lambda function provided by the V flag.")
     parser.add_argument("--real_time", default=False, action="store_true",
                         help="Switch for Split-Operator method to use imaginary time or not.")
+    parser.add_argument("-load_script", type=str, default="script_0001.pkl",
+                        help="Load system to simulate and namespace (configuration for experiment) "
+                             "from pkl-files.")
+
+    args = parser.parse_args(args_array)
+    print(f"args: {args}")
+
+    return args
+
+
+def flags_script(args_array):
+    parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
+                                                 "and continue simulation from there.")
+    parser.add_argument("-neighborhood", type=json.loads, action='store', nargs=2,
+                        help="Arguments for function get_peak_neighborhood: "
+                             "prob_min, number_of_peaks")
+    parser.add_argument("-w", metavar="Trap frequency", type=json.loads, default=None,
+                        help="Frequency of harmonic trap in x, y, z direction. If None, "
+                             "frequency of the loaded System from the npz is taken.")
+    parser.add_argument("-noise", type=json.loads, default=None, action='store',
+                        nargs=2, help="Min and max of gauss noise to apply on psi.")
+    parser.add_argument("--noise_func", type=functions.lambda_parsed, nargs="+",
+                        default=[None], help="Function to apply on the range given by noise flag.")
+    parser.add_argument("-filename_npz", type=str, default="step_" + "%07d" % 0 + ".npz",
+                        help="Name of file, where psi_val is saved. "
+                             "For example the standard naming convention is step_000001.npz")
+    parser.add_argument("-filename2_npz", type=str, default="2-step_" + "%07d" % 0 + ".npz",
+                        help="Name of file, where psi2_val is saved. "
+                             "For example the standard naming convention is 2-step_000001.npz")
+    parser.add_argument("-dir_path", type=str, default="~/supersolids/results",
+                        help="Absolute path to save data to")
+    parser.add_argument("-dir_name_load", type=str, default="movie" + "%03d" % 1,
+                        help="Name of directory where the files to load lie. "
+                             "For example the standard naming convention is movie001")
+    parser.add_argument("-dir_name_result", type=str, default="",
+                        help="Name of directory where to save the results at. "
+                             "For example the standard naming convention is movie002")
+    parser.add_argument("-summary_name", type=Optional[str], default=None,
+                        help="Filename prefix of Summary for example SchroedingerMixtureSummary_")
+    parser.add_argument("-filename_schroedinger", type=str, default="schroedinger.pkl",
+                        help="Name of file, where the Schroedinger object is saved")
+    parser.add_argument("-load_script", type=str, default="script_0001.pkl",
+                        help="Load system to simulate and namespace (configuration for experiment) "
+                             "from pkl-files.")
 
     args = parser.parse_args(args_array)
     print(f"args: {args}")
@@ -439,4 +493,30 @@ def flags(args_array):
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     args = flags(sys.argv[1:])
+    if args.load_script:
+        args_overwrite = flags_script(sys.argv[1:])
+        try:
+            dir_path = Path(args_overwrite.dir_path).expanduser()
+        except Exception:
+            dir_path = args_overwrite.dir_path
+
+        input_path = Path(dir_path, args_overwrite.dir_name_load)
+
+        with open(Path(input_path, args_overwrite.load_script), "rb") as f:
+            args_loaded = dill.load(file=f)
+
+        args_loaded.load_script = args_overwrite.load_script
+        args_loaded.dir_path = args_overwrite.dir_path
+        args_loaded.dir_name_load = args_overwrite.dir_name_load
+        args_loaded.dir_name_result = args_overwrite.dir_name_result
+        args_loaded.filename_schroedinger = args_overwrite.filename_schroedinger
+        args_loaded.filename_npz = args_overwrite.filename_npz
+        args_loaded.filename2_npz = args_overwrite.filename2_npz
+        args_loaded.summary_name = args_overwrite.summary_name
+        args_loaded.w = args_overwrite.w
+        args_loaded.noise = args_overwrite.noise
+        args_loaded.noise_func = args_overwrite.noise_func
+        args_loaded.neighborhood = args_overwrite.neighborhood
+        args = args_loaded
+
     simulate_npz(args)

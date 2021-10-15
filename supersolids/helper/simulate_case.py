@@ -12,7 +12,7 @@ time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 """
 
 from pathlib import Path
-from typing import Tuple
+from typing import Optional, Tuple, List
 
 import numpy as np
 from mayavi import mlab
@@ -28,6 +28,7 @@ def simulate_case(System: Schroedinger,
                   accuracy: float = 10 ** -6,
                   delete_input: bool = True,
                   dir_path: Path = Path.home().joinpath("supersolids", "results"),
+                  dir_name_load: str = "",
                   dir_name_result: str = "",
                   slice_indices: np.ndarray = [0, 0, 0],
                   offscreen: bool = False,
@@ -39,6 +40,11 @@ def simulate_case(System: Schroedinger,
                   steps_format: str = "%07d",
                   steps_per_npz: int = 10,
                   frame_start: int = 0,
+                  script_name: str = "script",
+                  script_args: str = "",
+                  script_number_regex: str = '*',
+                  script_extensions: Optional[List[str]] = None,
+                  script_extensions_index: int = 0,
                   ) -> Schroedinger:
     """
     Wrapper for Animation and Schroedinger to get a working Animation
@@ -89,6 +95,8 @@ def simulate_case(System: Schroedinger,
     :param frame_start: Number of named file, where psi_val is loaded from. For example
         the standard naming convention is step_000001.npz
 
+    :param script_name: Name of file, where to save args of the running simulate_npz.
+
     :return: Reference to Schroedinger System
 
     """
@@ -138,11 +146,17 @@ def simulate_case(System: Schroedinger,
         else:
             System.simulate_raw(accuracy=accuracy,
                                 dir_path=dir_path,
+                                dir_name_load=dir_name_load,
                                 dir_name_result=dir_name_result,
                                 filename_schroedinger=filename_schroedinger,
                                 filename_steps=filename_steps,
                                 steps_format=steps_format,
                                 steps_per_npz=steps_per_npz,
                                 frame_start=frame_start,
+                                script_name=script_name,
+                                script_args=script_args,
+                                script_number_regex=script_number_regex,
+                                script_extensions=script_extensions,
+                                script_extensions_index=script_extensions_index,
                                 )
         return System
