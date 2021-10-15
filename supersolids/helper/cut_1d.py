@@ -117,7 +117,8 @@ def prepare_cuts(func: Callable, N: int, alpha_z: float,
     psi_sol_3d = functools.partial(func, R_r=R_r, R_z=R_z)
     print(f"kappa: {kappa}, R_r: {R_r}, R_z: {R_z}")
 
-    if not (np.isnan(R_r) or np.isnan(R_z)):
-        return psi_sol_3d
-    else:
+    if R_r == 0.0 or R_z == 0.0 or np.isnan(R_r) or np.isnan(R_z):
+        print(f"WARNING: R_r: {R_r}, R_z: {R_z}, but cannot be 0 or nan. Setting psi_sol=None.")
         return None
+    else:
+        return psi_sol_3d
