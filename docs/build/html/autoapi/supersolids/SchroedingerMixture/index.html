@@ -1,73 +1,33 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>supersolids.SchroedingerMixture &mdash; supersolids 0.1.26 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../index.html" class="icon icon-home"> supersolids
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -75,18 +35,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../README.html">Supersolids</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
@@ -94,78 +43,37 @@
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">API Reference</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">supersolids</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.SchroedingerMixture</span></code></li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../../../_sources/autoapi/supersolids/SchroedingerMixture/index.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <div class="section" id="module-supersolids.SchroedingerMixture">
-<span id="supersolids-schroedingermixture"></span><h1><a class="reference internal" href="#module-supersolids.SchroedingerMixture" title="supersolids.SchroedingerMixture"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.SchroedingerMixture</span></code></a><a class="headerlink" href="#module-supersolids.SchroedingerMixture" title="Permalink to this headline">¶</a></h1>
+<span id="supersolids-schroedingermixture"></span><h1><a class="reference internal" href="#module-supersolids.SchroedingerMixture" title="supersolids.SchroedingerMixture"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.SchroedingerMixture</span></code></a><a class="headerlink" href="#module-supersolids.SchroedingerMixture" title="Permalink to this headline"></a></h1>
 <p>Numerical solver for non-linear time-dependent Schrodinger equation (eGPE) for dipolar mixtures.</p>
 <div class="section" id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
 <div class="section" id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline"></a></h3>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -179,7 +87,7 @@
 </table>
 <dl class="py class">
 <dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">supersolids.SchroedingerMixture.</span></span><span class="sig-name descname"><span class="pre">SchroedingerMixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_11_bohr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">95.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_12_bohr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">95.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_22_bohr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">95.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9.93</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9.93</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_0_noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">functions.noise_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi2_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">functions.psi_gauss_3d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi2_0_noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">functions.noise_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_sol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">functions.mu_3d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Path('~/supersolids/results').expanduser()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">supersolids.SchroedingerMixture.</span></span><span class="sig-name descname"><span class="pre">SchroedingerMixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MyBox</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_timesteps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.0</span> <span class="pre">*</span> <span class="pre">np.pi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nA_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">33.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">80.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">167.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imag_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_arr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">functions.v_harmonic_3d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V_interaction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_0_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[functions.psi_gauss_3d]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_0_noise_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[functions.noise_mesh]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_sol_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[functions.thomas_fermi_3d]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_sol_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[functions.mu_3d]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Path('~/supersolids/results').expanduser()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="../Schroedinger/index.html#supersolids.Schroedinger.Schroedinger" title="supersolids.Schroedinger.Schroedinger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">supersolids.Schroedinger.Schroedinger</span></code></a></p>
 <p>Implements a numerical solution of the dimensionless time-dependent
 non-linear Schroedinger equation for an arbitrary potential:</p>
@@ -202,31 +110,118 @@ and the dipolar scale of energy <span class="math notranslate nohighlight">\(\ep
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>System</strong> (<a class="reference internal" href="../Schroedinger/index.html#supersolids.Schroedinger.Schroedinger" title="supersolids.Schroedinger.Schroedinger"><em>supersolids.Schroedinger.Schroedinger</em></a>) – </p></li>
-<li><p><strong>a_11_bohr</strong> (<em>float</em>) – </p></li>
-<li><p><strong>a_12_bohr</strong> (<em>float</em>) – </p></li>
-<li><p><strong>a_22_bohr</strong> (<em>float</em>) – </p></li>
-<li><p><strong>N2</strong> (<em>float</em>) – </p></li>
-<li><p><strong>m1</strong> (<em>float</em>) – </p></li>
-<li><p><strong>m2</strong> (<em>float</em>) – </p></li>
-<li><p><strong>mu_1</strong> (<em>float</em>) – </p></li>
-<li><p><strong>mu_2</strong> (<em>float</em>) – </p></li>
-<li><p><strong>psi_0_noise</strong> (<em>numpy.ndarray</em>) – </p></li>
-<li><p><strong>psi2_0</strong> (<em>Callable</em>) – </p></li>
-<li><p><strong>psi2_0_noise</strong> (<em>numpy.ndarray</em>) – </p></li>
-<li><p><strong>mu_sol</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>]</em>) – </p></li>
+<li><p><strong>MyBox</strong> (<a class="reference internal" href="../helper/Box/index.html#supersolids.helper.Box.Box" title="supersolids.helper.Box.Box"><em>supersolids.helper.Box.Box</em></a>) – </p></li>
+<li><p><strong>Res</strong> (<a class="reference internal" href="../helper/Resolution/index.html#supersolids.helper.Resolution.Resolution" title="supersolids.helper.Resolution.Resolution"><em>supersolids.helper.Resolution.Resolution</em></a>) – </p></li>
+<li><p><strong>max_timesteps</strong> (<em>int</em>) – </p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – </p></li>
+<li><p><strong>N_list</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – </p></li>
+<li><p><strong>m_list</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – </p></li>
+<li><p><strong>a_s_array</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>a_dd_array</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>a_s_factor</strong> (<em>float</em>) – </p></li>
+<li><p><strong>a_dd_factor</strong> (<em>float</em>) – </p></li>
+<li><p><strong>nA_max</strong> (<em>int</em>) – </p></li>
+<li><p><strong>dt_func</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>]</em>) – </p></li>
+<li><p><strong>w_x</strong> (<em>float</em>) – </p></li>
+<li><p><strong>w_y</strong> (<em>float</em>) – </p></li>
+<li><p><strong>w_z</strong> (<em>float</em>) – </p></li>
+<li><p><strong>imag_time</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>mu_arr</strong> (<em>Optional</em><em>[</em><em>numpy.ndarray</em><em>]</em>) – </p></li>
+<li><p><strong>E</strong> (<em>float</em>) – </p></li>
+<li><p><strong>V</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>]</em>) – </p></li>
+<li><p><strong>V_interaction</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>]</em>) – </p></li>
+<li><p><strong>psi_0_list</strong> (<em>List</em><em>[</em><em>numpy.ndarray</em><em>]</em>) – </p></li>
+<li><p><strong>psi_0_noise_list</strong> (<em>List</em><em>[</em><em>Optional</em><em>[</em><em>Callable</em><em>]</em><em>]</em>) – </p></li>
+<li><p><strong>psi_sol_list</strong> (<em>List</em><em>[</em><em>Optional</em><em>[</em><em>Callable</em><em>]</em><em>]</em>) – </p></li>
+<li><p><strong>mu_sol_list</strong> (<em>List</em><em>[</em><em>Optional</em><em>[</em><em>Callable</em><em>]</em><em>]</em>) – </p></li>
 <li><p><strong>input_path</strong> (<em>pathlib.Path</em>) – </p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.mixture_variables">
-<span class="sig-name descname"><span class="pre">mixture_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.mixture_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.mixture_variables" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.func_energy">
+<span class="sig-name descname"><span class="pre">func_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.func_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.func_energy" title="Permalink to this definition"></a></dt>
+<dd><p>(V_+)**5/2 + (<a href="#id1"><span class="problematic" id="id2">V_</span></a>-)**5/2</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.func_f_symb">
+<span class="sig-name descname"><span class="pre">func_f_symb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.func_f_symb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.func_f_symb" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>func</strong> (<em>Callable</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.mu_lhy_list">
+<span class="sig-name descname"><span class="pre">mu_lhy_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.mu_lhy_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.mu_lhy_list" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>func_list</strong> (<em>List</em><em>[</em><em>Callable</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.func_f">
+<span class="sig-name descname"><span class="pre">func_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_dVdn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.func_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.func_f" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>eta_dVdn</strong> (<em>Callable</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.eta_V">
+<span class="sig-name descname"><span class="pre">eta_V</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_aa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_bb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_ab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.eta_V"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.eta_V" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.eta_dVdna">
+<span class="sig-name descname"><span class="pre">eta_dVdna</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_aa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_bb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_ab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.eta_dVdna"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.eta_dVdna" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.eta_dVdnb">
+<span class="sig-name descname"><span class="pre">eta_dVdnb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_aa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_bb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_ab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.eta_dVdnb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.eta_dVdnb" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.get_mu_lhy_list">
+<span class="sig-name descname"><span class="pre">get_mu_lhy_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.get_mu_lhy_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.get_mu_lhy_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.get_energy_lhy">
+<span class="sig-name descname"><span class="pre">get_energy_lhy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.get_energy_lhy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.get_energy_lhy" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.get_A_density_total">
+<span class="sig-name descname"><span class="pre">get_A_density_total</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.get_A_density_total"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.get_A_density_total" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.get_r_0">
+<span class="sig-name descname"><span class="pre">get_r_0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_DEFAULT</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9.93</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.get_r_0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.get_r_0" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mu_DEFAULT</strong> (<em>float</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.save_psi_val">
+<span class="sig-name descname"><span class="pre">save_psi_val</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.save_psi_val"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.save_psi_val" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.use_summary">
-<span class="sig-name descname"><span class="pre">use_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.use_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.use_summary" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">use_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.use_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.use_summary" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>summary_name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p>
@@ -236,7 +231,7 @@ and the dipolar scale of energy <span class="math notranslate nohighlight">\(\ep
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.load_summary">
-<span class="sig-name descname"><span class="pre">load_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.load_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.load_summary" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">load_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SchroedingerMixtureSummary_'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.load_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.load_summary" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>summary_name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p>
@@ -245,40 +240,108 @@ and the dipolar scale of energy <span class="math notranslate nohighlight">\(\ep
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.dEps_dPsi">
-<span class="sig-name descname"><span class="pre">dEps_dPsi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_dd1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_dd2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.dEps_dPsi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.dEps_dPsi" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.array_to_tensor_grid">
+<span class="sig-name descname"><span class="pre">array_to_tensor_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.array_to_tensor_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.array_to_tensor_grid" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arr</strong> (<em>numpy.ndarray</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.tensor_grid_mult">
+<span class="sig-name descname"><span class="pre">tensor_grid_mult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_vec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.tensor_grid_mult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.tensor_grid_mult" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.arr_tensor_mult">
+<span class="sig-name descname"><span class="pre">arr_tensor_mult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_vec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.arr_tensor_mult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.arr_tensor_mult" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.load_mu">
-<span class="sig-name descname"><span class="pre">load_mu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_mu_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interpolator_mu_a.pkl'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_mu_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interpolator_mu_b.pkl'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.load_mu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.load_mu" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">load_mu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_mu_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interpolator_mu_a.pkl'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_mu_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interpolator_mu_b.pkl'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.load_mu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.load_mu" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.load_lhy">
-<span class="sig-name descname"><span class="pre">load_lhy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_lhy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interpolator_lhy_energy.pkl'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.load_lhy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.load_lhy" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">load_lhy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_lhy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interpolator_lhy_energy.pkl'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.load_lhy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.load_lhy" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.energy_density_interaction">
-<span class="sig-name descname"><span class="pre">energy_density_interaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_dd1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_dd2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.energy_density_interaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.energy_density_interaction" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">energy_density_interaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_dd_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.energy_density_interaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.energy_density_interaction" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.energy">
-<span class="sig-name descname"><span class="pre">energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_dd1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_dd2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.energy" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_dd_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_lhy_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.energy" title="Permalink to this definition"></a></dt>
 <dd><p>Input psi_1, psi_2 need to be normalized.
 density1 and density2 need to be build by the normalized psi_1, psi_2.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.save_psi_val">
-<span class="sig-name descname"><span class="pre">save_psi_val</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.save_psi_val"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.save_psi_val" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">save_psi_val</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.save_psi_val"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.get_density_list">
+<span class="sig-name descname"><span class="pre">get_density_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.get_density_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.get_density_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.get_U_dd_list">
+<span class="sig-name descname"><span class="pre">get_U_dd_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.get_U_dd_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.get_U_dd_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.get_H_pot_exponent_terms">
+<span class="sig-name descname"><span class="pre">get_H_pot_exponent_terms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dipol_term</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_interaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_lhy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.get_H_pot_exponent_terms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.get_H_pot_exponent_terms" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.get_H_pot">
+<span class="sig-name descname"><span class="pre">get_H_pot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.get_H_pot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.get_H_pot" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>split_step</strong> (<em>float</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.split_operator_pot">
+<span class="sig-name descname"><span class="pre">split_operator_pot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.split_operator_pot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.split_operator_pot" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>split_step</strong> (<em>float</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>(List[numpy.ndarray], List[numpy.ndarray])</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.split_operator_kin">
+<span class="sig-name descname"><span class="pre">split_operator_kin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.split_operator_kin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.split_operator_kin" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.normalize_psi_val">
+<span class="sig-name descname"><span class="pre">normalize_psi_val</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.normalize_psi_val"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.normalize_psi_val" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="supersolids.SchroedingerMixture.SchroedingerMixture.time_step">
-<span class="sig-name descname"><span class="pre">time_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.time_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.time_step" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">time_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/supersolids/SchroedingerMixture.html#SchroedingerMixture.time_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.SchroedingerMixture.SchroedingerMixture.time_step" title="Permalink to this definition"></a></dt>
 <dd><p>Evolves System according Schrödinger Equations by using the
 split operator method with the Trotter-Suzuki approximation.</p>
 <dl class="field-list simple">
@@ -296,46 +359,30 @@ split operator method with the Trotter-Suzuki approximation.</p>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Daniel Scheiermann.
-
-    </p>
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -17,7 +17,7 @@ def dic2str(dic):
     return dic_str_single_quote_wrapped
 
 
-supersolids_version = "0.1.33rc10"
+supersolids_version = "0.1.34rc7"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/")
 # dir_path = Path("/home/dsche/supersolids/results/")
 
@@ -176,7 +176,7 @@ for i, v_0 in enumerate(np.arange(v_start, v_end, v_step)):
         func = func_list[j_counter]
         func_path = func_path_list[j_counter]
         dir_path_func = dir_path_func_list[j_counter]
-        if func_path.is_dir():
+        if func_path.is_file():
             print(f"File {func_path} already exists!")
         else:
             if not dir_path_func.is_dir():

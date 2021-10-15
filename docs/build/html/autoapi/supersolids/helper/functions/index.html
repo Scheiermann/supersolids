@@ -1,73 +1,33 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>supersolids.helper.functions &mdash; supersolids 0.1.26 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
-    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../../index.html" class="icon icon-home"> supersolids
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -75,18 +35,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../README.html">Supersolids</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../CONTRIBUTING.html">Contributing</a></li>
@@ -94,120 +43,92 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">supersolids</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.functions</span></code></li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../../../../_sources/autoapi/supersolids/helper/functions/index.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <div class="section" id="module-supersolids.helper.functions">
-<span id="supersolids-helper-functions"></span><h1><a class="reference internal" href="#module-supersolids.helper.functions" title="supersolids.helper.functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.functions</span></code></a><a class="headerlink" href="#module-supersolids.helper.functions" title="Permalink to this headline">¶</a></h1>
+<span id="supersolids-helper-functions"></span><h1><a class="reference internal" href="#module-supersolids.helper.functions" title="supersolids.helper.functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.functions</span></code></a><a class="headerlink" href="#module-supersolids.helper.functions" title="Permalink to this headline"></a></h1>
 <p>Functions for Potential and initial wave function <span class="math notranslate nohighlight">\(\psi_0\)</span></p>
 <div class="section" id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.Resolution" title="supersolids.helper.functions.Resolution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Resolution</span></code></a></p></td>
-<td><p>Specifies the resolution of the simulation in x, y, z directions (1D, 2D, 3D).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.Box" title="supersolids.helper.functions.Box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Box</span></code></a></p></td>
-<td><p>Specifies the ranges in which the simulation is calculated (1D, 2D or 3D).</p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
 <div class="section" id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h3>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.BoxResAssert" title="supersolids.helper.functions.BoxResAssert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxResAssert</span></code></a>(Res, Box)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.check_ResBox" title="supersolids.helper.functions.check_ResBox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_ResBox</span></code></a>(Res, MyBox)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.aResAssert" title="supersolids.helper.functions.aResAssert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aResAssert</span></code></a>(Res, a)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_grid_helper" title="supersolids.helper.functions.get_grid_helper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_grid_helper</span></code></a>(Res, MyBox, index)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.lambda_parsed" title="supersolids.helper.functions.lambda_parsed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lambda_parsed</span></code></a>(s)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_grid" title="supersolids.helper.functions.get_grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_grid</span></code></a>(Res, MyBox)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.identity" title="supersolids.helper.functions.identity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">identity</span></code></a>(*args)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.BoxResAssert" title="supersolids.helper.functions.BoxResAssert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxResAssert</span></code></a>(Res, Box)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.fft_plot" title="supersolids.helper.functions.fft_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fft_plot</span></code></a>(t, property_all)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.aResAssert" title="supersolids.helper.functions.aResAssert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aResAssert</span></code></a>(Res, a)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_meshgrid" title="supersolids.helper.functions.get_meshgrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_meshgrid</span></code></a>(x, y)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.lambda_parsed" title="supersolids.helper.functions.lambda_parsed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lambda_parsed</span></code></a>(s)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_meshgrid_3d" title="supersolids.helper.functions.get_meshgrid_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_meshgrid_3d</span></code></a>(x, y, z)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.identity" title="supersolids.helper.functions.identity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">identity</span></code></a>(*args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.fft_plot" title="supersolids.helper.functions.fft_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fft_plot</span></code></a>(t, property_all)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_meshgrid" title="supersolids.helper.functions.get_meshgrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_meshgrid</span></code></a>(x, y)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_meshgrid_3d" title="supersolids.helper.functions.get_meshgrid_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_meshgrid_3d</span></code></a>(x, y, z)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.check_provided_lists" title="supersolids.helper.functions.check_provided_lists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_provided_lists</span></code></a>(number_of_mixtures, a_s_array, a_dd_array)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.generate_a_dd" title="supersolids.helper.functions.generate_a_dd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_a_dd</span></code></a>(mu_list, a_dd_factor)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_parameters_mixture" title="supersolids.helper.functions.get_parameters_mixture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parameters_mixture</span></code></a>(l_0, mu_list, a_s_list, a_dd_factor)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.dimensionless" title="supersolids.helper.functions.dimensionless"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dimensionless</span></code></a>(arr, l_0)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.combinations2array" title="supersolids.helper.functions.combinations2array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">combinations2array</span></code></a>(number_of_mixtures, combinations_list)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.symmetric_mat" title="supersolids.helper.functions.symmetric_mat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">symmetric_mat</span></code></a>(arr)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.w_dimensionsless" title="supersolids.helper.functions.w_dimensionsless"><code class="xref py py-obj docutils literal notranslate"><span class="pre">w_dimensionsless</span></code></a>(dimensionless_factor, w_x = 2.0 * np.pi * 30.0, w_y = 2.0 * np.pi * 30.0, w_z = 2.0 * np.pi * 30.0)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_parameters" title="supersolids.helper.functions.get_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parameters</span></code></a>(N = 10**4, m = 164 * constants.u_in_kg, a_s = 90.0 * constants.a_0, a_dd = 130.0 * constants.a_0, w_x = 2.0 * np.pi * 30.0)</p></td>
@@ -219,122 +140,143 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.g_qf_helper" title="supersolids.helper.functions.g_qf_helper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">g_qf_helper</span></code></a>(m = 164 * constants.u_in_kg, a_s = 90.0 * constants.a_0, a_dd = 130.0 * constants.a_0, w_x = 2.0 * np.pi * 30.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_g_qf" title="supersolids.helper.functions.get_g_qf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_g_qf</span></code></a>(N, a_s_l_ho_ratio, epsilon_dd)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.new_int" title="supersolids.helper.functions.new_int"><code class="xref py py-obj docutils literal notranslate"><span class="pre">new_int</span></code></a>(epsilon_dd)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_l_ho" title="supersolids.helper.functions.get_l_ho"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_l_ho</span></code></a>(m = 164.0 * constants.u_in_kg, w_x = 2.0 * np.pi * 30.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_g_qf" title="supersolids.helper.functions.get_g_qf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_g_qf</span></code></a>(N, a_s_l_ho_ratio, epsilon_dd)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_alphas" title="supersolids.helper.functions.get_alphas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_alphas</span></code></a>(w_x = 2.0 * np.pi * 30.0, w_y = 2.0 * np.pi * 30.0, w_z = 2.0 * np.pi * 30.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_l_ho" title="supersolids.helper.functions.get_l_ho"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_l_ho</span></code></a>(m = 164.0 * constants.u_in_kg, w_x = 2.0 * np.pi * 30.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_2d_pdf" title="supersolids.helper.functions.psi_gauss_2d_pdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_2d_pdf</span></code></a>(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]]))</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_alphas" title="supersolids.helper.functions.get_alphas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_alphas</span></code></a>(w_x = 2.0 * np.pi * 30.0, w_y = 2.0 * np.pi * 30.0, w_z = 2.0 * np.pi * 30.0)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_2d_pdf" title="supersolids.helper.functions.psi_gauss_2d_pdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_2d_pdf</span></code></a>(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]]))</p></td>
 <td><p>Gives values according to gaus dirstribution (2D)</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_2d" title="supersolids.helper.functions.psi_gauss_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_2d</span></code></a>(x, y, a_x = 1.0, a_y = 1.0, x_0 = 0.0, y_0 = 0.0, k_0 = 0.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_2d" title="supersolids.helper.functions.psi_gauss_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_2d</span></code></a>(x, y, a_x = 1.0, a_y = 1.0, x_0 = 0.0, y_0 = 0.0, k_0 = 0.0)</p></td>
 <td><p>Gaussian wave packet of width a and momentum k_0, centered at x_0, y_0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_3d" title="supersolids.helper.functions.psi_gauss_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_3d</span></code></a>(x, y, z, a_x = 1.0, a_y = 1.0, a_z = 1.0, x_0 = 0.0, y_0 = 0.0, z_0 = 0.0, k_0 = 0.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_3d" title="supersolids.helper.functions.psi_gauss_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_3d</span></code></a>(x, y, z, a_x = 1.0, a_y = 1.0, a_z = 1.0, x_0 = 0.0, y_0 = 0.0, z_0 = 0.0, k_0 = 0.0)</p></td>
 <td><p>Gaussian wave packet of width a and momentum k_0, centered at x_0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_1d" title="supersolids.helper.functions.psi_gauss_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_1d</span></code></a>(x, a = 1.0, x_0 = 0.0, k_0 = 0.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_1d" title="supersolids.helper.functions.psi_gauss_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_1d</span></code></a>(x, a = 1.0, x_0 = 0.0, k_0 = 0.0)</p></td>
 <td><p>Gaussian wave packet of width a and momentum k_0, centered at x_0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_pdf" title="supersolids.helper.functions.psi_pdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_pdf</span></code></a>(x, loc = 0.0, scale = 1.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_pdf" title="supersolids.helper.functions.psi_pdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_pdf</span></code></a>(x, loc = 0.0, scale = 1.0)</p></td>
 <td><p>Mathematical function of gauss pulse</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_rect" title="supersolids.helper.functions.psi_rect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_rect</span></code></a>(x, x_min = -0.5, x_max = 0.5, a = 1.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_rect" title="supersolids.helper.functions.psi_rect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_rect</span></code></a>(x, x_min = -0.5, x_max = 0.5, a = 1.0)</p></td>
 <td><p>Mathematical function of rectangular pulse</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_solution" title="supersolids.helper.functions.psi_gauss_solution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_solution</span></code></a>(x)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_solution" title="supersolids.helper.functions.psi_gauss_solution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_solution</span></code></a>(x)</p></td>
 <td><p>Mathematical function of solution of non-linear Schroedinger for g=0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_1d" title="supersolids.helper.functions.thomas_fermi_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_1d</span></code></a>(x, g = 0.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_1d" title="supersolids.helper.functions.thomas_fermi_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_1d</span></code></a>(x, g = 0.0)</p></td>
 <td><p>Mathematical function of Thomas-Fermi distribution with coupling constant g</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_2d" title="supersolids.helper.functions.thomas_fermi_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_2d</span></code></a>(x, y, g = 0.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_2d" title="supersolids.helper.functions.thomas_fermi_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_2d</span></code></a>(x, y, g = 0.0)</p></td>
 <td><p>Mathematical function of Thomas-Fermi distribution with coupling constant g</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_2d_pos" title="supersolids.helper.functions.thomas_fermi_2d_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_2d_pos</span></code></a>(pos, g = 0.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_2d_pos" title="supersolids.helper.functions.thomas_fermi_2d_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_2d_pos</span></code></a>(pos, g = 0.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_3d" title="supersolids.helper.functions.thomas_fermi_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_3d</span></code></a>(x, y, z, g = 0.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_3d" title="supersolids.helper.functions.thomas_fermi_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_3d</span></code></a>(x, y, z, g = 0.0)</p></td>
 <td><p>Mathematical function of Thomas-Fermi distribution with coupling constant g</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.mu_1d" title="supersolids.helper.functions.mu_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu_1d</span></code></a>(g = 0.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.mu_1d" title="supersolids.helper.functions.mu_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu_1d</span></code></a>(g = 0.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.mu_2d" title="supersolids.helper.functions.mu_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu_2d</span></code></a>(g = 0.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.mu_2d" title="supersolids.helper.functions.mu_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu_2d</span></code></a>(g = 0.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.mu_3d" title="supersolids.helper.functions.mu_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu_3d</span></code></a>(g = 0.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.mu_3d" title="supersolids.helper.functions.mu_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu_3d</span></code></a>(g = 0.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_harmonic_1d" title="supersolids.helper.functions.v_harmonic_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_harmonic_1d</span></code></a>(x)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_harmonic_1d" title="supersolids.helper.functions.v_harmonic_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_harmonic_1d</span></code></a>(x)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_harmonic_2d" title="supersolids.helper.functions.v_harmonic_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_harmonic_2d</span></code></a>(pos, alpha_y = 1.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_harmonic_2d" title="supersolids.helper.functions.v_harmonic_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_harmonic_2d</span></code></a>(pos, alpha_y = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_2d" title="supersolids.helper.functions.v_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_2d</span></code></a>(x, y, alpha_y=1.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_2d" title="supersolids.helper.functions.v_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_2d</span></code></a>(x, y, alpha_y=1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_harmonic_3d" title="supersolids.helper.functions.v_harmonic_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_harmonic_3d</span></code></a>(x, y, z, alpha_y = 1.0, alpha_z = 1.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_harmonic_3d" title="supersolids.helper.functions.v_harmonic_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_harmonic_3d</span></code></a>(x, y, z, alpha_y = 1.0, alpha_z = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_r_cut" title="supersolids.helper.functions.get_r_cut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_r_cut</span></code></a>(k_mesh, r_cut = 1.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_r_cut" title="supersolids.helper.functions.get_r_cut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_r_cut</span></code></a>(k_mesh, r_cut = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.dipol_dipol_interaction" title="supersolids.helper.functions.dipol_dipol_interaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipol_dipol_interaction</span></code></a>(kx_mesh, ky_mesh, kz_mesh, r_cut = 1.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.dipol_dipol_interaction" title="supersolids.helper.functions.dipol_dipol_interaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipol_dipol_interaction</span></code></a>(kx_mesh, ky_mesh, kz_mesh, r_cut = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.f_kappa" title="supersolids.helper.functions.f_kappa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f_kappa</span></code></a>(kappa, epsilon = 10**(-10))</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi" title="supersolids.helper.functions.get_V_k_val_ddi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi</span></code></a>(kx_mesh, ky_mesh, kz_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)</p></td>
+<td><p>Explicit calculation of the Fourier transform with the cylindrical cut-off</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral" title="supersolids.helper.functions.get_rho_integral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral</span></code></a>(k_rho_mesh, kz_mesh, z_mesh, rho_cut = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.atan_special" title="supersolids.helper.functions.atan_special"><code class="xref py py-obj docutils literal notranslate"><span class="pre">atan_special</span></code></a>(x)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral1" title="supersolids.helper.functions.get_rho_integral1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral1</span></code></a>(kx_mesh, ky_mesh, kz_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.func_125" title="supersolids.helper.functions.func_125"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_125</span></code></a>(kappa, alpha_z, e_dd, epsilon = 10**(-10))</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi2" title="supersolids.helper.functions.get_V_k_val_ddi2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi2</span></code></a>(x_mesh, y_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.func_124" title="supersolids.helper.functions.func_124"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_124</span></code></a>(kappa, e_dd, N, a_s_l_ho_ratio)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi3" title="supersolids.helper.functions.get_V_k_val_ddi3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi3</span></code></a>(x_mesh, y_mesh, z_mesh, x_cut, y_cut, z_cut)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_R_rz" title="supersolids.helper.functions.get_R_rz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_R_rz</span></code></a>(kappa, e_dd, N, a_s_l_ho_ratio)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.bessel_func" title="supersolids.helper.functions.bessel_func"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bessel_func</span></code></a>(z, k_rho, kz)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_kappa" title="supersolids.helper.functions.get_kappa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_kappa</span></code></a>(alpha_z, e_dd, x_min = 3.0, x_max = 5.0, res = 1000)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.f_kappa" title="supersolids.helper.functions.f_kappa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f_kappa</span></code></a>(kappa, epsilon = 10**(-10))</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.density_in_trap" title="supersolids.helper.functions.density_in_trap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">density_in_trap</span></code></a>(x, y, z, R_r, R_z, g = 0.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.atan_special" title="supersolids.helper.functions.atan_special"><code class="xref py py-obj docutils literal notranslate"><span class="pre">atan_special</span></code></a>(x)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.density_in_trap_r" title="supersolids.helper.functions.density_in_trap_r"><code class="xref py py-obj docutils literal notranslate"><span class="pre">density_in_trap_r</span></code></a>(r, z, R_r, R_z, g = 0.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.func_125" title="supersolids.helper.functions.func_125"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_125</span></code></a>(kappa, alpha_z, e_dd, epsilon = 10**(-10))</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_func_r" title="supersolids.helper.functions.camera_func_r"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_func_r</span></code></a>(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, r_per_frame = 10.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.func_124" title="supersolids.helper.functions.func_124"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_124</span></code></a>(kappa, e_dd, N, a_s_l_ho_ratio)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_func_phi" title="supersolids.helper.functions.camera_func_phi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_func_phi</span></code></a>(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, phi_per_frame = 10.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_R_rz" title="supersolids.helper.functions.get_R_rz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_R_rz</span></code></a>(kappa, e_dd, N, a_s_l_ho_ratio)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_func_z" title="supersolids.helper.functions.camera_func_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_func_z</span></code></a>(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, z_per_frame = 10.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_kappa" title="supersolids.helper.functions.get_kappa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_kappa</span></code></a>(alpha_z, e_dd, x_min = 3.0, x_max = 5.0, res = 1000)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_3d_trajectory" title="supersolids.helper.functions.camera_3d_trajectory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_3d_trajectory</span></code></a>(frame, r_func = None, phi_func = None, z_func = None, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.density_in_trap" title="supersolids.helper.functions.density_in_trap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">density_in_trap</span></code></a>(x, y, z, R_r, R_z, g = 0.0)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.density_in_trap_r" title="supersolids.helper.functions.density_in_trap_r"><code class="xref py py-obj docutils literal notranslate"><span class="pre">density_in_trap_r</span></code></a>(r, z, R_r, R_z, g = 0.0)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_func_r" title="supersolids.helper.functions.camera_func_r"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_func_r</span></code></a>(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, r_per_frame = 10.0)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_func_phi" title="supersolids.helper.functions.camera_func_phi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_func_phi</span></code></a>(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, phi_per_frame = 10.0)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_func_z" title="supersolids.helper.functions.camera_func_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_func_z</span></code></a>(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, z_per_frame = 10.0)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_3d_trajectory" title="supersolids.helper.functions.camera_3d_trajectory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_3d_trajectory</span></code></a>(frame, r_func = None, phi_func = None, z_func = None, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0)</p></td>
 <td><p>Computes r, phi, z as the components of the camera position</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.noise_mesh" title="supersolids.helper.functions.noise_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">noise_mesh</span></code></a>(min = 0.8, max = 1.2, shape = (64, 64, 64))</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.noise_mesh" title="supersolids.helper.functions.noise_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">noise_mesh</span></code></a>(min = 0.8, max = 1.2, shape = (64, 64, 64))</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.dt_adaptive" title="supersolids.helper.functions.dt_adaptive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dt_adaptive</span></code></a>(t, dt)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.dt_adaptive" title="supersolids.helper.functions.dt_adaptive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dt_adaptive</span></code></a>(t, dt)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline"></a></h3>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -346,119 +288,181 @@
 </tr>
 </tbody>
 </table>
-<dl class="py class">
-<dt class="sig sig-object py" id="supersolids.helper.functions.Resolution">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">Resolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#Resolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.Resolution" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specifies the resolution of the simulation in x, y, z directions (1D, 2D, 3D).</p>
-<dl class="field-list simple">
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.check_ResBox">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">check_ResBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MyBox</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#check_ResBox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.check_ResBox" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>float</em>) – </p></li>
-<li><p><strong>y</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>) – </p></li>
-<li><p><strong>z</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>) – </p></li>
+<li><p><strong>Res</strong> (<a class="reference internal" href="../Resolution/index.html#supersolids.helper.Resolution.Resolution" title="supersolids.helper.Resolution.Resolution"><em>supersolids.helper.Resolution.Resolution</em></a>) – </p></li>
+<li><p><strong>MyBox</strong> (<a class="reference internal" href="../Box/index.html#supersolids.helper.Box.Box" title="supersolids.helper.Box.Box"><em>supersolids.helper.Box.Box</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="supersolids.helper.functions.Resolution.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#Resolution.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.Resolution.__str__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return str(self).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[Optional[float]]</p>
-</dd>
-</dl>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="supersolids.helper.functions.Box">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">Box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#Box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.Box" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specifies the ranges in which the simulation is calculated (1D, 2D or 3D).
-Needs to be given in pairs (x0, x1), (y0, y1), (z0, z1).</p>
-<dl class="field-list simple">
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_grid_helper">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_grid_helper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MyBox</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_grid_helper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_grid_helper" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x0</strong> (<em>float</em>) – </p></li>
-<li><p><strong>x1</strong> (<em>float</em>) – </p></li>
-<li><p><strong>y0</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>) – </p></li>
-<li><p><strong>y1</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>) – </p></li>
-<li><p><strong>z0</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>) – </p></li>
-<li><p><strong>z1</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>) – </p></li>
+<li><p><strong>Res</strong> (<a class="reference internal" href="../Resolution/index.html#supersolids.helper.Resolution.Resolution" title="supersolids.helper.Resolution.Resolution"><em>supersolids.helper.Resolution.Resolution</em></a>) – </p></li>
+<li><p><strong>MyBox</strong> (<a class="reference internal" href="../Box/index.html#supersolids.helper.Box.Box" title="supersolids.helper.Box.Box"><em>supersolids.helper.Box.Box</em></a>) – </p></li>
+<li><p><strong>index</strong> (<em>int</em>) – </p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="supersolids.helper.functions.Box.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#Box.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.Box.__str__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return str(self).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[Optional[float]]</p>
-</dd>
-</dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="supersolids.helper.functions.Box.lengths">
-<span class="sig-name descname"><span class="pre">lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#Box.lengths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.Box.lengths" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the box lengths in the directions available in order [x, y, z]</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>List of the box length in the directions available in order [x, y, z]</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>List[float]</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_grid">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MyBox</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_grid" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Res</strong> (<a class="reference internal" href="../Resolution/index.html#supersolids.helper.Resolution.Resolution" title="supersolids.helper.Resolution.Resolution"><em>supersolids.helper.Resolution.Resolution</em></a>) – </p></li>
+<li><p><strong>MyBox</strong> (<a class="reference internal" href="../Box/index.html#supersolids.helper.Box.Box" title="supersolids.helper.Box.Box"><em>supersolids.helper.Box.Box</em></a>) – </p></li>
+</ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="supersolids.helper.functions.Box.min_length">
-<span class="sig-name descname"><span class="pre">min_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#Box.min_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.Box.min_length" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.BoxResAssert">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">BoxResAssert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Box</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#BoxResAssert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.BoxResAssert" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">BoxResAssert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Box</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#BoxResAssert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.BoxResAssert" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.aResAssert">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">aResAssert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#aResAssert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.aResAssert" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">aResAssert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#aResAssert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.aResAssert" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.lambda_parsed">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">lambda_parsed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#lambda_parsed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.lambda_parsed" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">lambda_parsed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#lambda_parsed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.lambda_parsed" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.identity">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">identity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#identity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.identity" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">identity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#identity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.identity" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.fft_plot">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">fft_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_all</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#fft_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.fft_plot" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">fft_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_all</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#fft_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.fft_plot" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_meshgrid">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_meshgrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_meshgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_meshgrid" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_meshgrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_meshgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_meshgrid" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_meshgrid_3d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_meshgrid_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_meshgrid_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_meshgrid_3d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_meshgrid_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_meshgrid_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_meshgrid_3d" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.check_provided_lists">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">check_provided_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_mixtures</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#check_provided_lists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.check_provided_lists" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>number_of_mixtures</strong> (<em>int</em>) – </p></li>
+<li><p><strong>a_s_array</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>a_dd_array</strong> (<em>numpy.ndarray</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.generate_a_dd">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">generate_a_dd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd_factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#generate_a_dd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.generate_a_dd" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mu_list</strong> (<em>list</em>) – </p></li>
+<li><p><strong>a_dd_factor</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_parameters_mixture">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_parameters_mixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd_factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_parameters_mixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_parameters_mixture" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>l_0</strong> (<em>float</em>) – </p></li>
+<li><p><strong>mu_list</strong> (<em>list</em>) – </p></li>
+<li><p><strong>a_s_list</strong> (<em>list</em>) – </p></li>
+<li><p><strong>a_dd_factor</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>(numpy.ndarray, numpy.ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.dimensionless">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">dimensionless</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l_0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#dimensionless"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.dimensionless" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.combinations2array">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">combinations2array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_mixtures</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combinations_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#combinations2array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.combinations2array" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>number_of_mixtures</strong> (<em>int</em>) – </p></li>
+<li><p><strong>combinations_list</strong> (<em>list</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.symmetric_mat">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">symmetric_mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#symmetric_mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.symmetric_mat" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arr</strong> (<em>numpy.ndarray</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.w_dimensionsless">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">w_dimensionsless</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimensionless_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#w_dimensionsless"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.w_dimensionsless" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dimensionless_factor</strong> (<em>float</em>) – </p></li>
+<li><p><strong>w_x</strong> (<em>float</em>) – </p></li>
+<li><p><strong>w_y</strong> (<em>float</em>) – </p></li>
+<li><p><strong>w_z</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>(float, float, float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_parameters">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span> <span class="pre">**</span> <span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">164</span> <span class="pre">*</span> <span class="pre">constants.u_in_kg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90.0</span> <span class="pre">*</span> <span class="pre">constants.a_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">130.0</span> <span class="pre">*</span> <span class="pre">constants.a_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_parameters" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span> <span class="pre">**</span> <span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">164</span> <span class="pre">*</span> <span class="pre">constants.u_in_kg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90.0</span> <span class="pre">*</span> <span class="pre">constants.a_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">130.0</span> <span class="pre">*</span> <span class="pre">constants.a_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_parameters" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -474,7 +478,7 @@ Needs to be given in pairs (x0, x1), (y0, y1), (z0, z1).</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_g">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_g</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_l_ho_ratio</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_g"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_g" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_g</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_l_ho_ratio</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_g"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_g" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -487,7 +491,7 @@ Needs to be given in pairs (x0, x1), (y0, y1), (z0, z1).</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.g_qf_helper">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">g_qf_helper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">164</span> <span class="pre">*</span> <span class="pre">constants.u_in_kg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90.0</span> <span class="pre">*</span> <span class="pre">constants.a_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">130.0</span> <span class="pre">*</span> <span class="pre">constants.a_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#g_qf_helper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.g_qf_helper" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">g_qf_helper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">164</span> <span class="pre">*</span> <span class="pre">constants.u_in_kg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90.0</span> <span class="pre">*</span> <span class="pre">constants.a_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">130.0</span> <span class="pre">*</span> <span class="pre">constants.a_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#g_qf_helper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.g_qf_helper" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -501,8 +505,18 @@ Needs to be given in pairs (x0, x1), (y0, y1), (z0, z1).</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.new_int">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">new_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epsilon_dd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#new_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.new_int" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>epsilon_dd</strong> (<em>float</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_g_qf">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_g_qf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_l_ho_ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon_dd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_g_qf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_g_qf" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_g_qf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_l_ho_ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon_dd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_g_qf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_g_qf" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -516,7 +530,7 @@ Needs to be given in pairs (x0, x1), (y0, y1), (z0, z1).</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_l_ho">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_l_ho</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">164.0</span> <span class="pre">*</span> <span class="pre">constants.u_in_kg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_l_ho"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_l_ho" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_l_ho</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">164.0</span> <span class="pre">*</span> <span class="pre">constants.u_in_kg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_l_ho"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_l_ho" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -529,7 +543,7 @@ Needs to be given in pairs (x0, x1), (y0, y1), (z0, z1).</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_alphas">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_alphas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_alphas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_alphas" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_alphas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span> <span class="pre">*</span> <span class="pre">np.pi</span> <span class="pre">*</span> <span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_alphas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_alphas" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -543,7 +557,7 @@ Needs to be given in pairs (x0, x1), (y0, y1), (z0, z1).</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.psi_gauss_2d_pdf">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_gauss_2d_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">np.array([0.0,</span> <span class="pre">0.0])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">np.array([[1.0,</span> <span class="pre">0.0],</span> <span class="pre">[0.0,</span> <span class="pre">1.0]])</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_gauss_2d_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_gauss_2d_pdf" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_gauss_2d_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">np.array([0.0,</span> <span class="pre">0.0])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">np.array([[1.0,</span> <span class="pre">0.0],</span> <span class="pre">[0.0,</span> <span class="pre">1.0]])</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_gauss_2d_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_gauss_2d_pdf" title="Permalink to this definition"></a></dt>
 <dd><p>Gives values according to gaus dirstribution (2D)
 with meshgrid of x,y as input</p>
 <dl class="field-list simple">
@@ -561,7 +575,7 @@ with meshgrid of x,y as input</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.psi_gauss_2d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_gauss_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_gauss_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_gauss_2d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_gauss_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_gauss_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_gauss_2d" title="Permalink to this definition"></a></dt>
 <dd><p>Gaussian wave packet of width a and momentum k_0, centered at x_0, y_0</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -580,7 +594,7 @@ with meshgrid of x,y as input</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.psi_gauss_3d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_gauss_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_gauss_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_gauss_3d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_gauss_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_gauss_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_gauss_3d" title="Permalink to this definition"></a></dt>
 <dd><p>Gaussian wave packet of width a and momentum k_0, centered at x_0</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -602,7 +616,7 @@ with meshgrid of x,y as input</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.psi_gauss_1d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_gauss_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_gauss_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_gauss_1d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_gauss_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_gauss_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_gauss_1d" title="Permalink to this definition"></a></dt>
 <dd><p>Gaussian wave packet of width a and momentum k_0, centered at x_0</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -618,7 +632,7 @@ with meshgrid of x,y as input</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.psi_pdf">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_pdf" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_pdf" title="Permalink to this definition"></a></dt>
 <dd><p>Mathematical function of gauss pulse</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -633,7 +647,7 @@ with meshgrid of x,y as input</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.psi_rect">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_rect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_rect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_rect" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_rect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_rect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_rect" title="Permalink to this definition"></a></dt>
 <dd><p>Mathematical function of rectangular pulse
 between x_min and x_max with amplitude a</p>
 <dl class="field-list simple">
@@ -650,7 +664,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.psi_gauss_solution">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_gauss_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_gauss_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_gauss_solution" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">psi_gauss_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#psi_gauss_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.psi_gauss_solution" title="Permalink to this definition"></a></dt>
 <dd><p>Mathematical function of solution of non-linear Schroedinger for g=0</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -661,7 +675,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.thomas_fermi_1d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">thomas_fermi_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#thomas_fermi_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.thomas_fermi_1d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">thomas_fermi_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#thomas_fermi_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.thomas_fermi_1d" title="Permalink to this definition"></a></dt>
 <dd><p>Mathematical function of Thomas-Fermi distribution with coupling constant g</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -675,7 +689,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.thomas_fermi_2d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">thomas_fermi_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#thomas_fermi_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.thomas_fermi_2d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">thomas_fermi_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#thomas_fermi_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.thomas_fermi_2d" title="Permalink to this definition"></a></dt>
 <dd><p>Mathematical function of Thomas-Fermi distribution with coupling constant g</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -690,7 +704,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.thomas_fermi_2d_pos">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">thomas_fermi_2d_pos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#thomas_fermi_2d_pos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.thomas_fermi_2d_pos" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">thomas_fermi_2d_pos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#thomas_fermi_2d_pos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.thomas_fermi_2d_pos" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>g</strong> (<em>float</em>) – </p>
@@ -700,7 +714,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.thomas_fermi_3d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">thomas_fermi_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#thomas_fermi_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.thomas_fermi_3d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">thomas_fermi_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#thomas_fermi_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.thomas_fermi_3d" title="Permalink to this definition"></a></dt>
 <dd><p>Mathematical function of Thomas-Fermi distribution with coupling constant g</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -716,7 +730,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.mu_1d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">mu_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#mu_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.mu_1d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">mu_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#mu_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.mu_1d" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>g</strong> (<em>float</em>) – </p>
@@ -726,7 +740,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.mu_2d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">mu_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#mu_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.mu_2d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">mu_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#mu_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.mu_2d" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>g</strong> (<em>float</em>) – </p>
@@ -736,7 +750,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.mu_3d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">mu_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#mu_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.mu_3d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">mu_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#mu_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.mu_3d" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>g</strong> (<em>float</em>) – </p>
@@ -746,12 +760,12 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.v_harmonic_1d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">v_harmonic_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#v_harmonic_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.v_harmonic_1d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">v_harmonic_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#v_harmonic_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.v_harmonic_1d" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.v_harmonic_2d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">v_harmonic_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#v_harmonic_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.v_harmonic_2d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">v_harmonic_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#v_harmonic_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.v_harmonic_2d" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>alpha_y</strong> (<em>float</em>) – </p>
@@ -761,12 +775,12 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.v_2d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">v_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#v_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.v_2d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">v_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#v_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.v_2d" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.v_harmonic_3d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">v_harmonic_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#v_harmonic_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.v_harmonic_3d" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">v_harmonic_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#v_harmonic_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.v_harmonic_3d" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -779,7 +793,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_r_cut">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_r_cut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_r_cut"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_r_cut" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_r_cut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_r_cut"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_r_cut" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -792,7 +806,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.dipol_dipol_interaction">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">dipol_dipol_interaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kx_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ky_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#dipol_dipol_interaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.dipol_dipol_interaction" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">dipol_dipol_interaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kx_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ky_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#dipol_dipol_interaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.dipol_dipol_interaction" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -806,8 +820,92 @@ between x_min and x_max with amplitude a</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_V_k_val_ddi">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_V_k_val_ddi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kx_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ky_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_V_k_val_ddi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_V_k_val_ddi" title="Permalink to this definition"></a></dt>
+<dd><p>Explicit calculation of the Fourier transform with the cylindrical cut-off</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rho_cut</strong> (<em>float</em>) – </p></li>
+<li><p><strong>z_cut</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_rho_integral">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_rho_integral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k_rho_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_rho_integral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_rho_integral" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k_rho_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>kz_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>z_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>rho_cut</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_rho_integral1">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_rho_integral1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kx_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ky_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_rho_integral1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_rho_integral1" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kx_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>ky_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>kz_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>z_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>rho_cut</strong> (<em>float</em>) – </p></li>
+<li><p><strong>z_cut</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_V_k_val_ddi2">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_V_k_val_ddi2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_V_k_val_ddi2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_V_k_val_ddi2" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>y_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>z_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>rho_cut</strong> (<em>float</em>) – </p></li>
+<li><p><strong>z_cut</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_V_k_val_ddi3">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_V_k_val_ddi3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_cut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_cut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_cut</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_V_k_val_ddi3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_V_k_val_ddi3" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>y_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>z_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>x_cut</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – </p></li>
+<li><p><strong>y_cut</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – </p></li>
+<li><p><strong>z_cut</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.bessel_func">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">bessel_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#bessel_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.bessel_func" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.f_kappa">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">f_kappa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span> <span class="pre">**</span> <span class="pre">-</span> <span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#f_kappa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.f_kappa" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">f_kappa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span> <span class="pre">**</span> <span class="pre">-</span> <span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#f_kappa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.f_kappa" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -823,12 +921,12 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.atan_special">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">atan_special</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#supersolids.helper.functions.atan_special" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">atan_special</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#supersolids.helper.functions.atan_special" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.func_125">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">func_125</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span> <span class="pre">**</span> <span class="pre">-</span> <span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#func_125"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.func_125" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">func_125</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span> <span class="pre">**</span> <span class="pre">-</span> <span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#func_125"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.func_125" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -843,7 +941,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.func_124">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">func_124</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_l_ho_ratio</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#func_124"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.func_124" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">func_124</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_l_ho_ratio</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#func_124"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.func_124" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -858,7 +956,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_R_rz">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_R_rz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_l_ho_ratio</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_R_rz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_R_rz" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_R_rz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_l_ho_ratio</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_R_rz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_R_rz" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -873,7 +971,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_kappa">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_kappa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_kappa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_kappa" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_kappa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_kappa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_kappa" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -889,7 +987,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.density_in_trap">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">density_in_trap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#density_in_trap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.density_in_trap" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">density_in_trap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#density_in_trap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.density_in_trap" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -906,7 +1004,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.density_in_trap_r">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">density_in_trap_r</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#density_in_trap_r"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.density_in_trap_r" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">density_in_trap_r</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#density_in_trap_r"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.density_in_trap_r" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -922,7 +1020,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.camera_func_r">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">camera_func_r</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_per_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#camera_func_r"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.camera_func_r" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">camera_func_r</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_per_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#camera_func_r"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.camera_func_r" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -941,7 +1039,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.camera_func_phi">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">camera_func_phi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_per_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#camera_func_phi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.camera_func_phi" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">camera_func_phi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_per_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#camera_func_phi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.camera_func_phi" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -960,7 +1058,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.camera_func_z">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">camera_func_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_per_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#camera_func_z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.camera_func_z" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">camera_func_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_per_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#camera_func_z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.camera_func_z" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -979,7 +1077,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.camera_3d_trajectory">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">camera_3d_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#camera_3d_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.camera_3d_trajectory" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">camera_3d_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#camera_3d_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.camera_3d_trajectory" title="Permalink to this definition"></a></dt>
 <dd><p>Computes r, phi, z as the components of the camera position
 in the animation for the given frame.
 Depending on, if a callable function is given for the components,
@@ -1009,7 +1107,7 @@ in the animation for the given frame.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.noise_mesh">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">noise_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(64,</span> <span class="pre">64,</span> <span class="pre">64)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#noise_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.noise_mesh" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">noise_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(64,</span> <span class="pre">64,</span> <span class="pre">64)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#noise_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.noise_mesh" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1026,7 +1124,7 @@ in the animation for the given frame.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.dt_adaptive">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">dt_adaptive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#dt_adaptive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.dt_adaptive" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">dt_adaptive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#dt_adaptive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.dt_adaptive" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>float</p>
@@ -1036,7 +1134,7 @@ in the animation for the given frame.</p>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="supersolids.helper.functions.datapoints_exponent">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">datapoints_exponent</span></span><em class="property"> <span class="pre">:int</span> <span class="pre">=</span> <span class="pre">6</span></em><a class="headerlink" href="#supersolids.helper.functions.datapoints_exponent" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">datapoints_exponent</span></span><em class="property"> <span class="pre">:int</span> <span class="pre">=</span> <span class="pre">6</span></em><a class="headerlink" href="#supersolids.helper.functions.datapoints_exponent" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </div>
@@ -1045,46 +1143,30 @@ in the animation for the given frame.</p>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Daniel Scheiermann.
-
-    </p>
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

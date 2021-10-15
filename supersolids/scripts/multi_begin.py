@@ -8,7 +8,7 @@ from supersolids.helper.dict2str import dic2str
 
 
 xvfb_display = 98
-supersolids_version = "0.1.34rc1"
+supersolids_version = "0.1.34rc7"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture/")
 # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
@@ -173,10 +173,11 @@ echo $(which pip3)
         existing_dirnames = list(map(lambda path: path.name, existing_dirs))
         print(f"{movie_after}")
         while not movie_after in existing_dirnames:
-            print(f"{existing_dirs}")
-            print(f"{existing_dirnames}")
-            print(f"Directory for {movie_after} not created yet. Waiting 3 seconds.")
-            time.sleep(3)
+            if not existing_dirs:
+                print(f"First path: {existing_dirs[0]}")
+            print(f"Found dirnames: {existing_dirnames}")
+            print(f"Directory for {movie_after} not created yet. Waiting 20 seconds.")
+            time.sleep(20)
             existing_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
             existing_dirnames = list(map(lambda path: path.name, existing_dirs))
 

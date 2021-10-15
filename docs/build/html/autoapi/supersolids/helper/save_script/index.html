@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>supersolids.scripts.multi_load &mdash; supersolids 0.1.26 documentation</title>
+  <title>supersolids.helper.save_script &mdash; supersolids 0.1.26 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
@@ -56,9 +56,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.scripts.multi_load</span></code></li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.save_script</span></code></li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../../../_sources/autoapi/supersolids/scripts/multi_load/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../../../_sources/autoapi/supersolids/helper/save_script/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -66,8 +66,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="module-supersolids.scripts.multi_load">
-<span id="supersolids-scripts-multi-load"></span><h1><a class="reference internal" href="#module-supersolids.scripts.multi_load" title="supersolids.scripts.multi_load"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.scripts.multi_load</span></code></a><a class="headerlink" href="#module-supersolids.scripts.multi_load" title="Permalink to this headline"></a></h1>
+  <div class="section" id="module-supersolids.helper.save_script">
+<span id="supersolids-helper-save-script"></span><h1><a class="reference internal" href="#module-supersolids.helper.save_script" title="supersolids.helper.save_script"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.save_script</span></code></a><a class="headerlink" href="#module-supersolids.helper.save_script" title="Permalink to this headline"></a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
 <div class="section" id="functions">
@@ -78,34 +78,20 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.scripts.multi_load.string_float" title="supersolids.scripts.multi_load.string_float"><code class="xref py py-obj docutils literal notranslate"><span class="pre">string_float</span></code></a>(s)</p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline"></a></h3>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.scripts.multi_load.path_anchor_input" title="supersolids.scripts.multi_load.path_anchor_input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">path_anchor_input</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.save_script.save_script" title="supersolids.helper.save_script.save_script"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_script</span></code></a>(script_count_old, input_path, script_name, obj_to_save, txt_version = False, script_format='%04d')</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
-<dt class="sig sig-object py" id="supersolids.scripts.multi_load.string_float">
-<span class="sig-prename descclassname"><span class="pre">supersolids.scripts.multi_load.</span></span><span class="sig-name descname"><span class="pre">string_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/scripts/multi_load.html#string_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.scripts.multi_load.string_float" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="supersolids.scripts.multi_load.path_anchor_input">
-<span class="sig-prename descclassname"><span class="pre">supersolids.scripts.multi_load.</span></span><span class="sig-name descname"><span class="pre">path_anchor_input</span></span><a class="headerlink" href="#supersolids.scripts.multi_load.path_anchor_input" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="supersolids.helper.save_script.save_script">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.save_script.</span></span><span class="sig-name descname"><span class="pre">save_script</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">script_count_old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">script_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_to_save</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">txt_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">script_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%04d'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/save_script.html#save_script"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.save_script.save_script" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>txt_version</strong> (<em>bool</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
 
 </div>
 </div>
