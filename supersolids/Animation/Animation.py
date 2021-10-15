@@ -9,7 +9,7 @@
 Base class for Animations
 
 """
-from typing import Optional, Callable
+from typing import Optional, Callable, List
 
 from supersolids.helper.Resolution import Resolution
 
@@ -19,8 +19,8 @@ class Animation:
                  Res: Resolution = Resolution(x=2 ** 8, y=2 ** 7, z=2 ** 5),
                  plot_psi_sol: bool = True,
                  plot_V: bool = False,
-                 alpha_psi: float = 0.8,
-                 alpha_psi_sol: float = 0.53,
+                 alpha_psi_list: List[float] = [],
+                 alpha_psi_sol_list: List[float] = [],
                  alpha_V: float = 0.3,
                  camera_r_func: Optional[Callable] = None,
                  camera_phi_func: Optional[Callable] = None,
@@ -39,9 +39,9 @@ class Animation:
 
         :param plot_V: Condition if V should be plotted.
 
-        :param alpha_psi: Alpha value for plot transparency of :math:`\psi`
+        :param alpha_psi_list: Alpha value for plot transparency of :math:`\psi`
 
-        :param alpha_psi_sol: Alpha value for plot transparency of :math:`\psi_{sol}`
+        :param alpha_psi_sol_list: Alpha value for plot transparency of :math:`\psi_{sol}`
 
         :param alpha_V: Alpha value for plot transparency of V
 
@@ -54,13 +54,17 @@ class Animation:
         :param filename: Filename with filetype to save the movie to
 
         """
-        self.Res = Res
-        self.dim = Res.dim
-        self.plot_psi_sol = plot_psi_sol
-        self.plot_V = plot_V
+        if not alpha_psi_list:
+            alpha_psi_list = [0.8]
+        if not alpha_psi_sol_list:
+            alpha_psi_sol_list = [0.53]
 
-        self.alpha_psi: float = alpha_psi
-        self.alpha_psi_sol: float = alpha_psi_sol
+        self.Res: Resolution = Res
+        self.dim: int = Res.dim
+        self.plot_V: bool = plot_V
+
+        self.alpha_psi_list: List[float] = alpha_psi_list
+        self.alpha_psi_sol_list: List[float] = alpha_psi_sol_list
         self.alpha_V: float = alpha_V
 
         self.camera_r_func: Optional[Callable] = camera_r_func
