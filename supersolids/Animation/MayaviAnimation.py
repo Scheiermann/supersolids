@@ -23,18 +23,8 @@ from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper import functions, constants, get_path
+from supersolids.helper.get_supersolids_version import get_supersolids_version
 
-
-def get_supersolids_version():
-    if sys.version_info >= (3, 8, 0):
-        from importlib.metadata import version
-        supersolids_version = version('supersolids')
-    elif sys.version_info >= (3, 6, 0):
-        import pkg_resources
-        supersolids_version = pkg_resources.get_distribution(
-            "supersolids").version
-    else:
-        supersolids_version = "unknown"
 
     return supersolids_version
 
