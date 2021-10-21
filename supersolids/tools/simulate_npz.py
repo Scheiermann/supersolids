@@ -56,6 +56,7 @@ def simulate_npz(args):
             System_loaded: Schroedinger = dill.load(file=f)
 
         SystemSummary, summary_name = System_loaded.use_summary(summary_name=args.summary_name)
+        SystemSummary.copy_to(System_loaded)
 
         print(f"File at {schroedinger_path} loaded.")
         try:
@@ -69,14 +70,9 @@ def simulate_npz(args):
                     with open(psi_val_path, "rb") as f:
                         System_loaded.psi_val = np.load(file=f)["psi_val"]
 
-                    if isinstance(System_loaded, SchroedingerMixture):
-                        with open(psi2_val_path, "rb") as f:
-                            System_loaded.psi2_val = np.load(file=f)["psi2_val"]
-
             # get the frame number as it encodes the number steps dt,
             # so System.t can be reconstructed
             frame = int(args.filename_npz.split(".npz")[0].split("_")[-1])
-            System_loaded.t = System_loaded.dt * frame
             System_loaded.max_timesteps = args.max_timesteps
 
             if args.Box is None:
@@ -539,6 +535,7 @@ if __name__ == "__main__":
         with open(Path(input_path, args_overwrite.load_script), "rb") as f:
             args_loaded = dill.load(file=f)
 
+        # loaded script args can be overwritten by current args
         args_loaded.load_script = args_overwrite.load_script
         args_loaded.dir_path = args_overwrite.dir_path
         args_loaded.dir_name_load = args_overwrite.dir_name_load
