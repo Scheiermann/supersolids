@@ -113,15 +113,15 @@ for N2_part in np.arange(N_start, N_end, N_step):
 
         else:
             cluster_flags = f"""#==================================================
-# PBS -N {jobname}
-# PBS -M daniel.scheiermann@itp.uni-hannover.de
-# PBS -d /bigwork/dscheier/supersolids/supersolids/results/
-# PBS -e /bigwork/dscheier/supersolids/supersolids/results/log/error_$PBS_JOBID.txt
-# PBS -o /bigwork/dscheier/supersolids/supersolids/results/log/output_$PBS_JOBID.txt
-# PBS -l nodes=1:ppn=1:ws
-# PBS -l walltime=200:00:00
-# PBS -l mem={mem_in_GB}GB
-# PBS -l vmem={mem_in_GB}GB
+#PBS -N {jobname}
+#PBS -M daniel.scheiermann@itp.uni-hannover.de
+#PBS -d /bigwork/dscheier/supersolids/supersolids/results/
+#PBS -e /bigwork/dscheier/supersolids/supersolids/results/log/error_$PBS_JOBID.txt
+#PBS -o /bigwork/dscheier/supersolids/supersolids/results/log/output_$PBS_JOBID.txt
+#PBS -l nodes=1:ppn=1:ws
+#PBS -l walltime=200:00:00
+#PBS -l mem={mem_in_GB}GB
+#PBS -l vmem={mem_in_GB}GB
 """
 
         heredoc = "\n".join(["#!/bin/bash",
