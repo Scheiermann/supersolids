@@ -46,7 +46,7 @@ class SchroedingerMixtureSummary:
         self.w_z: float = SystemMixture.w_z
         self.imag_time: bool = SystemMixture.imag_time
         self.dim: int = SystemMixture.dim
-        self.mu: float = SystemMixture.mu_arr
+        self.mu_arr: float = SystemMixture.mu_arr
         self.E: float = SystemMixture.E
         self.V: Callable = SystemMixture.V
         self.V_interaction: Callable = SystemMixture.V_interaction

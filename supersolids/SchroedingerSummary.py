@@ -48,7 +48,7 @@ class SchroedingerSummary:
         self.e_dd: float = System.e_dd
         self.imag_time: bool = System.imag_time
         self.dim: int = System.dim
-        self.mu: float = System.mu_arr
+        self.mu_arr: float = System.mu_arr
         self.E: float = System.E
         self.psi_0: Callable = System.psi_0
         self.V: Callable = System.V
