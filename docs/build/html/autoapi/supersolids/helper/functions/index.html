@@ -209,25 +209,31 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_r_cut" title="supersolids.helper.functions.get_r_cut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_r_cut</span></code></a>(k_mesh, r_cut = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.dipol_dipol_interaction" title="supersolids.helper.functions.dipol_dipol_interaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipol_dipol_interaction</span></code></a>(kx_mesh, ky_mesh, kz_mesh, r_cut = 1.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.dipol_dipol_interaction" title="supersolids.helper.functions.dipol_dipol_interaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipol_dipol_interaction</span></code></a>(kx_mesh, ky_mesh, kz_mesh, r_cut = 1.0, use_cut_off = False)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi" title="supersolids.helper.functions.get_V_k_val_ddi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi</span></code></a>(kx_mesh, ky_mesh, kz_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi" title="supersolids.helper.functions.get_V_k_val_ddi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi</span></code></a>(kx_mesh, ky_mesh, kz_mesh, rho_lin, z_lin)</p></td>
 <td><p>Explicit calculation of the Fourier transform with the cylindrical cut-off</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral" title="supersolids.helper.functions.get_rho_integral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral</span></code></a>(k_rho_mesh, kz_mesh, z_mesh, rho_cut = 1.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral_slow" title="supersolids.helper.functions.get_rho_integral_slow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral_slow</span></code></a>(k_rho_mesh, kz_mesh, rho_lin, z_lin)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral1" title="supersolids.helper.functions.get_rho_integral1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral1</span></code></a>(kx_mesh, ky_mesh, kz_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.triu_list2array" title="supersolids.helper.functions.triu_list2array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">triu_list2array</span></code></a>(triu_list, triu_ind, shape)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi2" title="supersolids.helper.functions.get_V_k_val_ddi2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi2</span></code></a>(x_mesh, y_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral" title="supersolids.helper.functions.get_rho_integral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral</span></code></a>(k_rho_mesh, kz_mesh, rho_lin, z_lin)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi3" title="supersolids.helper.functions.get_V_k_val_ddi3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi3</span></code></a>(x_mesh, y_mesh, z_mesh, x_cut, y_cut, z_cut)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral_quad" title="supersolids.helper.functions.get_rho_integral_quad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral_quad</span></code></a>(kx_mesh, ky_mesh, kz_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.bessel_func" title="supersolids.helper.functions.bessel_func"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bessel_func</span></code></a>(z, k_rho, kz)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi_fft_where" title="supersolids.helper.functions.get_V_k_val_ddi_fft_where"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi_fft_where</span></code></a>(x_mesh, y_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi_fft" title="supersolids.helper.functions.get_V_k_val_ddi_fft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi_fft</span></code></a>(x_mesh, y_mesh, z_mesh, x_cut, y_cut, z_cut)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.bessel_func" title="supersolids.helper.functions.bessel_func"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bessel_func</span></code></a>(rho, z, k_rho, kz)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.f_kappa" title="supersolids.helper.functions.f_kappa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f_kappa</span></code></a>(kappa, epsilon = 10**(-10))</p></td>
@@ -806,14 +812,15 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.dipol_dipol_interaction">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">dipol_dipol_interaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kx_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ky_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#dipol_dipol_interaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.dipol_dipol_interaction" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">dipol_dipol_interaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kx_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ky_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cut_off</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#dipol_dipol_interaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.dipol_dipol_interaction" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>kx_mesh</strong> (<em>float</em>) – </p></li>
-<li><p><strong>ky_mesh</strong> (<em>float</em>) – </p></li>
-<li><p><strong>kz_mesh</strong> (<em>float</em>) – </p></li>
+<li><p><strong>kx_mesh</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>ky_mesh</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>kz_mesh</strong> (<em>numpy.ndarray</em>) – </p></li>
 <li><p><strong>r_cut</strong> (<em>float</em>) – </p></li>
+<li><p><strong>use_cut_off</strong> (<em>bool</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -821,36 +828,56 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_V_k_val_ddi">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_V_k_val_ddi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kx_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ky_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_V_k_val_ddi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_V_k_val_ddi" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_V_k_val_ddi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kx_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ky_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_lin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_lin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_V_k_val_ddi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_V_k_val_ddi" title="Permalink to this definition"></a></dt>
 <dd><p>Explicit calculation of the Fourier transform with the cylindrical cut-off</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rho_cut</strong> (<em>float</em>) – </p></li>
-<li><p><strong>z_cut</strong> (<em>float</em>) – </p></li>
+<li><p><strong>rho_lin</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>z_lin</strong> (<em>numpy.ndarray</em>) – </p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="supersolids.helper.functions.get_rho_integral">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_rho_integral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k_rho_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_rho_integral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_rho_integral" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_rho_integral_slow">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_rho_integral_slow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k_rho_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_lin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_lin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_rho_integral_slow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_rho_integral_slow" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>k_rho_mesh</strong> (<em>float</em>) – </p></li>
-<li><p><strong>kz_mesh</strong> (<em>float</em>) – </p></li>
-<li><p><strong>z_mesh</strong> (<em>float</em>) – </p></li>
-<li><p><strong>rho_cut</strong> (<em>float</em>) – </p></li>
+<li><p><strong>k_rho_mesh</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>kz_mesh</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>rho_lin</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>z_lin</strong> (<em>numpy.ndarray</em>) – </p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="supersolids.helper.functions.get_rho_integral1">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_rho_integral1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kx_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ky_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_rho_integral1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_rho_integral1" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="supersolids.helper.functions.triu_list2array">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">triu_list2array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">triu_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triu_ind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#triu_list2array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.triu_list2array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_rho_integral">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_rho_integral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k_rho_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_lin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_lin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_rho_integral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_rho_integral" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k_rho_mesh</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>kz_mesh</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>rho_lin</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>z_lin</strong> (<em>numpy.ndarray</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_rho_integral_quad">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_rho_integral_quad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kx_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ky_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_rho_integral_quad"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_rho_integral_quad" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -866,8 +893,8 @@ between x_min and x_max with amplitude a</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="supersolids.helper.functions.get_V_k_val_ddi2">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_V_k_val_ddi2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_V_k_val_ddi2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_V_k_val_ddi2" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_V_k_val_ddi_fft_where">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_V_k_val_ddi_fft_where</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_V_k_val_ddi_fft_where"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_V_k_val_ddi_fft_where" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -882,8 +909,8 @@ between x_min and x_max with amplitude a</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="supersolids.helper.functions.get_V_k_val_ddi3">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_V_k_val_ddi3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_cut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_cut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_cut</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_V_k_val_ddi3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_V_k_val_ddi3" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_V_k_val_ddi_fft">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_V_k_val_ddi_fft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_cut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_cut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_cut</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_V_k_val_ddi_fft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_V_k_val_ddi_fft" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -900,7 +927,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.bessel_func">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">bessel_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#bessel_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.bessel_func" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">bessel_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#bessel_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.bessel_func" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
