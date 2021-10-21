@@ -30,9 +30,8 @@ from supersolids.helper import functions
 from supersolids.helper.Resolution import Resolution, ResAssert
 from supersolids.helper.Box import Box, BoxResAssert
 
-# Script runs, if script is run as main script (called by python *.py)
-if __name__ == "__main__":
-    # Use parser to
+
+def flags(args_array):
     parser = argparse.ArgumentParser(description="Define constants for Schrödinger equation")
     parser.add_argument("-dt", metavar="dt", type=float, default=2 * 10 ** -3, nargs="?",
                         help="Length of timestep to evolve Schrödinger system.")
@@ -132,8 +131,15 @@ if __name__ == "__main__":
                              "shown and saved as mp4, else Schroedinger is "
                              "saved as pkl and allows offscreen usage.")
 
-    args = parser.parse_args()
-    print(f"args: {args}\n")
+    flag_args = parser.parse_args(args_array)
+    print(f"args: {flag_args}")
+
+    return flag_args
+
+
+# Script runs, if script is run as main script (called by python *.py)
+if __name__ == "__main__":
+    args = flags(sys.argv[1:])
 
     # apply units to input
     m_list = [m * constants.u_in_kg for m in args.m_list]
