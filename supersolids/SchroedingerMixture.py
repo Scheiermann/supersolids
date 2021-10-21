@@ -259,8 +259,7 @@ class SchroedingerMixture(Schroedinger):
                 self.V_k_val = np.full(self.psi_val.shape, 1.0)
             else:
                 if callable(self.V_interaction):
-                    # self.V_k_val = self.V_interaction(kx_mesh, ky_mesh, kz_mesh, self.z_mesh)
-                    self.V_k_val = self.V_interaction(self.x_mesh, self.y_mesh, self.z_mesh)
+                    self.V_k_val = self.V_interaction(kx_mesh, ky_mesh, kz_mesh)
 
         if imag_time:
             # Convention: $e^{-iH} = e^{UH}$
