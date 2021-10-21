@@ -17,7 +17,7 @@ def dic2str(dic):
     return dic_str_single_quote_wrapped
 
 
-supersolids_version = "0.1.34rc9"
+supersolids_version = "0.1.34rc10"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/")
 # dir_path = Path("/home/dsche/supersolids/results/")
 
