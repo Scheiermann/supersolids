@@ -206,16 +206,38 @@ if __name__ == "__main__":
     V_2d = functools.partial(functions.v_harmonic_2d, alpha_y=alpha_y)
     V_3d = functools.partial(functions.v_harmonic_3d, alpha_y=alpha_y, alpha_z=alpha_z)
 
-    V_3d_ddi = functools.partial(functions.get_V_k_val_ddi3,
-                                 x_cut=V_interaction_cut_x,
-                                 y_cut=V_interaction_cut_y,
-                                 z_cut=V_interaction_cut_z)
-    # V_3d_ddi = functools.partial(functions.get_V_k_val_ddi,
+    ## cut-off with fft (not working)
+    # V_3d_ddi = functools.partial(functions.get_V_k_val_ddi_fft,
+    #                              x_cut=V_interaction_cut_x,
+    #                              y_cut=V_interaction_cut_y,
+    #                              z_cut=V_interaction_cut_z)
+
+    ## cut-off with fft (not working)
+    # V_3d_ddi = functools.partial(functions.get_V_k_val_ddi_fft_where,
     #                               rho_cut=0.8 * max(MyBox.lengths()[:2]),
     #                               z_cut=0.8 * MyBox.lengths()[2])
 
+    # radial or no cut-off
+    V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
+                                 rho_cut=0.9 * max(MyBox.lengths()),
+                                 use_cut_off=False,
+                                 )
+
+    ## cylindrical cut-off
+    # rho_bound_factor: float = 2000.0
+    # rho_num: int = 50000
+    # z_num: int = 128
+    # cut_ratio = 0.95
+    # rho_cut = cut_ratio * np.sqrt(Box.lengths()[0] ** 2.0 + Box.lengths()[1] ** 2.0)
+    # z_cut = cut_ratio * Box.lengths()[2]
+    # rho_bound: float = rho_bound_factor * rho_cut
+    # rho_lin = np.linspace(rho_cut, rho_bound, rho_num)
+    # z_lin = np.linspace(0.0, z_cut, z_num)
+    # V_3d_ddi = functools.partial(functions.get_V_k_val_ddi, rho_lin, z_lin)
+
     # functools.partial sets all arguments except x, y, z,
     # psi_0_1d = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
+
     a_len = len(args.a)
     if a_len == 1:
         psi_0_1d = functools.partial(functions.psi_gauss_1d, a=args.a["a_x"],
@@ -294,6 +316,7 @@ if __name__ == "__main__":
         sys.exit("Spatial dimension over 3. This is not implemented.")
 
     if args.V_none:
+        # V_val will be 0.0
         V = None
     else:
         if args.V is not None:

@@ -142,11 +142,11 @@ def check_provided_lists(number_of_mixtures: int,
                          a_dd_array: np.ndarray,
                          ):
     combinations = list(
-                        itertools.combinations_with_replacement(
-                            range(1, number_of_mixtures + 1),
-                            number_of_mixtures
-                            )
-                        )
+        itertools.combinations_with_replacement(
+            range(1, number_of_mixtures + 1),
+            number_of_mixtures
+        )
+    )
     print(f"a_s and a_dd need to be provided as a list with the given order of combinations: "
           f"{combinations}.")
 
@@ -221,6 +221,7 @@ def w_dimensionsless(dimensionless_factor: float,
     w_z_dimensionless = w_z * dimensionless_factor
 
     return w_x_dimensionless, w_y_dimensionless, w_z_dimensionless
+
 
 def get_parameters(N: int = 10 ** 4,
                    m: float = 164 * constants.u_in_kg,
@@ -332,11 +333,11 @@ def psi_gauss_2d(x, y,
     return (
             (a_x * a_y * np.pi) ** -0.5
             * np.exp(-0.5 * (
-                             ((x - x_0) / a_x) ** 2.0
-                             + ((y - y_0) / a_y) ** 2.0
-                            )
+            ((x - x_0) / a_x) ** 2.0
+            + ((y - y_0) / a_y) ** 2.0
+    )
                      + 1j * x * k_0)
-            )
+    )
 
 
 def psi_gauss_3d(x, y, z,
@@ -588,10 +589,11 @@ def get_r_cut(k_mesh: np.ndarray, r_cut: float = 1.0):
     return r_cut_mesh
 
 
-def dipol_dipol_interaction(kx_mesh: float,
-                            ky_mesh: float,
-                            kz_mesh: float,
-                            r_cut: float = 1.0):
+def dipol_dipol_interaction(kx_mesh: np.ndarray,
+                            ky_mesh: np.ndarray,
+                            kz_mesh: np.ndarray,
+                            r_cut: float = 1.0,
+                            use_cut_off: bool = False):
     k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
     factor = 3.0 * (kz_mesh ** 2.0)
     # for [0, 0, 0] there is a singularity and factor/k_squared is 0/0, so we
@@ -599,7 +601,10 @@ def dipol_dipol_interaction(kx_mesh: float,
     k_squared_singular_free = np.where(k_squared == 0.0, 1.0, k_squared)
 
     k_mesh: np.ndarray = np.sqrt(k_squared)
-    r_cut_mesh: np.ndarray = get_r_cut(k_mesh, r_cut=r_cut)
+    if use_cut_off:
+        r_cut_mesh: np.ndarray = get_r_cut(k_mesh, r_cut=r_cut)
+    else:
+        r_cut_mesh: float = 1.0
 
     V_k_val = r_cut_mesh * ((factor / k_squared_singular_free) - 1.0)
 
@@ -610,11 +615,15 @@ def dipol_dipol_interaction(kx_mesh: float,
 
 
 def get_V_k_val_ddi(kx_mesh, ky_mesh, kz_mesh,
-                    z_mesh, rho_cut: float = 1.0, z_cut: float = 1.0):
+                    rho_lin: np.ndarray,
+                    z_lin: np.ndarray,
+                    ):
     """
     Explicit calculation of the Fourier transform with the cylindrical cut-off
 
     """
+    z_cut = z_lin[-1]
+
     k_rho2_mesh = kx_mesh ** 2.0 + ky_mesh ** 2.0
     k_rho_mesh = np.sqrt(k_rho2_mesh)
     k_r2_mesh = k_rho2_mesh + kz_mesh ** 2.0
@@ -629,39 +638,95 @@ def get_V_k_val_ddi(kx_mesh, ky_mesh, kz_mesh,
     term2 = np.exp(-z_cut * k_rho_mesh) * (sin2a * np.cos(z_cut * kz_mesh)
                                            - sinacosa * np.sin(z_cut * kz_mesh)
                                            )
-    term3 = quad(get_rho_integral(k_rho_mesh, kz_mesh, z_mesh, rho_cut), 0.0, z_cut)
+    term3 = get_rho_integral(k_rho_mesh, kz_mesh, rho_lin, z_lin)
+    # term3_slow = get_rho_integral_slow(k_rho_mesh, kz_mesh, rho_lin, z_lin)
+
     return 4.0 * np.pi * (term1 + term2 + term3)
 
 
-def get_rho_integral(k_rho_mesh: float,
-                     kz_mesh: float,
-                     z_mesh: float,
-                     rho_cut: float = 1.0,
-                     ):
-    shape = kz_mesh.shape
-
-    r_bound = 2000.0 * rho_cut
-    # r_bound = np.inf
+def get_rho_integral_slow(k_rho_mesh: np.ndarray,
+                          kz_mesh: np.ndarray,
+                          rho_lin: np.ndarray,
+                          z_lin: np.ndarray,
+                          ):
+    drho = rho_lin[1] - rho_lin[0]
+    dz = z_lin[1] - z_lin[0]
 
     with run_time(name="quad bessel_func"):
-        it = np.nditer([z_mesh, k_rho_mesh, kz_mesh, None], flags=['external_loop'])
-
+        it = np.nditer([k_rho_mesh, kz_mesh], flags=['external_loop'])
+        shape = np.shape(kz_mesh)
+        out = []
+        # it = np.nditer([k_rho_mesh, kz_mesh, None], flags=['external_loop'])
+        # out = np.zeros(shape=shape)
         with it:
-            for z1, k_rho1, kz1, out in it:
-                for z, k_rho, kz in zip(z1, k_rho1, kz1):
-                    out[...] = quad(bessel_func(z, k_rho, kz), rho_cut, r_bound)[0]
+            iter = np.ndindex(shape)
+            for k_rho1, kz1 in it:
+                for k_rho, kz in zip(k_rho1, kz1):
+                    index = next(iter)
+                    integrand_rho_z = bessel_func(rho_lin[:, np.newaxis], z_lin, k_rho, kz)
+                    out.append(np.sum(np.sum(integrand_rho_z)) * drho * dz)
+                    # out[index] = np.sum(np.sum(integrand_rho_z)) * drho * dz
 
-        result = np.array(out).reshape(shape)
+        out = np.array(out).reshape(shape)
 
-    return result
+    return out
 
 
-def get_rho_integral1(kx_mesh: float,
-                      ky_mesh: float,
-                      kz_mesh: float,
-                      z_mesh: float,
-                      rho_cut: float = 1.0,
-                      z_cut: float = 1.0):
+def triu_list2array(triu_list, triu_ind, shape):
+    triu = np.zeros(shape=shape)
+    triu[triu_ind] = triu_list
+
+    return triu
+
+
+def get_rho_integral(k_rho_mesh: np.ndarray,
+                     kz_mesh: np.ndarray,
+                     rho_lin: np.ndarray,
+                     z_lin: np.ndarray,
+                     ):
+    drho = rho_lin[1] - rho_lin[0]
+    dz = z_lin[1] - z_lin[0]
+    x_size, y_size = k_rho_mesh.shape[0], k_rho_mesh.shape[1]
+
+    with run_time(name="quad bessel_func new"):
+        x_len = int((x_size / 2.0) + 1.0)
+        y_len = int((y_size / 2.0) + 1.0)
+        k_rho_mesh_halved = k_rho_mesh[0:x_len, 0:y_len, :]
+        kz_mesh_halved = kz_mesh[0:x_len, 0:y_len, :]
+        z_len = np.shape(kz_mesh_halved)[2]
+
+        triu_ind = np.triu_indices(n=x_len, m=y_len, k=-1)
+        g = [k_rho_mesh_halved[:, :, i][triu_ind] for i in range(0, z_len)]
+        h = [kz_mesh_halved[:, :, i][triu_ind] for i in range(0, z_len)]
+        out = []
+        for k_rho_rank, kz_rank in zip(g, h):
+            inner = []
+            for k_rho, kz in zip(k_rho_rank, kz_rank):
+                integrand_rho_z = bessel_func(rho_lin[:, np.newaxis], z_lin, k_rho, kz)
+                inner.append(np.sum(np.sum(integrand_rho_z)) * drho * dz)
+            out.append(inner)
+
+        trius = [triu_list2array(inner, triu_ind, (x_len, y_len)) for inner in out]
+        out = np.stack(trius, axis=2)
+
+    a1 = out[1:, :, :]
+    # a = np.delete(term3, 0, 0)
+    b = np.rot90(a1, 1, axes=(0, 1))
+    c = np.rot90(a1, 2, axes=(0, 1))
+    d = np.rot90(a1, 3, axes=(0, 1))
+    e = np.vstack(a1, b)
+    f = np.vstack(c, d)
+    g = np.hstack(e, f)
+
+    return out
+
+
+def get_rho_integral_quad(kx_mesh: float,
+                          ky_mesh: float,
+                          kz_mesh: float,
+                          z_mesh: float,
+                          rho_cut: float = 1.0,
+                          z_cut: float = 1.0):
     shape = kx_mesh.shape
     k_rho_mesh = np.sqrt(kx_mesh ** 2.0 + ky_mesh ** 2.0)
 
@@ -677,11 +742,11 @@ def get_rho_integral1(kx_mesh: float,
     return result
 
 
-def get_V_k_val_ddi2(x_mesh: float,
-                     y_mesh: float,
-                     z_mesh: float,
-                     rho_cut: float = 1.0,
-                     z_cut: float = 1.0):
+def get_V_k_val_ddi_fft_where(x_mesh: float,
+                              y_mesh: float,
+                              z_mesh: float,
+                              rho_cut: float = 1.0,
+                              z_cut: float = 1.0):
     with run_time(name="fft V_ddi"):
         rho2_mesh = x_mesh ** 2.0 + y_mesh ** 2.0
         rho_mesh = np.sqrt(rho2_mesh)
@@ -700,12 +765,12 @@ def get_V_k_val_ddi2(x_mesh: float,
     return V_k_val_real
 
 
-def get_V_k_val_ddi3(x_mesh: float,
-                     y_mesh: float,
-                     z_mesh: float,
-                     x_cut: List[float],
-                     y_cut: List[float],
-                     z_cut: List[float]):
+def get_V_k_val_ddi_fft(x_mesh: float,
+                        y_mesh: float,
+                        z_mesh: float,
+                        x_cut: List[float],
+                        y_cut: List[float],
+                        z_cut: List[float]):
     with run_time(name="fft V_ddi xyz cut"):
         r_mesh = np.sqrt(x_mesh ** 2.0 + y_mesh ** 2.0 + z_mesh ** 2.0)
 
@@ -727,11 +792,11 @@ def get_V_k_val_ddi3(x_mesh: float,
     return V_k_val_real
 
 
-def bessel_func(z, k_rho, kz):
-    bessel = lambda rho: (
-        - np.cos(kz * z) * rho
-        * (rho ** 2.0 - 2.0 * z ** 2.0) / ((rho ** 2.0 + z ** 2.0) ** 2.5) * jv(0, rho * k_rho)
-        )
+def bessel_func(rho, z, k_rho, kz):
+    bessel = (- np.cos(kz * z) * rho
+              * (rho ** 2.0 - 2.0 * z ** 2.0) / ((rho ** 2.0 + z ** 2.0) ** 2.5)
+              * jv(0, rho * k_rho)
+              )
 
     return bessel
 
