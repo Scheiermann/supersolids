@@ -6,8 +6,8 @@ import time
 
 from supersolids.helper.dict2str import dic2str
 
-
-xvfb_display = 200
+slurm = True
+xvfb_display = 500
 supersolids_version = "0.1.34rc9"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture/")
 # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
@@ -22,11 +22,9 @@ a11 = 95.0
 m_list = [164.0, 164.0]
 mu_list = [10.0, 9.0]
 
-
 Box = {"x0": -12, "x1": 12, "y0": -7, "y1": 7, "z0": -5, "z1": 5}
 Res = {"x": 256, "y": 128, "z": 32}
-# N = 50000
-# w_y = 518.36
+
 noise = [0.8, 1.2]
 accuracy = 0.0
 
@@ -45,7 +43,7 @@ a = {"a_x": 2.2, "a_y": 1.5, "a_z": 1.0}
 
 max_timesteps = 1500001
 dt = 0.0002
-steps_per_npz = 10000
+steps_per_npz = 1000
 steps_format = "%07d"
 accuracy = 0.0
 
@@ -53,9 +51,9 @@ N_start = 0.05
 N_end = 0.51
 N_step = 0.05
 
-alpha_start = 0.6
-alpha_end = 0.91
-alpha_step = 0.02
+a12_start = 0.6
+a12_end = 0.91
+a12_step = 0.02
 
 func_filename = "distort.txt"
 
@@ -65,16 +63,16 @@ movie_list = []
 func_list = []
 func_path_list = []
 dir_path_func_list = []
-for v in np.arange(N_start, N_end, N_step):
-    for d in np.arange(alpha_start, alpha_end, alpha_step):
+for N2_part in np.arange(N_start, N_end, N_step):
+    for a12 in np.arange(a12_start, a12_end, a12_step):
         func_list.append([])
-        v_string = round(v, ndigits=5)
-        d_string = round(d, ndigits=5)
-        N2 = int(N * v_string)
+        N2_part_string = round(N2_part, ndigits=5)
+        a12_string = round(a12, ndigits=5)
+        N2 = int(N * N2_part)
         N_list = [N - N2, N2]
 
         # a_s_list in triu (triangle upper matrix) form: a11, a12, a22
-        a_s_list = [a11, d_string * a11, a11]
+        a_s_list = [a11, a12 * a11, a11]
 
         # w_y = 2.0 * np.pi * (w_x_freq / d_string)
         # -w_y={w_y} \
@@ -96,17 +94,37 @@ for v in np.arange(N_start, N_end, N_step):
         func_path = Path(dir_path_func, func_filename)
         func_path_list.append(func_path)
 
-        heredoc = f"""#!/bin/bash
-#==================================================
-#PBS -N {supersolids_version}_N2_{v_string}a12_{d_string}
-#PBS -M daniel.scheiermann@itp.uni-hannover.de
-#PBS -d /bigwork/dscheier/supersolids/supersolids/results/
-#PBS -e /bigwork/dscheier/supersolids/supersolids/results/log/error_$PBS_JOBID.txt
-#PBS -o /bigwork/dscheier/supersolids/supersolids/results/log/output_$PBS_JOBID.txt
-#PBS -l nodes=1:ppn=1:ws
-#PBS -l walltime=200:00:00
-#PBS -l mem=8GB
-#PBS -l vmem=8GB
+        jobname = f"{supersolids_version}_N2_{N2_part_string}a12_{a12_string}"
+
+        if slurm:
+            cluster_flags = f"""
+                             #SBATCH --job-name {jobname}
+                             #SBATCH -D /bigwork/dscheier/supersolids/supersolids/results/
+                             #SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
+                             #SBATCH --mail-type=BEGIN,END,FAIL
+                             #SBATCH -o output-%j.out
+                             #SBATCH -e error-%j.out
+                             #SBATCH -N 1
+                             #SBATCH -n 1
+                             #SBATCH -t 14-00:00:00
+                             #SBATCH --mem=6G
+                             #SBATCH --mem-per-cpu=6G
+                             """
+        else:
+            cluster_flags = f"""
+                             # PBS -N {jobname}
+                             # PBS -M daniel.scheiermann@itp.uni-hannover.de
+                             # PBS -d /bigwork/dscheier/supersolids/supersolids/results/
+                             # PBS -e /bigwork/dscheier/supersolids/supersolids/results/log/error_$PBS_JOBID.txt
+                             # PBS -o /bigwork/dscheier/supersolids/supersolids/results/log/output_$PBS_JOBID.txt
+                             # PBS -l nodes=1:ppn=1:ws
+                             # PBS -l walltime=200:00:00
+                             # PBS -l mem=6GB
+                             # PBS -l vmem=6GB
+                            """
+
+        heredoc = ("#!/usr/bin/bash env" + cluster_flags
+                   + f"""#==================================================
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -159,20 +177,17 @@ echo $(which pip3)
 --mixture
 
 """
-
-        func_list[j_counter].append(f"N={N}")
-        func_list[j_counter].append(f"Box={Box}")
-        func_list[j_counter].append(f"Res={Res}")
-        func_list[j_counter].append(f"dt={dt}")
-        func_list[j_counter].append(f"a_s={a_s}")
-        func_list[j_counter].append(f"a={a}")
-        # func_list[j_counter].append(f"w_y={w_y}")
-        func_list[j_counter].append(f"noise={noise}")
-        func_list[j_counter].append(f"steps_per_npz={steps_per_npz}")
+                   )
 
         print(heredoc)
 
-        p = subprocess.Popen(["qsub"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=False)
+        if slurm:
+            p = subprocess.Popen(["sbatch"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                 shell=False)
+        else:
+            p = subprocess.Popen(["qsub"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                 shell=False)
+
         out, err = p.communicate(heredoc.encode())
         p.wait()
 
@@ -190,7 +205,6 @@ echo $(which pip3)
             if existing_dirs:
                 print(f"First path: {existing_dirs[0]}")
 
-
 movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
 movie_dirnames = list(map(lambda path: path.name, movie_dirs))
 while not all(item in movie_dirnames for item in movie_list):
@@ -204,7 +218,7 @@ while not all(item in movie_dirnames for item in movie_list):
 j_counter = 0
 # put distort.txt with the used V for every movie
 for i, v_0 in enumerate(np.arange(N_start, N_end, N_step)):
-    for j, delta in enumerate(np.arange(alpha_start, alpha_end, alpha_step)):
+    for j, delta in enumerate(np.arange(a12_start, a12_end, a12_step)):
         func = func_list[j_counter]
         func_path = func_path_list[j_counter]
         dir_path_func = dir_path_func_list[j_counter]
@@ -219,4 +233,3 @@ for i, v_0 in enumerate(np.arange(N_start, N_end, N_step)):
                 func_file.write(f"{func_string}")
 
         j_counter += 1
-
