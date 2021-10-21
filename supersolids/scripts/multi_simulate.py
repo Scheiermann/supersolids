@@ -16,11 +16,12 @@ def dic2str(dic):
 
     return dic_str_single_quote_wrapped
 
-
 supersolids_version = "0.1.34rc10"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/")
 # dir_path = Path("/home/dsche/supersolids/results/")
 
+slurm: bool = True
+mem_in_GB = 6
 xvfb_display = 50
 
 max_timesteps = 700001
@@ -31,13 +32,13 @@ accuracy = 0.0
 w_x_freq = 33.0
 w_z_freq = 167.0
 
-v_start = 60000
-v_end = 61000
-v_step = 5000
+N_start = 0.05
+N_end = 0.51
+N_step = 0.05
 
-d_start = 0.35
-d_end = 0.40
-d_step = 0.05
+a12_start = 0.6
+a12_end = 0.91
+a12_step = 0.02
 
 file_start = "step_"
 file_number = 1130000
@@ -58,17 +59,17 @@ j_counter = 0
 func_list = []
 func_path_list = []
 dir_path_func_list = []
-for v in np.arange(v_start, v_end, v_step):
-    for d in np.arange(d_start, d_end, d_step)[::-1]:
+for N2_part in np.arange(N_start, N_end, N_step):
+    for a12 in np.arange(a12_start, a12_end, a12_step)[::-1]:
         func_list.append([])
-        v_string = round(v, ndigits=5)
-        d_string = round(d, ndigits=5)
+        N2_part_string = round(N2_part, ndigits=5)
+        a12_string = round(a12, ndigits=5)
         # d_string = 0.0001 * 10.0 ** round(d, ndigits=5)
 
         w_x = 2.0 * np.pi * w_x_freq
-        w_y = 2.0 * np.pi * (w_x_freq / d_string)
+        w_y = 2.0 * np.pi * (w_x_freq / a12_string)
         w_z = 2.0 * np.pi * w_z_freq
-        w={"w_x": eval(f"{w_x}"), "w_y": eval(f"{w_y}"), "w_z": eval(f"{w_z}")}
+        w = {"w_x": eval(f"{w_x}"), "w_y": eval(f"{w_y}"), "w_z": eval(f"{w_z}")}
 
         # V = f"lambda x, y, z: {v_string} * np.sin(np.pi*x/{d_string}) ** 2"
         # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi/4.0) + (np.pi*x/{d_string}) )"
@@ -76,8 +77,8 @@ for v in np.arange(v_start, v_end, v_step):
         # V = f"lambda x, y, z: {v_string} * np.exp(-((x ** 2.0) /{d_string} ** 2.0) )"
         V = None
         # func_list[j_counter].append(f"-V='{V}' ")
-        func_list[j_counter].append(f"N={v_string} ")
-        func_list[j_counter].append(f"alpha={d_string} ")
+        func_list[j_counter].append(f"N2/N1={N2_part_string} ")
+        func_list[j_counter].append(f"a12={a12_string} ")
         # func_list[j_counter].append(f"--real_time ")
 
         noise_func = None
@@ -102,17 +103,38 @@ for v in np.arange(v_start, v_end, v_step):
         func_path = Path(dir_path_func, func_filename)
         func_path_list.append(func_path)
 
-        heredoc = f"""#!/bin/bash
-#==================================================
-#PBS -N {supersolids_version}_v{v_string}dx{d_string}
-#PBS -d /bigwork/dscheier/
-#PBS -e /bigwork/dscheier/supersolids/supersolids/results/log/error_$PBS_JOBID.txt
-#PBS -o /bigwork/dscheier/supersolids/supersolids/results/log/output_$PBS_JOBID.txt
-#PBS -l nodes=1:ppn=1:ws
-#PBS -l walltime=250:00:00
-#PBS -l mem=8GB
-#PBS -l vmem=8GB
+        jobname = f"{supersolids_version}_N2_{N2_part_string}a12_{a12_string}"
 
+        if slurm:
+            cluster_flags = f"""#==================================================
+        #SBATCH --job-name {jobname}
+        #SBATCH -D /bigwork/dscheier/supersolids/supersolids/results/
+        #SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
+        #SBATCH --mail-type=END,FAIL
+        #SBATCH -o output-%j.out
+        #SBATCH -e error-%j.out
+        #SBATCH -N 1
+        #SBATCH -n 1
+        #SBATCH -t 14-00:00:00
+        #SBATCH --mem={mem_in_GB}G
+        """
+
+        else:
+            cluster_flags = f"""#==================================================
+        # PBS -N {jobname}
+        # PBS -M daniel.scheiermann@itp.uni-hannover.de
+        # PBS -d /bigwork/dscheier/supersolids/supersolids/results/
+        # PBS -e /bigwork/dscheier/supersolids/supersolids/results/log/error_$PBS_JOBID.txt
+        # PBS -o /bigwork/dscheier/supersolids/supersolids/results/log/output_$PBS_JOBID.txt
+        # PBS -l nodes=1:ppn=1:ws
+        # PBS -l walltime=200:00:00
+        # PBS -l mem={mem_in_GB}GB
+        # PBS -l vmem={mem_in_GB}GB
+        """
+
+        heredoc = "\n".join(["#!/bin/bash",
+                             cluster_flags,
+                             f"""
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/bigwork/dscheier/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
@@ -159,10 +181,17 @@ echo $(which pip3)
 # -V={V} \
 # -noise_func='{noise_func}'\
 # -neighborhood 0.02 4
-"""
+"""])
+
         print(heredoc)
 
-        p = subprocess.Popen(["qsub"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=False)
+        if slurm:
+            p = subprocess.Popen(["sbatch"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                 shell=False)
+        else:
+            p = subprocess.Popen(["qsub"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                 shell=False)
+
         out, err = p.communicate(heredoc.encode())
         p.wait()
 
@@ -171,8 +200,8 @@ echo $(which pip3)
 
 j_counter = 0
 # put distort.txt with the used V for every movie
-for i, v_0 in enumerate(np.arange(v_start, v_end, v_step)):
-    for j, delta in enumerate(np.arange(d_start, d_end, d_step)):
+for i, N2_part in enumerate(np.arange(N_start, N_end, N_step)):
+    for j, a12 in enumerate(np.arange(a12_start, a12_end, a12_step)):
         func = func_list[j_counter]
         func_path = func_path_list[j_counter]
         dir_path_func = dir_path_func_list[j_counter]
