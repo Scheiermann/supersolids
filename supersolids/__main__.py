@@ -98,10 +98,13 @@ if __name__ == "__main__":
                         help="Min and max values for z to cut V_3d_ddi (Dipol-Dipol-Interaction).")
     parser.add_argument("--real_time", default=False, action="store_true",
                         help="Switch for Split-Operator method to use imaginary time or not.")
-    parser.add_argument("--plot_psi_list", default=None, nargs="+",
-                        help="Option to plot the list of wavefunctions psi.")
-    parser.add_argument("--plot_psi_sol_list", default=None, nargs="+",
-                        help="Option to plot the manually given solution for the wavefunction psi.")
+    parser.add_argument("--alpha_psi_list", default=[], nargs="+",
+                        help="Option to adjust the transparency of the list of plots.")
+    parser.add_argument("--alpha_psi_sol_list", default=[], nargs="+",
+                        help="Option to adjust the transparency of the list of plots.")
+    parser.add_argument("--alpha_V", default=0.3,
+                        help="Option to adjust the transparency of the external potential V "
+                             "(trap + extra).")
     parser.add_argument("--plot_V", default=False, action="store_true",
                         help="Option to plot the external potential of the system (the trap).")
     parser.add_argument("-script_name", type=str, default="script",
@@ -333,7 +336,7 @@ if __name__ == "__main__":
             e_dd=e_dd,
             a_s=args.a_s,
             imag_time=(not args.real_time),
-            mu_arr=1.1,
+            mu_arr=np.array([1.1]),
             E=1.0,
             psi_0=psi_0,
             V=V,
@@ -346,9 +349,9 @@ if __name__ == "__main__":
     Anim: Animation = Animation(
         Res=SchroedingerInput.Res,
         plot_V=args.plot_V,
-        alpha_psi_list=[],
-        alpha_psi_sol_list=[],
-        alpha_V=0.3,
+        alpha_psi_list=args.alpha_psi_list,
+        alpha_psi_sol_list=args.alpha_psi_sol_list,
+        alpha_V=args.alpha_V,
         camera_r_func=functools.partial(functions.camera_func_r,
                                         r_0=10.0, phi_0=45.0, z_0=50.0,
                                         r_per_frame=0.0),
