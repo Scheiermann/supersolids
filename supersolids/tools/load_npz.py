@@ -35,7 +35,7 @@ def load_npz(flag_args):
     Anim: Animation = Animation(plot_V=flag_args.plot_V,
                                 alpha_psi_list=flag_args.alpha_psi_list,
                                 alpha_psi_sol_list=flag_args.alpha_psi_sol_list,
-                                alpha_V=0.3,
+                                alpha_V=args.alpha_V,
                                 filename="anim.mp4",
                                 )
 
@@ -94,10 +94,13 @@ def flags(args_array):
                         help="Index of mixture to take slices from.")
     parser.add_argument("-azimuth", type=float, default=0.0, help="Phi angle in x-y-plane.")
     parser.add_argument("-elevation", type=float, default=0.0, help="Zenith angle theta in z-axis.")
-    parser.add_argument("--alpha_psi_list", default=None, nargs="+",
+    parser.add_argument("--alpha_psi_list", default=[], nargs="+",
                         help="Option to adjust the transparency of the list of plots.")
-    parser.add_argument("--alpha_psi_sol_list", default=None, nargs="+",
+    parser.add_argument("--alpha_psi_sol_list", default=[], nargs="+",
                         help="Option to adjust the transparency of the list of plots.")
+    parser.add_argument("--alpha_V", default=0.3,
+                        help="Option to adjust the transparency of the external potential V "
+                             "(trap + extra).")
     parser.add_argument("--plot_V", default=False, action="store_true",
                         help="Option to plot the external potential of the system (the trap)")
     parser.add_argument("--delete_input", default=False, action="store_true",
