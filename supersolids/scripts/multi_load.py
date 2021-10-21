@@ -20,10 +20,8 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/y_kick/kick_fix_0.01/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/scissor/")
     # path_anchor_input = Path("/run/media/dsche/ITP Transfer/test/")
-    path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture/")
+    path_anchor_input = Path("/run/media/dsche/scr2/begin_mixture/")
     # path_anchor_input = Path("/home/dsche/supersolids/results/")
 
     mixture = True
@@ -31,7 +29,7 @@ if __name__ == "__main__":
     # take_last = 30
     take_last = np.inf
 
-    steps_per_npz = 1
+    steps_per_npz = 10000
 
     movie_string = "movie"
     counting_format = "%03d"

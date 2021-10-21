@@ -25,7 +25,7 @@ xvfb_display = 50
 
 max_timesteps = 700001
 dt = 0.0002
-steps_per_npz = 1000
+steps_per_npz = 10000
 accuracy = 0.0
 
 w_x_freq = 33.0
@@ -106,12 +106,12 @@ for v in np.arange(v_start, v_end, v_step):
 #==================================================
 #PBS -N {supersolids_version}_v{v_string}dx{d_string}
 #PBS -d /bigwork/dscheier/
-#PBS -e /bigwork/dscheier/supersolids/supersolids/results/error_$PBS_JOBID.txt
-#PBS -o /bigwork/dscheier/supersolids/supersolids/results/output_$PBS_JOBID.txt
+#PBS -e /bigwork/dscheier/supersolids/supersolids/results/log/error_$PBS_JOBID.txt
+#PBS -o /bigwork/dscheier/supersolids/supersolids/results/log/output_$PBS_JOBID.txt
 #PBS -l nodes=1:ppn=1:ws
 #PBS -l walltime=250:00:00
-#PBS -l mem=4GB
-#PBS -l vmem=4GB
+#PBS -l mem=8GB
+#PBS -l vmem=8GB
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!

@@ -38,9 +38,8 @@ a = {"a_x": 2.2, "a_y": 1.5, "a_z": 1.0}
 
 max_timesteps = 1500001
 dt = 0.0002
-steps_per_npz = 50000
+steps_per_npz = 10000
 steps_format = "%07d"
-steps_per_npz = 1000
 accuracy = 0.0
 
 N_start = 10000
@@ -95,12 +94,12 @@ for v in np.arange(N_start, N_end, N_step):
 #PBS -N {supersolids_version}_N2_{v_string}a12_{d_string}
 #PBS -M daniel.scheiermann@itp.uni-hannover.de
 #PBS -d /bigwork/dscheier/supersolids/supersolids/results/
-#PBS -e /bigwork/dscheier/supersolids/supersolids/results/error_$PBS_JOBID.txt
-#PBS -o /bigwork/dscheier/supersolids/supersolids/results/output_$PBS_JOBID.txt
+#PBS -e /bigwork/dscheier/supersolids/supersolids/results/log/error_$PBS_JOBID.txt
+#PBS -o /bigwork/dscheier/supersolids/supersolids/results/log/output_$PBS_JOBID.txt
 #PBS -l nodes=1:ppn=1:ws
 #PBS -l walltime=200:00:00
-#PBS -l mem=4GB
-#PBS -l vmem=4GB
+#PBS -l mem=8GB
+#PBS -l vmem=8GB
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
