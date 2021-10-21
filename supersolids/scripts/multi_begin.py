@@ -35,7 +35,7 @@ w_y_freq = 80.0
 w_z_freq = 167.0
 w_x = 2.0 * np.pi * w_x_freq
 w_y = 2.0 * np.pi * w_y_freq
-w_y = 2.0 * np.pi * w_z_freq
+w_z = 2.0 * np.pi * w_z_freq
 
 a_s = 0.000000004656
 # a = {"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}
