@@ -219,7 +219,7 @@ if __name__ == "__main__":
 
     # radial or no cut-off
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
-                                 rho_cut=0.9 * max(MyBox.lengths()),
+                                 r_cut=0.9 * max(MyBox.lengths()),
                                  use_cut_off=False,
                                  )
 
