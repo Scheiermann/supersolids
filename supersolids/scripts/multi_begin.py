@@ -173,13 +173,13 @@ echo $(which pip3)
         existing_dirnames = list(map(lambda path: path.name, existing_dirs))
         print(f"{movie_after}")
         while not movie_after in existing_dirnames:
-            if not existing_dirs:
-                print(f"First path: {existing_dirs[0]}")
             print(f"Found dirnames: {existing_dirnames}")
             print(f"Directory for {movie_after} not created yet. Waiting 20 seconds.")
             time.sleep(20)
             existing_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
             existing_dirnames = list(map(lambda path: path.name, existing_dirs))
+            if existing_dirs:
+                print(f"First path: {existing_dirs[0]}")
 
 
 movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
