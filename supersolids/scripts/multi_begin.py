@@ -7,7 +7,7 @@ import time
 from supersolids.helper.dict2str import dic2str
 
 
-xvfb_display = 98
+xvfb_display = 200
 supersolids_version = "0.1.34rc9"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture/")
 # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
@@ -16,20 +16,27 @@ movie_string = "movie"
 counting_format = "%03d"
 movie_number = 1
 
-N = 65000
+N = 63000
 a11 = 95.0
 
 m_list = [164.0, 164.0]
 mu_list = [10.0, 9.0]
 
 
-Box = {"x0": -10, "x1": 10, "y0": -5, "y1": 5, "z0": -4, "z1": 4}
+Box = {"x0": -12, "x1": 12, "y0": -7, "y1": 7, "z0": -5, "z1": 5}
 Res = {"x": 256, "y": 128, "z": 32}
 # N = 50000
 # w_y = 518.36
 noise = [0.8, 1.2]
 accuracy = 0.0
+
 w_x_freq = 33.0
+w_y_freq = 80.0
+w_z_freq = 167.0
+w_x = 2.0 * np.pi * w_x_freq
+w_y = 2.0 * np.pi * w_y_freq
+w_y = 2.0 * np.pi * w_z_freq
+
 a_s = 0.000000004656
 # a = {"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}
 
@@ -42,13 +49,13 @@ steps_per_npz = 10000
 steps_format = "%07d"
 accuracy = 0.0
 
-N_start = 10000
-N_end = 60000
-N_step = 5000
+N_start = 0.05
+N_end = 0.51
+N_step = 0.05
 
-alpha_start = 0.3
-alpha_end = 1.3
-alpha_step = 0.1
+alpha_start = 0.6
+alpha_end = 0.91
+alpha_step = 0.02
 
 func_filename = "distort.txt"
 
@@ -63,7 +70,7 @@ for v in np.arange(N_start, N_end, N_step):
         func_list.append([])
         v_string = round(v, ndigits=5)
         d_string = round(d, ndigits=5)
-        N2 = v_string
+        N2 = int(N * v_string)
         N_list = [N - N2, N2]
 
         # a_s_list in triu (triangle upper matrix) form: a11, a12, a22
@@ -138,6 +145,9 @@ echo $(which pip3)
 -dir_path={dir_path} \
 -dir_name_result={dir_name_result} \
 -a={dic2str(a)} \
+-w_x={w_x} \
+-w_y={w_y} \
+-w_z={w_z} \
 -accuracy={accuracy} \
 -noise {' '.join(map(str, noise))} \
 --N_list {' '.join(map(str, N_list))} \
