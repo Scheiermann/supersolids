@@ -10,6 +10,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from supersolids.Schroedinger import Schroedinger
+from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.tools.track_property import property_check, get_property
 
 
@@ -28,12 +29,21 @@ def get_System_at_npz(dir_path: Path = Path("~/supersolids/results").expanduser(
     input_path = Path(dir_path, dir_name)
     with open(Path(input_path, filename_schroedinger), "rb") as f:
         # WARNING: this is just the input Schroedinger at t=0
-        System: Schroedinger = dill.load(file=f)
+        System_loaded: Schroedinger = dill.load(file=f)
+
+    SystemSummary, summary_name = System_loaded.use_summary(summary_name=args.summary_name)
     try:
         # get the psi_val of Schroedinger at other timesteps (t!=0)
         psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
-        with open(psi_val_path, "rb") as f:
-            System.psi_val = np.load(file=f)["psi_val"]
+        if isinstance(System_loaded, SchroedingerMixture):
+            # get the psi_val of Schroedinger at other timesteps (t!=0)
+            with open(psi_val_path, "rb") as f:
+                System_loaded.psi_val_list = np.load(file=f)["psi_val_list"]
+        else:
+            # get the psi_val of Schroedinger at other timesteps (t!=0)
+            with open(psi_val_path, "rb") as f:
+                System_loaded.psi_val = np.load(file=f)["psi_val"]
+
     except zipfile.BadZipFile:
         print(f"Zipfile with frame {frame} can't be read. Maybe the simulation "
               "was stopped before file was successfully created."
@@ -41,7 +51,7 @@ def get_System_at_npz(dir_path: Path = Path("~/supersolids/results").expanduser(
     except FileNotFoundError:
         print(f"File not found.")
 
-    return System
+    return System_loaded
 
 
 def plot_System_at_npz(args):
