@@ -97,35 +97,35 @@ for N2_part in np.arange(N_start, N_end, N_step):
         jobname = f"{supersolids_version}_N2_{N2_part_string}a12_{a12_string}"
 
         if slurm:
-            cluster_flags = f"""
-                             #SBATCH --job-name {jobname}
-                             #SBATCH -D /bigwork/dscheier/supersolids/supersolids/results/
-                             #SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
-                             #SBATCH --mail-type=BEGIN,END,FAIL
-                             #SBATCH -o output-%j.out
-                             #SBATCH -e error-%j.out
-                             #SBATCH -N 1
-                             #SBATCH -n 1
-                             #SBATCH -t 14-00:00:00
-                             #SBATCH --mem=6G
-                             #SBATCH --mem-per-cpu=6G
-                             """
+            cluster_flags = f"""#==================================================
+#SBATCH --job-name {jobname}
+#SBATCH -D /bigwork/dscheier/supersolids/supersolids/results/
+#SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH -o output-%j.out
+#SBATCH -e error-%j.out
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH -t 14-00:00:00
+#SBATCH --mem=6G
+"""
+
         else:
-            cluster_flags = f"""
-                             # PBS -N {jobname}
-                             # PBS -M daniel.scheiermann@itp.uni-hannover.de
-                             # PBS -d /bigwork/dscheier/supersolids/supersolids/results/
-                             # PBS -e /bigwork/dscheier/supersolids/supersolids/results/log/error_$PBS_JOBID.txt
-                             # PBS -o /bigwork/dscheier/supersolids/supersolids/results/log/output_$PBS_JOBID.txt
-                             # PBS -l nodes=1:ppn=1:ws
-                             # PBS -l walltime=200:00:00
-                             # PBS -l mem=6GB
-                             # PBS -l vmem=6GB
-                            """
+            cluster_flags = f"""#==================================================
+# PBS -N {jobname}
+# PBS -M daniel.scheiermann@itp.uni-hannover.de
+# PBS -d /bigwork/dscheier/supersolids/supersolids/results/
+# PBS -e /bigwork/dscheier/supersolids/supersolids/results/log/error_$PBS_JOBID.txt
+# PBS -o /bigwork/dscheier/supersolids/supersolids/results/log/output_$PBS_JOBID.txt
+# PBS -l nodes=1:ppn=1:ws
+# PBS -l walltime=200:00:00
+# PBS -l mem=6GB
+# PBS -l vmem=6GB
+"""
 
-        heredoc = ("#!/usr/bin/bash env" + cluster_flags
-                   + f"""#==================================================
-
+        heredoc = "\n".join(["#!/bin/bash",
+                             cluster_flags,
+                            f""" 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/bigwork/dscheier/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
@@ -176,8 +176,7 @@ echo $(which pip3)
 --offscreen \
 --mixture
 
-"""
-                   )
+"""])
 
         print(heredoc)
 
