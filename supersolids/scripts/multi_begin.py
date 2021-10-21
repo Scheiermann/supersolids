@@ -7,6 +7,7 @@ import time
 from supersolids.helper.dict2str import dic2str
 
 slurm = True
+mem_in_GB = 6
 xvfb_display = 500
 supersolids_version = "0.1.34rc10"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture/")
@@ -101,13 +102,13 @@ for N2_part in np.arange(N_start, N_end, N_step):
 #SBATCH --job-name {jobname}
 #SBATCH -D /bigwork/dscheier/supersolids/supersolids/results/
 #SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
-#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-type=END,FAIL
 #SBATCH -o output-%j.out
 #SBATCH -e error-%j.out
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH -t 14-00:00:00
-#SBATCH --mem=6G
+#SBATCH --mem={mem_in_GB}G
 """
 
         else:
@@ -119,8 +120,8 @@ for N2_part in np.arange(N_start, N_end, N_step):
 # PBS -o /bigwork/dscheier/supersolids/supersolids/results/log/output_$PBS_JOBID.txt
 # PBS -l nodes=1:ppn=1:ws
 # PBS -l walltime=200:00:00
-# PBS -l mem=6GB
-# PBS -l vmem=6GB
+# PBS -l mem={mem_in_GB}GB
+# PBS -l vmem={mem_in_GB}GB
 """
 
         heredoc = "\n".join(["#!/bin/bash",
