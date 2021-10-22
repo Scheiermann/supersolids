@@ -35,7 +35,7 @@ def load_npz(flag_args):
     Anim: Animation = Animation(plot_V=flag_args.plot_V,
                                 alpha_psi_list=flag_args.alpha_psi_list,
                                 alpha_psi_sol_list=flag_args.alpha_psi_sol_list,
-                                alpha_V=args.alpha_V,
+                                alpha_V=flag_args.alpha_V,
                                 filename="anim.mp4",
                                 )
 
