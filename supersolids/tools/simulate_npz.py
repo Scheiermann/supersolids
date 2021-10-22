@@ -160,15 +160,18 @@ def simulate_npz(args):
 
             if isinstance(System_loaded, SchroedingerMixture):
                 SchroedingerInput: SchroedingerMixture = SchroedingerMixture(
-                    MyBox,
-                    Res,
-                    args.max_timesteps,
-                    args.dt,
-                    System_loaded.N_list,
-                    System_loaded.m_list,
-                    System_loaded.a_s_array,
-                    System_loaded.a_dd_array,
-                    System_loaded.dt_func,
+                    MyBox=MyBox,
+                    Res=Res,
+                    max_timesteps=args.max_timesteps,
+                    dt=args.dt,
+                    N_list=System_loaded.N_list,
+                    m_list=System_loaded.m_list,
+                    a_s_array=System_loaded.a_s_array,
+                    a_dd_array=System_loaded.a_dd_array,
+                    a_s_factor=System_loaded.a_s_factor,
+                    a_dd_factor=System_loaded.a_dd_factor,
+                    nA_max=System_loaded.nA_max,
+                    dt_func=System_loaded.dt_func,
                     w_x=w_x,
                     w_y=w_y,
                     w_z=w_z,
@@ -469,9 +472,9 @@ def flags(args_array):
                              "plus the lambda function provided by the V flag.")
     parser.add_argument("--real_time", default=False, action="store_true",
                         help="Switch for Split-Operator method to use imaginary time or not.")
-    parser.add_argument("-load_script", type=str, default="script_0001.pkl",
+    parser.add_argument("-load_script", type=str, default=None,
                         help="Load system to simulate and namespace (configuration for experiment) "
-                             "from pkl-files.")
+                             "from pkl-files e.g. script_0001.pkl")
 
     args = parser.parse_args(args_array)
     print(f"args: {args}")
