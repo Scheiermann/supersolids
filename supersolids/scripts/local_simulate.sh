@@ -12,13 +12,11 @@ accuracy=0.0
 
 file_start="mixture_step_"
 #file_start="step_"
-file2_start="2-step_"
 file_number_load=20
 file_format="%07d"
 file_pattern=".npz"
 printf -v file_number_formatted ${file_format} ${file_number_load}
 filename_npz="${file_start}${file_number_formatted}${file_pattern}"
-filename2_npz="${file2_start}${file_number_formatted}${file_pattern}"
 
 movie_string="movie"
 movie_format="%03d"
@@ -42,7 +40,6 @@ python -m supersolids.tools.simulate_npz \
 -dir_name_load=${movie_now} \
 -dir_name_result=${movie_after} \
 -filename_npz=${filename_npz} \
--filename2_npz=${filename2_npz} \
 -dir_path="${dir_path}" \
 --offscreen \
 --V_reload
