@@ -945,6 +945,6 @@ class Schroedinger:
                                                   "Then the system is divergent.")
                 break
 
-            if frame == (self.max_timesteps - 1):
+            if frame == (frame_end - 1):
                 # Animation stops at the next step, to actually show the last step
                 print(f"Maximum timesteps are reached. Animation is stopped.")
