@@ -14,9 +14,8 @@ dir_name_result=$movie_string$movie_number_formatted
 dir_path_after="/run/media/dsche/ITP Transfer/test/"
 
 python -m supersolids \
--N=50000 \
--Box='{"x0":-10, "x1":10, "y0":-5, "y1":5, "z0":-4, "z1":4}' \
 -Res='{"x":256, "y":128, "z":32}' \
+-Box='{"x0":-10, "x1":10, "y0":-5, "y1":5, "z0":-4, "z1":4}' \
 -max_timesteps=5 \
 -dt=0.0002 \
 -steps_per_npz=$steps_per_npz \
@@ -24,12 +23,18 @@ python -m supersolids \
 -a='{"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}' \
 -dir_path="${dir_path}" \
 -dir_name_result="${dir_name_result}" \
--a_s=0.000000004656 \
--w_y=518.36 \
+-w_x=207.345 \
+-w_y=502.65 \
+-w_z=1049.29 \
 -accuracy=0.0 \
 -noise 0.8 1.2 \
+--N_list 58000 5000 \
+--m_list  164.0 164.0 \
+--mu_list 10.0 9.0 \
+--a_s_list  95.0 57.0 95.0 \
 --V_interaction \
---offscreen
+--offscreen \
+--mixture
 
 # -w_y=518.36
 # -w_y=518.36 # w_y = 2 * np.pi * 82.50 # alpha_t=0.4 # get some 1D and all 2D, while bigger N
