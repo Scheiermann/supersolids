@@ -190,8 +190,8 @@ if __name__ == "__main__":
                                                                  a_dd_factor,
                                                                  )
 
-        print(f"g_array:\n{a_s_array}")
-        print(f"U_dd_factor_array:\n{a_dd_array}\n")
+        print(f"a_s_array:\n{a_s_array}")
+        print(f"a_dd_array:\n{a_dd_array}\n")
     else:
         g, g_qf, e_dd, a_s_l_ho_ratio = functions.get_parameters(
             N=args.N, m=m_list[0], a_s=args.a_s, a_dd=args.a_dd, w_x=args.w_x)
@@ -255,7 +255,7 @@ if __name__ == "__main__":
             k_0=0.0)
         psi_0_3d_2 = functools.partial(
             functions.psi_gauss_3d,
-            a_x=0.5 * args.a["a_x"], a_y=0.5 * args.a["a_y"], a_z=1.5 * args.a["a_z"],
+            a_x=0.5 * args.a["a_x"], a_y=0.5 * args.a["a_y"], a_z=0.5 * args.a["a_z"],
             x_0=args.mu["mu_x"], y_0=args.mu["mu_y"], z_0=args.mu["mu_z"],
             k_0=0.0)
         # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
