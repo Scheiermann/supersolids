@@ -53,6 +53,7 @@ def func_V_symb():
     return [v_a_np, v_b_np]
 """
 
+
 class SchroedingerMixture(Schroedinger):
     """
     Implements a numerical solution of the dimensionless time-dependent
@@ -124,8 +125,8 @@ class SchroedingerMixture(Schroedinger):
         self.N_list: List[float] = N_list
         self.m_list: List[float] = m_list
 
-        self.a_s_factor = a_s_factor
-        self.a_dd_factor = a_dd_factor
+        self.a_s_factor: float = a_s_factor
+        self.a_dd_factor: float = a_dd_factor
 
         self.a_s_array: np.ndarray = a_s_array
         self.a_dd_array: np.ndarray = a_dd_array

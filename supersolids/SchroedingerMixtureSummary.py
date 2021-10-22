@@ -39,8 +39,10 @@ class SchroedingerMixtureSummary:
         self.dt_func: Optional[Callable] = SystemMixture.dt_func
         self.N_list: List[float] = SystemMixture.N_list
         self.m_list: List[float] = SystemMixture.m_list
-        self.g_array: np.ndarray = SystemMixture.a_s_array
-        self.U_dd_factor_array: np.ndarray = SystemMixture.a_dd_array
+        self.a_s_factor: float = SystemMixture.a_s_factor
+        self.a_dd_factor: float = SystemMixture.a_dd_factor
+        self.a_s_array: np.ndarray = SystemMixture.a_s_array
+        self.a_dd_array: np.ndarray = SystemMixture.a_dd_array
         self.w_x: float = SystemMixture.w_x
         self.w_y: float = SystemMixture.w_y
         self.w_z: float = SystemMixture.w_z
@@ -48,6 +50,7 @@ class SchroedingerMixtureSummary:
         self.dim: int = SystemMixture.dim
         self.mu_arr: float = SystemMixture.mu_arr
         self.E: float = SystemMixture.E
+        self.nA_max: int = SystemMixture.nA_max
         self.V: Callable = SystemMixture.V
         self.V_interaction: Callable = SystemMixture.V_interaction
         self.psi_0_list: List[np.ndarray] = SystemMixture.psi_0_list
@@ -65,8 +68,10 @@ class SchroedingerMixtureSummary:
         SystemMixture.dt_func: Optional[Callable] = self.dt_func
         SystemMixture.N_list: List[float] = self.N_list
         SystemMixture.m_list: List[float] = self.m_list
-        SystemMixture.a_s_array: np.ndarray = self.g_array
-        SystemMixture.a_dd_array: np.ndarray = self.U_dd_factor_array
+        SystemMixture.a_s_factor: float = self.a_s_factor
+        SystemMixture.a_dd_factor: float = self.a_dd_factor
+        SystemMixture.a_s_array: np.ndarray = self.a_s_array
+        SystemMixture.a_dd_array: np.ndarray = self.a_dd_array
         SystemMixture.w_x: float = self.w_x
         SystemMixture.w_y: float = self.w_y
         SystemMixture.w_z: float = self.w_z
@@ -74,6 +79,7 @@ class SchroedingerMixtureSummary:
         SystemMixture.dim: int = self.dim
         SystemMixture.mu_arr: np.ndarray = self.mu_arr
         SystemMixture.E: float = self.E
+        SystemMixture.nA_max: int = self.nA_max
         SystemMixture.V: Callable = self.V
         SystemMixture.V_interaction: Callable = self.V_interaction
         SystemMixture.psi_0_list: List[np.ndarray] = self.psi_0_list
