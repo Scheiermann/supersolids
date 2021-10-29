@@ -215,20 +215,9 @@ if __name__ == "__main__":
     V_2d = functools.partial(functions.v_harmonic_2d, alpha_y=alpha_y)
     V_3d = functools.partial(functions.v_harmonic_3d, alpha_y=alpha_y, alpha_z=alpha_z)
 
-    ## cut-off with fft (not working)
-    # V_3d_ddi = functools.partial(functions.get_V_k_val_ddi_fft,
-    #                              x_cut=V_interaction_cut_x,
-    #                              y_cut=V_interaction_cut_y,
-    #                              z_cut=V_interaction_cut_z)
-
-    ## cut-off with fft (not working)
-    # V_3d_ddi = functools.partial(functions.get_V_k_val_ddi_fft_where,
-    #                               rho_cut=0.8 * max(MyBox.lengths()[:2]),
-    #                               z_cut=0.8 * MyBox.lengths()[2])
-
     # radial or no cut-off
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
-                                 r_cut=0.9 * max(MyBox.lengths()),
+                                 r_cut=0.98 * max(MyBox.lengths()),
                                  use_cut_off=False,
                                  )
 
@@ -237,12 +226,12 @@ if __name__ == "__main__":
     # rho_num: int = 50000
     # z_num: int = 128
     # cut_ratio = 0.95
-    # rho_cut = cut_ratio * np.sqrt(Box.lengths()[0] ** 2.0 + Box.lengths()[1] ** 2.0)
-    # z_cut = cut_ratio * Box.lengths()[2]
+    # rho_cut = cut_ratio * np.sqrt(MyBox.lengths()[0] ** 2.0 + MyBox.lengths()[1] ** 2.0)
+    # z_cut = cut_ratio * MyBox.lengths()[2]
     # rho_bound: float = rho_bound_factor * rho_cut
     # rho_lin = np.linspace(rho_cut, rho_bound, rho_num)
     # z_lin = np.linspace(0.0, z_cut, z_num)
-    # V_3d_ddi = functools.partial(functions.get_V_k_val_ddi, rho_lin, z_lin)
+    # V_3d_ddi = functools.partial(functions.get_V_k_val_ddi, rho_lin=rho_lin, z_lin=z_lin)
 
     # functools.partial sets all arguments except x, y, z,
     # psi_0_1d = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
@@ -264,7 +253,7 @@ if __name__ == "__main__":
             k_0=0.0)
         psi_0_3d_2 = functools.partial(
             functions.psi_gauss_3d,
-            a_x=0.5 * args.a["a_x"], a_y=0.5 * args.a["a_y"], a_z=0.5 * args.a["a_z"],
+            a_x=1.0 * args.a["a_x"], a_y=1.0 * args.a["a_y"], a_z=1.0 * args.a["a_z"],
             x_0=args.mu["mu_x"], y_0=args.mu["mu_y"], z_0=args.mu["mu_z"],
             k_0=0.0)
         # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
@@ -416,10 +405,6 @@ if __name__ == "__main__":
         delete_input=False,
         dir_path=dir_path,
         dir_name_result=args.dir_name_result,
-        slice_indices=slice_indices, # from here just mayavi
-        offscreen=args.offscreen,
-        x_lim=x_lim, # from here just matplotlib
-        y_lim=y_lim,
         filename_steps=args.filename_steps,
         steps_format=args.steps_format,
         steps_per_npz=args.steps_per_npz,
@@ -429,6 +414,10 @@ if __name__ == "__main__":
         script_number_regex=args.script_number_regex,
         script_extensions=args.script_extensions,
         script_extensions_index=args.script_extensions_index,
+        slice_indices=slice_indices,  # from here just mayavi
+        offscreen=args.offscreen,
+        x_lim=x_lim,  # from here just matplotlib
+        y_lim=y_lim,
         )
 
     print("Single core done")
