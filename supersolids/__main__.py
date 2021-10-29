@@ -16,7 +16,7 @@ import functools
 import json
 import sys
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, Optional, List
 
 import numpy as np
 
@@ -236,28 +236,6 @@ if __name__ == "__main__":
     # functools.partial sets all arguments except x, y, z,
     # psi_0_1d = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
 
-    a_len = len(args.a)
-    if a_len == 1:
-        psi_0_1d = functools.partial(functions.psi_gauss_1d, a=args.a["a_x"],
-                                     x_0=args.mu["mu_x"], k_0=0.0)
-    elif a_len == 2:
-        psi_0_2d = functools.partial(functions.psi_gauss_2d_pdf,
-                                     mu=[args.mu["mu_x"], args.mu["mu_y"]],
-                                     var=np.array([[args.a["a_x"], 0.0], [0.0, args.a["a_y"]]])
-                                     )
-    else:
-        psi_0_3d = functools.partial(
-            functions.psi_gauss_3d,
-            a_x=args.a["a_x"], a_y=args.a["a_y"], a_z=args.a["a_z"],
-            x_0=args.mu["mu_x"], y_0=args.mu["mu_y"], z_0=args.mu["mu_z"],
-            k_0=0.0)
-        psi_0_3d_2 = functools.partial(
-            functions.psi_gauss_3d,
-            a_x=1.0 * args.a["a_x"], a_y=1.0 * args.a["a_y"], a_z=1.0 * args.a["a_z"],
-            x_0=args.mu["mu_x"], y_0=args.mu["mu_y"], z_0=args.mu["mu_z"],
-            k_0=0.0)
-        # psi_0_3d = functools.partial(functions.prob_in_trap, R_r=R_r, R_z=R_z)
-
     if args.noise is None:
         psi_0_noise_3d = None
     else:
@@ -267,45 +245,63 @@ if __name__ == "__main__":
             shape=(Res.x, Res.y, Res.z)
             )
 
-    # Used to remember that 2D need the special pos function (g is set inside
-    # of Schroedinger for convenience)
-    psi_sol_1d = functions.thomas_fermi_1d
-    psi_sol_2d = functions.thomas_fermi_2d_pos
-
-    # psi_sol_3d = functions.thomas_fermi_3d
     if MyBox.dim == 3:
         if args.mixture:
             psi_sol_3d = None
         else:
+            # psi_sol_3d = functions.thomas_fermi_3d
             psi_sol_3d: Optional[Callable] = prepare_cuts(functions.density_in_trap,
                                                           args.N, alpha_z, e_dd,
                                                           a_s_l_ho_ratio)
     else:
         psi_sol_3d = None
 
+    psi_0_list: List = []
+    psi_0_noise_list: List = []
+    psi_sol_list: List = []
+    mu_sol_list: List = []
     if Res.dim == 1:
         x_lim = (MyBox.x0, MyBox.x1)
         y_lim = (-1, 1) # arbitrary as not used
         V_trap = V_1d
-        psi_0 = psi_0_1d
-        psi_sol = psi_sol_1d
-        mu_sol = functions.mu_1d
+        for i in range(0, len(m_list)):
+            psi_0_list.append(functools.partial(functions.psi_gauss_1d, a=args.a["a_x"],
+                x_0=args.mu["mu_x"], k_0=0.0)
+            )
+            psi_0_noise_list.append(None)
+            psi_sol_list.append(functions.thomas_fermi_1d)
+            mu_sol_list.append(functions.mu_1d)
         V_interaction = None
     elif Res.dim == 2:
         x_lim = (MyBox.x0, MyBox.x1)
         y_lim = (MyBox.y0, MyBox.y1)
         V_trap = V_2d
-        psi_0 = psi_0_2d
-        psi_sol = psi_sol_2d
-        mu_sol = functions.mu_2d
+        for i in range(0, len(m_list)):
+            psi_0_list.append(functools.partial(functions.psi_gauss_2d_pdf,
+                mu=[args.mu["mu_x"], args.mu["mu_y"]],
+                var=np.array([[args.a["a_x"], 0.0], [0.0, args.a["a_y"]]])
+                )
+            )
+            psi_0_noise_list.append(None)
+            psi_sol_list.append(functions.thomas_fermi_2d_pos)
+            mu_sol_list.append(functions.mu_2d)
         V_interaction = None
     elif Res.dim == 3:
         x_lim = (MyBox.x0, MyBox.x1) # arbitrary as not used (mayavi vs matplotlib)
         y_lim = (MyBox.y0, MyBox.y1) # arbitrary as not used (mayavi vs matplotlib)
         V_trap = V_3d
-        psi_0 = psi_0_3d
-        psi_sol = psi_sol_3d
-        mu_sol = functions.mu_3d
+
+        for i in range(0, len(m_list)):
+            psi_0_list.append(functools.partial(
+                functions.psi_gauss_3d,
+                a_x=args.a["a_x"], a_y=args.a["a_y"], a_z=args.a["a_z"],
+                x_0=args.mu["mu_x"], y_0=args.mu["mu_y"], z_0=args.mu["mu_z"],
+                k_0=0.0)
+            )
+            psi_0_noise_list.append(psi_0_noise_3d)
+            psi_sol_list.append(psi_sol_3d)
+            mu_sol_list.append(functions.mu_3d)
+
         if args.V_interaction:
             V_interaction = V_3d_ddi
         else:
@@ -341,10 +337,10 @@ if __name__ == "__main__":
             E=1.0,
             V=V,
             V_interaction=V_interaction,
-            psi_0_list=[psi_0, psi_0_3d_2],
-            psi_0_noise_list=[psi_0_noise_3d, psi_0_noise_3d],
-            psi_sol_list=[functions.thomas_fermi_3d, functions.thomas_fermi_3d],
-            mu_sol_list=[functions.mu_3d, functions.mu_3d],
+            psi_0_list=psi_0_list,
+            psi_0_noise_list=psi_0_noise_list,
+            psi_sol_list=psi_sol_list,
+            mu_sol_list=mu_sol_list,
             input_path=Path("~/Documents/itp/master/supersolids/supersolids/").expanduser(),
             )
     else:
@@ -365,12 +361,12 @@ if __name__ == "__main__":
             imag_time=(not args.real_time),
             mu_arr=np.array([1.1]),
             E=1.0,
-            psi_0=psi_0,
+            psi_0=psi_0_list[0],
             V=V,
             V_interaction=V_interaction,
-            psi_sol=psi_sol,
-            mu_sol=mu_sol,
-            psi_0_noise=psi_0_noise_3d,
+            psi_sol=psi_sol_list[0],
+            mu_sol=mu_sol_list[0],
+            psi_0_noise=psi_0_noise_list[0],
             )
 
     Anim: Animation = Animation(
