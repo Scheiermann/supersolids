@@ -21,6 +21,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from supersolids import Schroedinger
+from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper import get_path, functions
 
 
@@ -45,9 +46,9 @@ def get_last_index(input_path, filename_steps):
 def get_property(System: Schroedinger,
                  property_name: str = "get_center_of_mass",
                  ):
-    try:
+    if hasattr(System, property_name):
         property = getattr(System, property_name)
-    except AttributeError:
+    else:
         sys.exit(f"The loaded Schroedinger object has no property named {property_name}.")
 
     return property
@@ -59,20 +60,19 @@ def property_check(property,
                    property_args=[],
                    ):
     if property_func:
-        try:
-            return property(*property_args)
-        except AttributeError:
-            sys.exit(f"The loaded Schroedinger object has no method named {property_name}.")
+        property_result = property(*property_args)
     elif callable(property):
         sys.exit(f"{property_name} is a function, but flag property_func is not set.")
     else:
-        return property
+        property_result = property
+
+    return property_result
 
 
 def track_property(input_path,
                    filename_schroedinger=f"schroedinger.pkl",
                    filename_steps=f"step_",
-                   steps_format: str = "%06d",
+                   steps_format: str = "%07d",
                    steps_per_npz: int = 10,
                    frame_start: int = 0,
                    property_name: str = "get_center_of_mass",
@@ -83,7 +83,7 @@ def track_property(input_path,
     print("Load schroedinger")
     with open(Path(input_path, filename_schroedinger), "rb") as f:
         # WARNING: this is just the input Schroedinger at t=0
-        System = dill.load(file=f)
+        System_loaded = dill.load(file=f)
 
     # read new frames until Exception (last frame read)
     frame = frame_start
@@ -92,9 +92,17 @@ def track_property(input_path,
         try:
             # get the psi_val of Schroedinger at other timesteps (t!=0)
             psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
-            with open(psi_val_path, "rb") as f:
-                psi_val_pkl = np.load(file=f)["psi_val"]
-                System.psi_val = psi_val_pkl
+            if isinstance(System_loaded, SchroedingerMixture):
+                with open(psi_val_path, "rb") as f:
+                    psi_val_pkl = np.load(file=f)["psi_val_list"]
+                    System_loaded.psi_val_list = psi_val_pkl
+            else:
+                with open(psi_val_path, "rb") as f:
+                    psi_val_pkl = np.load(file=f)["psi_val"]
+                    System_loaded.psi_val = psi_val_pkl
+
+            System_loaded = System_loaded.load_summary(input_path, steps_format, frame,
+                                                       summary_name=None)
 
         except zipfile.BadZipFile:
             print(
@@ -108,7 +116,7 @@ def track_property(input_path,
 
         frame = frame + steps_per_npz
 
-        yield property_check(get_property(System, property_name),
+        yield property_check(get_property(System_loaded, property_name),
                              property_name,
                              property_func,
                              property_args)
@@ -119,19 +127,32 @@ def track_property(input_path,
             frame = last_index
 
 
-def property_to_array(property_tuple):
+def property_to_array(property_tuple, list_of_arrays: bool=False):
     property_all = np.empty(shape=(1, 1))
     # initialize with first value
-    for property in property_tuple:
-        property_all = property
+    for property_components_all in property_tuple:
+        if list_of_arrays:
+            # take first property of every mixture component and create a list of arrays
+            property_all = []
+            for property_mixture_component in property_components_all:
+                property_all.append(np.array(property_components_all))
+
+        else:
+            property_all = property_components_all
         break
 
     # load all other values
-    for i, property in enumerate(property_tuple):
+    for i, property_components_all in enumerate(property_tuple):
         try:
-            property_all = np.vstack((property_all, property))
+            if list_of_arrays:
+                number_of_components = len(property_all)
+                for j in range(0, number_of_components):
+                    for property_mixture_component in property_components_all:
+                        property_all[j] = np.vstack((property_all[j], property_mixture_component))
+            else:
+                property_all = np.vstack((property_all, property_components_all))
         except ValueError:
-            sys.exit(f"Failed at {i}: {property}. Not enough values. "
+            sys.exit(f"Failed at {i}: {property_components_all}. Not enough values. "
                      "Adjust provided arguments of property.")
 
     return property_all
@@ -144,6 +165,21 @@ def plot_property(args, func=functions.identity):
 
     input_path = get_input_path(dir_path, args.dir_name)
     print(input_path)
+    print("Load t")
+    t_tuple = track_property(input_path=input_path,
+                             filename_schroedinger=args.filename_schroedinger,
+                             filename_steps=args.filename_steps,
+                             steps_format=args.steps_format,
+                             steps_per_npz=args.steps_per_npz,
+                             frame_start=args.frame_start,
+                             property_name="t",
+                             property_func=False,
+                             property_args=[],
+                             )
+
+    t_list = property_to_array(t_tuple, list_of_arrays=False)
+    t = np.ravel(np.array(t_list))
+
     property_tuple = track_property(input_path=input_path,
                                     filename_schroedinger=args.filename_schroedinger,
                                     filename_steps=args.filename_steps,
@@ -155,15 +191,18 @@ def plot_property(args, func=functions.identity):
                                     property_args=args.property_args,
                                     )
 
-    property_all = property_to_array(property_tuple)
+    property_all = property_to_array(property_tuple, list_of_arrays=args.list_of_arrays)
 
     try:
-        dim = property_all.shape[1]
+        if args.list_of_arrays:
+            property_length = np.shape(property_all[0])[0]
+            dim = property_all[0].shape[1]
+        else:
+            property_length = np.shape(property_all)[0]
+            dim = property_all.shape[1]
     except Exception:
         dim = 1
 
-    property_length = np.shape(property_all)[0]
-    t = np.arange(property_length) * args.steps_per_npz * args.dt
     if dim == 1:
         plt.plot(property_all, "x-")
         plt.xlabel(rf"t with dt={args.dt}")
@@ -176,17 +215,26 @@ def plot_property(args, func=functions.identity):
     else:
         labels = []
         if args.subplots:
-            fig, axes = plt.subplots(nrows=np.shape(property_all)[1], ncols=1, squeeze=False, sharex='col')
+            fig, axes = plt.subplots(nrows=dim, ncols=1, squeeze=False, sharex='col')
             for i, ax in enumerate(plt.gcf().get_axes()):
-                labels.append(str(i))
-                x_range, y_range = func(t, property_all.T[i])
-                ax.plot(x_range, y_range, "x-", label=labels[i])
+                if args.list_of_arrays:
+                    number_of_components = len(property_all)
+                    for j in range(0, number_of_components):
+                        labels.append(f"component {j} axis {i}")
+                        x_range, y_range = func(t, property_all[j].T[i])
+                        ax.plot(x_range, y_range, "x-", label=labels[-1])
+                else:
+                    labels.append(str(i))
+                    x_range, y_range = func(t, property_all.T[i])
+                    ax.plot(x_range, y_range, "x-", label=labels[i])
                 ax.grid()
                 ax.legend()
-            axes[0, 0].figure.text(0.5, 0.04, rf"t with dt={args.dt}", ha="center", va="center")
+            plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
             axes[0, 0].figure.text(0.05, 0.5, f"{args.property_name}", ha="center", va="center", rotation=90)
+            axes[0, 0].figure.text(0.5, 0.04, rf"t with dt={args.dt}", ha="center", va="baseline")
+
             plt.suptitle(f"{args.property_name}({', '.join(map(str, args.property_args))})")
-            plt.subplots_adjust(left=0.15)
+            plt.subplots_adjust(left=0.15, bottom=0.2)
 
             if args.property_name:
                 fig.savefig(Path(input_path, f"{args.property_name + args.property_filename_suffix}"))
@@ -196,6 +244,7 @@ def plot_property(args, func=functions.identity):
                 x_range, y_range = func(t, property_all.T[i])
                 plt.plot(x_range, y_range, "x-", label=labels[i])
 
+            plt.setp(plt.gca().get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
             plt.xlabel(rf"t with dt={args.dt}")
             plt.ylabel(f"{args.property_name}")
             plt.grid()
@@ -222,10 +271,10 @@ def flags(args_array):
                         help="Name of file, without enumarator for the files. "
                              "For example the standard naming convention is step_000001.npz, "
                              "the string needed is step_")
-    parser.add_argument("-steps_format", type=str, default="%06d",
+    parser.add_argument("-steps_format", type=str, default="%07d",
                         help="Formating string to enumerate the files. "
                              "For example the standard naming convention is step_000001.npz, "
-                             "the string needed is percent 06d")
+                             "the string needed is percent 07d")
     parser.add_argument("-steps_per_npz", type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
     parser.add_argument("-frame_start", type=int, default=0, help="Counter of first saved npz.")
@@ -246,6 +295,10 @@ def flags(args_array):
     parser.add_argument("-inbuild_func", type=functions.lambda_parsed,
                         help="Function to construct new properties "
                              "from t and the in-build property_name.")
+    parser.add_argument("--list_of_arrays", default=False, action="store_true",
+                        help="Use to track properties that are arrays of SchroedingerMixture. "
+                             "As example center_of_mass for 2 components Mixture: "
+                             "[(x1, y1, z1), (x2, y2, z2)]")
     parser.add_argument("-func", type=functions.lambda_parsed,
                         help="User-defined function to construct new properties "
                              "from t and the in-build property_name. "
