@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 from typing import Optional, Callable, Union, List
 
+from scipy import ndimage
 from scipy.constants import mu_0
 from scipy.interpolate import interpolate
 from scipy.integrate import quad_vec
@@ -553,6 +554,42 @@ class SchroedingerMixture(Schroedinger):
 
         return density_list
 
+    def get_center_of_mass(self, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
+        """
+        Calculates the center of mass of the System.
+
+        """
+
+        x0, x1, y0, y1, z0, z1 = self.slice_default(x0, x1, y0, y1, z0, z1)
+        prob_list = [density[x0:x1, y0:y1, z0:z1] for density in self.get_density_list()]
+        r = self.get_mesh_list(x0, x1, y0, y1, z0, z1)
+        com_list = []
+        for prob in prob_list:
+            center_of_mass_along_axis = [prob * r_i for r_i in r]
+            com_list.append([self.trapez_integral(com_along_axis) / self.trapez_integral(prob)
+                             for com_along_axis in center_of_mass_along_axis])
+        return com_list
+
+    def get_contrast(self, prob_min, region_threshold: int=1000):
+        prob_list = self.get_density_list()
+        bec_contrast_list = []
+        for N, prob in zip(self.N_list, prob_list):
+            prob_region = np.where(prob >= prob_min * N, prob, 0)
+            label_im, nb_labels = ndimage.label(prob_region,
+                                                structure=ndimage.generate_binary_structure(3, 1))
+            # get biggest region
+            sizes = ndimage.sum(prob_region, label_im, range(nb_labels + 1))
+            mask = sizes > region_threshold
+            label_region = mask[label_im]
+            bec_min = ndimage.minimum(prob, labels=label_region)
+            bec_max = ndimage.maximum(prob, labels=label_region)
+
+            bec_contrast = (bec_max - bec_min) / (bec_max + bec_min)
+
+            bec_contrast_list.append(bec_contrast)
+
+        return bec_contrast_list
+
     def get_U_dd_list(self, density_list):
         U_dd_list: List[np.ndarray] = []
         for density in density_list:
@@ -574,8 +611,7 @@ class SchroedingerMixture(Schroedinger):
 
         return H_pot
 
-    def split_operator_pot(self, split_step: float = 0.5) -> (List[np.ndarray],
-                                                              List[np.ndarray]):
+    def split_operator_pot(self, split_step: float = 0.5) -> (List[np.ndarray], List[np.ndarray]):
         density_list = self.get_density_list()
         density_tensor_vec = np.stack(density_list, axis=0)
 
