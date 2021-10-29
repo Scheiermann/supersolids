@@ -110,13 +110,13 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_meshgrid_3d" title="supersolids.helper.functions.get_meshgrid_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_meshgrid_3d</span></code></a>(x, y, z)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.check_provided_lists" title="supersolids.helper.functions.check_provided_lists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_provided_lists</span></code></a>(number_of_mixtures, a_s_array, a_dd_array)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.check_provided_lists" title="supersolids.helper.functions.check_provided_lists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_provided_lists</span></code></a>(number_of_mixtures, a_s_list, a_dd_list)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.generate_a_dd" title="supersolids.helper.functions.generate_a_dd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_a_dd</span></code></a>(mu_list, a_dd_factor)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_mu_combinations" title="supersolids.helper.functions.get_mu_combinations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mu_combinations</span></code></a>(dipol_list)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_parameters_mixture" title="supersolids.helper.functions.get_parameters_mixture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parameters_mixture</span></code></a>(l_0, mu_list, a_s_list, a_dd_factor)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_parameters_mixture" title="supersolids.helper.functions.get_parameters_mixture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parameters_mixture</span></code></a>(l_0, number_of_mixtures, a_dd_list, a_s_list)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.dimensionless" title="supersolids.helper.functions.dimensionless"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dimensionless</span></code></a>(arr, l_0)</p></td>
@@ -221,7 +221,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.triu_list2array" title="supersolids.helper.functions.triu_list2array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">triu_list2array</span></code></a>(triu_list, triu_ind, shape)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral" title="supersolids.helper.functions.get_rho_integral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral</span></code></a>(k_rho_mesh, kz_mesh, rho_lin, z_lin)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral" title="supersolids.helper.functions.get_rho_integral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral</span></code></a>(k_rho_mesh, kz_mesh, rho_lin, z_lin, compare)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral_quad" title="supersolids.helper.functions.get_rho_integral_quad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral_quad</span></code></a>(kx_mesh, ky_mesh, kz_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)</p></td>
@@ -371,41 +371,38 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.check_provided_lists">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">check_provided_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_mixtures</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#check_provided_lists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.check_provided_lists" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">check_provided_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_mixtures</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#check_provided_lists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.check_provided_lists" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>number_of_mixtures</strong> (<em>int</em>) – </p></li>
-<li><p><strong>a_s_array</strong> (<em>numpy.ndarray</em>) – </p></li>
-<li><p><strong>a_dd_array</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>a_s_list</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>a_dd_list</strong> (<em>numpy.ndarray</em>) – </p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="supersolids.helper.functions.generate_a_dd">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">generate_a_dd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd_factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#generate_a_dd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.generate_a_dd" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_mu_combinations">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_mu_combinations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dipol_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_mu_combinations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_mu_combinations" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mu_list</strong> (<em>list</em>) – </p></li>
-<li><p><strong>a_dd_factor</strong> (<em>float</em>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>dipol_list</strong> (<em>list</em>) – </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_parameters_mixture">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_parameters_mixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd_factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_parameters_mixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_parameters_mixture" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_parameters_mixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_mixtures</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_parameters_mixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_parameters_mixture" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>l_0</strong> (<em>float</em>) – </p></li>
-<li><p><strong>mu_list</strong> (<em>list</em>) – </p></li>
+<li><p><strong>number_of_mixtures</strong> (<em>int</em>) – </p></li>
+<li><p><strong>a_dd_list</strong> (<em>list</em>) – </p></li>
 <li><p><strong>a_s_list</strong> (<em>list</em>) – </p></li>
-<li><p><strong>a_dd_factor</strong> (<em>float</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -862,7 +859,7 @@ between x_min and x_max with amplitude a</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_rho_integral">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_rho_integral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k_rho_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_lin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_lin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_rho_integral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_rho_integral" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_rho_integral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k_rho_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kz_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_lin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_lin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compare</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_rho_integral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_rho_integral" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
