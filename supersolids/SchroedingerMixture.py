@@ -542,11 +542,6 @@ class SchroedingerMixture(Schroedinger):
 
         return E
 
-    def save_psi_val(self, input_path, filename_steps, steps_format, frame):
-        with open(Path(input_path, "mixture_" + filename_steps + steps_format % frame + ".npz"),
-                  "wb") as g:
-            np.savez_compressed(g, psi_val_list=self.psi_val_list)
-
     def get_density_list(self):
         density_list: List[np.ndarray] = []
         for psi_val, N in zip(self.psi_val_list, self.N_list):
