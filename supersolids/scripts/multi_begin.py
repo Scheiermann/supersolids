@@ -7,7 +7,7 @@ import time
 from supersolids.helper.dict2str import dic2str
 
 slurm = True
-mem_in_GB = 6
+mem_in_GB = 8
 xvfb_display = 500
 supersolids_version = "0.1.34rc11"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture/")
@@ -31,7 +31,7 @@ noise = [0.8, 1.2]
 accuracy = 0.0
 
 w_x_freq = 33.0
-w_y_freq = 80.0
+w_y_freq = 110.0
 w_z_freq = 167.0
 w_x = 2.0 * np.pi * w_x_freq
 w_y = 2.0 * np.pi * w_y_freq
@@ -108,7 +108,7 @@ for N2_part in np.arange(N_start, N_end, N_step):
 #SBATCH -e error-%j.out
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH -t 14-00:00:00
+#SBATCH -t 7-00:00:00
 #SBATCH --mem={mem_in_GB}G
 """
 
