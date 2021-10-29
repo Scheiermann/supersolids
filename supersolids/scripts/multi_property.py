@@ -12,11 +12,14 @@ def string_float(s):
 if __name__ == "__main__":
     path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_alpha/")
 
-    frame_start = 1130000
-    steps_per_npz = 10000
+    filename_schroedinger: str = "schroedinger.pkl"
+    filename_steps: str = "mixture_step_"
+
+    frame_start = 0
+    steps_per_npz = 1000
 
     movie_start = 1
-    movie_end = 40
+    movie_end = 150
 
     dt = 0.0002
 
@@ -46,6 +49,9 @@ if __name__ == "__main__":
     # property_args = [0]
     # property_args = []
 
+    property_name = "get_contrast"
+    property_args = [0.01]
+
     # property_name = "get_phase_var"
     # property_args = [0, 256, 0, 128, 0, 32]
     # property_args = [0, 128, 0, 128, 0, 32]
@@ -54,25 +60,27 @@ if __name__ == "__main__":
     # property_name = "get_phase_var_neighborhood"
     # [prob_min, amount]
     # property_args = [0.02, 4]
-
-    property_name = "get_N_in_droplets"
-    number_of_peaks = [5, 4, 1, 1, 1, 1, 1, 1,
-                       5, 4, 3, 1, 1, 1, 1, 1,
-                       5, 5, 3, 1, 1, 1, 1, 1,
-                       5, 5, 4, 1, 1, 1, 1, 1,
-                       6, 5, 6, 3, 1, 1, 1, 1,
-                       ]
+    #
+    # property_name = "get_N_in_droplets"
+    # number_of_peaks = [5, 4, 1, 1, 1, 1, 1, 1,
+    #                    5, 4, 3, 1, 1, 1, 1, 1,
+    #                    5, 5, 3, 1, 1, 1, 1, 1,
+    #                    5, 5, 4, 1, 1, 1, 1, 1,
+    #                    6, 5, 6, 3, 1, 1, 1, 1,
+    #                    ]
 
     # we want 2S=D, so that the peaks distance equals the distance between max and min of sin
     # delta = s * 2.0
 
     for peak_index, i in enumerate(range(movie_start, movie_end + 1)):
-        property_args = [0.00725, number_of_peaks[peak_index]]
+        # property_args = [0.00725, number_of_peaks[peak_index]]
         command = ["python", "-m", "supersolids.tools.track_property"]
         flags = [f"-dt={dt}",
                  f"-dir_path={path_anchor_input}",
                  f"-dir_name={dir_name}{counting_format % i}",
+                 f"-filename_schroedinger={filename_schroedinger}",
                  f"-frame_start={frame_start}",
+                 f"-filename_steps={filename_steps}",
                  f"-steps_per_npz={steps_per_npz}",
                  f"-steps_format={steps_format}",
                  f"-property_name={property_name}",
