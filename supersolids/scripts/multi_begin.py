@@ -20,8 +20,9 @@ movie_number = 1
 N = 63000
 a11 = 95.0
 
-m_list = [164.0, 164.0]
-mu_list = [10.0, 9.0]
+m_list = [163.9, 163.9]
+a_dd = 130.8
+a_dd_list = [a_dd, (9.0/10.0) * a_dd, (9.0/10.0) ** 2.0 * a_dd]
 
 Box = {"x0": -12, "x1": 12, "y0": -7, "y1": 7, "z0": -5, "z1": 5}
 Res = {"x": 256, "y": 128, "z": 32}
@@ -171,7 +172,7 @@ echo $(which pip3)
 -noise {' '.join(map(str, noise))} \
 --N_list {' '.join(map(str, N_list))} \
 --m_list {' '.join(map(str, m_list))} \
---mu_list {' '.join(map(str, mu_list))} \
+--a_dd_list {' '.join(map(str, a_dd_list))} \
 --a_s_list {' '.join(map(str, a_s_list))} \
 --V_interaction \
 --offscreen \

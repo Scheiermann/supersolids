@@ -49,14 +49,17 @@ def flags(args_array):
                         help="Number of particles in box per mixture")
     parser.add_argument("--m_list", metavar="m",  type=float, nargs="+", default=[164.0],
                         help="Mass of a particles in atomic mass unit (u) per mixture")
-    parser.add_argument("--mu_list", metavar="mu",  type=float, nargs="+", default=[1.0],
-                        help="Mass of a particles in mu_0 per mixture")
+    parser.add_argument("--dipol_list", metavar="mu",  type=float, nargs="+", default=None,
+                        help="Use a_dd_list or this flag (not both), as it is used to construct "
+                             "a_dd_list. Dipol moment of particles per mixture component. "
+                             "E.g. for Dy: dipol_list = [9.5 * 10 ** (-23), 9.5 * 10 ** (-23)]")
     parser.add_argument("--a_s_list", metavar="a_s", type=float, nargs="+", default=[85.0],
-                        help="Constant a_s per mixture-mixture interaction in a upper triangle "
+                        help="a_s in a0 per mixture-mixture interaction in a upper triangle "
                              "matrix e.g. for 2 mixtures, the index combinations are [11, 12, 22].")
-    parser.add_argument("-a_dd", metavar="a_dd", type=float, default=130.0 * constants.a_0,
-                        help="Constant a_dd (Ignored for mixtures, "
-                             "as mu_list is used to construct the values)")
+    parser.add_argument("--a_dd_list", metavar="a_dd",  type=float, nargs="+",
+                        default=[130.8],
+                        help="a_dd in a0 per mixture-mixture interaction in a upper triangle "
+                             "matrix e.g. for 2 mixtures, the index combinations are [11, 12, 22].")
     parser.add_argument("-w_x", metavar="w_x", type=float, default=2.0 * np.pi * 33.0,
                         help="Frequency of harmonic trap in x direction")
     parser.add_argument("-w_y", metavar="w_y", type=float, default=2.0 * np.pi * 80.0,
@@ -143,8 +146,9 @@ if __name__ == "__main__":
 
     # apply units to input
     m_list = [m * constants.u_in_kg for m in args.m_list]
-    mu_list = [mu * constants.mu_0 for mu in args.mu_list]
     a_s_list = [a_s * constants.a_0 for a_s in args.a_s_list]
+    a_dd_list = [a_dd * constants.a_0 for a_dd in args.a_dd_list]
+
     if args.l_0 is None:
         # x harmonic oscillator length
         # l_0 = np.sqrt(constants.hbar / (m_list[0] * args.w_x))
@@ -153,7 +157,7 @@ if __name__ == "__main__":
         l_0 = args.l_0
 
     dimensionless_factor = constants.hbar ** 2.0 / (m_list[0] * l_0 ** 2.0)
-    a_dd_factor = (m_list[0] / constants.hbar ** 2.0) * (constants.mu_0 / (12.0 * np.pi))
+    a_dd_helper = (m_list[0] / constants.hbar ** 2.0) * (constants.mu_0 / (12.0 * np.pi))
 
     BoxResAssert(args.Res, args.Box)
     ResAssert(args.Res, args.a)
@@ -184,10 +188,16 @@ if __name__ == "__main__":
         dir_path = args.dir_path
 
     if args.mixture:
+        number_of_mixtures = len(m_list)
+
+        if args.dipol_list:
+            a_dd_list = a_dd_helper * functions.get_mu_combinations(args.dipol_list)
+            functions.check_provided_lists(number_of_mixtures, a_s_list, a_dd_list)
+
         a_s_array, a_dd_array = functions.get_parameters_mixture(l_0,
-                                                                 mu_list,
+                                                                 number_of_mixtures,
+                                                                 a_dd_list,
                                                                  a_s_list,
-                                                                 a_dd_factor,
                                                                  )
 
         print(f"a_s_array:\n{a_s_array}")

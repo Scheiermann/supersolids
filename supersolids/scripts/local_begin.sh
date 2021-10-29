@@ -30,7 +30,7 @@ python -m supersolids \
 -noise 0.8 1.2 \
 --N_list 58000 5000 \
 --m_list  164.0 164.0 \
---mu_list 10.0 9.0 \
+--dipol_list 10.0 9.0 \
 --a_s_list  95.0 57.0 95.0 \
 --V_interaction \
 --offscreen \

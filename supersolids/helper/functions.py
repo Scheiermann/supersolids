@@ -138,8 +138,8 @@ def get_meshgrid_3d(x, y, z):
 
 
 def check_provided_lists(number_of_mixtures: int,
-                         a_s_array: np.ndarray,
-                         a_dd_array: np.ndarray,
+                         a_s_list: np.ndarray,
+                         a_dd_list: np.ndarray,
                          ):
     combinations = list(
         itertools.combinations_with_replacement(
@@ -150,41 +150,34 @@ def check_provided_lists(number_of_mixtures: int,
     print(f"a_s and a_dd need to be provided as a list with the given order of combinations: "
           f"{combinations}.")
 
-    if len(a_s_array) != len(combinations):
-        sys.exit(f"a_s: {a_s_array} does not have the same length as combinations.")
+    if len(a_s_list) != len(combinations):
+        sys.exit(f"a_s: {a_s_list} does not have the same length as combinations.")
 
-    if len(a_dd_array) != len(combinations):
-        sys.exit(f"a_dd: {a_dd_array} does not have the same length as combinations.")
+    if len(a_dd_list) != len(combinations):
+        sys.exit(f"a_dd: {a_dd_list} does not have the same length as combinations.")
 
 
-def generate_a_dd(mu_list: list,
-                  a_dd_factor: float,
-                  ):
-    number_of_mixtures = len(mu_list)
+def get_mu_combinations(dipol_list: list):
+    number_of_mixtures = len(dipol_list)
     mu_combinations = list(
         itertools.combinations_with_replacement(
-            mu_list,
+            dipol_list,
             number_of_mixtures
         )
     )
 
     mu_prod_combinations = np.fromiter(map(np.prod, mu_combinations), dtype=float)
-    a_dd_list = mu_prod_combinations * a_dd_factor
 
-    return a_dd_list
+    return mu_prod_combinations
 
 
 def get_parameters_mixture(l_0: float,
-                           mu_list: list,
+                           number_of_mixtures: int,
+                           a_dd_list: list,
                            a_s_list: list,
-                           a_dd_factor: float,
                            ) -> (np.ndarray, np.ndarray):
-    number_of_mixtures = len(mu_list)
-    a_dd_list = generate_a_dd(mu_list, a_dd_factor)
-    check_provided_lists(number_of_mixtures, a_s_list, a_dd_list)
-
-    a_s_array = dimensionless(combinations2array(number_of_mixtures, a_s_list), l_0)
-    a_dd_array = dimensionless(combinations2array(number_of_mixtures, a_dd_list), l_0)
+    a_s_array = combinations2array(number_of_mixtures, a_s_list)
+    a_dd_array = combinations2array(number_of_mixtures, a_dd_list)
 
     a_s_array_dimless = dimensionless(a_s_array, l_0)
     a_dd_array_dimless = dimensionless(a_dd_array, l_0)
