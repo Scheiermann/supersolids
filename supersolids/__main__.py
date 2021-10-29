@@ -151,8 +151,7 @@ if __name__ == "__main__":
 
     if args.l_0 is None:
         # x harmonic oscillator length
-        # l_0 = np.sqrt(constants.hbar / (m_list[0] * args.w_x))
-        l_0 = 1.0 / constants.u_in_kg
+        l_0 = np.sqrt(constants.hbar / (m_list[0] * args.w_x))
     else:
         l_0 = args.l_0
 
