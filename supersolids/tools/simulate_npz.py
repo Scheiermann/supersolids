@@ -39,7 +39,6 @@ def simulate_npz(args):
     input_path = Path(dir_path, args.dir_name_load)
     schroedinger_path = Path(input_path, args.filename_schroedinger)
     psi_val_path = Path(input_path, args.filename_npz)
-    psi2_val_path = Path(input_path, args.filename2_npz)
 
     Anim: Animation = Animation(
         plot_V=False,
@@ -458,9 +457,6 @@ def flags(args_array):
     parser.add_argument("-filename_npz", type=str, default="step_" + "%07d" % 0 + ".npz",
                         help="Name of file, where psi_val is saved. "
                              "For example the standard naming convention is step_000001.npz")
-    parser.add_argument("-filename2_npz", type=str, default="2-step_" + "%07d" % 0 + ".npz",
-                        help="Name of file, where psi2_val is saved. "
-                             "For example the standard naming convention is 2-step_000001.npz")
     parser.add_argument("-filename_steps", type=str, default="step_",
                         help="Name of file, without enumerator for the files. "
                              "For example the standard naming convention is step_000001.npz, "
@@ -504,9 +500,6 @@ def flags_script(args_array):
     parser.add_argument("-filename_npz", type=str, default="step_" + "%07d" % 0 + ".npz",
                         help="Name of file, where psi_val is saved. "
                              "For example the standard naming convention is step_000001.npz")
-    parser.add_argument("-filename2_npz", type=str, default="2-step_" + "%07d" % 0 + ".npz",
-                        help="Name of file, where psi2_val is saved. "
-                             "For example the standard naming convention is 2-step_000001.npz")
     parser.add_argument("-dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to save data to")
     parser.add_argument("-dir_name_load", type=str, default="movie" + "%03d" % 1,
