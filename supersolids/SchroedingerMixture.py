@@ -92,6 +92,7 @@ class SchroedingerMixture(Schroedinger):
                  m_list: List[float],
                  a_s_array: np.ndarray,
                  a_dd_array: np.ndarray,
+                 t: float = 0.0,
                  a_s_factor: float = 4.0 * np.pi,
                  a_dd_factor: float = 3.0,
                  nA_max: int = 100,
@@ -112,7 +113,7 @@ class SchroedingerMixture(Schroedinger):
                  ) -> None:
 
         self.name: str = "SchroedingerMixtureSummary_"
-        self.t: float = 0.0
+        self.t: float = t
         self.imag_time: bool = imag_time
         self.dt: float = dt
         self.max_timesteps: int = max_timesteps
@@ -420,7 +421,8 @@ class SchroedingerMixture(Schroedinger):
         return r_0
 
     def save_psi_val(self, input_path, filename_steps, steps_format, frame):
-        with open(Path(input_path, filename_steps + steps_format % frame + ".npz"), "wb") as g:
+        with open(Path(input_path, "mixture_" + filename_steps + steps_format % frame + ".npz"),
+                  "wb") as g:
             np.savez_compressed(g, psi_val_list=self.psi_val_list)
 
     def use_summary(self, summary_name: Optional[str] = None):

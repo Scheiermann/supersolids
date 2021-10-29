@@ -55,9 +55,6 @@ def simulate_npz(args):
             # WARNING: this is just the input Schroedinger at t=0
             System_loaded: Schroedinger = dill.load(file=f)
 
-        SystemSummary, summary_name = System_loaded.use_summary(summary_name=args.summary_name)
-        SystemSummary.copy_to(System_loaded)
-
         print(f"File at {schroedinger_path} loaded.")
         try:
             if not args.load_script:
@@ -73,6 +70,9 @@ def simulate_npz(args):
             # get the frame number as it encodes the number steps dt,
             # so System.t can be reconstructed
             frame = int(args.filename_npz.split(".npz")[0].split("_")[-1])
+            System_loaded = System_loaded.load_summary(input_path, args.steps_format, frame,
+                                                       summary_name=args.summary_name)
+
             System_loaded.max_timesteps = args.max_timesteps
 
             if args.Box is None:
@@ -84,6 +84,11 @@ def simulate_npz(args):
                 Res: Resolution = System_loaded.Res
             else:
                 Res = Resolution(**args.Res)
+
+            if args.dt is None:
+                dt = System_loaded.dt
+            else:
+                dt: float = float(args.dt[0])
 
             # check if changes of Box or Res, can be done
             x_step_old = (System_loaded.Box.lengths()[0] / System_loaded.Res.x)
@@ -163,7 +168,8 @@ def simulate_npz(args):
                     MyBox=MyBox,
                     Res=Res,
                     max_timesteps=args.max_timesteps,
-                    dt=args.dt,
+                    t=System_loaded.t,
+                    dt=dt,
                     N_list=System_loaded.N_list,
                     m_list=System_loaded.m_list,
                     a_s_array=System_loaded.a_s_array,
@@ -192,7 +198,7 @@ def simulate_npz(args):
                     MyBox,
                     Res,
                     max_timesteps=args.max_timesteps,
-                    dt=args.dt,
+                    dt=dt,
                     g=System_loaded.g,
                     g_qf=System_loaded.g_qf,
                     w_x=w_x,
@@ -410,7 +416,7 @@ def simulate_npz(args):
 def flags(args_array):
     parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
                                                  "and continue simulation from there.")
-    parser.add_argument("-dt", type=float, default=2 * 10 ** -3, nargs="?",
+    parser.add_argument("-dt", type=json.loads, default=None, action='store', nargs=1,
                         help="Length of timestep to evolve Schrödinger system")
     parser.add_argument("-Res", type=json.loads, default=None,
                         help="Dictionary of resolutions for the box (1D, 2D, 3D). "
