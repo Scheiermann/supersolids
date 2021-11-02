@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --job-name 0.1.34rc12-begin
+#SBATCH --job-name 0.1.34rc13-begin
 #SBATCH -D /bigwork/dscheier/supersolids/supersolids/results/
 #SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -11,7 +11,7 @@
 #SBATCH --mem=4G
 #SBATCH --mem-per-cpu=4G
 
-supersolids_version=0.1.34rc12
+supersolids_version=0.1.34rc13
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
