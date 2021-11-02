@@ -557,8 +557,8 @@ def v_2d(x, y, alpha_y=1.0):
     return 0.5 * (x ** 2 + y ** 2)
 
 
-def v_harmonic_3d(x, y, z, alpha_y: float = 1.0, alpha_z: float = 1.0):
-    return 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2)
+def v_harmonic_3d(x, y, z, alpha_y: float = 1.0, alpha_z: float = 1.0, lH0: float = 1.0):
+    return 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2) / (lH0 ** 4.0)
 
 
 def get_r_cut(k_mesh: np.ndarray, r_cut: float = 1.0):
