@@ -10,7 +10,7 @@ slurm = True
 mem_in_GB = 8
 xvfb_display = 500
 supersolids_version = "0.1.34rc13"
-dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture/")
+dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_13/")
 # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
 movie_string = "movie"
@@ -24,10 +24,10 @@ m_list = [163.9, 163.9]
 a_dd = 130.8
 a_dd_list = [a_dd, (9.0/10.0) * a_dd, (9.0/10.0) ** 2.0 * a_dd]
 
-Box = {"x0": -12, "x1": 12, "y0": -7, "y1": 7, "z0": -5, "z1": 5}
+Box = {"x0": -15, "x1": 15, "y0": -7, "y1": 7, "z0": -6, "z1": 6}
 Res = {"x": 256, "y": 128, "z": 32}
 
-noise = [0.8, 1.2]
+noise = [0.9, 1.1]
 accuracy = 0.0
 
 w_x_freq = 33.0
@@ -37,15 +37,15 @@ w_x = 2.0 * np.pi * w_x_freq
 w_y = 2.0 * np.pi * w_y_freq
 w_z = 2.0 * np.pi * w_z_freq
 
-a_s = 0.000000004656
+# a_s = 0.000000004656
 # a = {"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}
 
 # for mixtures
-a = {"a_x": 2.2, "a_y": 1.5, "a_z": 1.0}
+a = {"a_x": 4.0, "a_y": 0.8, "a_z": 1.8}
 
 max_timesteps = 1500001
 dt = 0.0002
-steps_per_npz = 1000
+steps_per_npz = 10000
 steps_format = "%07d"
 accuracy = 0.0
 
@@ -59,7 +59,9 @@ a12_step = 0.02
 
 func_filename = "distort.txt"
 
-j_counter = 0
+j_counter = 132
+skip_counter = 0
+skip = j_counter
 
 movie_list = []
 func_list = []
@@ -67,6 +69,9 @@ func_path_list = []
 dir_path_func_list = []
 for N2_part in np.arange(N_start, N_end, N_step):
     for a12 in np.arange(a12_start, a12_end, a12_step):
+        skip_counter += 1
+        if skip_counter < skip:
+            continue
         func_list.append([])
         N2_part_string = round(N2_part, ndigits=5)
         a12_string = round(a12, ndigits=5)
@@ -216,21 +221,21 @@ while not all(item in movie_dirnames for item in movie_list):
     movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
     movie_dirnames = list(map(lambda path: path.name, movie_dirs))
 
-j_counter = 0
-# put distort.txt with the used V for every movie
-for i, v_0 in enumerate(np.arange(N_start, N_end, N_step)):
-    for j, delta in enumerate(np.arange(a12_start, a12_end, a12_step)):
-        func = func_list[j_counter]
-        func_path = func_path_list[j_counter]
-        dir_path_func = dir_path_func_list[j_counter]
-        if func_path.is_dir():
-            print(f"File {func_path} already exists!")
-        else:
-            if not dir_path_func.is_dir():
-                dir_path_func.mkdir(mode=0o751)
+# j_counter = 0
+# # put distort.txt with the used V for every movie
+# for i, v_0 in enumerate(np.arange(N_start, N_end, N_step)):
+    # for j, delta in enumerate(np.arange(a12_start, a12_end, a12_step)):
+        # func = func_list[j_counter]
+        # func_path = func_path_list[j_counter]
+        # dir_path_func = dir_path_func_list[j_counter]
+        # if func_path.is_dir():
+            # print(f"File {func_path} already exists!")
+        # else:
+            # if not dir_path_func.is_dir():
+                # dir_path_func.mkdir(mode=0o751)
 
-            with open(func_path, "a") as func_file:
-                func_string = '\n'.join(func)
-                func_file.write(f"{func_string}")
+            # with open(func_path, "a") as func_file:
+                # func_string = '\n'.join(func)
+                # func_file.write(f"{func_string}")
 
-        j_counter += 1
+        # j_counter += 1
