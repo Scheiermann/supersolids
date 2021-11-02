@@ -39,9 +39,9 @@ if __name__ == "__main__":
     slice_indices = {"x": 127, "y": 63, "z": 15}
 
     if mixture:
-        mixture_slice_index = 1
+        mixture_slice_index = 0
         filename_steps = "mixture_step_"
-        alpha_psi_list = [0.3, 0.8]
+        alpha_psi_list = [0.01, 0.2]
     else:
         filename_steps = "step_"
 
