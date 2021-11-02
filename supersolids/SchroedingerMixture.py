@@ -248,7 +248,7 @@ class SchroedingerMixture(Schroedinger):
                             print(f"Norm for psi_sol (trapez integral): "
                                   f"{self.trapez_integral(np.abs(psi_sol_val) ** 2.0)}")
 
-            kx_mesh, ky_mesh, kz_mesh, _ = functions.get_meshgrid_3d(self.kx, self.ky, self.kz)
+            kx_mesh, ky_mesh, kz_mesh = np.meshgrid(self.kx, self.ky, self.kz, indexing="ij")
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
 
             if V is None:
