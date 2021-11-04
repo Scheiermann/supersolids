@@ -90,16 +90,18 @@ def track_property(input_path,
     while True:
         print(f"frame={frame}")
         try:
-            # get the psi_val of Schroedinger at other timesteps (t!=0)
-            psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
-            if isinstance(System_loaded, SchroedingerMixture):
-                with open(psi_val_path, "rb") as f:
-                    psi_val_pkl = np.load(file=f)["psi_val_list"]
-                    System_loaded.psi_val_list = psi_val_pkl
-            else:
-                with open(psi_val_path, "rb") as f:
-                    psi_val_pkl = np.load(file=f)["psi_val"]
-                    System_loaded.psi_val = psi_val_pkl
+            # if property is attribute, loading of psi_val is not needed as it is saved in Summary
+            if property_func:
+                # get the psi_val of Schroedinger at other timesteps (t!=0)
+                psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
+                if isinstance(System_loaded, SchroedingerMixture):
+                    with open(psi_val_path, "rb") as f:
+                        psi_val_pkl = np.load(file=f)["psi_val_list"]
+                        System_loaded.psi_val_list = psi_val_pkl
+                else:
+                    with open(psi_val_path, "rb") as f:
+                        psi_val_pkl = np.load(file=f)["psi_val"]
+                        System_loaded.psi_val = psi_val_pkl
 
             System_loaded = System_loaded.load_summary(input_path, steps_format, frame,
                                                        summary_name=None)
@@ -204,7 +206,7 @@ def plot_property(args, func=functions.identity):
         dim = 1
 
     if dim == 1:
-        plt.plot(property_all, "x-")
+        plt.plot(t, property_all, "x-")
         plt.xlabel(rf"t with dt={args.dt}")
         plt.ylabel(f"{args.property_name}")
         plt.grid()
