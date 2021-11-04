@@ -39,7 +39,10 @@ def get_path(dir_path: Path,
             last_index = 0
             print(f"No old data found. Setting last_index={last_index}.")
 
-    input_path = Path(dir_path, dir_name + counting_format % last_index)
+    if file_pattern:
+        input_path = Path(dir_path, dir_name + counting_format % last_index + file_pattern)
+    else:
+        input_path = Path(dir_path, dir_name + counting_format % last_index)
 
     return input_path, last_index, dir_name, counting_format
 
