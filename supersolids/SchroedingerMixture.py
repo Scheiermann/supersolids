@@ -553,6 +553,24 @@ class SchroedingerMixture(Schroedinger):
                              for com_along_axis in center_of_mass_along_axis])
         return com_list
 
+    def get_parity(self, axis=2, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
+        parity_list: List[float] = []
+        x0, x1, y0, y1, z0, z1 = self.slice_default(x0, x1, y0, y1, z0, z1)
+        for psi_val in self.psi_val_list:
+            psi_under0, psi_over0 = np.split(psi_val, 2, axis=axis)
+
+            if axis in [0, 1, 2]:
+                psi_over0_reversed = psi_over0[::-1]
+            else:
+                sys.exit(f"No such axis ({axis}). Choose 0, 1 or 2 for axis x, y or z.")
+
+            parity = self.trapez_integral(np.abs(
+                psi_under0[x0:x1, y0:y1, z0:z1] - psi_over0_reversed[x0:x1, y0:y1, z0:z1]) ** 2.0)
+
+            parity_list.append(parity)
+
+        return parity_list
+
     def get_contrast(self, prob_min, region_threshold: int=1000):
         prob_list = self.get_density_list()
         bec_contrast_list = []
