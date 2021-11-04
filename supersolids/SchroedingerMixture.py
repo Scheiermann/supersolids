@@ -409,15 +409,6 @@ class SchroedingerMixture(Schroedinger):
 
         return density_A, density_total
 
-    def get_r_0(self, mu_DEFAULT: float = 9.93):
-        # r_0 = 387.4
-        r_0 = (161.9 * constants.u_in_kg * mu_0 * (mu_DEFAULT * constants.mu_bohr) ** 2.0
-               / (4.0 * np.pi * constants.hbar ** 2.0)
-               ) / constants.a_0
-        print(f"r_0: {r_0}")
-
-        return r_0
-
     def save_psi_val(self, input_path, filename_steps, steps_format, frame):
         with open(Path(input_path, "mixture_" + filename_steps + steps_format % frame + ".npz"),
                   "wb") as g:
