@@ -13,9 +13,9 @@ def cp_plots(start, number, path_anchor_input, dir_name, filename_in,
             path_anchor_output.mkdir(parents=True)
 
         print(f"{movie_number}")
-        shutil.copy(
-            Path(path_anchor_input, dir_name + movie_number, filename_in + filename_extension),
-            Path(path_anchor_output, filename_out + "_" + movie_number + filename_extension))
+        path_in: Path = Path(path_anchor_input, dir_name + movie_number, filename_in + filename_extension)
+        path_out: Path = Path(path_anchor_output, filename_out + "_" + movie_number + filename_extension)
+        shutil.copy(path_in, path_out)
 
 
 if __name__ == "__main__":
