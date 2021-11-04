@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-start=322466
-job_number=25
+start=350862
+job_number=50
 
 for ((i = $start; i < $((start + job_number)); i++))
 do
