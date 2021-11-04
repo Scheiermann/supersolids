@@ -581,6 +581,10 @@ def get_r_cut(k_mesh: np.ndarray, r_cut: float = 1.0):
 
     return r_cut_mesh
 
+def dipol_dipol(u):
+    dipol = (4.0 * np.pi / 3.0) * (3.0 * u ** 2.0 - 1.0)
+
+    return dipol
 
 def dipol_dipol_interaction(kx_mesh: np.ndarray,
                             ky_mesh: np.ndarray,
@@ -588,21 +592,20 @@ def dipol_dipol_interaction(kx_mesh: np.ndarray,
                             r_cut: float = 1.0,
                             use_cut_off: bool = False):
     k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
-    factor = 3.0 * (kz_mesh ** 2.0)
     # for [0, 0, 0] there is a singularity and factor/k_squared is 0/0, so we
     # arbitrary set the divisor to 1.0
-    k_squared_singular_free = np.where(k_squared == 0.0, 1.0, k_squared)
-    k_squared_singular_index = np.where(k_squared == 0.0)
-
     k_mesh: np.ndarray = np.sqrt(k_squared)
+    k_mesh_singular_free = np.where(k_mesh == 0.0, 1.0, k_mesh)
+    k_mesh_singular_index = np.where(k_mesh == 0.0)
+
     if use_cut_off:
-        r_cut_mesh: np.ndarray = get_r_cut(k_mesh, r_cut=r_cut)
+        r_cut_mesh: np.ndarray = get_r_cut(k_mesh_singular_free, r_cut=r_cut)
     else:
         r_cut_mesh: float = 1.0
 
-    V_k_val = r_cut_mesh * (4.0 * np.pi / 3.0) * ((factor / k_squared_singular_free) - 1.0)
+    V_k_val = r_cut_mesh * dipol_dipol(kz_mesh / k_mesh_singular_free)
     # set the the arbitrary value assigned to the singularity to 0
-    V_k_val[k_squared_singular_index] = 0.0
+    V_k_val[k_mesh_singular_index] = 0.0
 
     return V_k_val
 

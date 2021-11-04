@@ -29,7 +29,6 @@ from supersolids.helper import functions, constants
 from supersolids.helper.Box import Box
 from supersolids.helper.Resolution import Resolution
 
-
 """
 from sympy import diff, sqrt, re
 from sympy import symbols
@@ -301,8 +300,7 @@ class SchroedingerMixture(Schroedinger):
 
         """
         eta_array: np.ndarray = (self.a_s_factor * self.a_s_array
-                                 + 4.0 * np.pi * self.a_dd_factor * self.a_dd_array * (
-                                         u ** 2.0 - 1.0 / 3.0)
+                                 + self.a_dd_factor * self.a_dd_array * functions.dipol_dipol(u)
                                  )
         eta_aa = eta_array[0, 0]
         eta_ab = eta_array[0, 1]
@@ -341,8 +339,7 @@ class SchroedingerMixture(Schroedinger):
 
     def func_f(self, u, eta_dVdn: Callable):
         eta_array: np.ndarray = (self.a_s_factor * self.a_s_array
-                                 + 4.0 * np.pi * self.a_dd_factor * self.a_dd_array * (
-                                         u ** 2.0 - 1.0 / 3.0)
+                                 + self.a_dd_factor * self.a_dd_array * functions.dipol_dipol(u)
                                  )
         eta_aa = eta_array[0, 0]
         eta_ab = eta_array[0, 1]
