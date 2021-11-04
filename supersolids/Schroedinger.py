@@ -656,24 +656,24 @@ class Schroedinger:
 
     def slice_default(self, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
         if (x0 is None) and (x1 is None):
-            x0 = self.Box.x0
-            x1 = self.Box.x1
+            x0 = 0
+            x1 = self.Res.x - 1
         else:
             if (x0 < 0) or ((x0 or x1) > self.Res.x):
                 sys.exit(f"ERROR: Slice indices ({x0}, {x1}) for x out of bound. "
                          f"Bounds are (0, {self.Res.x})\n")
 
         if (y0 is None) and (y1 is None):
-            y0 = self.Box.y0
-            y1 = self.Box.y1
+            y0 = 0
+            y1 = self.Res.y - 1
         else:
             if (y0 < 0) or ((y0 or y1) > self.Res.y):
                 sys.exit(f"ERROR: Slice indices ({y0}, {y1}) for y out of bound. "
                          f"Bounds are (0, {self.Res.y})\n")
 
         if (z0 is None) and (z1 is None):
-            z0 = self.Box.z0
-            z1 = self.Box.z1
+            z0 = 0
+            z1 = self.Res.z - 1
         else:
             if (z0 < 0) or ((z0 or z1) > self.Res.z):
                 sys.exit(f"ERROR: Slice indices ({z0}, {z1}) for z out of bound. "
