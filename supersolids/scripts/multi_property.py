@@ -31,14 +31,12 @@ if __name__ == "__main__":
     dir_suffix = ""
     # dir_suffix = "_right"
 
-    file_suffix = ""
     # file_suffix = "_fft"
     # inbuild_func = "fft_plot"
     inbuild_func = ""
     func = "lambda x, y: (x, y)"
     # func = ""
 
-    property_filename_suffix = dir_suffix + file_suffix
 
     subplots = True
     property_func = True
@@ -71,6 +69,10 @@ if __name__ == "__main__":
 
     # we want 2S=D, so that the peaks distance equals the distance between max and min of sin
     # delta = s * 2.0
+
+    file_suffix = ""
+    # file_suffix = "-" + "-".join(map(str, property_args)) + ".png"
+    property_filename_suffix = dir_suffix + file_suffix
 
     for peak_index, i in enumerate(range(movie_start, movie_end + 1)):
         # property_args = [0.00725, number_of_peaks[peak_index]]
