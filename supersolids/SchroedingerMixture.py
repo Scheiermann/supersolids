@@ -308,9 +308,9 @@ class SchroedingerMixture(Schroedinger):
         energy_prefactor = np.sqrt(2.) / 15. / np.pi ** 2
 
         return energy_prefactor * np.real(
-                    np.lib.scimath.sqrt(self.eta_V(1, eta_aa, eta_bb, eta_ab)) ** 5.0
-                    + np.lib.scimath.sqrt(self.eta_V(-1, eta_aa, eta_bb, eta_ab)) ** 5.0
-                    )
+            np.lib.scimath.sqrt(self.eta_V(1, eta_aa, eta_bb, eta_ab)) ** 5.0
+            + np.lib.scimath.sqrt(self.eta_V(-1, eta_aa, eta_bb, eta_ab)) ** 5.0
+        )
 
     def func_f_symb(self, u, func: Callable, eta_a, eta_b):
         eta_array: np.ndarray = (self.a_s_factor * self.a_s_array
@@ -571,7 +571,7 @@ class SchroedingerMixture(Schroedinger):
 
         return parity_list
 
-    def get_contrast(self, prob_min, region_threshold: int=1000):
+    def get_contrast(self, prob_min, region_threshold: int = 1000):
         prob_list = self.get_density_list()
         bec_contrast_list = []
         for N, prob in zip(self.N_list, prob_list):

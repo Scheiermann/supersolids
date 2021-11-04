@@ -9,8 +9,7 @@ def get_supersolids_version():
         supersolids_version = version('supersolids')
     elif version_info >= (3, 6, 0):
         import pkg_resources
-        supersolids_version = pkg_resources.get_distribution(
-            "supersolids").version
+        supersolids_version = pkg_resources.get_distribution("supersolids").version
     else:
         supersolids_version = "unknown"
 
