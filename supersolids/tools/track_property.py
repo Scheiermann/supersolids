@@ -36,7 +36,7 @@ def get_input_path(dir_path, dir_name):
 
 def get_last_index(input_path, filename_steps):
     _, last_index, _, _ = get_path.get_path(input_path,
-                                            dir_name=filename_steps,
+                                            search_prefix=filename_steps,
                                             file_pattern=".npz"
                                             )
 

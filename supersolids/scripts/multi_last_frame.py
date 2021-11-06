@@ -42,16 +42,17 @@ if __name__ == "__main__":
         # gets last movie with animations of each movie
         path_last_movie_png, _, _, _ = get_path(
             Path(path_anchor_input, f"{dir_name}{counting_format % movie_number}"),
-            dir_name=f"{dir_name_png}",
+            search_prefix=f"{dir_name_png}",
             counting_format=counting_format_png,
-            file_pattern=""
+            file_pattern="",
+            take_last=movie_take_last,
             )
         # gets last anim.png of each last movie with animations
         path_last_png, _, _, _ = get_path(
             path_last_movie_png,
-            dir_name=filename_pattern,
+            search_prefix=filename_pattern,
             counting_format=filename_format,
-            file_pattern=filename_extension
+            file_pattern=filename_extension,
             )
         print(f"{path_last_png}")
         shutil.copy(path_last_png,

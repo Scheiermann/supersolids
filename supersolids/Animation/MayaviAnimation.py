@@ -319,7 +319,7 @@ class MayaviAnimation(Animation.Animation):
         self.dir_path = input_path
         self.fig.scene.movie_maker.directory = self.dir_path
         _, last_index, _, _ = get_path.get_path(self.dir_path,
-                                                dir_name=filename_steps,
+                                                search_prefix=filename_steps,
                                                 file_pattern=".npz"
                                                 )
 
