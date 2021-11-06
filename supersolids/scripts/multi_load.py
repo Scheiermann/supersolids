@@ -50,6 +50,7 @@ if __name__ == "__main__":
 
     azimuth = 0.0
     elevation = 0.0
+    distance = 29.0
 
     arg_slices = False
     plot_V = False
@@ -82,7 +83,8 @@ if __name__ == "__main__":
                        f"-mixture_slice_index={mixture_slice_index}",
                        f"-slice_indices={dic2str(slice_indices, single_quote_wrapped=False)}",
                        f"-azimuth={azimuth}",
-                       f"-elevation={elevation}"]
+                       f"-elevation={elevation}",
+                       f"-distance={distance}"]
 
         if arg_slices:
             flags_given.append("--arg_slices")

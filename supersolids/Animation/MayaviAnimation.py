@@ -299,6 +299,7 @@ class MayaviAnimation(Animation.Animation):
                     arg_slices: bool = False,
                     azimuth: float = 0.0,
                     elevation: float = 0.0,
+                    distance: float = 60.0,
                     summary_name: Optional[str] = None,
                     mixture_slice_index: int = 0
                     ):
@@ -365,7 +366,7 @@ class MayaviAnimation(Animation.Animation):
                                        size=1.0,
                                        color=(0, 0, 0),
                                        )
-                    mlab.view(azimuth=azimuth, elevation=elevation)
+                    mlab.view(azimuth=azimuth, elevation=elevation, distance=distance)
 
                     if arg_slices:
                         cbar = mlab.colorbar(object=slice_x_plot, orientation='vertical', nb_labels=10)

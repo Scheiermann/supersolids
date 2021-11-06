@@ -56,6 +56,7 @@ def load_npz(flag_args):
                                   arg_slices=flag_args.arg_slices,
                                   azimuth=flag_args.azimuth,
                                   elevation=flag_args.elevation,
+                                  distance=flag_args.distance,
                                   mixture_slice_index=flag_args.mixture_slice_index,
                                   )
     mlab.show()
@@ -94,6 +95,7 @@ def flags(args_array):
                         help="Index of mixture to take slices from.")
     parser.add_argument("-azimuth", type=float, default=0.0, help="Phi angle in x-y-plane.")
     parser.add_argument("-elevation", type=float, default=0.0, help="Zenith angle theta in z-axis.")
+    parser.add_argument("-distance", type=float, default=60.0, help="Setting for zoom.")
     parser.add_argument("--alpha_psi_list", default=[], nargs="+",
                         help="Option to adjust the transparency of the list of plots.")
     parser.add_argument("--alpha_psi_sol_list", default=[], nargs="+",
