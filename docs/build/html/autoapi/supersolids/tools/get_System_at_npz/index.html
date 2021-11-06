@@ -78,10 +78,16 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.get_System_at_npz" title="supersolids.tools.get_System_at_npz.get_System_at_npz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_System_at_npz</span></code></a>(dir_path = Path('~/supersolids/results').expanduser(), dir_name = 'movie001', filename_schroedinger = f'schroedinger.pkl', filename_steps = f'step_', steps_format = '%06d', frame = 0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.get_System_at_npz" title="supersolids.tools.get_System_at_npz.get_System_at_npz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_System_at_npz</span></code></a>(dir_path = Path('~/supersolids/results').expanduser(), dir_name = 'movie001', filename_schroedinger = f'schroedinger.pkl', filename_steps = f'step_', steps_format = '%07d', frame = 0)</p></td>
 <td><p>Gets Schroedinger at given npz</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.plot_System_at_npz" title="supersolids.tools.get_System_at_npz.plot_System_at_npz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_System_at_npz</span></code></a>(args)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.get_property_all" title="supersolids.tools.get_System_at_npz.get_property_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_property_all</span></code></a>(args)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.plot_System_at_npz" title="supersolids.tools.get_System_at_npz.plot_System_at_npz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_System_at_npz</span></code></a>(args, dir_path, v_0_list, delta_list, property_values)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.plot_contour" title="supersolids.tools.get_System_at_npz.plot_contour"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_contour</span></code></a>(args, dir_path, property_values)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.flags" title="supersolids.tools.get_System_at_npz.flags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flags</span></code></a>(args_array)</p></td>
@@ -105,7 +111,7 @@
 </table>
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.get_System_at_npz">
-<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">get_System_at_npz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dir_path</span> <span class="pre">=</span> <span class="pre">Path('~/supersolids/results').expanduser()</span></em>, <em class="sig-param"><span class="pre">dir_name</span> <span class="pre">=</span> <span class="pre">'movie001'</span></em>, <em class="sig-param"><span class="pre">filename_schroedinger</span> <span class="pre">=</span> <span class="pre">f'schroedinger.pkl'</span></em>, <em class="sig-param"><span class="pre">filename_steps</span> <span class="pre">=</span> <span class="pre">f'step_'</span></em>, <em class="sig-param"><span class="pre">steps_format</span> <span class="pre">=</span> <span class="pre">'%06d'</span></em>, <em class="sig-param"><span class="pre">frame</span> <span class="pre">=</span> <span class="pre">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#get_System_at_npz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.get_System_at_npz" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">get_System_at_npz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dir_path</span> <span class="pre">=</span> <span class="pre">Path('~/supersolids/results').expanduser()</span></em>, <em class="sig-param"><span class="pre">dir_name</span> <span class="pre">=</span> <span class="pre">'movie001'</span></em>, <em class="sig-param"><span class="pre">filename_schroedinger</span> <span class="pre">=</span> <span class="pre">f'schroedinger.pkl'</span></em>, <em class="sig-param"><span class="pre">filename_steps</span> <span class="pre">=</span> <span class="pre">f'step_'</span></em>, <em class="sig-param"><span class="pre">steps_format</span> <span class="pre">=</span> <span class="pre">'%07d'</span></em>, <em class="sig-param"><span class="pre">frame</span> <span class="pre">=</span> <span class="pre">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#get_System_at_npz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.get_System_at_npz" title="Permalink to this definition"></a></dt>
 <dd><p>Gets Schroedinger at given npz</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -128,8 +134,18 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.get_property_all">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">get_property_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#get_property_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.get_property_all" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.plot_System_at_npz">
-<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">plot_System_at_npz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#plot_System_at_npz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.plot_System_at_npz" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">plot_System_at_npz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_0_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#plot_System_at_npz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.plot_System_at_npz" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.plot_contour">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">plot_contour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#plot_contour"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.plot_contour" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">

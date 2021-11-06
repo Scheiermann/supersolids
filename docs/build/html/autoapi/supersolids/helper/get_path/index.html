@@ -78,7 +78,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_path" title="supersolids.helper.get_path.get_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_path</span></code></a>(dir_path, dir_name = 'movie', counting_format = '%03d', file_pattern = '')</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_path" title="supersolids.helper.get_path.get_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_path</span></code></a>(dir_path, search_prefix = 'movie', counting_format = '%03d', file_pattern = '', take_last = 1)</p></td>
 <td><p>Looks up all directories with matching dir_name</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_step_index_from_list" title="supersolids.helper.get_path.get_step_index_from_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_step_index_from_list</span></code></a>(dir_paths, filename_prefix='step_', file_pattern='.npz')</p></td>
@@ -91,7 +91,7 @@
 </table>
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.get_path.get_path">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_path.</span></span><span class="sig-name descname"><span class="pre">get_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'movie'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counting_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%03d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_path.html#get_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_path.get_path" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_path.</span></span><span class="sig-name descname"><span class="pre">get_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'movie'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counting_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%03d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_path.html#get_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_path.get_path" title="Permalink to this definition"></a></dt>
 <dd><p>Looks up all directories with matching dir_name
 and counting format in dir_path.
 Gets the highest number and returns a path with dir_name counted one up
@@ -100,9 +100,10 @@ Gets the highest number and returns a path with dir_name counted one up
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – Path where to look for old directories (movie data)</p></li>
-<li><p><strong>dir_name</strong> (<em>str</em>) – General name of the directories without the counter</p></li>
+<li><p><strong>search_prefix</strong> (<em>str</em>) – General name of the directories without the counter</p></li>
 <li><p><strong>counting_format</strong> (<em>str</em>) – Format of counter of the directories</p></li>
 <li><p><strong>file_pattern</strong> (<em>str</em>) – </p></li>
+<li><p><strong>take_last</strong> (<em>int</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

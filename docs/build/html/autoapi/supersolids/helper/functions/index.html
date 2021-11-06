@@ -104,181 +104,202 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.fft_plot" title="supersolids.helper.functions.fft_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fft_plot</span></code></a>(t, property_all)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_meshgrid" title="supersolids.helper.functions.get_meshgrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_meshgrid</span></code></a>(x, y)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_droplet_edges" title="supersolids.helper.functions.get_droplet_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_droplet_edges</span></code></a>(prob_droplets, peaks_index_3d, cut_axis)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_meshgrid_3d" title="supersolids.helper.functions.get_meshgrid_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_meshgrid_3d</span></code></a>(x, y, z)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.extract_droplet" title="supersolids.helper.functions.extract_droplet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_droplet</span></code></a>(prob_droplets, peaks_index_3d)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.check_provided_lists" title="supersolids.helper.functions.check_provided_lists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_provided_lists</span></code></a>(number_of_mixtures, a_s_list, a_dd_list)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.peaks_sort" title="supersolids.helper.functions.peaks_sort"><code class="xref py py-obj docutils literal notranslate"><span class="pre">peaks_sort</span></code></a>(peaks_indices, peaks_height, number_of_peaks)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_mu_combinations" title="supersolids.helper.functions.get_mu_combinations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mu_combinations</span></code></a>(dipol_list)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.peaks_sort_along" title="supersolids.helper.functions.peaks_sort_along"><code class="xref py py-obj docutils literal notranslate"><span class="pre">peaks_sort_along</span></code></a>(peaks_indices, peaks_height, number_of_peaks, axis)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_parameters_mixture" title="supersolids.helper.functions.get_parameters_mixture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parameters_mixture</span></code></a>(l_0, number_of_mixtures, a_dd_list, a_s_list)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_peaks" title="supersolids.helper.functions.get_peaks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_peaks</span></code></a>(prob)</p></td>
+<td><p>Takes an image and detect the peaks using the local maximum filter.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.binary_structures" title="supersolids.helper.functions.binary_structures"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binary_structures</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.dimensionless" title="supersolids.helper.functions.dimensionless"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dimensionless</span></code></a>(arr, l_0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.fill_holes" title="supersolids.helper.functions.fill_holes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fill_holes</span></code></a>(region, structure_vertical, structure_horizontal)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.combinations2array" title="supersolids.helper.functions.combinations2array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">combinations2array</span></code></a>(number_of_mixtures, combinations_list)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_meshgrid" title="supersolids.helper.functions.get_meshgrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_meshgrid</span></code></a>(x, y)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.symmetric_mat" title="supersolids.helper.functions.symmetric_mat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">symmetric_mat</span></code></a>(arr, axis=None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_meshgrid_3d" title="supersolids.helper.functions.get_meshgrid_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_meshgrid_3d</span></code></a>(x, y, z)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.w_dimensionsless" title="supersolids.helper.functions.w_dimensionsless"><code class="xref py py-obj docutils literal notranslate"><span class="pre">w_dimensionsless</span></code></a>(dimensionless_factor, w_x = 2.0 * np.pi * 30.0, w_y = 2.0 * np.pi * 30.0, w_z = 2.0 * np.pi * 30.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.check_provided_lists" title="supersolids.helper.functions.check_provided_lists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_provided_lists</span></code></a>(number_of_mixtures, a_s_list, a_dd_list)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_parameters" title="supersolids.helper.functions.get_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parameters</span></code></a>(N = 10**4, m = 164 * constants.u_in_kg, a_s = 90.0 * constants.a_0, a_dd = 130.0 * constants.a_0, w_x = 2.0 * np.pi * 30.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_mu_combinations" title="supersolids.helper.functions.get_mu_combinations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mu_combinations</span></code></a>(dipol_list)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_g" title="supersolids.helper.functions.get_g"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_g</span></code></a>(N, a_s_l_ho_ratio)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_parameters_mixture" title="supersolids.helper.functions.get_parameters_mixture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parameters_mixture</span></code></a>(l_0, number_of_mixtures, a_dd_list, a_s_list)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.g_qf_helper" title="supersolids.helper.functions.g_qf_helper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">g_qf_helper</span></code></a>(m = 164 * constants.u_in_kg, a_s = 90.0 * constants.a_0, a_dd = 130.0 * constants.a_0, w_x = 2.0 * np.pi * 30.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.dimensionless" title="supersolids.helper.functions.dimensionless"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dimensionless</span></code></a>(arr, l_0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.new_int" title="supersolids.helper.functions.new_int"><code class="xref py py-obj docutils literal notranslate"><span class="pre">new_int</span></code></a>(epsilon_dd)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.combinations2array" title="supersolids.helper.functions.combinations2array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">combinations2array</span></code></a>(number_of_mixtures, combinations_list)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_g_qf" title="supersolids.helper.functions.get_g_qf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_g_qf</span></code></a>(N, a_s_l_ho_ratio, epsilon_dd)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.symmetric_mat" title="supersolids.helper.functions.symmetric_mat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">symmetric_mat</span></code></a>(arr, axis=None)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_l_ho" title="supersolids.helper.functions.get_l_ho"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_l_ho</span></code></a>(m = 164.0 * constants.u_in_kg, w_x = 2.0 * np.pi * 30.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.w_dimensionsless" title="supersolids.helper.functions.w_dimensionsless"><code class="xref py py-obj docutils literal notranslate"><span class="pre">w_dimensionsless</span></code></a>(dimensionless_factor, w_x = 2.0 * np.pi * 30.0, w_y = 2.0 * np.pi * 30.0, w_z = 2.0 * np.pi * 30.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_alphas" title="supersolids.helper.functions.get_alphas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_alphas</span></code></a>(w_x = 2.0 * np.pi * 30.0, w_y = 2.0 * np.pi * 30.0, w_z = 2.0 * np.pi * 30.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_parameters" title="supersolids.helper.functions.get_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parameters</span></code></a>(N = 10**4, m = 164 * constants.u_in_kg, a_s = 90.0 * constants.a_0, a_dd = 130.0 * constants.a_0, w_x = 2.0 * np.pi * 30.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_2d_pdf" title="supersolids.helper.functions.psi_gauss_2d_pdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_2d_pdf</span></code></a>(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]]))</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_g" title="supersolids.helper.functions.get_g"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_g</span></code></a>(N, a_s_l_ho_ratio)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.g_qf_helper" title="supersolids.helper.functions.g_qf_helper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">g_qf_helper</span></code></a>(m = 164 * constants.u_in_kg, a_s = 90.0 * constants.a_0, a_dd = 130.0 * constants.a_0, w_x = 2.0 * np.pi * 30.0)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.new_int" title="supersolids.helper.functions.new_int"><code class="xref py py-obj docutils literal notranslate"><span class="pre">new_int</span></code></a>(epsilon_dd)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_g_qf" title="supersolids.helper.functions.get_g_qf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_g_qf</span></code></a>(N, a_s_l_ho_ratio, epsilon_dd)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_l_ho" title="supersolids.helper.functions.get_l_ho"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_l_ho</span></code></a>(m = 164.0 * constants.u_in_kg, w_x = 2.0 * np.pi * 30.0)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_alphas" title="supersolids.helper.functions.get_alphas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_alphas</span></code></a>(w_x = 2.0 * np.pi * 30.0, w_y = 2.0 * np.pi * 30.0, w_z = 2.0 * np.pi * 30.0)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_2d_pdf" title="supersolids.helper.functions.psi_gauss_2d_pdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_2d_pdf</span></code></a>(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]]))</p></td>
 <td><p>Gives values according to gaus dirstribution (2D)</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_2d" title="supersolids.helper.functions.psi_gauss_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_2d</span></code></a>(x, y, a_x = 1.0, a_y = 1.0, x_0 = 0.0, y_0 = 0.0, k_0 = 0.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_2d" title="supersolids.helper.functions.psi_gauss_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_2d</span></code></a>(x, y, a_x = 1.0, a_y = 1.0, x_0 = 0.0, y_0 = 0.0, k_0 = 0.0)</p></td>
 <td><p>Gaussian wave packet of width a and momentum k_0, centered at x_0, y_0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_3d" title="supersolids.helper.functions.psi_gauss_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_3d</span></code></a>(x, y, z, a_x = 1.0, a_y = 1.0, a_z = 1.0, x_0 = 0.0, y_0 = 0.0, z_0 = 0.0, k_0 = 0.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_3d" title="supersolids.helper.functions.psi_gauss_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_3d</span></code></a>(x, y, z, a_x = 1.0, a_y = 1.0, a_z = 1.0, x_0 = 0.0, y_0 = 0.0, z_0 = 0.0, k_0 = 0.0)</p></td>
 <td><p>Gaussian wave packet of width a and momentum k_0, centered at x_0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_1d" title="supersolids.helper.functions.psi_gauss_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_1d</span></code></a>(x, a = 1.0, x_0 = 0.0, k_0 = 0.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_1d" title="supersolids.helper.functions.psi_gauss_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_1d</span></code></a>(x, a = 1.0, x_0 = 0.0, k_0 = 0.0)</p></td>
 <td><p>Gaussian wave packet of width a and momentum k_0, centered at x_0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_pdf" title="supersolids.helper.functions.psi_pdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_pdf</span></code></a>(x, loc = 0.0, scale = 1.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_pdf" title="supersolids.helper.functions.psi_pdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_pdf</span></code></a>(x, loc = 0.0, scale = 1.0)</p></td>
 <td><p>Mathematical function of gauss pulse</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_rect" title="supersolids.helper.functions.psi_rect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_rect</span></code></a>(x, x_min = -0.5, x_max = 0.5, a = 1.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_rect" title="supersolids.helper.functions.psi_rect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_rect</span></code></a>(x, x_min = -0.5, x_max = 0.5, a = 1.0)</p></td>
 <td><p>Mathematical function of rectangular pulse</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_solution" title="supersolids.helper.functions.psi_gauss_solution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_solution</span></code></a>(x)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.psi_gauss_solution" title="supersolids.helper.functions.psi_gauss_solution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi_gauss_solution</span></code></a>(x)</p></td>
 <td><p>Mathematical function of solution of non-linear Schroedinger for g=0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_1d" title="supersolids.helper.functions.thomas_fermi_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_1d</span></code></a>(x, g = 0.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_1d" title="supersolids.helper.functions.thomas_fermi_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_1d</span></code></a>(x, g = 0.0)</p></td>
 <td><p>Mathematical function of Thomas-Fermi distribution with coupling constant g</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_2d" title="supersolids.helper.functions.thomas_fermi_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_2d</span></code></a>(x, y, g = 0.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_2d" title="supersolids.helper.functions.thomas_fermi_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_2d</span></code></a>(x, y, g = 0.0)</p></td>
 <td><p>Mathematical function of Thomas-Fermi distribution with coupling constant g</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_2d_pos" title="supersolids.helper.functions.thomas_fermi_2d_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_2d_pos</span></code></a>(pos, g = 0.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_2d_pos" title="supersolids.helper.functions.thomas_fermi_2d_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_2d_pos</span></code></a>(pos, g = 0.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_3d" title="supersolids.helper.functions.thomas_fermi_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_3d</span></code></a>(x, y, z, g = 0.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.thomas_fermi_3d" title="supersolids.helper.functions.thomas_fermi_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thomas_fermi_3d</span></code></a>(x, y, z, g = 0.0)</p></td>
 <td><p>Mathematical function of Thomas-Fermi distribution with coupling constant g</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.mu_1d" title="supersolids.helper.functions.mu_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu_1d</span></code></a>(g = 0.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.mu_1d" title="supersolids.helper.functions.mu_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu_1d</span></code></a>(g = 0.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.mu_2d" title="supersolids.helper.functions.mu_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu_2d</span></code></a>(g = 0.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.mu_2d" title="supersolids.helper.functions.mu_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu_2d</span></code></a>(g = 0.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.mu_3d" title="supersolids.helper.functions.mu_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu_3d</span></code></a>(g = 0.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.mu_3d" title="supersolids.helper.functions.mu_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu_3d</span></code></a>(g = 0.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_harmonic_1d" title="supersolids.helper.functions.v_harmonic_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_harmonic_1d</span></code></a>(x)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_harmonic_1d" title="supersolids.helper.functions.v_harmonic_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_harmonic_1d</span></code></a>(x)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_harmonic_2d" title="supersolids.helper.functions.v_harmonic_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_harmonic_2d</span></code></a>(pos, alpha_y = 1.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_harmonic_2d" title="supersolids.helper.functions.v_harmonic_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_harmonic_2d</span></code></a>(pos, alpha_y = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_2d" title="supersolids.helper.functions.v_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_2d</span></code></a>(x, y, alpha_y=1.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_2d" title="supersolids.helper.functions.v_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_2d</span></code></a>(x, y, alpha_y=1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_harmonic_3d" title="supersolids.helper.functions.v_harmonic_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_harmonic_3d</span></code></a>(x, y, z, alpha_y = 1.0, alpha_z = 1.0, lH0 = 1.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.v_harmonic_3d" title="supersolids.helper.functions.v_harmonic_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v_harmonic_3d</span></code></a>(x, y, z, alpha_y = 1.0, alpha_z = 1.0, lH0 = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_r_cut" title="supersolids.helper.functions.get_r_cut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_r_cut</span></code></a>(k_mesh, r_cut = 1.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_r_cut" title="supersolids.helper.functions.get_r_cut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_r_cut</span></code></a>(k_mesh, r_cut = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.dipol_dipol" title="supersolids.helper.functions.dipol_dipol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipol_dipol</span></code></a>(u)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.dipol_dipol" title="supersolids.helper.functions.dipol_dipol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipol_dipol</span></code></a>(u)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.dipol_dipol_interaction" title="supersolids.helper.functions.dipol_dipol_interaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipol_dipol_interaction</span></code></a>(kx_mesh, ky_mesh, kz_mesh, r_cut = 1.0, use_cut_off = False)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.dipol_dipol_interaction" title="supersolids.helper.functions.dipol_dipol_interaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipol_dipol_interaction</span></code></a>(kx_mesh, ky_mesh, kz_mesh, r_cut = 1.0, use_cut_off = False)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi" title="supersolids.helper.functions.get_V_k_val_ddi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi</span></code></a>(kx_mesh, ky_mesh, kz_mesh, rho_lin, z_lin)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi" title="supersolids.helper.functions.get_V_k_val_ddi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi</span></code></a>(kx_mesh, ky_mesh, kz_mesh, rho_lin, z_lin)</p></td>
 <td><p>Explicit calculation of the Fourier transform with the cylindrical cut-off</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral_slow" title="supersolids.helper.functions.get_rho_integral_slow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral_slow</span></code></a>(k_rho_mesh, kz_mesh, rho_lin, z_lin)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral_slow" title="supersolids.helper.functions.get_rho_integral_slow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral_slow</span></code></a>(k_rho_mesh, kz_mesh, rho_lin, z_lin)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.triu_list2array" title="supersolids.helper.functions.triu_list2array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">triu_list2array</span></code></a>(triu_list, triu_ind, shape)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.triu_list2array" title="supersolids.helper.functions.triu_list2array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">triu_list2array</span></code></a>(triu_list, triu_ind, shape)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral" title="supersolids.helper.functions.get_rho_integral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral</span></code></a>(k_rho_mesh, kz_mesh, rho_lin, z_lin, compare)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral" title="supersolids.helper.functions.get_rho_integral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral</span></code></a>(k_rho_mesh, kz_mesh, rho_lin, z_lin, compare)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral_quad" title="supersolids.helper.functions.get_rho_integral_quad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral_quad</span></code></a>(kx_mesh, ky_mesh, kz_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_rho_integral_quad" title="supersolids.helper.functions.get_rho_integral_quad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rho_integral_quad</span></code></a>(kx_mesh, ky_mesh, kz_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi_fft_where" title="supersolids.helper.functions.get_V_k_val_ddi_fft_where"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi_fft_where</span></code></a>(x_mesh, y_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi_fft_where" title="supersolids.helper.functions.get_V_k_val_ddi_fft_where"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi_fft_where</span></code></a>(x_mesh, y_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi_fft" title="supersolids.helper.functions.get_V_k_val_ddi_fft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi_fft</span></code></a>(x_mesh, y_mesh, z_mesh, x_cut, y_cut, z_cut)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_V_k_val_ddi_fft" title="supersolids.helper.functions.get_V_k_val_ddi_fft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_k_val_ddi_fft</span></code></a>(x_mesh, y_mesh, z_mesh, x_cut, y_cut, z_cut)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.bessel_func" title="supersolids.helper.functions.bessel_func"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bessel_func</span></code></a>(rho, z, k_rho, kz)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.bessel_func" title="supersolids.helper.functions.bessel_func"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bessel_func</span></code></a>(rho, z, k_rho, kz)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.f_kappa" title="supersolids.helper.functions.f_kappa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f_kappa</span></code></a>(kappa, epsilon = 10**(-10))</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.f_kappa" title="supersolids.helper.functions.f_kappa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f_kappa</span></code></a>(kappa, epsilon = 10**(-10))</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.atan_special" title="supersolids.helper.functions.atan_special"><code class="xref py py-obj docutils literal notranslate"><span class="pre">atan_special</span></code></a>(x)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.atan_special" title="supersolids.helper.functions.atan_special"><code class="xref py py-obj docutils literal notranslate"><span class="pre">atan_special</span></code></a>(x)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.func_125" title="supersolids.helper.functions.func_125"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_125</span></code></a>(kappa, alpha_z, e_dd, epsilon = 10**(-10))</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.func_125" title="supersolids.helper.functions.func_125"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_125</span></code></a>(kappa, alpha_z, e_dd, epsilon = 10**(-10))</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.func_124" title="supersolids.helper.functions.func_124"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_124</span></code></a>(kappa, e_dd, N, a_s_l_ho_ratio)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.func_124" title="supersolids.helper.functions.func_124"><code class="xref py py-obj docutils literal notranslate"><span class="pre">func_124</span></code></a>(kappa, e_dd, N, a_s_l_ho_ratio)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_R_rz" title="supersolids.helper.functions.get_R_rz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_R_rz</span></code></a>(kappa, e_dd, N, a_s_l_ho_ratio)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_R_rz" title="supersolids.helper.functions.get_R_rz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_R_rz</span></code></a>(kappa, e_dd, N, a_s_l_ho_ratio)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_kappa" title="supersolids.helper.functions.get_kappa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_kappa</span></code></a>(alpha_z, e_dd, x_min = 3.0, x_max = 5.0, res = 1000)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_kappa" title="supersolids.helper.functions.get_kappa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_kappa</span></code></a>(alpha_z, e_dd, x_min = 3.0, x_max = 5.0, res = 1000)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.density_in_trap" title="supersolids.helper.functions.density_in_trap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">density_in_trap</span></code></a>(x, y, z, R_r, R_z, g = 0.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.density_in_trap" title="supersolids.helper.functions.density_in_trap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">density_in_trap</span></code></a>(x, y, z, R_r, R_z, g = 0.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.density_in_trap_r" title="supersolids.helper.functions.density_in_trap_r"><code class="xref py py-obj docutils literal notranslate"><span class="pre">density_in_trap_r</span></code></a>(r, z, R_r, R_z, g = 0.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.density_in_trap_r" title="supersolids.helper.functions.density_in_trap_r"><code class="xref py py-obj docutils literal notranslate"><span class="pre">density_in_trap_r</span></code></a>(r, z, R_r, R_z, g = 0.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_func_r" title="supersolids.helper.functions.camera_func_r"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_func_r</span></code></a>(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, r_per_frame = 10.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_func_r" title="supersolids.helper.functions.camera_func_r"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_func_r</span></code></a>(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, r_per_frame = 10.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_func_phi" title="supersolids.helper.functions.camera_func_phi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_func_phi</span></code></a>(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, phi_per_frame = 10.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_func_phi" title="supersolids.helper.functions.camera_func_phi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_func_phi</span></code></a>(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, phi_per_frame = 10.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_func_z" title="supersolids.helper.functions.camera_func_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_func_z</span></code></a>(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, z_per_frame = 10.0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_func_z" title="supersolids.helper.functions.camera_func_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_func_z</span></code></a>(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, z_per_frame = 10.0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_3d_trajectory" title="supersolids.helper.functions.camera_3d_trajectory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_3d_trajectory</span></code></a>(frame, r_func = None, phi_func = None, z_func = None, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_3d_trajectory" title="supersolids.helper.functions.camera_3d_trajectory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_3d_trajectory</span></code></a>(frame, r_func = None, phi_func = None, z_func = None, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0)</p></td>
 <td><p>Computes r, phi, z as the components of the camera position</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.noise_mesh" title="supersolids.helper.functions.noise_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">noise_mesh</span></code></a>(min = 0.8, max = 1.2, shape = (64, 64, 64))</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.noise_mesh" title="supersolids.helper.functions.noise_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">noise_mesh</span></code></a>(min = 0.8, max = 1.2, shape = (64, 64, 64))</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.dt_adaptive" title="supersolids.helper.functions.dt_adaptive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dt_adaptive</span></code></a>(t, dt)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.dt_adaptive" title="supersolids.helper.functions.dt_adaptive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dt_adaptive</span></code></a>(t, dt)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -360,6 +381,44 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.fft_plot">
 <span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">fft_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_all</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#fft_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.fft_plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_droplet_edges">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_droplet_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prob_droplets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peaks_index_3d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_axis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_droplet_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_droplet_edges" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.extract_droplet">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">extract_droplet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prob_droplets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peaks_index_3d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#extract_droplet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.extract_droplet" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.peaks_sort">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">peaks_sort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">peaks_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peaks_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_peaks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#peaks_sort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.peaks_sort" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.peaks_sort_along">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">peaks_sort_along</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">peaks_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peaks_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#peaks_sort_along"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.peaks_sort_along" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.get_peaks">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_peaks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prob</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_peaks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_peaks" title="Permalink to this definition"></a></dt>
+<dd><p>Takes an image and detect the peaks using the local maximum filter.
+Returns a boolean mask of the peaks (i.e. 1 when
+the pixel’s value is the neighborhood maximum, 0 otherwise)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.binary_structures">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">binary_structures</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#binary_structures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.binary_structures" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.functions.fill_holes">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">fill_holes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_vertical</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_horizontal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#fill_holes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.fill_holes" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
