@@ -18,7 +18,7 @@ def get_System_at_npz(dir_path: Path = Path("~/supersolids/results").expanduser(
                       dir_name: str = "movie001",
                       filename_schroedinger: str = f"schroedinger.pkl",
                       filename_steps: str = f"step_",
-                      steps_format: str = "%06d",
+                      steps_format: str = "%07d",
                       frame: int = 0,
                       ) -> Schroedinger:
     """
@@ -133,13 +133,13 @@ def flags(args_array):
                         help="Name of file, where the Schroedinger object is saved")
     parser.add_argument("-filename_steps", type=str, default="step_",
                         help="Name of file, without enumarator for the files. "
-                             "For example the standard naming convention is step_000001.npz, "
+                             "For example the standard naming convention is step_0000001.npz, "
                              "the string needed is step_")
-    parser.add_argument("-steps_format", metavar="steps_format", type=str, default="%06d",
+    parser.add_argument("-steps_format", metavar="steps_format", type=str, default="%07d",
                         help="Formating string to enumerate the files. "
-                             "For example the standard naming convention is step_000001.npz, "
-                             "the string needed is percent 06d")
-    parser.add_argument("-frame", type=int, default=0, help="Counter of first saved npz.")
+                             "For example the standard naming convention is step_0000001.npz, "
+                             "the string needed is %07d")
+    parser.add_argument("-frame", type=json.loads, default=None, help="Counter of first saved npz.")
     parser.add_argument("-dir_start", type=int, default=1, help="Counter of first dir name.")
     parser.add_argument("-dir_end", type=int, default=2, help="Counter of last dir name.")
     parser.add_argument("-v_arange", metavar=("v_start", "v_end", "v_step"),
