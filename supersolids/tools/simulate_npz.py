@@ -279,6 +279,7 @@ def simulate_npz(args):
 
                 else:
                     bool_grid_list = System_loaded.get_peak_neighborhood(
+                        prob=np.abs(SchroedingerInput.psi_val_list[i]) ** 2.0,
                         prob_min=args.neighborhood[0],
                         number_of_peaks=args.neighborhood[1],
                         )
