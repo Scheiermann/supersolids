@@ -41,9 +41,12 @@ if __name__ == "__main__":
     if mixture:
         mixture_slice_index = 0
         filename_steps = "mixture_step_"
-        alpha_psi_list = [0.01, 0.2]
+        alpha_psi_list = [0.0, 0.0]
+        alpha_psi_sol_list = [0.0, 0.0]
     else:
         filename_steps = "step_"
+        alpha_psi_list = [0.0]
+        alpha_psi_sol_list = [0.0]
 
     steps_format = "%07d"
     filename_pattern = ".npz"
@@ -51,6 +54,8 @@ if __name__ == "__main__":
     azimuth = 0.0
     elevation = 0.0
     distance = 29.0
+
+    alpha_V = 0.0
 
     arg_slices = False
     plot_V = False
@@ -66,7 +71,8 @@ if __name__ == "__main__":
                 files_last = files[0]
             except IndexError:
                 # no files in dir
-                print(f'{str(Path(path_in)) + "/*" + filename_pattern} not found. Skipping.')
+                print(f'{str(Path(path_in)) + filename_steps + "/*" + filename_pattern} '
+                      f'not found. Skipping.')
                 continue
 
         frame_start = get_step_index(files_last,
@@ -80,11 +86,20 @@ if __name__ == "__main__":
                        f"-filename_steps={filename_steps}",
                        f"-steps_per_npz={steps_per_npz}",
                        f"-steps_format={steps_format}",
-                       f"-mixture_slice_index={mixture_slice_index}",
                        f"-slice_indices={dic2str(slice_indices, single_quote_wrapped=False)}",
                        f"-azimuth={azimuth}",
                        f"-elevation={elevation}",
-                       f"-distance={distance}"]
+                       f"-distance={distance}",
+                       f"--alpha_V={alpha_V}",
+                       ]
+
+        alpha_args_parsed = list(map(str, alpha_psi_list))
+        flags_given.append(f"--alpha_psi_list")
+        flags_given += alpha_args_parsed
+
+        alpha_args_parsed = list(map(str, alpha_psi_sol_list))
+        flags_given.append(f"--alpha_psi_sol_list")
+        flags_given += alpha_args_parsed
 
         if arg_slices:
             flags_given.append("--arg_slices")
@@ -93,9 +108,7 @@ if __name__ == "__main__":
         if ui:
             flags_given.append("--ui")
         if mixture:
-            alpha_args_parsed = list(map(str, alpha_psi_list))
-            flags_given.append(f"--alpha_psi_list")
-            flags_given += alpha_args_parsed
+            flags_given.append(f"-mixture_slice_index={mixture_slice_index}")
 
         flags_parsed = " ".join(flags_given)
 
