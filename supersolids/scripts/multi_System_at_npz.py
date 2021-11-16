@@ -45,21 +45,23 @@ if __name__ == "__main__":
     # property_args = [0]
     property_args = []
 
-    property_name = "get_contrast"
-    # property_args = [0.3]
-    prob_min_start = 0.3
-    prob_step = 0.002
-    number_of_peaks = [1, 2, 2, 2, 1, 1, 1,
-                       2, 2, 3, 3, 1, 1, 1,
-                       3, 4, 4, 4, 1, 1, 1,
-                       4, 5, 5, 4, 1, 1, 1,
-                       5, 5, 5, 5, 1, 1, 1,
-                       5, 6, 5, 5, 1, 1, 1,
-                       6, 6, 6, 5, 1, 1, 1,
-                       5, 5, 5, 5, 1, 1, 1,
-                       6, 6, 5, 4, 1, 1, 1,
-                       6, 5, 5, 4, 1, 1, 1,
-                       ]
+    property_name = "get_contrast_old"
+    box = [117, 137, 62, 64, 14, 16]
+
+    # property_name = "get_contrast"
+    # prob_min_start = 0.3
+    # prob_step = 0.01
+    # number_of_peaks = [1, 2, 2, 2, 1, 1, 1,
+    #                    2, 2, 3, 3, 1, 1, 1,
+    #                    3, 4, 4, 4, 1, 1, 1,
+    #                    4, 5, 5, 4, 1, 1, 1,
+    #                    5, 5, 5, 5, 1, 1, 1,
+    #                    5, 6, 5, 5, 1, 1, 1,
+    #                    6, 6, 6, 5, 1, 1, 1,
+    #                    5, 5, 5, 5, 1, 1, 1,
+    #                    6, 6, 5, 4, 1, 1, 1,
+    #                    6, 5, 5, 4, 1, 1, 1,
+    #                    ]
 
     # property_name = "get_phase_var"
     # property_args = [0, 256, 0, 128, 0, 32]
@@ -80,10 +82,11 @@ if __name__ == "__main__":
 
     dir_name_list = []
     property_args_list = []
-    for peak_index, i in enumerate(range(movie_start, movie_end + 1)):
-        property_args = [number_of_peaks[peak_index], prob_min_start, prob_step]
+    for peak_index, movie_number in enumerate(range(movie_start, movie_end + 1)):
+        property_args = [*box]
+        # property_args = [number_of_peaks[peak_index], prob_min_start, prob_step]
         property_args_list.append(property_args)
-        dir_name_list.append(f"{dir_name}{dir_name_format % i}")
+        dir_name_list.append(f"{dir_name}{dir_name_format % movie_number}")
 
     command = ["python", "-m", "supersolids.tools.get_System_at_npz"]
     flags = [f"-dir_path={path_anchor_input}",
