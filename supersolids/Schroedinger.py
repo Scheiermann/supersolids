@@ -517,7 +517,7 @@ class Schroedinger:
 
         bool_grid_list = []
         for i, peak_index in enumerate(peaks_sorted_indices):
-            prob_droplets = np.where(prob >= prob_min, prob, 0)
+            prob_droplets = np.where(prob > prob_min, prob, 0)
             single_droplet, edges = functions.extract_droplet(prob_droplets, peaks_sorted_indices[i])
 
             pad_width = []
@@ -751,7 +751,6 @@ class Schroedinger:
 
         try:
             # load SchroedingerSummary
-            system_summary_path = Path(input_path, self.name + steps_format % frame + ".pkl")
             with open(system_summary_path, "rb") as f:
                 SystemSummary: SchroedingerSummary = dill.load(file=f)
                 SystemSummary.copy_to(self)
