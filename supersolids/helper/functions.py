@@ -108,6 +108,32 @@ def identity(*args):
     return args
 
 
+def tensor_grid_mult(tensor, tensor_vec):
+    tensor_vec_result = np.einsum("ij..., j...->i...", tensor, tensor_vec)
+
+    return tensor_vec_result
+
+
+def array_to_tensor_grid(arr: np.ndarray, res_x: int, res_y: int, res_z: int):
+    number_of_mixtures: int = arr.shape[0]
+
+    arr_grid: List[np.ndarray] = []
+    for elem in np.nditer(arr):
+        arr_grid.append(np.full((res_x, res_y, res_z), elem))
+    tensor_grid_1d = np.array(arr_grid)
+    tensor_grid_2d = tensor_grid_1d.reshape(
+        (number_of_mixtures, number_of_mixtures, res_x, res_y, res_z))
+
+    return tensor_grid_2d
+
+
+def arr_tensor_mult(self, arr, tensor_vec):
+    tensor = array_to_tensor_grid(arr)
+    tensor_result = tensor_grid_mult(tensor, tensor_vec)
+
+    return tensor_result
+
+
 def fft_plot(t, property_all):
     T = t[-1]
     N = len(t)

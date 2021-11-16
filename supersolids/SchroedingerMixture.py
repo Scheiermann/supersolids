@@ -437,29 +437,6 @@ class SchroedingerMixture(Schroedinger):
 
         return self
 
-    def array_to_tensor_grid(self, arr: np.ndarray):
-        number_of_mixtures: int = arr.shape[0]
-
-        arr_grid: List[np.ndarray] = []
-        for elem in np.nditer(arr):
-            arr_grid.append(np.full((self.Res.x, self.Res.y, self.Res.z), elem))
-        tensor_grid_1d = np.array(arr_grid)
-        tensor_grid_2d = tensor_grid_1d.reshape(
-            (number_of_mixtures, number_of_mixtures, self.Res.x, self.Res.y, self.Res.z))
-
-        return tensor_grid_2d
-
-    def tensor_grid_mult(self, tensor, tensor_vec):
-        tensor_vec_result = np.einsum("ij..., j...->i...", tensor, tensor_vec)
-
-        return tensor_vec_result
-
-    def arr_tensor_mult(self, arr, tensor_vec):
-        tensor = self.array_to_tensor_grid(arr)
-        tensor_result = self.tensor_grid_mult(tensor, tensor_vec)
-
-        return tensor_result
-
     def load_mu(self,
                 filename_mu_a="interpolator_mu_a.pkl",
                 filename_mu_b="interpolator_mu_b.pkl"):
