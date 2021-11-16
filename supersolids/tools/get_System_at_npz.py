@@ -81,12 +81,7 @@ def get_property_one(args, dir_path: Path, i: int):
     return property_one
 
 
-def get_property_all(args):
-    try:
-        dir_path = Path(args.dir_path).expanduser()
-    except Exception:
-        dir_path = args.dir_path
-
+def get_property_all(args, dir_path: Path):
     property_values = []
     for i in range(0, len(args.dir_name_list)):
         property_one = get_property_one(args, dir_path, i)
@@ -95,10 +90,13 @@ def get_property_all(args):
     print(f"Extracted property_values: {property_values}")
     print(f"Extracted len(property_values): {len(property_values)}")
 
-    return dir_path, property_values
+    return property_values
 
 
-def plot_System_at_npz(args, dir_path, var1, var2, property_values):
+def plot_System_at_npz(property_name, dir_path, var1_mesh, var2_mesh, property_values):
+    var1_ravel = np.ravel(var1_mesh)
+    var2_ravel = np.ravel(var2_mesh)
+
     try:
         dim = property_values[0].shape[0]
         print(f"Extracted property_values[0].shape: {property_values[0].shape}")
@@ -117,31 +115,46 @@ def plot_System_at_npz(args, dir_path, var1, var2, property_values):
         ax.legend()
 
     ax.set_xlabel(r"Ratio $\frac{N_2}{N}$ (var1)")
-    ax.set_ylabel(f"{args.property_name}")
-    ax.set_xticks(np.arange(len(var1)))
-    ax.set_xticklabels([round(elem, 3) for elem in var1])
+    ax.set_ylabel(f"{property_name}")
+    ax.set_xticks(np.arange(len(var1_ravel)))
+    ax.set_xticklabels([round(elem, 3) for elem in var1_ravel])
     ax.tick_params(axis="x", rotation=90)
     secx = ax.secondary_xaxis("top")
-    secx.set_xticks(np.arange(len(var2)))
-    secx.set_xticklabels([round(elem, 3) for elem in var2])
+    secx.set_xticks(np.arange(len(var2_ravel)))
+    secx.set_xticklabels([round(elem, 3) for elem in var2_ravel])
     secx.tick_params(axis="x", rotation=90)
     secx.set_xlabel(r"Scatter length $a_{12}$ (var2)")
     ax.grid()
-    # ax.set_title(f"with property_args: {args.property_args}")
-    if args.property_name:
-        fig.savefig(Path(dir_path, f"{args.property_name}"))
+    # ax.set_title(f"with property_args: {property_args}")
+    if property_name:
+        fig.savefig(Path(dir_path, f"{property_name}"))
 
 
-def plot_contour(args, dir_path, var1_mesh, var2_mesh, property_values):
+def plot_contour(property_name, dir_path, X, Y, property_values, title):
     property_arr = np.array(property_values)
+    Z_list = []
     for i in range(0, len(property_values[0])):
-        fig, ax = plt.subplots()
+        path_output = Path(dir_path, f"{property_name}" + "_contour_" + f"{i}")
         Z = np.reshape(property_arr[:, i], var1_mesh.shape)
-        im = ax.pcolormesh(var2_mesh, var1_mesh, Z, shading="auto")
-        fig.colorbar(im)
-        ax.set_title(f"with property_args: {args.property_args}")
-        if args.property_name:
-            fig.savefig(Path(dir_path, f"{args.property_name}" + "_contour_" + f"{i}"))
+        Z_list.append(Z)
+        plot_contour_helper(path_output, X, Y, Z, title)
+
+    path_output_sum = Path(dir_path, f"{property_name}" + "_contour_sum")
+    plot_contour_helper(path_output_sum, X, Y, sum(Z_list), title)
+
+
+def plot_contour_helper(path_output, X, Y, Z, title):
+    fig, ax = plt.subplots()
+    im = ax.pcolormesh(X, Y, Z, shading="auto")
+    ax.set_xlabel(r"Scatter length $a_{12}$ (var2)")
+    ax.set_ylabel(r"Ratio $\frac{N_2}{N}$ (var1)")
+    for j in range(0, Z.shape[0]):
+        for k in range(0, Z.shape[1]):
+            text = ax.text(X[j, k], Y[j, k], np.round(Z[j, k], 4),
+                           ha="center", va="center", color="black")
+    fig.colorbar(im)
+    ax.set_title(title)
+    fig.savefig(path_output)
 
 
 def flags(args_array):
@@ -189,8 +202,27 @@ def flags(args_array):
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     args = flags(sys.argv[1:])
-    var1_mesh, var2_mesh = np.meshgrid(args.var1_arange, args.var2_arange, indexing="ij")
 
-    dir_path, property_values = get_property_all(args)
-    plot_System_at_npz(args, dir_path, args.var1_arange, args.var2_arange, property_values)
-    plot_contour(args, dir_path, var1_mesh, var2_mesh, property_values)
+    property_filename = f"{args.property_name}" + ".pkl"
+    graphs_dirname = "graphs"
+
+    var1_mesh, var2_mesh = np.meshgrid(args.var1_arange, args.var2_arange, indexing="ij")
+    try:
+        dir_path = Path(args.dir_path).expanduser()
+    except Exception:
+        dir_path = args.dir_path
+    path_graphs = Path(dir_path, graphs_dirname)
+
+    try:
+        with open(Path(path_graphs, property_filename), "rb") as f:
+            # WARNING: this is just the input Schroedinger at t=0
+            property_values = dill.load(file=f)
+    except:
+        property_values = get_property_all(args, dir_path)
+        with open(Path(path_graphs, property_filename), "wb") as f:
+            dill.dump(obj=property_values, file=f)
+
+    plot_System_at_npz(args.property_name, path_graphs, var1_mesh, var2_mesh, property_values)
+
+    title = f"with property_args: {args.property_args_list[0]}"
+    plot_contour(args.property_name, path_graphs, var2_mesh, var1_mesh, property_values, title)
