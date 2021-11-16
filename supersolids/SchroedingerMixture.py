@@ -421,13 +421,13 @@ class SchroedingerMixture(Schroedinger):
 
     def load_summary(self, input_path, steps_format, frame,
                      summary_name: Optional[str] = "SchroedingerMixtureSummary_"):
+        if summary_name:
+            system_summary_path = Path(input_path, summary_name + steps_format % frame + ".pkl")
+        else:
+            system_summary_path = Path(input_path, self.name + steps_format % frame + ".pkl")
+
         try:
             # load SchroedingerSummary
-            if summary_name:
-                system_summary_path = Path(input_path, summary_name + steps_format % frame + ".pkl")
-            else:
-                system_summary_path = Path(input_path, self.name + steps_format % frame + ".pkl")
-
             with open(system_summary_path, "rb") as f:
                 SystemSummary: SchroedingerMixtureSummary = dill.load(file=f)
         except Exception:

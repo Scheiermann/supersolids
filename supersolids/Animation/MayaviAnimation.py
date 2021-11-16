@@ -218,16 +218,6 @@ class MayaviAnimation(Animation.Animation):
                                         transparent=True)
 
             prob_plots = [prob1_plot]
-            if isinstance(System, SchroedingerMixture):
-                prob2_3d = np.abs(System.psi2_val) ** 2.0
-                prob2_plot = mlab.contour3d(System.x_mesh,
-                                            System.y_mesh,
-                                            System.z_mesh,
-                                            prob2_3d,
-                                            colormap="spectral",
-                                            opacity=self.alpha_psi_list[1],
-                                            transparent=True)
-                prob_plots.append(prob2_plot)
 
         slice_x_plot = mlab.volume_slice(System.x_mesh,
                                          System.y_mesh,
@@ -292,7 +282,6 @@ class MayaviAnimation(Animation.Animation):
                     dir_name: str = None,
                     filename_schroedinger: str = f"schroedinger.pkl",
                     filename_steps: str = f"step_",
-                    filename_steps2: str = f"2-step_",
                     steps_format: str = "%06d",
                     steps_per_npz: int = 10,
                     frame_start: int = 0,
@@ -348,13 +337,9 @@ class MayaviAnimation(Animation.Animation):
                     with open(psi_val_path, "rb") as f:
                         System.psi_val = np.load(file=f)["psi_val"]
 
-                    if isinstance(System, SchroedingerMixture):
-                        psi2_val_path = Path(input_path, filename_steps2 + steps_format % frame + ".npz")
-                        with open(psi2_val_path, "rb") as f:
-                            System.psi2_val = np.load(file=f)["psi2_val"]
-
-                System = System.load_summary(input_path, steps_format, frame,
-                                             summary_name=summary_name)
+                if not (summary_name is None):
+                    System = System.load_summary(input_path, steps_format, frame,
+                                                 summary_name=summary_name)
 
                 text = get_legend(System, frame, frame_start, supersolids_version)
 
@@ -395,9 +380,6 @@ class MayaviAnimation(Animation.Animation):
                     # Update plot functions
                     density1: np.ndarray = System.get_density(func=System.psi_val, p=2.0)
                     densities = [density1]
-                    if isinstance(System, SchroedingerMixture):
-                        density2: np.ndarray = System.get_density(func=System.psi2_val, p=2.0)
-                        densities.append(density2)
 
                     if arg_slices:
                         psi_arg = np.angle(System.psi_val) + np.pi

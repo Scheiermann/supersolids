@@ -57,6 +57,7 @@ def load_npz(flag_args):
                                   azimuth=flag_args.azimuth,
                                   elevation=flag_args.elevation,
                                   distance=flag_args.distance,
+                                  summary_name=flag_args.summary_name,
                                   mixture_slice_index=flag_args.mixture_slice_index,
                                   )
     mlab.show()
@@ -76,6 +77,9 @@ def flags(args_array):
                              "For example the standard naming convention is movie001")
     parser.add_argument("-filename_schroedinger", type=str, default="schroedinger.pkl",
                         help="Name of file, where the Schroedinger object is saved")
+    parser.add_argument("-summary_name", type=str, default=None,
+                        help="SchroedingerSummary_ or SchroedingerMixtureSummary_ "
+                             "to load attributes from.")
     parser.add_argument("-filename_steps", type=str, default="step_",
                         help="Name of file, without enumerator for the files. "
                              "For example the standard naming convention is step_000001.npz, "

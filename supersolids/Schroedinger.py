@@ -742,7 +742,13 @@ class Schroedinger:
 
         return Summary, summary_name
 
-    def load_summary(self, input_path, steps_format, frame):
+    def load_summary(self, input_path, steps_format, frame,
+                     summary_name: Optional[str] = "SchroedingerSummary_"):
+        if summary_name:
+            system_summary_path = Path(input_path, summary_name + steps_format % frame + ".pkl")
+        else:
+            system_summary_path = Path(input_path, self.name + steps_format % frame + ".pkl")
+
         try:
             # load SchroedingerSummary
             system_summary_path = Path(input_path, self.name + steps_format % frame + ".pkl")
