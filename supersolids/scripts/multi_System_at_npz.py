@@ -80,10 +80,11 @@ if __name__ == "__main__":
 
     dir_name_list = []
     property_args_list = []
-    for peak_index, i in enumerate(range(movie_start, movie_end + 1)):
-        property_args = [number_of_peaks[peak_index], prob_min_start, prob_step]
+    for peak_index, movie_number in enumerate(range(movie_start, movie_end + 1)):
+        property_args = [*box]
+        # property_args = [number_of_peaks[peak_index], prob_min_start, prob_step]
         property_args_list.append(property_args)
-        dir_name_list.append(f"{dir_name}{dir_name_format % i}")
+        dir_name_list.append(f"{dir_name}{dir_name_format % movie_number}")
 
     command = ["python", "-m", "supersolids.tools.get_System_at_npz"]
     flags = [f"-dir_path={path_anchor_input}",
