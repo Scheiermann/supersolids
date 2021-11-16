@@ -19,13 +19,13 @@ from pathlib import Path
 from typing import Optional, Callable, Union, List
 
 from scipy import ndimage
-from scipy.constants import mu_0
 from scipy.interpolate import interpolate
 from scipy.integrate import quad_vec
+from scipy.ndimage import distance_transform_edt
 
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixtureSummary import SchroedingerMixtureSummary
-from supersolids.helper import functions, constants
+from supersolids.helper import functions
 from supersolids.helper.Box import Box
 from supersolids.helper.Resolution import Resolution
 
@@ -548,21 +548,94 @@ class SchroedingerMixture(Schroedinger):
 
         return parity_list
 
-    def get_contrast(self, prob_min, region_threshold: int = 1000):
+    def distmat(self, a, index):
+        mask = np.ones(a.shape, dtype=bool)
+        mask[index[0], index[1], index[2]] = False
+        return distance_transform_edt(mask)
+
+    def get_contrast_old(self, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
+        x0, x1, y0, y1, z0, z1 = self.slice_default(x0, x1, y0, y1, z0, z1)
         prob_list = self.get_density_list()
         bec_contrast_list = []
         for N, prob in zip(self.N_list, prob_list):
-            prob_region = np.where(prob >= prob_min * N, prob, 0)
-            label_im, nb_labels = ndimage.label(prob_region,
-                                                structure=ndimage.generate_binary_structure(3, 1))
-            # get biggest region
-            sizes = ndimage.sum(prob_region, label_im, range(nb_labels + 1))
-            mask = sizes > region_threshold
-            label_region = mask[label_im]
-            bec_min = ndimage.minimum(prob, labels=label_region)
-            bec_max = ndimage.maximum(prob, labels=label_region)
+            mask = np.full(np.shape(prob), False)
+            mask[x0:x1, y0:y1, z0:z1] = True
 
-            bec_contrast = (bec_max - bec_min) / (bec_max + bec_min)
+            bec_min_edgeless = ndimage.minimum(prob, labels=mask)
+            bec_max_edgeless = ndimage.maximum(prob, labels=mask)
+            bec_contrast_edgeless = (bec_max_edgeless - bec_min_edgeless) / (
+                    bec_max_edgeless + bec_min_edgeless)
+            bec_contrast_list.append(bec_contrast_edgeless)
+
+        return bec_contrast_list
+
+    def get_contrast(self, number_of_peaks: int, prob_min_start, prob_step: float = 0.01,
+                     prob_min_edge: float = 0.015, region_threshold: int = 100,
+                     ):
+        prob_list = self.get_density_list()
+        bec_contrast_list = []
+        structures = functions.binary_structures()
+        for N, prob in zip(self.N_list, prob_list):
+            prob_max = np.max(prob)
+            prob_min_lin_reverse = np.arange(0.001, prob_min_start, prob_step)[::-1]
+            for prob_min_ratio in prob_min_lin_reverse:
+                # get biggest region
+                prob_region_outer = np.where(prob >= prob_min_ratio * prob_max, prob, 0)
+                label_im_outer, nb_labels_outer = ndimage.label(prob_region_outer,
+                                                                structure=structures[0])
+                sizes_outer = ndimage.sum(prob_region_outer, label_im_outer,
+                                          range(nb_labels_outer + 1))
+                mask_outer = sizes_outer > region_threshold
+                label_region_outer = mask_outer[label_im_outer]
+                region_outer = functions.fill_holes(label_region_outer, *structures[1:])
+
+                # remove edge
+                prob_region_inner = np.where(prob >= (prob_min_edge + prob_min_ratio) * prob_max,
+                                             prob, 0)
+                label_im_inner, nb_labels_inner = ndimage.label(prob_region_inner,
+                                                                structure=structures[0])
+                sizes_inner = ndimage.sum(prob_region_inner, label_im_inner,
+                                          range(nb_labels_inner + 1))
+                mask_inner = sizes_inner > region_threshold
+                label_region_inner = mask_inner[label_im_inner]
+                region_inner = functions.fill_holes(label_region_inner, *structures[1:])
+
+                region_edgeless = np.logical_and(region_outer, region_inner)
+                region = functions.fill_holes(region_edgeless, *structures[1:])
+                label_im_region, nb_labels_region = ndimage.label(region, structure=structures[0])
+
+                if nb_labels_region == 1:
+                    region_shrunk = ndimage.binary_erosion(region)
+                    region_diff = np.logical_xor(region_shrunk, region)
+                    label_im_region_diff, nb_labels_region_diff = ndimage.label(
+                        region_diff, structure=structures[0])
+
+                    peak_list = self.get_peak_neighborhood(prob, prob_max * prob_min_ratio,
+                                                           number_of_peaks=number_of_peaks)
+                    if len(peak_list) == 1:
+                        # no peak_neighborhood to calculate dist
+                        prob_one = np.where(prob > 0.8 * prob_max, prob, 0)
+                        label_im_one, nb_labels_one = ndimage.label(prob_one,
+                                                                    structure=structures[0])
+                        bec_min = ndimage.minimum(prob_one, labels=label_im_one)
+                    else:
+                        peaks_max_index = [ndimage.maximum_position(peak,
+                                                                    labels=np.array(peak, dtype=bool))
+                                           for peak in peak_list
+                                           ]
+                        max_dists = [self.distmat(prob, peak_max_index)
+                                     for peak_max_index in peaks_max_index]
+                        max_dists_sum = sum(max_dists)
+                        bec_min_index = ndimage.minimum_position(max_dists_sum, labels=region_diff)
+                        bec_min = prob[bec_min_index]
+
+                    bec_max = ndimage.maximum(prob, labels=region)
+                    bec_contrast = (bec_max - bec_min) / (bec_max + bec_min)
+                    break
+
+            if nb_labels_region != 1:
+                print(f"Could not connect maxima regions. prob_step: {prob_step} to high.")
+                # sys.exit(f"Could not connect maxima regions. prob_step: {prob_step} to high.")
 
             bec_contrast_list.append(bec_contrast)
 
