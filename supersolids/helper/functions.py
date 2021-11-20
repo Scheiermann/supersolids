@@ -334,8 +334,19 @@ def combinations2array(number_of_mixtures: int,
     return arr
 
 
-def symmetric_mat(arr: np.ndarray) -> np.ndarray:
-    return arr + arr.T - np.diag(arr.diagonal())
+def symmetric_mat(arr: np.ndarray, axis=None) -> np.ndarray:
+    if axis:
+        z_len = np.shape(arr)[axis]
+        result = arr[:, :, 0] + arr[:, :, 0].T - np.diag(arr[:, :, 0].diagonal())
+        for i in range(1, z_len):
+            result = np.stack((result,
+                               arr[:, :, i] + arr[:, :, i].T - np.diag(arr[:, :, i].diagonal())
+                               ), axis=axis)
+
+    else:
+        result = arr + arr.T - np.diag(arr.diagonal())
+
+    return result
 
 
 def w_dimensionsless(dimensionless_factor: float,
@@ -384,7 +395,10 @@ def g_qf_helper(m: float = 164 * constants.u_in_kg,
 
 def new_int(epsilon_dd: float):
     func = lambda u: (1 + epsilon_dd * (3 * u ** 2.0 - 1.0)) ** 2.5
-    integral = quad(func, 0.0, 1.0)[0]
+    try:
+        integral = quad(func, 0.0, 1.0)[0]
+    except:
+        print(f"\nWARNING: epsilon_dd: {epsilon_dd} is over 1.0, leading to complex values in new_int.\n")
 
     return integral
 
@@ -770,8 +784,8 @@ def get_V_k_val_ddi(kx_mesh, ky_mesh, kz_mesh,
     term2 = np.exp(-z_cut * k_rho_mesh) * (sin2a * np.cos(z_cut * kz_mesh)
                                            - sinacosa * np.sin(z_cut * kz_mesh)
                                            )
-    term3 = get_rho_integral(k_rho_mesh, kz_mesh, rho_lin, z_lin)
-    # term3_slow = get_rho_integral_slow(k_rho_mesh, kz_mesh, rho_lin, z_lin)
+    term3_slow = get_rho_integral_slow(k_rho_mesh, kz_mesh, rho_lin, z_lin)
+    term3 = get_rho_integral(k_rho_mesh, kz_mesh, rho_lin, z_lin, compare=term3_slow)
 
     return 4.0 * np.pi * (term1 + term2 + term3)
 
@@ -784,7 +798,7 @@ def get_rho_integral_slow(k_rho_mesh: np.ndarray,
     drho = rho_lin[1] - rho_lin[0]
     dz = z_lin[1] - z_lin[0]
 
-    with run_time(name="quad bessel_func"):
+    with run_time(name="get_rho_integral_slow"):
         it = np.nditer([k_rho_mesh, kz_mesh], flags=['external_loop'])
         shape = np.shape(kz_mesh)
         out = []
@@ -815,12 +829,13 @@ def get_rho_integral(k_rho_mesh: np.ndarray,
                      kz_mesh: np.ndarray,
                      rho_lin: np.ndarray,
                      z_lin: np.ndarray,
+                     compare,
                      ):
     drho = rho_lin[1] - rho_lin[0]
     dz = z_lin[1] - z_lin[0]
     x_size, y_size = k_rho_mesh.shape[0], k_rho_mesh.shape[1]
 
-    with run_time(name="quad bessel_func new"):
+    with run_time(name="get_rho_integral"):
         x_len = int((x_size / 2.0) + 1.0)
         y_len = int((y_size / 2.0) + 1.0)
         k_rho_mesh_halved = k_rho_mesh[0:x_len, 0:y_len, :]
@@ -841,16 +856,31 @@ def get_rho_integral(k_rho_mesh: np.ndarray,
         trius = [triu_list2array(inner, triu_ind, (x_len, y_len)) for inner in out]
         out = np.stack(trius, axis=2)
 
-    a1 = out[1:, :, :]
-    # a = np.delete(term3, 0, 0)
-    b = np.rot90(a1, 1, axes=(0, 1))
-    c = np.rot90(a1, 2, axes=(0, 1))
-    d = np.rot90(a1, 3, axes=(0, 1))
-    e = np.vstack(a1, b)
-    f = np.vstack(c, d)
-    g = np.hstack(e, f)
+    out_n_n = out[1:int(x_len - 1), :, :]
+    a1 = np.apply_over_axes(symmetric_mat, out_n_n, axes=2)
+    z_len = np.shape(a1)[2]
+    result = []
+    for i in range(0, z_len):
+        b = np.rot90(a1[:, :, i], 1, axes=(0, 1)).T
+        c = np.rot90(b, 2, axes=(0, 1)).T
+        d = np.rot90(c, 3, axes=(0, 1)).T
+        e = np.vstack((a1[:, :, i], b))
+        f = np.vstack((d, c))
+        g = np.hstack((e, f))
+        first = np.hstack((out[0, :, i], out[0, :, i][::-1]))
+        h = np.insert(g, 0, first, axis=0)
+        middle = np.hstack((out[int(x_len - 1), :, i], out[int(x_len - 1), :, i][::-1]))
+        j = np.insert(h, x_len, middle, axis=0)
+        j_size_y = np.size(j)[1]
+        y_too_much = y_size - j_size_y
+        for counter in range(0, y_too_much):
+            k = np.delete(j, int(y_size + 1), axis=1)
+        # m = np.hstack((out[i, :, :], k))
+        result.append(k)
 
-    return out
+    result = np.reshape(result, np.shape(k_rho_mesh))
+
+    return result
 
 
 def get_rho_integral_quad(kx_mesh: float,
@@ -863,7 +893,7 @@ def get_rho_integral_quad(kx_mesh: float,
     k_rho_mesh = np.sqrt(kx_mesh ** 2.0 + ky_mesh ** 2.0)
 
     result = []
-    with run_time(name="quad bessel_func list"):
+    with run_time(name="get_rho_integral_quad"):
         it = np.nditer([z_mesh, kz_mesh, k_rho_mesh], flags=['multi_index'])
         for z, kz, k_rho in it:
             # print(f"triple: {z}, {kz}, {k_rho}")
