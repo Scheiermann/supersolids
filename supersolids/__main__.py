@@ -45,7 +45,7 @@ def flags(args_array):
                               "Two values per dimension to set start and end (1D, 2D, 3D)."))
     parser.add_argument("-l_0", metavar="l_0", type=float, default=None,
                         help="Help constant for dimensionless formulation of equations.")
-    parser.add_argument("--N_list", metavar="N", type=int, nargs="+", default=6 * 10 ** 4,
+    parser.add_argument("--N_list", metavar="N", type=int, nargs="+", default=[6 * 10 ** 4],
                         help="Number of particles in box per mixture")
     parser.add_argument("--m_list", metavar="m",  type=float, nargs="+", default=[164.0],
                         help="Mass of a particles in atomic mass unit (u) per mixture")
@@ -203,7 +203,8 @@ if __name__ == "__main__":
         print(f"a_dd_array:\n{a_dd_array}\n")
     else:
         g, g_qf, e_dd, a_s_l_ho_ratio = functions.get_parameters(
-            N=args.N, m=m_list[0], a_s=args.a_s, a_dd=args.a_dd, w_x=args.w_x)
+            N=args.N_list[0], m=m_list[0], a_s=args.a_s_list[0], a_dd=args.a_dd_list[0],
+            w_x=args.w_x)
         print(f"g, g_qf, e_dd: {g, g_qf, e_dd}")
 
     alpha_y, alpha_z = functions.get_alphas(w_x=args.w_x, w_y=args.w_y, w_z=args.w_z)
