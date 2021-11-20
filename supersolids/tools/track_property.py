@@ -167,13 +167,23 @@ def plot_property(args, func=functions.identity):
 
     input_path = get_input_path(dir_path, args.dir_name)
     print(input_path)
+    if args.frame_start is None:
+        _, last_index, _, _ = get_path.get_path(input_path,
+                                                search_prefix=args.filename_steps,
+                                                counting_format=args.steps_format,
+                                                file_pattern=".npz",
+                                                take_last=args.take_last)
+        frame_start = last_index
+    else:
+        frame_start = args.frame_start
+
     print("Load t")
     t_tuple = track_property(input_path=input_path,
                              filename_schroedinger=args.filename_schroedinger,
                              filename_steps=args.filename_steps,
                              steps_format=args.steps_format,
                              steps_per_npz=args.steps_per_npz,
-                             frame_start=args.frame_start,
+                             frame_start=frame_start,
                              property_name="t",
                              property_func=False,
                              property_args=[],
@@ -187,7 +197,7 @@ def plot_property(args, func=functions.identity):
                                     filename_steps=args.filename_steps,
                                     steps_format=args.steps_format,
                                     steps_per_npz=args.steps_per_npz,
-                                    frame_start=args.frame_start,
+                                    frame_start=frame_start,
                                     property_name=args.property_name,
                                     property_func=args.property_func,
                                     property_args=args.property_args,
@@ -279,7 +289,9 @@ def flags(args_array):
                              "the string needed is percent 07d")
     parser.add_argument("-steps_per_npz", type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
-    parser.add_argument("-frame_start", type=int, default=0, help="Counter of first saved npz.")
+    parser.add_argument("-frame_start", type=int, default=None, help="Counter of first saved npz.")
+    parser.add_argument("-take_last", type=int, default=None, help="Index to automatically get the "
+                        "last n-th npz number of the current movie and use it as frame_start.")
     parser.add_argument("-property_filename_suffix", type=str, default="", nargs="?",
                         help="Suffix to the filename of the property plot.")
     parser.add_argument("-property_name", type=str, default="mu",

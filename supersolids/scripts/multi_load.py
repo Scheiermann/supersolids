@@ -25,6 +25,7 @@ if __name__ == "__main__":
     # path_anchor_input = Path("/home/dsche/supersolids/results/")
 
     mixture = True
+    no_legend = True
 
     # take_last = 30
     take_last = np.inf
@@ -71,7 +72,7 @@ if __name__ == "__main__":
                 files_last = files[0]
             except IndexError:
                 # no files in dir
-                print(f'{str(Path(path_in)) + filename_steps + "/*" + filename_pattern} '
+                print(f'{str(Path(path_in, filename_steps + "*" + filename_pattern))} '
                       f'not found. Skipping.')
                 continue
 
@@ -101,6 +102,8 @@ if __name__ == "__main__":
         flags_given.append(f"--alpha_psi_sol_list")
         flags_given += alpha_args_parsed
 
+        if no_legend:
+            flags_given.append("--no_legend")
         if arg_slices:
             flags_given.append("--arg_slices")
         if plot_V:

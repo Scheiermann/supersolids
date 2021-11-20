@@ -59,6 +59,7 @@ def load_npz(flag_args):
                                   distance=flag_args.distance,
                                   summary_name=flag_args.summary_name,
                                   mixture_slice_index=flag_args.mixture_slice_index,
+                                  no_legend=flag_args.no_legend,
                                   )
     mlab.show()
 
@@ -107,6 +108,8 @@ def flags(args_array):
     parser.add_argument("--alpha_V", default=0.3,
                         help="Option to adjust the transparency of the external potential V "
                              "(trap + extra).")
+    parser.add_argument("--no_legend", default=False, action="store_true",
+                        help="Option to add legend as text to every frame.")
     parser.add_argument("--plot_V", default=False, action="store_true",
                         help="Option to plot the external potential of the system (the trap)")
     parser.add_argument("--delete_input", default=False, action="store_true",

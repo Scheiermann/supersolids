@@ -290,8 +290,16 @@ class MayaviAnimation(Animation.Animation):
                     elevation: float = 0.0,
                     distance: float = 60.0,
                     summary_name: Optional[str] = None,
-                    mixture_slice_index: int = 0
+                    mixture_slice_index: int = 0,
+                    no_legend: bool = False,
                     ):
+        """
+        Animates solving of the Schroedinger equations of System with mayavi in 3D.
+        Loaded from npz-files.
+
+        :param no_legend: Option to add legend as text to every frame.
+
+        """
 
         supersolids_version = get_supersolids_version()
 
@@ -341,16 +349,18 @@ class MayaviAnimation(Animation.Animation):
                     System = System.load_summary(input_path, steps_format, frame,
                                                  summary_name=summary_name)
 
-                text = get_legend(System, frame, frame_start, supersolids_version)
+                if not no_legend:
+                    text = get_legend(System, frame, frame_start, supersolids_version)
 
                 if frame == frame_start:
-                    # create title for first frame
-                    title = mlab.title(text=text,
-                                       height=0.95,
-                                       line_width=1.0,
-                                       size=1.0,
-                                       color=(0, 0, 0),
-                                       )
+                    if not no_legend:
+                        # create title for first frame
+                        title = mlab.title(text=text,
+                                           height=0.95,
+                                           line_width=1.0,
+                                           size=1.0,
+                                           color=(0, 0, 0),
+                                           )
                     mlab.view(azimuth=azimuth, elevation=elevation, distance=distance)
 
                     if arg_slices:
@@ -358,7 +368,8 @@ class MayaviAnimation(Animation.Animation):
                         cbar.use_default_range = False
                         cbar.data_range = np.array([0.0, 2.0 * np.pi])
 
-                title.set(text=text)
+                if not no_legend:
+                    title.set(text=text)
                 if isinstance(System, SchroedingerMixture):
                     densities: List[np.ndarray] = []
                     for i, psi_val in enumerate(System.psi_val_list):
@@ -418,7 +429,8 @@ class MayaviAnimation(Animation.Animation):
         mlab.close(all=True)
 
     @mlab.animate(delay=10, ui=True)
-    def animate(self, System: Schroedinger, accuracy: float = 10 ** -6, interactive: bool = True):
+    def animate(self, System: Schroedinger, accuracy: float = 10 ** -6,
+                interactive: bool = True, no_legend: bool = False):
         """
         Animates solving of the Schroedinger equations of System with mayavi in 3D.
         Animation is limited to System.max_timesteps or
@@ -438,6 +450,8 @@ class MayaviAnimation(Animation.Animation):
         :param interactive: Condition for interactive mode. When camera functions are used,
             then interaction is not possible. So interactive=True turn the usage
             of camera functions off.
+
+        :param no_legend: Option to add legend as text to every frame.
 
         """
         (prob_plots, slice_x_plot, slice_y_plot, slice_z_plot,
@@ -487,19 +501,22 @@ class MayaviAnimation(Animation.Animation):
                 # Animation stops at the next step, to actually show the last step
                 print(f"Maximum timesteps are reached. Animation is stopped.")
 
-            # Update legend (especially time)
-            text = get_legend(System, frame, 0, supersolids_version, mu_rel)
+            if not no_legend:
+                # Update legend (especially time)
+                text = get_legend(System, frame, 0, supersolids_version, mu_rel)
 
             if frame == 0:
-                # create title for first frame
-                title = mlab.title(text=text,
-                                   height=0.95,
-                                   line_width=1.0,
-                                   size=1.0,
-                                   color=(0, 0, 0),
-                                   )
+                if not no_legend:
+                    # create title for first frame
+                    title = mlab.title(text=text,
+                                       height=0.95,
+                                       line_width=1.0,
+                                       size=1.0,
+                                       color=(0, 0, 0),
+                                       )
 
-            title.set(text=text)
+            if not no_legend:
+                title.set(text=text)
 
             # Update plot functions
             density1: np.ndarray = System.get_density(func=System.psi_val, p=2.0)

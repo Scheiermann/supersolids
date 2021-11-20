@@ -45,6 +45,7 @@ def simulate_case(System: Schroedinger,
                   script_number_regex: str = '*',
                   script_extensions: Optional[List[str]] = None,
                   script_extensions_index: int = 0,
+                  no_legend: bool = True,
                   ) -> Schroedinger:
     """
     Wrapper for Animation and Schroedinger to get a working Animation
@@ -97,6 +98,8 @@ def simulate_case(System: Schroedinger,
 
     :param script_name: Name of file, where to save args of the running simulate_npz.
 
+    :param no_legend: Option to add legend as text to every frame.
+
     :return: Reference to Schroedinger System
 
     """
@@ -132,6 +135,7 @@ def simulate_case(System: Schroedinger,
             with run_time.run_time(name="MayaviAnimation.animate"):
                 MayAnimator = MayAnim.animate(System, accuracy=accuracy,
                                               interactive=(not offscreen),
+                                              no_legend=no_legend,
                                               )
 
             with run_time.run_time(name="mlab.show"):

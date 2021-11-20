@@ -747,8 +747,11 @@ class Schroedinger:
         if summary_name:
             system_summary_path = Path(input_path, summary_name + steps_format % frame + ".pkl")
         else:
-            system_summary_path = Path(input_path, self.name + steps_format % frame + ".pkl")
-
+            try:
+                # needed because old versions had no self.name
+                system_summary_path = Path(input_path, self.name + steps_format % frame + ".pkl")
+            except:
+                system_summary_path = None
         try:
             # load SchroedingerSummary
             with open(system_summary_path, "rb") as f:

@@ -13,13 +13,21 @@ if __name__ == "__main__":
     path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_alpha/")
 
     filename_schroedinger: str = "schroedinger.pkl"
-    filename_steps: str = "mixture_step_"
 
-    frame_start = 0
+    if mixture:
+        filename_steps = "mixture_step_"
+    else:
+        filename_steps = "step_"
+
     steps_per_npz = 1000
 
-    movie_start = 1
-    movie_end = 150
+    # frame_start = 1150000
+    frame_start = None
+    if frame_start is None:
+        take_last = 5
+
+    movie_start = 475
+    movie_end = 494
 
     dt = 0.0002
 
@@ -34,9 +42,9 @@ if __name__ == "__main__":
     # file_suffix = "_fft"
     # inbuild_func = "fft_plot"
     inbuild_func = ""
-    func = "lambda x, y: (x, y)"
     # func = ""
-
+    func = "lambda x, y: (x, y)"
+    # func = "lambda x, y: (x[1:], np.abs(np.diff(y)) / y[1:])"
 
     subplots = True
     property_func = True
@@ -74,14 +82,13 @@ if __name__ == "__main__":
     # file_suffix = "-" + "-".join(map(str, property_args)) + ".png"
     property_filename_suffix = dir_suffix + file_suffix
 
-    for peak_index, i in enumerate(range(movie_start, movie_end + 1)):
-        # property_args = [0.00725, number_of_peaks[peak_index]]
+    for i, movie_number in enumerate(range(movie_start, movie_end + 1)):
+        # property_args = [0.00725, number_of_peaks[i]]
         command = ["python", "-m", "supersolids.tools.track_property"]
         flags = [f"-dt={dt}",
                  f"-dir_path={path_anchor_input}",
-                 f"-dir_name={dir_name}{counting_format % i}",
+                 f"-dir_name={dir_name}{counting_format % movie_number}",
                  f"-filename_schroedinger={filename_schroedinger}",
-                 f"-frame_start={frame_start}",
                  f"-filename_steps={filename_steps}",
                  f"-steps_per_npz={steps_per_npz}",
                  f"-steps_format={steps_format}",
@@ -100,6 +107,10 @@ if __name__ == "__main__":
             flags.append(f"-inbuild_func={inbuild_func}")
         if func:
             flags.append(f"-func={func}")
+        if frame_start is None:
+            flags.append(f"-take_last={take_last}")
+        else:
+            flags.append(f"-frame_start={frame_start}")
 
         # command needs flags to be provided as list
         command.extend(flags)
