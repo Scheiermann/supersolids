@@ -299,6 +299,8 @@ class MayaviAnimation(Animation.Animation):
 
         :param no_legend: Option to add legend as text to every frame.
 
+        :param mixture_slice_index: Index of component of which the slices are taken.
+
         """
 
         supersolids_version = get_supersolids_version()
@@ -430,7 +432,9 @@ class MayaviAnimation(Animation.Animation):
 
     @mlab.animate(delay=10, ui=True)
     def animate(self, System: Schroedinger, accuracy: float = 10 ** -6,
-                interactive: bool = True, no_legend: bool = False):
+                interactive: bool = True,
+                mixture_slice_index: int = 0,
+                no_legend: bool = False):
         """
         Animates solving of the Schroedinger equations of System with mayavi in 3D.
         Animation is limited to System.max_timesteps or
@@ -452,6 +456,8 @@ class MayaviAnimation(Animation.Animation):
             of camera functions off.
 
         :param no_legend: Option to add legend as text to every frame.
+
+        :param mixture_slice_index: Index of component of which the slices are taken.
 
         """
         (prob_plots, slice_x_plot, slice_y_plot, slice_z_plot,
@@ -522,12 +528,14 @@ class MayaviAnimation(Animation.Animation):
             density1: np.ndarray = System.get_density(func=System.psi_val, p=2.0)
             densities = [density1]
             if isinstance(System, SchroedingerMixture):
-                density2: np.ndarray = System.get_density(func=System.psi2_val, p=2.0)
-                densities.append(density2)
+                for i, psi_val in enumerate(System.psi_val_list):
+                    densities.append(System.get_density(func=psi_val, p=2.0))
+                    if i == mixture_slice_index:
+                        psi_val1 = psi_val
+                        density1 = densities[i]
 
-            for prob_plot, density, plot_psi in zip(prob_plots, densities, self.plot_psi_list):
-                if plot_psi:
-                    prob_plot.mlab_source.trait_set(scalars=density)
+            for prob_plot, density in zip(prob_plots, densities):
+                prob_plot.mlab_source.trait_set(scalars=density)
 
             slice_x_plot.mlab_source.trait_set(scalars=density1)
             slice_y_plot.mlab_source.trait_set(scalars=density1)
