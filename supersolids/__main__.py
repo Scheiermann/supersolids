@@ -252,7 +252,7 @@ if __name__ == "__main__":
         else:
             # psi_sol_3d = functions.thomas_fermi_3d
             psi_sol_3d: Optional[Callable] = prepare_cuts(functions.density_in_trap,
-                                                          args.N, alpha_z, e_dd,
+                                                          args.N_list[0], alpha_z, e_dd,
                                                           a_s_l_ho_ratio)
     else:
         psi_sol_3d = None
@@ -358,7 +358,7 @@ if __name__ == "__main__":
             w_y=args.w_y,
             w_z=args.w_z,
             e_dd=e_dd,
-            a_s=args.a_s,
+            a_s=args.a_s_list[0],
             imag_time=(not args.real_time),
             mu_arr=np.array([1.1]),
             E=1.0,
