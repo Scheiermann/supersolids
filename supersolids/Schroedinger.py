@@ -841,14 +841,13 @@ class Schroedinger:
 
             SystemSummary, summary_name = self.use_summary()
 
-            # save SchroedingerSummary not Schroedinger to save disk space
             if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
                 with open(Path(input_path, self.name + steps_format % frame + ".pkl"),
                           "wb") as f:
+                    # save SchroedingerSummary not Schroedinger to save disk space
                     dill.dump(obj=SystemSummary, file=f)
 
-            # save psi_val after steps_per_npz steps of dt (to save disk space)
-            if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
+                # save psi_val after steps_per_npz steps of dt (to save disk space)
                 self.save_psi_val(input_path, filename_steps, steps_format, frame)
 
             print(f"t={self.t:07.05f}, mu_rel={mu_rel}, "
