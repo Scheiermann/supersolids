@@ -717,26 +717,33 @@ class Schroedinger:
         psi_norm_after_evolution: float = self.trapez_integral(np.abs(self.psi_val) ** 2.0)
         self.psi_val = self.psi_val / np.sqrt(psi_norm_after_evolution)
 
-        psi_quadratic_int = self.get_norm(p=4.0)
-        psi_quintic_int = self.get_norm(p=5.0)
-
         self.mu_arr = np.array([-np.log(psi_norm_after_evolution)
                                 / (2.0 * self.dt)])
 
-        psi_val_k = np.fft.fftn(self.psi_val)
-        psi_norm_k: float = self.get_norm(psi_val_k, fourier_space=True)
-        psi_val_k = psi_val_k / np.sqrt(psi_norm_k)
-        E_kin = self.get_norm(0.5 * self.k_squared * psi_val_k, fourier_space=True)
-
+    def get_E(self):
         if self.V_interaction:
+            psi_2 = self.get_density(p=2.0)
             E_U_dd = (1 / np.sqrt(2.0 * np.pi) ** 3.0) * self.sum_dV(
                 self.V_k_val * np.abs(np.fft.fftn(psi_2)) ** 2.0, fourier_space=True)
         else:
             E_U_dd = 0.0
 
+        psi_quadratic_int = self.get_norm(p=4.0)
+        psi_quintic_int = self.get_norm(p=5.0)
+
         self.E = (self.mu_arr - 0.5 * self.g * psi_quadratic_int
                   - 0.5 * E_U_dd
                   - (3.0 / 5.0) * self.g_qf * psi_quintic_int)
+
+        return self.E
+
+    def get_E_kin(self):
+        psi_val_k = np.fft.fftn(self.psi_val)
+        psi_norm_k: float = self.get_norm(psi_val_k, fourier_space=True)
+        psi_val_k = psi_val_k / np.sqrt(psi_norm_k)
+        E_kin = self.get_norm(0.5 * self.k_squared * psi_val_k, fourier_space=True)
+
+        return E_kin
 
     def use_summary(self, summary_name: Optional[str] = None):
         Summary: SchroedingerSummary = SchroedingerSummary(self)
@@ -838,6 +845,9 @@ class Schroedinger:
         for frame in range(frame_start, frame_end):
             mu_old = np.copy(self.mu_arr)
             self.time_step()
+            if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
+                # calculate energy just when saving, but before creating a summary
+                self.get_E()
 
             SystemSummary, summary_name = self.use_summary()
 

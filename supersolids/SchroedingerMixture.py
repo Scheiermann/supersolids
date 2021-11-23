@@ -472,6 +472,15 @@ class SchroedingerMixture(Schroedinger):
 
         return self.sum_dV(en_mf, dV=dV)
 
+    def get_E(self):
+        # update for energy calculation
+        density_list = self.get_density_list()
+        U_dd_list = self.get_U_dd_list(density_list)
+        mu_lhy_list: List[np.ndarray] = self.get_mu_lhy_list(density_list)
+
+        # use normalized inputs for energy
+        self.E = self.energy(density_list, U_dd_list, mu_lhy_list)
+
     def energy(self, density_list, U_dd_list, mu_lhy_list):
         """
         Input psi_1, psi_2 need to be normalized.
@@ -734,11 +743,3 @@ class SchroedingerMixture(Schroedinger):
         psi_norm_list: List[float] = self.normalize_psi_val()
         for i, psi_norm in enumerate(psi_norm_list):
             self.mu_arr[i] = -np.log(psi_norm) / (2.0 * self.dt)
-
-        # update for energy calculation
-        density_list = self.get_density_list()
-        U_dd_list = self.get_U_dd_list(density_list)
-        mu_lhy_list: List[np.ndarray] = self.get_mu_lhy_list(density_list)
-
-        # use normalized inputs for energy
-        self.E = self.energy(density_list, U_dd_list, mu_lhy_list)
