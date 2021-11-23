@@ -78,7 +78,7 @@ def flags(args_array):
                              "For example the standard naming convention is movie001")
     parser.add_argument("-filename_schroedinger", type=str, default="schroedinger.pkl",
                         help="Name of file, where the Schroedinger object is saved")
-    parser.add_argument("-summary_name", type=str, default=None,
+    parser.add_argument("-summary_name", type=str, default="",
                         help="SchroedingerSummary_ or SchroedingerMixtureSummary_ "
                              "to load attributes from.")
     parser.add_argument("-filename_steps", type=str, default="step_",

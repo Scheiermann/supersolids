@@ -203,8 +203,7 @@ if __name__ == "__main__":
         print(f"a_dd_array:\n{a_dd_array}\n")
     else:
         g, g_qf, e_dd, a_s_l_ho_ratio = functions.get_parameters(
-            N=args.N_list[0], m=m_list[0], a_s=args.a_s_list[0], a_dd=args.a_dd_list[0],
-            w_x=args.w_x)
+            N=args.N_list[0], m=m_list[0], a_s=a_s_list[0], a_dd=a_dd_list[0], w_x=args.w_x)
         print(f"g, g_qf, e_dd: {g, g_qf, e_dd}")
 
     alpha_y, alpha_z = functions.get_alphas(w_x=args.w_x, w_y=args.w_y, w_z=args.w_z)

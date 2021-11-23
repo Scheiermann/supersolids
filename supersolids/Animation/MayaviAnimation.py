@@ -65,7 +65,7 @@ def get_legend(System, frame, frame_start, supersolids_version, mu_rel=None):
                 f"t={System.t:07.05f}, "
                 f"processed={(frame - frame_start) / System.max_timesteps:05.03f}%, "
                 f"E={System.E:05.06E}, "
-                f"mu={System.mu:05.06E}, "
+                f"mu={System.mu_arr:05.06E}, "
                 )
 
     if mu_rel is not None:

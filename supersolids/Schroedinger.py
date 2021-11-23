@@ -240,7 +240,8 @@ class Schroedinger:
                 self.V_k_val = np.full(self.psi_val.shape, 1.0)
             else:
                 if callable(V_interaction):
-                    self.V_k_val = V_interaction(kx_mesh, ky_mesh, kz_mesh, self.z_mesh)
+                    # self.V_k_val = V_interaction(kx_mesh, ky_mesh, kz_mesh, self.z_mesh)
+                    self.V_k_val = V_interaction(kx_mesh, ky_mesh, kz_mesh)
 
         # here a number (U) is multiplied elementwise with an (1D, 2D or 3D) array (k_squared)
         self.H_kin: np.ndarray = np.exp(self.U * (0.5 * self.k_squared) * self.dt)

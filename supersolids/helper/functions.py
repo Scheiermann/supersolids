@@ -394,7 +394,7 @@ def g_qf_helper(m: float = 164 * constants.u_in_kg,
 
 
 def new_int(epsilon_dd: float):
-    func = lambda u: (1 + epsilon_dd * (3 * u ** 2.0 - 1.0)) ** 2.5
+    func = lambda u: np.real((1 + epsilon_dd * (3 * u ** 2.0 - 1.0)) ** 2.5)
     try:
         integral = quad(func, 0.0, 1.0)[0]
     except:
