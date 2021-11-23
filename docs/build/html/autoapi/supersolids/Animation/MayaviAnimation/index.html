@@ -175,6 +175,7 @@ Loaded from npz-files.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>no_legend</strong> (<em>bool</em>) – Option to add legend as text to every frame.</p></li>
+<li><p><strong>mixture_slice_index</strong> (<em>int</em>) – Index of component of which the slices are taken.</p></li>
 <li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – </p></li>
 <li><p><strong>dir_name</strong> (<em>str</em>) – </p></li>
 <li><p><strong>filename_schroedinger</strong> (<em>str</em>) – </p></li>
@@ -187,7 +188,6 @@ Loaded from npz-files.</p>
 <li><p><strong>elevation</strong> (<em>float</em>) – </p></li>
 <li><p><strong>distance</strong> (<em>float</em>) – </p></li>
 <li><p><strong>summary_name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p></li>
-<li><p><strong>mixture_slice_index</strong> (<em>int</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -195,7 +195,7 @@ Loaded from npz-files.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.Animation.MayaviAnimation.MayaviAnimation.animate">
-<span class="sig-name descname"><span class="pre">animate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span> <span class="pre">**</span> <span class="pre">-</span> <span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MayaviAnimation.html#MayaviAnimation.animate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.MayaviAnimation.animate" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">animate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span> <span class="pre">**</span> <span class="pre">-</span> <span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixture_slice_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MayaviAnimation.html#MayaviAnimation.animate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.MayaviAnimation.animate" title="Permalink to this definition"></a></dt>
 <dd><p>Animates solving of the Schroedinger equations of System with mayavi in 3D.
 Animation is limited to System.max_timesteps or
 the convergence according to accuracy.</p>
@@ -214,6 +214,7 @@ Max values is for e.g. System.Res.x - 1.</p></li>
 then interaction is not possible. So interactive=True turn the usage
 of camera functions off.</p></li>
 <li><p><strong>no_legend</strong> (<em>bool</em>) – Option to add legend as text to every frame.</p></li>
+<li><p><strong>mixture_slice_index</strong> (<em>int</em>) – Index of component of which the slices are taken.</p></li>
 </ul>
 </dd>
 </dl>
