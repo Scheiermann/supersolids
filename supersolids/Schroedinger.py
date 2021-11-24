@@ -12,7 +12,7 @@ Numerical solver for non-linear time-dependent Schrodinger equation.
 
 import functools
 import sys
-from typing import Callable, Union, Optional, List
+from typing import Callable, Union, Optional, List, Tuple
 from pathlib import Path
 
 import dill
@@ -246,51 +246,54 @@ class Schroedinger:
         # here a number (U) is multiplied elementwise with an (1D, 2D or 3D) array (k_squared)
         self.H_kin: np.ndarray = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 
-    def get_density(self, func=None, p: float = 2.0) -> np.ndarray:
+    def get_density(self, func_val: Optional[np.ndarray] = None, p: float = 2.0) -> np.ndarray:
         """
         Calculates :math:`|\psi|^p` for 1D, 2D or 3D (depending on self.dim).
 
         :param p: Exponent of :math:`|\psi|`. Use p=2.0 for density.
 
+        :param func_val: Array of function values to get p-norm for.
+
         :return: :math:`|\psi|^p`
+
         """
         if self.dim <= 3:
-            if func is None:
+            if func_val is None:
                 psi_density: np.ndarray = np.abs(self.psi_val) ** p
             else:
-                psi_density: np.ndarray = np.abs(func) ** p
+                psi_density = np.abs(func_val) ** p
 
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")
 
         return psi_density
 
-    def volume_element(self, fourier_space: bool = False):
+    def volume_element(self, fourier_space: bool = False) -> float:
         if self.dim == 1:
             if fourier_space:
                 dV: float = self.dkx
             else:
-                dV: float = self.dx
+                dV = self.dx
         elif self.dim == 2:
             if fourier_space:
-                dV: float = self.dkx * self.dky
+                dV = self.dkx * self.dky
             else:
-                dV: float = self.dx * self.dy
+                dV = self.dx * self.dy
         elif self.dim == 3:
             if fourier_space:
-                dV: float = self.dkx * self.dky * self.dkz
+                dV = self.dkx * self.dky * self.dkz
             else:
-                dV: float = self.dx * self.dy * self.dz
+                dV = self.dx * self.dy * self.dz
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")
 
         return dV
 
-    def sum_dV(self, func, fourier_space: bool = False, dV: float = None):
+    def sum_dV(self, func_val: np.ndarray, fourier_space: bool = False, dV: float = None) -> float:
         if dV is None:
             dV = self.volume_element(fourier_space=fourier_space)
 
-        psi_norm: float = np.sum(func) * dV
+        psi_norm: float = np.sum(func_val) * dV
 
         return psi_norm
 
@@ -324,7 +327,7 @@ class Schroedinger:
 
         return psi_norm
 
-    def trapez_integral(self, func_val: Callable) -> float:
+    def trapez_integral(self, func_val: np.ndarray) -> float:
         """
         Calculates the integral over func_val. If :math:`func_val = |\psi|^p`, then
         :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D
@@ -369,9 +372,9 @@ class Schroedinger:
             sys.exit(f"Trapez integral not implemented for dimension {self.dim}, "
                      "choose dimension smaller than 4.")
 
-    def get_r2(self):
+    def get_r2(self) -> np.ndarray:
         if self.dim == 1:
-            r2 = self.x_mesh ** 2.0
+            r2: np.ndarray = self.x_mesh ** 2.0
         elif self.dim == 2:
             r2 = self.x_mesh ** 2.0 + self.y_mesh ** 2.0
         elif self.dim == 3:
@@ -381,9 +384,14 @@ class Schroedinger:
 
         return r2
 
-    def get_mesh_list(self, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
+    def get_mesh_list(self,
+                      Mx0: Optional[int] = None, Mx1: Optional[int] = None,
+                      My0: Optional[int] = None, My1: Optional[int] = None,
+                      Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> List[np.ndarray]:
+        x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
+
         if self.dim == 1:
-            r = self.x_mesh[x0:x1]
+            r: List[np.ndarray] = [self.x_mesh[x0:x1]]
         elif self.dim == 2:
             r = [self.x_mesh[x0:x1, y0:y1], self.y_mesh[x0:x1, y0:y1]]
         elif self.dim == 3:
@@ -395,8 +403,9 @@ class Schroedinger:
 
         return r
 
-    def get_peaks_along(self, axis=0, height=0.05):
-        prob = np.abs(self.psi_val) ** 2.0
+    def get_peaks_along(self, axis: int = 0, height: float = 0.05) -> Tuple[List[float],
+                                                                            List[float]]:
+        prob: np.ndarray = np.abs(self.psi_val) ** 2.0
         res_x_middle = int(self.Res.x / 2)
         res_y_middle = int(self.Res.y / 2)
         res_z_middle = int(self.Res.z / 2)
@@ -413,11 +422,14 @@ class Schroedinger:
             sys.exit(f"No such axis (){axis}. Choose 0, 1 or 2 for axis x, y or z.")
 
         # get the highest peaks in a sorted fashion (the n biggest, where n is number_of_peaks)
-        peaks_height = properties['peak_heights']
+        peaks_height: List[np.ndarray] = properties['peak_heights']
 
         return peaks_indices, peaks_height
 
-    def get_peak_positions_along(self, axis=0, height=0.05, number_of_peaks=4):
+    def get_peak_positions_along(self,
+                                 axis: int = 0,
+                                 height: float = 0.05,
+                                 number_of_peaks: int = 4) -> List[float]:
         peaks_indices, _ = self.get_peaks_along(height=height, axis=axis)
         if axis == 0:
             positions = self.Box.lengths()[axis] * (peaks_indices / self.Res.x) + self.Box.x0
@@ -430,7 +442,7 @@ class Schroedinger:
 
         return positions
 
-    def get_peak_distances_along(self, axis=0, height=0.05):
+    def get_peak_distances_along(self, axis: int = 0, height: float = 0.05) -> List[float]:
         """
         Calculates the distances between the peaks in terms of box units.
 
@@ -448,8 +460,10 @@ class Schroedinger:
 
         return distances
 
-    def get_peak_neighborhood_along(self, axis=0, height=0.05, number_of_peaks=4, fraction=0.1,
-                                    peak_distances_cutoff=0.5):
+    def get_peak_neighborhood_along(self, axis: int = 0, height: float = 0.05,
+                                    number_of_peaks: int = 4,
+                                    fraction: float = 0.1,
+                                    peak_distances_cutoff: float = 0.5) -> List[np.ndarray]:
         """
         Calculates the neighborhood of the peaks,
         which has at least the given fraction of the maximum probability :math:`|\psi|^2`.
@@ -505,7 +519,8 @@ class Schroedinger:
 
         return bool_grid_list
 
-    def get_peak_neighborhood(self, prob, prob_min, number_of_peaks):
+    def get_peak_neighborhood(self, prob: np.ndarray, prob_min: float,
+                              number_of_peaks: int) -> List[np.ndarray]:
         """
         Calculates the neighborhood of the peaks,
         which has at least the given fraction of the maximum probability :math:`|\psi|^2`.
@@ -519,7 +534,8 @@ class Schroedinger:
         bool_grid_list = []
         for i, peak_index in enumerate(peaks_sorted_indices):
             prob_droplets = np.where(prob > prob_min, prob, 0)
-            single_droplet, edges = functions.extract_droplet(prob_droplets, peaks_sorted_indices[i])
+            single_droplet, edges = functions.extract_droplet(prob_droplets,
+                                                              peaks_sorted_indices[i])
 
             pad_width = []
             for j, res_axis in enumerate(np.array([self.Res.x, self.Res.y, self.Res.z])):
@@ -533,7 +549,7 @@ class Schroedinger:
 
         return bool_grid_list
 
-    def get_N_in_droplets(self, prob_min, number_of_peaks):
+    def get_N_in_droplets(self, prob_min: float, number_of_peaks: int) -> List[float]:
         """
 
         Parameters
@@ -567,49 +583,62 @@ class Schroedinger:
 
         return N_in_droplets
 
-    def slice_default(self, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
-        if (x0 is None) and (x1 is None):
-            x0 = 0
-            x1 = self.Res.x - 1
+    def slice_default(self,
+                      Mx0: Optional[int] = None, Mx1: Optional[int] = None,
+                      My0: Optional[int] = None, My1: Optional[int] = None,
+                      Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> Tuple[int, int, int,
+                                                                                   int, int, int]:
+        if (Mx0 is None) and (Mx1 is None):
+            Mx0 = 0
+            Mx1 = self.Res.x - 1
         else:
-            if (x0 < 0) or ((x0 or x1) > self.Res.x):
-                sys.exit(f"ERROR: Slice indices ({x0}, {x1}) for x out of bound. "
+            if (Mx0 < 0) or ((Mx0 or Mx1) > self.Res.x):
+                sys.exit(f"ERROR: Slice indices ({Mx0}, {Mx1}) for x out of bound. "
                          f"Bounds are (0, {self.Res.x})\n")
 
-        if (y0 is None) and (y1 is None):
-            y0 = 0
-            y1 = self.Res.y - 1
+        if (My0 is None) and (My1 is None):
+            My0 = 0
+            My1 = self.Res.y - 1
         else:
-            if (y0 < 0) or ((y0 or y1) > self.Res.y):
-                sys.exit(f"ERROR: Slice indices ({y0}, {y1}) for y out of bound. "
+            if (My0 < 0) or ((My0 or My1) > self.Res.y):
+                sys.exit(f"ERROR: Slice indices ({My0}, {My1}) for y out of bound. "
                          f"Bounds are (0, {self.Res.y})\n")
 
-        if (z0 is None) and (z1 is None):
-            z0 = 0
-            z1 = self.Res.z - 1
+        if (Mz0 is None) and (Mz1 is None):
+            Mz0 = 0
+            Mz1 = self.Res.z - 1
         else:
-            if (z0 < 0) or ((z0 or z1) > self.Res.z):
-                sys.exit(f"ERROR: Slice indices ({z0}, {z1}) for z out of bound. "
+            if (Mz0 < 0) or ((Mz0 or Mz1) > self.Res.z):
+                sys.exit(f"ERROR: Slice indices ({Mz0}, {Mz1}) for z out of bound. "
                          f"Bounds are (0, {self.Res.z})\n")
 
         return x0, x1, y0, y1, z0, z1
 
-    def get_center_of_mass(self, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
+    def get_center_of_mass(self,
+                           Mx0: Optional[int] = None, Mx1: Optional[int] = None,
+                           My0: Optional[int] = None, My1: Optional[int] = None,
+                           Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> List[float]:
         """
         Calculates the center of mass of the System.
 
         """
 
-        x0, x1, y0, y1, z0, z1 = self.slice_default(x0, x1, y0, y1, z0, z1)
+        x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
         prob = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1]
         r = self.get_mesh_list(x0, x1, y0, y1, z0, z1)
         center_of_mass_along_axis = [prob * r_i for r_i in r]
-        com = [self.trapez_integral(com_along_axis) / self.trapez_integral(prob) for com_along_axis in
+        com = [self.trapez_integral(com_along_axis) / self.trapez_integral(prob) for com_along_axis
+               in
                center_of_mass_along_axis]
         return com
 
-    def get_parity(self, axis=2, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
-        x0, x1, y0, y1, z0, z1 = self.slice_default(x0, x1, y0, y1, z0, z1)
+    def get_parity(self,
+                   axis: int = 2,
+                   Mx0: Optional[int] = None, Mx1: Optional[int] = None,
+                   My0: Optional[int] = None, My1: Optional[int] = None,
+                   Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> float:
+
+        x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
         psi_under0, psi_over0 = np.split(self.psi_val, 2, axis=axis)
 
         if axis in [0, 1, 2]:
@@ -617,12 +646,12 @@ class Schroedinger:
         else:
             sys.exit(f"No such axis ({axis}). Choose 0, 1 or 2 for axis x, y or z.")
 
-        parity = self.trapez_integral(np.abs(
+        parity: float = self.trapez_integral(np.abs(
             psi_under0[x0:x1, y0:y1, z0:z1] - psi_over0_reversed[x0:x1, y0:y1, z0:z1]) ** 2.0)
 
         return parity
 
-    def get_phase_var_neighborhood(self, prob_min, number_of_peaks):
+    def get_phase_var_neighborhood(self, prob_min: float, number_of_peaks: int) -> float:
         """
         Calculates the variance of the phase of the System.
 
@@ -643,11 +672,16 @@ class Schroedinger:
 
         return phase_var
 
-    def get_phase_var(self, x0, x1, y0, y1, z0, z1):
+    def get_phase_var(self,
+                      Mx0: Optional[int] = None, Mx1: Optional[int] = None,
+                      My0: Optional[int] = None, My1: Optional[int] = None,
+                      Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> float:
         """
         Calculates the variance of the phase of the System by cos(phi).
 
         """
+
+        x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
         norm = self.get_norm(func=self.psi_val[x0:x1, y0:y1, z0:z1])
 
         prob_cropped = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1] / norm
@@ -720,7 +754,7 @@ class Schroedinger:
         self.mu_arr = np.array([-np.log(psi_norm_after_evolution)
                                 / (2.0 * self.dt)])
 
-    def get_E(self):
+    def get_E(self) -> float:
         if self.V_interaction:
             psi_2 = self.get_density(p=2.0)
             E_U_dd = (1 / np.sqrt(2.0 * np.pi) ** 3.0) * self.sum_dV(
@@ -737,7 +771,7 @@ class Schroedinger:
 
         return self.E
 
-    def get_E_kin(self):
+    def get_E_kin(self) -> float:
         psi_val_k = np.fft.fftn(self.psi_val)
         psi_norm_k: float = self.get_norm(psi_val_k, fourier_space=True)
         psi_val_k = psi_val_k / np.sqrt(psi_norm_k)
@@ -745,32 +779,40 @@ class Schroedinger:
 
         return E_kin
 
-    def use_summary(self, summary_name: Optional[str] = None):
+    def use_summary(self, summary_name: Optional[str] = None) -> Tuple[SchroedingerSummary,
+                                                                       Optional[str]]:
         Summary: SchroedingerSummary = SchroedingerSummary(self)
 
         return Summary, summary_name
 
-    def load_summary(self, input_path, steps_format, frame,
-                     summary_name: Optional[str] = "SchroedingerSummary_"):
+    def load_summary(self, input_path: Path, steps_format: str, frame: int,
+                     summary_name: Optional[str] = "SchroedingerSummary_") -> "Schroedinger":
         if summary_name:
-            system_summary_path = Path(input_path, summary_name + steps_format % frame + ".pkl")
+            system_summary_path: Optional[Path] = Path(input_path,
+                                                       summary_name + steps_format % frame + ".pkl")
         else:
             try:
                 # needed because old versions had no self.name
                 system_summary_path = Path(input_path, self.name + steps_format % frame + ".pkl")
-            except:
+            except Exception:
                 system_summary_path = None
+            print(f"system_summary_path set None.")
         try:
             # load SchroedingerSummary
-            with open(system_summary_path, "rb") as f:
-                SystemSummary: SchroedingerSummary = dill.load(file=f)
-                SystemSummary.copy_to(self)
+            if system_summary_path:
+                with open(system_summary_path, "rb") as f:
+                    SystemSummary: SchroedingerSummary = dill.load(file=f)
+                    SystemSummary.copy_to(self)
+            else:
+                print(f"system_summary_path is None.")
+
         except Exception:
             print(f"{system_summary_path} not found.")
 
         return self
 
-    def save_psi_val(self, input_path, filename_steps, steps_format, frame):
+    def save_psi_val(self, input_path: Path, filename_steps: str,
+                     steps_format: str, frame: int) -> None:
         with open(Path(input_path, filename_steps + steps_format % frame + ".npz"), "wb") as g:
             np.savez_compressed(g, psi_val=self.psi_val)
 
@@ -801,11 +843,13 @@ class Schroedinger:
             dir_path.mkdir(parents=True)
 
         # Initialize mu_rel
-        mu_rel = self.mu_arr
+        mu_rel: np.ndarray = self.mu_arr
 
         if dir_name_result == "":
             _, last_index, dir_name, counting_format = get_path.get_path(dir_path)
-            input_path = Path(dir_path, dir_name + counting_format % (last_index + 1))
+            if last_index is None:
+                last_index = 0
+            input_path: Path = Path(dir_path, dir_name + counting_format % (last_index + 1))
         else:
             input_path = Path(dir_path, dir_name_result)
 
@@ -814,17 +858,18 @@ class Schroedinger:
             input_path.mkdir(parents=True)
 
         # per default index 0 takes list with pkl
-        script_list = reload_files(
-            dir_path, dir_name_load, input_path, script_name,
-            script_number_regex=script_number_regex,
-            script_extensions=script_extensions
-            )[script_extensions_index]
+        script_list: List[Path] = [reload_files(
+                                        dir_path, dir_name_load, input_path, script_name,
+                                        script_number_regex=script_number_regex,
+                                        script_extensions=script_extensions
+                                        )[script_extensions_index]
+                                   ]
 
         script_count_old = get_step_index_from_list(
             script_list,
-            filename_prefix=script_name+"_",
+            filename_prefix=script_name + "_",
             file_pattern=script_extensions[script_extensions_index]
-            )
+        )
 
         # per default index 0 takes list with pkl
         filename_schroedinger_prefix = filename_schroedinger.split(".")[0]
@@ -832,7 +877,7 @@ class Schroedinger:
             dir_path, dir_name_load, input_path, filename_schroedinger_prefix,
             script_number_regex="*",
             script_extensions=script_extensions
-            )[script_extensions_index]
+        )[script_extensions_index]
 
         save_script(script_count_old, input_path, script_name, script_args, txt_version=True)
         save_script(script_count_old, input_path, filename_schroedinger_prefix, self)
@@ -841,9 +886,9 @@ class Schroedinger:
         with open(Path(input_path, filename_schroedinger), "wb") as f:
             dill.dump(obj=self, file=f)
 
-        frame_end = frame_start + self.max_timesteps
+        frame_end: int = frame_start + self.max_timesteps
         for frame in range(frame_start, frame_end):
-            mu_old = np.copy(self.mu_arr)
+            mu_old: np.ndarray = np.copy(self.mu_arr)
             self.time_step()
             if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
                 # calculate energy just when saving, but before creating a summary

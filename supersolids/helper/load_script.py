@@ -7,12 +7,12 @@ from typing import Optional, List
 def reload_files(dir_path: Path, dir_name_load: str,
                  result_path: Path, script_name: str,
                  script_number_regex: str = '*',
-                 script_extensions: Optional[List[str]] = None):
+                 script_extensions: Optional[List[str]] = None) -> List[Path]:
     if script_extensions is None:
         script_extensions = [".pkl", ".txt"]
 
     path_load = Path(dir_path, dir_name_load)
-    files_per_extension_list = []
+    files_per_extension_list: List = []
     for filename_extension in script_extensions:
         files_per_extension_list.append(
             sorted([x for x
