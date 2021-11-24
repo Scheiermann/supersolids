@@ -16,7 +16,7 @@ import numpy as np
 import pickle
 import sys
 from pathlib import Path
-from typing import Optional, Callable, Union, List
+from typing import Optional, Callable, Union, List, Tuple
 
 from scipy import ndimage
 from scipy.interpolate import interpolate
@@ -294,7 +294,7 @@ class SchroedingerMixture(Schroedinger):
         energy_v = quad_vec(self.func_energy, 0.0, 1.0)[0]
         self.energy_helper_function = interpolate.interp1d(self.A, energy_v)
 
-    def func_energy(self, u):
+    def func_energy(self, u: float) -> np.ndarray:
         """
         (V_+)**5/2 + (V_-)**5/2
 
@@ -312,7 +312,7 @@ class SchroedingerMixture(Schroedinger):
             + np.lib.scimath.sqrt(self.eta_V(-1, eta_aa, eta_bb, eta_ab)) ** 5.0
         )
 
-    def func_f_symb(self, u, func: Callable, eta_a, eta_b):
+    def func_f_symb(self, u: float, func: Callable, eta_a, eta_b):
         eta_array: np.ndarray = (self.a_s_factor * self.a_s_array
                                  + 4.0 * np.pi * self.a_dd_factor * self.a_dd_array * (
                                          u ** 2.0 - 1.0 / 3.0)
@@ -337,7 +337,7 @@ class SchroedingerMixture(Schroedinger):
 
         return mu_lhy_list
 
-    def func_f(self, u, eta_dVdn: Callable):
+    def func_f(self, u: float, eta_dVdn: Callable):
         eta_array: np.ndarray = (self.a_s_factor * self.a_s_array
                                  + self.a_dd_factor * self.a_dd_array * functions.dipol_dipol(u)
                                  )
@@ -356,13 +356,13 @@ class SchroedingerMixture(Schroedinger):
 
         return result
 
-    def eta_V(self, lam, eta_aa, eta_bb, eta_ab):
+    def eta_V(self, lam: float, eta_aa: float, eta_bb: float, eta_ab: float):
         return (eta_aa * self.A
                 + eta_bb * (1.0 - self.A)
                 + lam * np.sqrt((eta_aa * self.A - eta_bb * (1.0 - self.A)) ** 2.0
                                 + 4.0 * eta_ab ** 2.0 * self.A * (1.0 - self.A)))
 
-    def eta_dVdna(self, lam, eta_aa, eta_bb, eta_ab):
+    def eta_dVdna(self, lam: float, eta_aa: float, eta_bb: float, eta_ab: float):
         return (eta_aa
                 + lam * (eta_aa * (eta_aa * self.A - eta_bb * (1 - self.A))
                          + 2 * eta_ab ** 2 * (1 - self.A)
@@ -372,7 +372,7 @@ class SchroedingerMixture(Schroedinger):
                           )
                 )
 
-    def eta_dVdnb(self, lam, eta_aa, eta_bb, eta_ab):
+    def eta_dVdnb(self, lam: float, eta_aa: float, eta_bb: float, eta_ab: float):
         return (eta_bb
                 + lam * (eta_bb * (eta_bb * (1 - self.A) - eta_aa * self.A)
                          + 2 * eta_ab ** 2 * self.A)
@@ -381,7 +381,7 @@ class SchroedingerMixture(Schroedinger):
                           )
                 )
 
-    def get_mu_lhy_list(self, density_list):
+    def get_mu_lhy_list(self, density_list: List[np.ndarray]):
         density_A, density_total = self.get_A_density_total(density_list)
 
         mu_lhy_list: List[np.ndarray] = []
@@ -391,12 +391,12 @@ class SchroedingerMixture(Schroedinger):
 
         return mu_lhy_list
 
-    def get_energy_lhy(self, density_list):
+    def get_energy_lhy(self, density_list: List[np.ndarray]):
         density_A, density_total = self.get_A_density_total(density_list)
 
         return self.energy_helper_function(density_A) * density_total ** 2.5
 
-    def get_A_density_total(self, density_list):
+    def get_A_density_total(self, density_list: List[np.ndarray]):
         if len(density_list) > 2:
             sys.exit(f"get_mu_lhy_list is not implemented for mixture with more than 2 components.")
 
@@ -409,7 +409,7 @@ class SchroedingerMixture(Schroedinger):
 
         return density_A, density_total
 
-    def save_psi_val(self, input_path, filename_steps, steps_format, frame):
+    def save_psi_val(self, input_path: Path, filename_steps: str, steps_format: str, frame: int):
         with open(Path(input_path, "mixture_" + filename_steps + steps_format % frame + ".npz"),
                   "wb") as g:
             np.savez_compressed(g, psi_val_list=self.psi_val_list)
@@ -419,7 +419,7 @@ class SchroedingerMixture(Schroedinger):
 
         return Summary, summary_name
 
-    def load_summary(self, input_path, steps_format, frame,
+    def load_summary(self, input_path: Path, steps_format: str, frame: int,
                      summary_name: Optional[str] = "SchroedingerMixtureSummary_"):
         if summary_name:
             system_summary_path = Path(input_path, summary_name + steps_format % frame + ".pkl")
@@ -438,26 +438,28 @@ class SchroedingerMixture(Schroedinger):
         return self
 
     def load_mu(self,
-                filename_mu_a="interpolator_mu_a.pkl",
-                filename_mu_b="interpolator_mu_b.pkl"):
+                filename_mu_a: str = "interpolator_mu_a.pkl",
+                filename_mu_b: str = "interpolator_mu_b.pkl") -> Tuple[np.ndarray, np.ndarray]:
         print("Loading mu from interpolating pickles ... ")
         with open(Path(self.input_path, filename_mu_a), "rb") as f:
-            mu_a = pickle.load(f)
+            mu_a: np.ndarray = pickle.load(f)
         with open(Path(self.input_path, filename_mu_b), "rb") as f:
-            mu_b = pickle.load(f)
+            mu_b: np.ndarray = pickle.load(f)
         print("mu pickles sucessfully loaded!")
 
         return mu_a, mu_b
 
-    def load_lhy(self, filename_lhy="interpolator_lhy_energy.pkl"):
+    def load_lhy(self, filename_lhy: str = "interpolator_lhy_energy.pkl") -> np.ndarray:
         print("Loading lhy from interpolating pickles ... ")
         with open(Path(self.input_path, filename_lhy), "rb") as f:
-            lhy_energy = pickle.load(f)
+            lhy_energy: np.ndarray = pickle.load(f)
         print("lhy pickle sucessfully loaded!")
 
         return lhy_energy
 
-    def energy_density_interaction(self, density_list, U_dd_list):
+    def energy_density_interaction(self,
+                                   density_list: List[np.ndarray],
+                                   U_dd_list: List[np.ndarray]):
         dV = self.volume_element(fourier_space=False)
         U_dd_array = np.stack(U_dd_list, axis=0)
         density_array = np.stack(density_list, axis=0)
@@ -481,7 +483,8 @@ class SchroedingerMixture(Schroedinger):
         # use normalized inputs for energy
         self.E = self.energy(density_list, U_dd_list, mu_lhy_list)
 
-    def energy(self, density_list, U_dd_list, mu_lhy_list):
+    def energy(self, density_list: List[np.ndarray], U_dd_list: List[np.ndarray],
+               mu_lhy_list: List[np.ndarray]) -> float:
         """
         Input psi_1, psi_2 need to be normalized.
         density1 and density2 need to be build by the normalized psi_1, psi_2.
@@ -516,20 +519,23 @@ class SchroedingerMixture(Schroedinger):
 
         return E
 
-    def get_density_list(self):
+    def get_density_list(self) -> List[np.ndarray]:
         density_list: List[np.ndarray] = []
         for psi_val, N in zip(self.psi_val_list, self.N_list):
             density_list.append(N * self.get_density(func=psi_val, p=2.0))
 
         return density_list
 
-    def get_center_of_mass(self, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
+    def get_center_of_mass(self,
+                           Mx0: Optional[int] = None, Mx1: Optional[int] = None,
+                           My0: Optional[int] = None, My1: Optional[int] = None,
+                           Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> List[float]:
         """
         Calculates the center of mass of the System.
 
         """
 
-        x0, x1, y0, y1, z0, z1 = self.slice_default(x0, x1, y0, y1, z0, z1)
+        x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
         prob_list = [density[x0:x1, y0:y1, z0:z1] for density in self.get_density_list()]
         r = self.get_mesh_list(x0, x1, y0, y1, z0, z1)
         com_list = []
@@ -657,7 +663,10 @@ class SchroedingerMixture(Schroedinger):
 
         return U_dd_list
 
-    def get_H_pot_exponent_terms(self, dipol_term, contact_interaction, mu_lhy):
+    def get_H_pot_exponent_terms(self,
+                                 dipol_term: np.ndarray,
+                                 contact_interaction: np.ndarray,
+                                 mu_lhy: np.ndarray) -> np.ndarray:
         terms = (self.V_val
                  + self.a_dd_factor * dipol_term
                  + self.a_s_factor * contact_interaction
@@ -666,7 +675,7 @@ class SchroedingerMixture(Schroedinger):
 
         return terms
 
-    def get_H_pot(self, terms, split_step: float = 0.5):
+    def get_H_pot(self, terms: np.ndarray, split_step: float = 0.5) -> np.ndarray:
         H_pot = np.exp(self.U * (split_step * self.dt) * terms)
 
         return H_pot

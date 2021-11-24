@@ -22,7 +22,7 @@ class SchroedingerSummary:
     to save disk space when saving it with dill (pickle).
     """
 
-    def __init__(self, System) -> None:
+    def __init__(self, System):
         """
         Schrödinger equations for the specified system.
 
