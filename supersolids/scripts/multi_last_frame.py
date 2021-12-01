@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-import shutil
 
+import dill
 import numpy as np
+import shutil
 
 from pathlib import Path
 from typing import List
@@ -19,26 +20,30 @@ if __name__ == "__main__":
     var1_list = []
     var2_list = []
 
-    path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_13/"))
+    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_13/"))
+    path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_13/"))
     var1_list.append(np.arange(0.6, 0.91, 0.05))
     var2_list.append(np.arange(0.05, 0.51, 0.05))
 
-    path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6125/"))
+    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6125/"))
+    path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6125/"))
     var1_list.append(np.arange(0.6125, 0.91, 0.05))
     var2_list.append(np.arange(0.05, 0.51, 0.05))
 
-    path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15/"))
+    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15/"))
+    path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15/"))
     var1_list.append(np.arange(0.625, 0.91, 0.05))
     var2_list.append(np.arange(0.05, 0.51, 0.05))
 
-    path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6375/"))
+    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6375/"))
+    path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6375/"))
     var1_list.append(np.arange(0.6375, 0.91, 0.05))
     var2_list.append(np.arange(0.05, 0.51, 0.05))
 
-    nrow_components = 1
-    ncol_components = 2
+    nrow_components = 2
+    ncol_components = 1
 
-    movie_take_last_list: int = [1, 2]
+    movie_take_last_list: int = [2, 1]
     suffix_list = ["_0", "_1"]
     dir_suffix_list = ["last_frame" + suf for suf in suffix_list]
     filename_out_list = ["last_frame" + suf for suf in suffix_list]
@@ -103,8 +108,17 @@ if __name__ == "__main__":
     var_mesh_x, var_mesh_y, path_mesh = merge_meshes(var_mesh_list,
                                                      path_mesh_list,
                                                      len(path_anchor_input_list))
+    dir_name_list = path_mesh.ravel()
 
+    # construct path_mesh_new with path to the last png in each movie
     path_out_periodic_list: List[Path] = []
+    path_dirname_list = Path(path_graphs, "dir_name_list")
+    with open(path_dirname_list.with_suffix(".pkl"), "wb") as f:
+        dill.dump(obj=dir_name_list, file=f)
+    with open(path_dirname_list.with_suffix(".txt"), "w") as f:
+        f.write(f"{dir_name_list}\n")
+
+
     for movie_take_last, path_anchor_output, suffix, filename_out in zip(movie_take_last_list,
                                                                          path_anchor_output_list,
                                                                          suffix_list,
@@ -129,9 +143,11 @@ if __name__ == "__main__":
 
         print(f"movie_take_last: {movie_take_last}")
 
-        path_out_periodic: Path = Path(path_graphs, f"periodic_system_merge_{suffix}.png")
+        path_out_periodic: Path = Path(path_graphs, f"periodic_system_merge{suffix}.png")
         path_out_periodic_list.append(path_out_periodic)
         nrow, ncol = path_mesh_new.shape
+        # flip needed as appending pictures start from left top corner,
+        # but enumeration of movies from left bottom corner
         path_mesh_mirrored: List[Path] = np.flip(path_mesh_new, axis=0)
         paste_together(path_mesh_mirrored.ravel(), path_out_periodic, nrow, ncol, ratio=dpi_ratio)
 
