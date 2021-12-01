@@ -24,7 +24,7 @@ from scipy.ndimage import distance_transform_edt
 from typing import Optional, Callable, Union, List, Tuple
 
 import supersolids.helper.numbas as numbas
-# import supersolids.helper.numba_compiled as numba_compiled
+import supersolids.helper.numba_compiled as numba_compiled
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixtureSummary import SchroedingerMixtureSummary
 from supersolids.helper import functions
@@ -334,8 +334,8 @@ class SchroedingerMixture(Schroedinger):
         energy_prefactor = np.sqrt(2.) / 15. / np.pi ** 2
 
         return energy_prefactor * np.real(
-            np.lib.scimath.sqrt(numbas.f_lam(self.A, 1, eta_aa, eta_bb, eta_ab)) ** 5.0
-            + np.lib.scimath.sqrt(numbas.f_lam(self.A, -1, eta_aa, eta_bb, eta_ab)) ** 5.0
+            np.lib.scimath.sqrt(numba_compiled.f_lam(self.A, 1, eta_aa, eta_bb, eta_ab)) ** 5.0
+            + np.lib.scimath.sqrt(numba_compiled.f_lam(self.A, -1, eta_aa, eta_bb, eta_ab)) ** 5.0
         )
 
     def func_f_symb(self, u: float, func: Callable, eta_a, eta_b):
@@ -363,10 +363,10 @@ class SchroedingerMixture(Schroedinger):
         eta_ab = eta_array[0, 1]
         eta_bb = eta_array[1, 1]
 
-        term1 = (np.lib.scimath.sqrt(numbas.f_lam(self.A, 1, eta_aa, eta_bb, eta_ab)) ** 3.0
+        term1 = (np.lib.scimath.sqrt(numba_compiled.f_lam(self.A, 1, eta_aa, eta_bb, eta_ab)) ** 3.0
                  * eta_dVdn(1, eta_aa, eta_bb, eta_ab)
                  )
-        term2 = (np.lib.scimath.sqrt(numbas.f_lam(self.A, -1, eta_aa, eta_bb, eta_ab)) ** 3.0
+        term2 = (np.lib.scimath.sqrt(numba_compiled.f_lam(self.A, -1, eta_aa, eta_bb, eta_ab)) ** 3.0
                  * eta_dVdn(-1, eta_aa, eta_bb, eta_ab)
                  )
 
@@ -375,10 +375,10 @@ class SchroedingerMixture(Schroedinger):
         return result
 
     def eta_dVdna(self, lam: float, eta_aa: float, eta_bb: float, eta_ab: float) -> np.ndarray:
-        return numbas.eta_dVdna_jit(self.A, lam, eta_aa, eta_bb, eta_ab)
+        return numba_compiled.eta_dVdna_jit(self.A, lam, eta_aa, eta_bb, eta_ab)
 
     def eta_dVdnb(self, lam: float, eta_aa: float, eta_bb: float, eta_ab: float) -> np.ndarray:
-        return numbas.eta_dVdnb_jit(self.A, lam, eta_aa, eta_bb, eta_ab)
+        return numba_compiled.eta_dVdnb_jit(self.A, lam, eta_aa, eta_bb, eta_ab)
 
     def get_mu_lhy_list(self, density_list: List[np.ndarray]) -> List[np.ndarray]:
         density_A, density_total = get_A_density_total(density_list)
@@ -510,7 +510,7 @@ class SchroedingerMixture(Schroedinger):
     def get_density_list(self) -> List[np.ndarray]:
         density_list: List[np.ndarray] = []
         for psi_val, N in zip(self.psi_val_list, self.N_list):
-            density_list.append(N * numbas.get_density_jit(psi_val))
+            density_list.append(N * numba_compiled.get_density_jit(psi_val))
 
         return density_list
 
@@ -686,14 +686,14 @@ class SchroedingerMixture(Schroedinger):
                 list(contact_interaction_vec),
                 list(dipol_term_vec),
                 mu_lhy_list)):
-            term = numbas.get_H_pot_exponent_terms_jit(self.V_val,
+            term = numba_compiled.get_H_pot_exponent_terms_jit(self.V_val,
                                                        self.a_dd_factor,
                                                        self.a_s_factor,
                                                        dipol_term,
                                                        contact_interaction,
                                                        mu_lhy
                                                        )
-            H_pot = numbas.get_H_pot_jit(self.U, self.dt, term, split_step)
+            H_pot = numba_compiled.get_H_pot_jit(self.U, self.dt, term, split_step)
             self.psi_val_list[i] = H_pot * self.psi_val_list[i]
 
         return density_list, U_dd_list
