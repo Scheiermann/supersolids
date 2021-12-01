@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-import subprocess
-from pathlib import Path
 
+import dill
 import numpy as np
+import subprocess
+
+from pathlib import Path
 
 from supersolids.scripts.cp_plots import cp_plots
 
@@ -13,18 +15,22 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    path_anchor_input = Path("/run/media/dsche/scr2/begin_mixture_13/")
+    path_anchor_input = Path("/run/media/dsche/scr2/")
 
     filename_schroedinger: str = "schroedinger.pkl"
     filename_steps: str = "mixture_step_"
 
     frame = None
 
-    movie_start = 1
-    movie_end = 70
+    # path_dir_name_list = None
+    path_dir_name_list = Path("/run/media/dsche/scr2/graphs/dir_name_list.pkl")
+    if not path_dir_name_list:
+        movie_start = 1
+        movie_end = 70
 
     var1_arange = (0.05, 0.51, 0.05)
-    var2_arange = (0.60, 0.90, 0.05)
+    # var2_arange = (0.60, 0.90, 0.05)
+    var2_arange = (0.60, 0.90, 0.0125)
     var1_arange = np.arange(*var1_arange)
     var2_arange = np.arange(*var2_arange)
 
@@ -43,10 +49,11 @@ if __name__ == "__main__":
     # property_name = "get_peak_distances_along"
     # property_name = "get_peak_positions"
     # property_args = [0]
-    property_args = []
+    # property_args = []
 
     property_name = "get_contrast_old"
     box = [117, 137, 62, 64, 14, 16]
+    property_args = [2, *box]
 
     # property_name = "get_contrast"
     # prob_min_start = 0.3
@@ -82,11 +89,18 @@ if __name__ == "__main__":
 
     dir_name_list = []
     property_args_list = []
-    for peak_index, movie_number in enumerate(range(movie_start, movie_end + 1)):
-        property_args = [*box]
-        # property_args = [number_of_peaks[peak_index], prob_min_start, prob_step]
-        property_args_list.append(property_args)
-        dir_name_list.append(f"{dir_name}{dir_name_format % movie_number}")
+    if path_dir_name_list:
+        with open(path_dir_name_list, "rb") as f:
+            # WARNING: this is just the input Schroedinger at t=0
+            dir_name_list = dill.load(file=f)
+        for dir in dir_name_list:
+            property_args_list.append(property_args)
+
+    else:
+        for peak_index, movie_number in enumerate(range(movie_start, movie_end + 1)):
+            # property_args = [number_of_peaks[peak_index], prob_min_start, prob_step]
+            property_args_list.append(property_args)
+            dir_name_list.append(f"{dir_name}{dir_name_format % movie_number}")
 
     command = ["python", "-m", "supersolids.tools.get_System_at_npz"]
     flags = [f"-dir_path={path_anchor_input}",
@@ -104,7 +118,7 @@ if __name__ == "__main__":
     flags.append(f"-var2_arange")
     flags += var2_arange_args_parsed
 
-    if dir_name_list:
+    if dir_name_list.any():
         property_args_parsed = list(map(str, dir_name_list))
         flags.append(f"-dir_name_list")
         flags += property_args_parsed
