@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #==================================================
- #PBS -N 1.34rc18
+ #PBS -N 1.34rc19
  #PBS -M daniel.scheiermann@itp.uni-hannover.de
  #PBS -d /bigwork/dscheier/
  #PBS -e /bigwork/dscheier/error.txt
@@ -10,7 +10,7 @@
  #PBS -l mem=4GB
  #PBS -l vmem=4GB
 
-supersolids_version=0.1.34rc18
+supersolids_version=0.1.34rc19
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
