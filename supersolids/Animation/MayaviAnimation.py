@@ -375,7 +375,7 @@ class MayaviAnimation(Animation.Animation):
                 if isinstance(System, SchroedingerMixture):
                     densities: List[np.ndarray] = []
                     for i, psi_val in enumerate(System.psi_val_list):
-                        densities.append(System.get_density(func=psi_val, p=2.0))
+                        densities.append(get_density(psi_val, 2.0))
                         if i == mixture_slice_index:
                             psi_val1 = psi_val
                             density1 = densities[i]
@@ -391,7 +391,7 @@ class MayaviAnimation(Animation.Animation):
                         slice_z_plot.mlab_source.trait_set(scalars=density1)
                 else:
                     # Update plot functions
-                    density1: np.ndarray = System.get_density(func=System.psi_val, p=2.0)
+                    density1: np.ndarray = get_density(System.psi_val, 2.0)
                     densities = [density1]
 
                     if arg_slices:
@@ -525,11 +525,11 @@ class MayaviAnimation(Animation.Animation):
                 title.set(text=text)
 
             # Update plot functions
-            density1: np.ndarray = System.get_density(func=System.psi_val, p=2.0)
+            density1: np.ndarray = get_density(System.psi_val, 2.0)
             densities = [density1]
             if isinstance(System, SchroedingerMixture):
                 for i, psi_val in enumerate(System.psi_val_list):
-                    densities.append(System.get_density(func=psi_val, p=2.0))
+                    densities.append(get_density(System.psi_val, 2.0))
                     if i == mixture_slice_index:
                         psi_val1 = psi_val
                         density1 = densities[i]

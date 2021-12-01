@@ -18,6 +18,7 @@ clean:
 	rm -rf dist/
 	rm -rf *.egg-info/
 	rm -rf .mypy_cache/
+	rm -rf supersolids/helper/*.so
 	cd docs; make clean;
 
 doc:
@@ -28,6 +29,10 @@ build:
 	make doc
 	git add dist/*
 	git add docs/build/html/autoapi/*
+
+build_test:
+	rm -rf supersolids/helper/*.so
+	python setup.py sdist bdist_wheel
 
 upload_test:
 	make build
