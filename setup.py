@@ -37,7 +37,7 @@ setup(
                       "sphinx-autoapi",
                       "sphinx-rtd-theme",
                       ],
-    # ext_modules=[cc.distutils_extension()],
+    ext_modules=[cc.distutils_extension()],
     # ext_modules=cythonize("*.pyx", language_level=3),
     python_requires=">=3.6",
     description="Simulate and animate supersolids.",
