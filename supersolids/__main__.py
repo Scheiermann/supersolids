@@ -23,6 +23,7 @@ import numpy as np
 from supersolids.Animation.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
+from supersolids.helper.run_time import run_time
 from supersolids.helper.simulate_case import simulate_case
 from supersolids.helper.cut_1d import prepare_cuts
 from supersolids.helper import constants
@@ -394,26 +395,27 @@ if __name__ == "__main__":
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    SystemResult: Schroedinger = simulate_case(
-        SchroedingerInput,
-        Anim,
-        accuracy=args.accuracy,
-        delete_input=False,
-        dir_path=dir_path,
-        dir_name_result=args.dir_name_result,
-        filename_steps=args.filename_steps,
-        steps_format=args.steps_format,
-        steps_per_npz=args.steps_per_npz,
-        frame_start=0,
-        script_name=args.script_name,
-        script_args=args,
-        script_number_regex=args.script_number_regex,
-        script_extensions=args.script_extensions,
-        script_extensions_index=args.script_extensions_index,
-        slice_indices=slice_indices,  # from here just mayavi
-        offscreen=args.offscreen,
-        x_lim=x_lim,  # from here just matplotlib
-        y_lim=y_lim,
-        )
+    with run_time(name="simulate_case"):
+        SystemResult: Schroedinger = simulate_case(
+            SchroedingerInput,
+            Anim,
+            accuracy=args.accuracy,
+            delete_input=False,
+            dir_path=dir_path,
+            dir_name_result=args.dir_name_result,
+            filename_steps=args.filename_steps,
+            steps_format=args.steps_format,
+            steps_per_npz=args.steps_per_npz,
+            frame_start=0,
+            script_name=args.script_name,
+            script_args=args,
+            script_number_regex=args.script_number_regex,
+            script_extensions=args.script_extensions,
+            script_extensions_index=args.script_extensions_index,
+            slice_indices=slice_indices,  # from here just mayavi
+            offscreen=args.offscreen,
+            x_lim=x_lim,  # from here just matplotlib
+            y_lim=y_lim,
+            )
 
     print("Single core done")
