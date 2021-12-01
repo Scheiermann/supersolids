@@ -701,6 +701,36 @@ class Schroedinger:
 
         return phase_var
 
+    def split_operator_pot(self, split_step: float = 0.5) -> None:
+        psi_2: np.ndarray = get_density_jit(self.psi_val, p=2.0)
+        psi_3: np.ndarray = get_density_jit(self.psi_val, p=3.0)
+        U_dd: np.ndarray = np.fft.ifftn(self.V_k_val * np.fft.fftn(psi_2))
+
+        # update H_pot before use
+        H_pot: np.ndarray = self.get_H_pot(psi_2, psi_3)
+
+        # multiply element-wise the (1D, 2D or 3D) arrays with each other
+        self.psi_val = H_pot * self.psi_val
+
+    def split_operator_kin(self) -> None:
+        self.psi_val = np.fft.fftn(self.psi_val)
+        # H_kin is just dependent on U and the grid-points, which are constants,
+        # so it does not need to be recalculated
+        # multiply element-wise the (1D, 2D or 3D) array (H_kin) with psi_val
+        # (1D, 2D or 3D)
+        self.psi_val = self.H_kin * self.psi_val
+        self.psi_val = np.fft.ifftn(self.psi_val)
+
+    def get_H_pot(self, psi_2: np.ndarray, psi_3: np.ndarray) -> np.ndarray:
+        H_pot: np.ndarray = np.exp(self.U
+                                   * (0.5 * self.dt)
+                                   * (self.V_val
+                                      + self.g * psi_2
+                                      + self.g_qf * psi_3
+                                      + self.g * self.e_dd * U_dd))
+
+        return H_pot
+
     def time_step(self) -> None:
         """
         Evolves System according Schrödinger Equations by using the
@@ -712,48 +742,17 @@ class Schroedinger:
 
         # Calculate the interaction by applying it to the psi_2 in k-space
         # (transform back and forth)
-        psi_2: np.ndarray = get_density_jit(self.psi_val, p=2.0)
-        psi_3: np.ndarray = get_density_jit(self.psi_val, p=3.0)
-        U_dd: np.ndarray = np.fft.ifftn(self.V_k_val * np.fft.fftn(psi_2))
-
-        # update H_pot before use
-        H_pot: np.ndarray = np.exp(self.U
-                                   * (0.5 * self.dt)
-                                   * (self.V_val
-                                      + self.g * psi_2
-                                      + self.g_qf * psi_3
-                                      + self.g * self.e_dd * U_dd))
-        # multiply element-wise the (1D, 2D or 3D) arrays with each other
-        self.psi_val = H_pot * self.psi_val
-
-        self.psi_val = np.fft.fftn(self.psi_val)
-        # H_kin is just dependent on U and the grid-points, which are constants,
-        # so it does not need to be recalculated
-        # multiply element-wise the (1D, 2D or 3D) array (H_kin) with psi_val
-        # (1D, 2D or 3D)
-        self.psi_val = self.H_kin * self.psi_val
-        self.psi_val = np.fft.ifftn(self.psi_val)
-
-        # update H_pot, psi_2, U_dd before use
-        psi_2: np.ndarray = get_density_jit(self.psi_val, p=2.0)
-        psi_3: np.ndarray = get_density_jit(self.psi_val, p=3.0)
-        U_dd = np.fft.ifftn(self.V_k_val * np.fft.fftn(psi_2))
-        H_pot = np.exp(self.U
-                       * (0.5 * self.dt)
-                       * (self.V_val
-                          + self.g * psi_2
-                          + self.g_qf * psi_3
-                          + self.g * self.e_dd * U_dd))
-
-        # multiply element-wise the (1D, 2D or 3D) arrays with each other
-        self.psi_val = H_pot * self.psi_val
+        self.split_operator_pot(split_step=0.5)
+        self.split_operator_kin()
+        self.split_operator_pot(split_step=0.5)
 
         self.t = self.t + self.dt
+
+        psi_norm_after_evolution: float = self.get_norm(func_val=psi_val)
 
         # for self.imag_time=False, renormalization should be preserved,
         # but we play safe here (regardless of speedup)
         # if self.imag_time:
-        psi_norm_after_evolution: float = self.trapez_integral(np.abs(self.psi_val) ** 2.0)
         self.psi_val = self.psi_val / np.sqrt(psi_norm_after_evolution)
 
         self.mu_arr = np.array([-np.log(psi_norm_after_evolution)
