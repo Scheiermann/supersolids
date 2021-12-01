@@ -12,6 +12,7 @@ def string_float(s):
 if __name__ == "__main__":
     path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_alpha/")
 
+    mixture = False
     filename_schroedinger: str = "schroedinger.pkl"
 
     if mixture:
