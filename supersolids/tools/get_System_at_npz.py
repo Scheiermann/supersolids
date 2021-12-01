@@ -130,28 +130,53 @@ def plot_System_at_npz(property_name, dir_path, var1_mesh, var2_mesh, property_v
         fig.savefig(Path(dir_path, f"{property_name}"))
 
 
-def plot_contour(property_name, dir_path, X, Y, property_values, title):
+def plot_contour(property_name, dir_path, X, Y, property_values, title,
+                 mesh=False, levels=None, var1_cut=None, var2_cut=None):
     property_arr = np.array(property_values)
-    Z_list = []
+    Z_half_list = []
     for i in range(0, len(property_values[0])):
-        path_output = Path(dir_path, f"{property_name}" + "_contour_" + f"{i}")
+        if mesh:
+            path_output = Path(dir_path, f"{property_name}" + "_mesh_" + f"{i}")
+        else:
+            path_output = Path(dir_path, f"{property_name}" + "_contour_" + f"{i}")
         Z = np.reshape(property_arr[:, i], var1_mesh.shape)
-        Z_list.append(Z)
-        plot_contour_helper(path_output, X, Y, Z, title)
+        if var1_cut:
+            X = X[:var1_cut, :]
+            Y = Y[:var1_cut, :]
+            Z = Z[:var1_cut, :]
+        if var2_cut:
+            X = X[:, :var2_cut]
+            Y = Y[:, :var2_cut]
+            Z = Z[:, :var2_cut]
+        Z_half_list.append(Z / 2.0)
+        plot_contour_helper(path_output, X, Y, Z, title, mesh=mesh, levels=levels)
 
-    path_output_sum = Path(dir_path, f"{property_name}" + "_contour_sum")
-    plot_contour_helper(path_output_sum, X, Y, sum(Z_list), title)
+    if mesh:
+        path_output_sum = Path(dir_path, f"{property_name}" + "_mesh_sum")
+    else:
+        path_output_sum = Path(dir_path, f"{property_name}" + "_contour_sum")
+    plot_contour_helper(path_output_sum, X, Y, sum(Z_half_list), title, mesh=mesh, levels=levels)
 
 
-def plot_contour_helper(path_output, X, Y, Z, title):
-    fig, ax = plt.subplots()
-    im = ax.pcolormesh(X, Y, Z, shading="auto")
+def plot_contour_helper(path_output, X, Y, Z, title, mesh=False, levels=None):
+    fig, ax = plt.subplots(figsize=(8,6))
+    if mesh:
+        im = ax.pcolormesh(X, Y, Z, shading="auto")
+        # text of value for every mesh-point
+        for j in range(0, Z.shape[0]):
+            for k in range(0, Z.shape[1]):
+                text = ax.text(X[j, k], Y[j, k], np.round(Z[j, k], 4),
+                               ha="center", va="center", color="black", size=5, rotation="vertical")
+    else:
+        if levels:
+            im = ax.contourf(X, Y, Z, levels=levels, cmap="viridis", extend="both")
+        else:
+            im = ax.contourf(X, Y, Z, cmap="viridis")
+        ax.contour(im)
+        ax.clabel(im, inline=True, fontsize=10, colors="black")
+
     ax.set_xlabel(r"Scatter length $a_{12}$ (var2)")
     ax.set_ylabel(r"Ratio $\frac{N_2}{N}$ (var1)")
-    for j in range(0, Z.shape[0]):
-        for k in range(0, Z.shape[1]):
-            text = ax.text(X[j, k], Y[j, k], np.round(Z[j, k], 4),
-                           ha="center", va="center", color="black")
     fig.colorbar(im)
     ax.set_title(title)
     fig.savefig(path_output)
@@ -225,4 +250,9 @@ if __name__ == "__main__":
     plot_System_at_npz(args.property_name, path_graphs, var1_mesh, var2_mesh, property_values)
 
     title = f"with property_args: {args.property_args_list[0]}"
+    plot_contour(args.property_name + f"_level", path_graphs, var2_mesh, var1_mesh, property_values,
+                 title,
+                 levels=[0.75, 0.8, 0.90, 0.935, 0.97, 0.98, 0.99, 0.999, 1.0])
     plot_contour(args.property_name, path_graphs, var2_mesh, var1_mesh, property_values, title)
+    plot_contour(args.property_name, path_graphs, var2_mesh, var1_mesh, property_values, title,
+                 mesh=True, var2_cut=None)
