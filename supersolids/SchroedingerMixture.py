@@ -15,19 +15,22 @@ import functools
 import numpy as np
 import pickle
 import sys
-from pathlib import Path
-from typing import Optional, Callable, Union, List, Tuple
 
+from pathlib import Path
 from scipy import ndimage
 from scipy.interpolate import interpolate
 from scipy.integrate import quad_vec
 from scipy.ndimage import distance_transform_edt
+from typing import Optional, Callable, Union, List, Tuple
 
+import supersolids.helper.numbas as numbas
+import supersolids.helper.numba_compiled as numba_compiled
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixtureSummary import SchroedingerMixtureSummary
 from supersolids.helper import functions
 from supersolids.helper.Box import Box
 from supersolids.helper.Resolution import Resolution
+from supersolids.helper.run_time import run_time
 
 """
 from sympy import diff, sqrt, re
@@ -52,6 +55,26 @@ def func_V_symb():
 
     return [v_a_np, v_b_np]
 """
+
+
+def get_A_density_total(density_list: List[np.ndarray]) -> Tuple[np.ndarray, np.ndarray]:
+    density_total: np.ndarray = np.copy(density_list[0])
+    for density in density_list[1:]:
+        density_total += density
+
+    # A = n1/(n1+n2)
+    density_A = density_list[0] / density_total
+
+    return density_A, density_total
+
+
+def get_mu_lhy_integrated_list(func_list: List[Callable]) -> List[np.ndarray]:
+    mu_lhy_prefactor = 1.0 / (3.0 * np.sqrt(2.0) * np.pi ** 2.0)
+    mu_lhy_list: List[np.ndarray] = []
+    for func in func_list:
+        mu_lhy_list.append(mu_lhy_prefactor * quad_vec(func, 0.0, 1.0)[0])
+
+    return mu_lhy_list
 
 
 class SchroedingerMixture(Schroedinger):
@@ -276,20 +299,23 @@ class SchroedingerMixture(Schroedinger):
 
         self.A = np.linspace(0.0, 1.0, self.nA_max)
 
-        func_fa = functools.partial(self.func_f, eta_dVdn=self.eta_dVdna)
-        func_fb = functools.partial(self.func_f, eta_dVdn=self.eta_dVdnb)
-        mu_v_list = self.mu_lhy_list(func_list=[func_fa, func_fb])
+        mu_lhy_integrand_a = functools.partial(self.mu_lhy_integrand, eta_dVdn=self.eta_dVdna)
+        mu_lhy_integrand_b = functools.partial(self.mu_lhy_integrand, eta_dVdn=self.eta_dVdnb)
+        mu_lhy_integrated_list = get_mu_lhy_integrated_list(func_list=[mu_lhy_integrand_a,
+                                                                       mu_lhy_integrand_b])
 
         # V_symb: List[Callable] = func_V_symb()
-        # func_fa_symb = functools.partial(self.func_f_symb, func=V_symb[0], eta_a=self.A, eta_b=1.0 - self.A)
-        # func_fb_symb = functools.partial(self.func_f_symb, func=V_symb[1], eta_a=self.A, eta_b=1.0 - self.A)
-        # mu_v_list_symb = self.mu_lhy_list(func_list=[func_fa_symb, func_fb_symb])
+        # func_fa_symb = functools.partial(self.func_f_symb, func=V_symb[0],
+        #                                  eta_a=self.A, eta_b=1.0 - self.A)
+        # func_fb_symb = functools.partial(self.func_f_symb, func=V_symb[1],
+        #                                  eta_a=self.A, eta_b=1.0 - self.A)
+        # mu_v_list_symb = construct_mu_lhy_list(func_list=[func_fa_symb, func_fb_symb])
 
-        mu_lhy_helper_list = []
-        for mu_v in mu_v_list:
-            mu_lhy_helper_list.append(interpolate.interp1d(self.A, mu_v))
+        mu_lhy_interpolation_list = []
+        for mu_lhy_integrated in mu_lhy_integrated_list:
+            mu_lhy_interpolation_list.append(interpolate.interp1d(self.A, mu_lhy_integrated))
 
-        self.mu_lhy_helper_list = mu_lhy_helper_list
+        self.mu_lhy_interpolation_list = mu_lhy_interpolation_list
 
         energy_v = quad_vec(self.func_energy, 0.0, 1.0)[0]
         self.energy_helper_function = interpolate.interp1d(self.A, energy_v)
@@ -308,8 +334,8 @@ class SchroedingerMixture(Schroedinger):
         energy_prefactor = np.sqrt(2.) / 15. / np.pi ** 2
 
         return energy_prefactor * np.real(
-            np.lib.scimath.sqrt(self.eta_V(1, eta_aa, eta_bb, eta_ab)) ** 5.0
-            + np.lib.scimath.sqrt(self.eta_V(-1, eta_aa, eta_bb, eta_ab)) ** 5.0
+            np.lib.scimath.sqrt(numba_compiled.f_lam(self.A, 1, eta_aa, eta_bb, eta_ab)) ** 5.0
+            + np.lib.scimath.sqrt(numba_compiled.f_lam(self.A, -1, eta_aa, eta_bb, eta_ab)) ** 5.0
         )
 
     def func_f_symb(self, u: float, func: Callable, eta_a, eta_b):
@@ -329,15 +355,7 @@ class SchroedingerMixture(Schroedinger):
 
         return func_u
 
-    def mu_lhy_list(self, func_list: List[Callable]):
-        mu_lhy_prefactor = 1.0 / (3.0 * np.sqrt(2.0) * np.pi ** 2.0)
-        mu_lhy_list: list = []
-        for func in func_list:
-            mu_lhy_list.append(mu_lhy_prefactor * quad_vec(func, 0.0, 1.0)[0])
-
-        return mu_lhy_list
-
-    def func_f(self, u: float, eta_dVdn: Callable):
+    def mu_lhy_integrand(self, u: float, eta_dVdn: Callable) -> np.ndarray:
         eta_array: np.ndarray = (self.a_s_factor * self.a_s_array
                                  + self.a_dd_factor * self.a_dd_array * functions.dipol_dipol(u)
                                  )
@@ -345,10 +363,10 @@ class SchroedingerMixture(Schroedinger):
         eta_ab = eta_array[0, 1]
         eta_bb = eta_array[1, 1]
 
-        term1 = (np.lib.scimath.sqrt(self.eta_V(1, eta_aa, eta_bb, eta_ab)) ** 3.0
+        term1 = (np.lib.scimath.sqrt(numba_compiled.f_lam(self.A, 1, eta_aa, eta_bb, eta_ab)) ** 3.0
                  * eta_dVdn(1, eta_aa, eta_bb, eta_ab)
                  )
-        term2 = (np.lib.scimath.sqrt(self.eta_V(-1, eta_aa, eta_bb, eta_ab)) ** 3.0
+        term2 = (np.lib.scimath.sqrt(numba_compiled.f_lam(self.A, -1, eta_aa, eta_bb, eta_ab)) ** 3.0
                  * eta_dVdn(-1, eta_aa, eta_bb, eta_ab)
                  )
 
@@ -356,65 +374,35 @@ class SchroedingerMixture(Schroedinger):
 
         return result
 
-    def eta_V(self, lam: float, eta_aa: float, eta_bb: float, eta_ab: float):
-        return (eta_aa * self.A
-                + eta_bb * (1.0 - self.A)
-                + lam * np.sqrt((eta_aa * self.A - eta_bb * (1.0 - self.A)) ** 2.0
-                                + 4.0 * eta_ab ** 2.0 * self.A * (1.0 - self.A)))
+    def eta_dVdna(self, lam: float, eta_aa: float, eta_bb: float, eta_ab: float) -> np.ndarray:
+        return numba_compiled.eta_dVdna_jit(self.A, lam, eta_aa, eta_bb, eta_ab)
 
-    def eta_dVdna(self, lam: float, eta_aa: float, eta_bb: float, eta_ab: float):
-        return (eta_aa
-                + lam * (eta_aa * (eta_aa * self.A - eta_bb * (1 - self.A))
-                         + 2 * eta_ab ** 2 * (1 - self.A)
-                         )
-                / np.sqrt((eta_aa * self.A - eta_bb * (1 - self.A)) ** 2
-                          + 4 * eta_ab ** 2 * self.A * (1 - self.A)
-                          )
-                )
+    def eta_dVdnb(self, lam: float, eta_aa: float, eta_bb: float, eta_ab: float) -> np.ndarray:
+        return numba_compiled.eta_dVdnb_jit(self.A, lam, eta_aa, eta_bb, eta_ab)
 
-    def eta_dVdnb(self, lam: float, eta_aa: float, eta_bb: float, eta_ab: float):
-        return (eta_bb
-                + lam * (eta_bb * (eta_bb * (1 - self.A) - eta_aa * self.A)
-                         + 2 * eta_ab ** 2 * self.A)
-                / np.sqrt((eta_aa * self.A - eta_bb * (1 - self.A)) ** 2
-                          + 4 * eta_ab ** 2 * self.A * (1 - self.A)
-                          )
-                )
-
-    def get_mu_lhy_list(self, density_list: List[np.ndarray]):
-        density_A, density_total = self.get_A_density_total(density_list)
+    def get_mu_lhy_list(self, density_list: List[np.ndarray]) -> List[np.ndarray]:
+        density_A, density_total = get_A_density_total(density_list)
 
         mu_lhy_list: List[np.ndarray] = []
-        en_lhy_list: List[np.ndarray] = []
-        for mu_lhy_helper in self.mu_lhy_helper_list:
-            mu_lhy_list.append(mu_lhy_helper(density_A) * density_total ** 1.5)
+        for mu_lhy_interpolation in self.mu_lhy_interpolation_list:
+            mu_lhy = mu_lhy_interpolation(density_A) * density_total ** 1.5
+            mu_lhy_list.append(mu_lhy)
 
         return mu_lhy_list
 
-    def get_energy_lhy(self, density_list: List[np.ndarray]):
-        density_A, density_total = self.get_A_density_total(density_list)
+    def get_energy_lhy(self, density_list: List[np.ndarray]) -> np.ndarray:
+        density_A, density_total = get_A_density_total(density_list)
 
         return self.energy_helper_function(density_A) * density_total ** 2.5
 
-    def get_A_density_total(self, density_list: List[np.ndarray]):
-        if len(density_list) > 2:
-            sys.exit(f"get_mu_lhy_list is not implemented for mixture with more than 2 components.")
-
-        density_total: np.ndarray = np.full_like(density_list[0], 0.0)
-        for density in density_list:
-            density_total += density
-
-        # A = n1/(n1+n2)
-        density_A = density_list[0] / density_total
-
-        return density_A, density_total
-
-    def save_psi_val(self, input_path: Path, filename_steps: str, steps_format: str, frame: int):
+    def save_psi_val(self, input_path: Path, filename_steps: str,
+                     steps_format: str, frame: int) -> None:
         with open(Path(input_path, "mixture_" + filename_steps + steps_format % frame + ".npz"),
                   "wb") as g:
             np.savez_compressed(g, psi_val_list=self.psi_val_list)
 
-    def use_summary(self, summary_name: Optional[str] = None):
+    def use_summary(self, summary_name: Optional[str] = None) -> Tuple[SchroedingerMixtureSummary,
+                                                                       Optional[str]]:
         Summary: SchroedingerMixtureSummary = SchroedingerMixtureSummary(self)
 
         return Summary, summary_name
@@ -459,7 +447,7 @@ class SchroedingerMixture(Schroedinger):
 
     def energy_density_interaction(self,
                                    density_list: List[np.ndarray],
-                                   U_dd_list: List[np.ndarray]):
+                                   U_dd_list: List[np.ndarray]) -> float:
         dV = self.volume_element(fourier_space=False)
         U_dd_array = np.stack(U_dd_list, axis=0)
         density_array = np.stack(density_list, axis=0)
@@ -474,7 +462,7 @@ class SchroedingerMixture(Schroedinger):
 
         return self.sum_dV(en_mf, dV=dV)
 
-    def get_E(self):
+    def get_E(self) -> None:
         # update for energy calculation
         density_list = self.get_density_list()
         U_dd_list = self.get_U_dd_list(density_list)
@@ -522,7 +510,7 @@ class SchroedingerMixture(Schroedinger):
     def get_density_list(self) -> List[np.ndarray]:
         density_list: List[np.ndarray] = []
         for psi_val, N in zip(self.psi_val_list, self.N_list):
-            density_list.append(N * self.get_density(func=psi_val, p=2.0))
+            density_list.append(N * numbas.get_density_jit(psi_val))
 
         return density_list
 
@@ -545,9 +533,13 @@ class SchroedingerMixture(Schroedinger):
                              for com_along_axis in center_of_mass_along_axis])
         return com_list
 
-    def get_parity(self, axis=2, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
+    def get_parity(self,
+                   axis: int = 2,
+                   Mx0: Optional[int] = None, Mx1: Optional[int] = None,
+                   My0: Optional[int] = None, My1: Optional[int] = None,
+                   Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> List[float]:
+        x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
         parity_list: List[float] = []
-        x0, x1, y0, y1, z0, z1 = self.slice_default(x0, x1, y0, y1, z0, z1)
         for psi_val in self.psi_val_list:
             psi_under0, psi_over0 = np.split(psi_val, 2, axis=axis)
 
@@ -563,13 +555,17 @@ class SchroedingerMixture(Schroedinger):
 
         return parity_list
 
-    def distmat(self, a, index):
+    def distmat(self, a: np.ndarray, index: List[float]):
         mask = np.ones(a.shape, dtype=bool)
         mask[index[0], index[1], index[2]] = False
         return distance_transform_edt(mask)
 
-    def get_contrast_old(self, x0=None, x1=None, y0=None, y1=None, z0=None, z1=None):
-        x0, x1, y0, y1, z0, z1 = self.slice_default(x0, x1, y0, y1, z0, z1)
+    def get_contrast_old(self,
+                   axis: int = 2,
+                   Mx0: Optional[int] = None, Mx1: Optional[int] = None,
+                   My0: Optional[int] = None, My1: Optional[int] = None,
+                   Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> List[float]:
+        x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
         prob_list = self.get_density_list()
         bec_contrast_list = []
         for N, prob in zip(self.N_list, prob_list):
@@ -586,7 +582,7 @@ class SchroedingerMixture(Schroedinger):
 
     def get_contrast(self, number_of_peaks: int, prob_min_start, prob_step: float = 0.01,
                      prob_min_edge: float = 0.015, region_threshold: int = 100,
-                     ):
+                     ) -> List[float]:
         prob_list = self.get_density_list()
         bec_contrast_list = []
         structures = functions.binary_structures()
@@ -635,7 +631,8 @@ class SchroedingerMixture(Schroedinger):
                         bec_min = ndimage.minimum(prob_one, labels=label_im_one)
                     else:
                         peaks_max_index = [ndimage.maximum_position(peak,
-                                                                    labels=np.array(peak, dtype=bool))
+                                                                    labels=np.array(peak,
+                                                                                    dtype=bool))
                                            for peak in peak_list
                                            ]
                         max_dists = [self.distmat(prob, peak_max_index)
@@ -656,31 +653,21 @@ class SchroedingerMixture(Schroedinger):
 
         return bec_contrast_list
 
-    def get_U_dd_list(self, density_list):
+    def get_U_dd_list(self, density_list: List[np.ndarray]) -> List[np.ndarray]:
         U_dd_list: List[np.ndarray] = []
         for density in density_list:
             U_dd_list.append(np.fft.ifftn(self.V_k_val * np.fft.fftn(density)))
 
         return U_dd_list
 
-    def get_H_pot_exponent_terms(self,
-                                 dipol_term: np.ndarray,
-                                 contact_interaction: np.ndarray,
-                                 mu_lhy: np.ndarray) -> np.ndarray:
-        terms = (self.V_val
-                 + self.a_dd_factor * dipol_term
-                 + self.a_s_factor * contact_interaction
-                 + mu_lhy
-                 )
-
-        return terms
 
     def get_H_pot(self, terms: np.ndarray, split_step: float = 0.5) -> np.ndarray:
         H_pot = np.exp(self.U * (split_step * self.dt) * terms)
 
         return H_pot
 
-    def split_operator_pot(self, split_step: float = 0.5) -> (List[np.ndarray], List[np.ndarray]):
+    def split_operator_pot(self, split_step: float = 0.5) -> Tuple[List[np.ndarray],
+                                                                   List[np.ndarray]]:
         density_list = self.get_density_list()
         density_tensor_vec = np.stack(density_list, axis=0)
 
@@ -695,25 +682,23 @@ class SchroedingerMixture(Schroedinger):
 
         mu_lhy_list: List[np.ndarray] = self.get_mu_lhy_list(density_list)
         terms_list: List[np.ndarray] = []
-        for contact_interaction, dipol_term, mu_lhy in zip(list(contact_interaction_vec),
-                                                           list(dipol_term_vec),
-                                                           mu_lhy_list):
-            terms_list.append(self.get_H_pot_exponent_terms(dipol_term,
-                                                            contact_interaction,
-                                                            mu_lhy
-                                                            )
-                              )
-
-        H_pot_list: List[np.ndarray] = []
-        for terms in terms_list:
-            H_pot_list.append(self.get_H_pot(terms, split_step=split_step))
-
-        for i, H_pot in enumerate(H_pot_list):
+        for i, (contact_interaction, dipol_term, mu_lhy) in enumerate(zip(
+                list(contact_interaction_vec),
+                list(dipol_term_vec),
+                mu_lhy_list)):
+            term = numba_compiled.get_H_pot_exponent_terms_jit(self.V_val,
+                                                               self.a_dd_factor,
+                                                               self.a_s_factor,
+                                                               dipol_term,
+                                                               contact_interaction,
+                                                               mu_lhy
+                                                               )
+            H_pot = numba_compiled.get_H_pot_jit(self.U, self.dt, term, split_step)
             self.psi_val_list[i] = H_pot * self.psi_val_list[i]
 
         return density_list, U_dd_list
 
-    def split_operator_kin(self):
+    def split_operator_kin(self) -> None:
         # apply H_kin in k-space (transform back and forth)
         for i in range(0, len(self.psi_val_list)):
             self.psi_val_list[i] = np.fft.fftn(self.psi_val_list[i])
@@ -727,7 +712,7 @@ class SchroedingerMixture(Schroedinger):
     def normalize_psi_val(self) -> List[float]:
         psi_norm_list: List[float] = []
         for i, psi_val in enumerate(self.psi_val_list):
-            psi_norm_list.append(self.trapez_integral(np.abs(psi_val) ** 2.0))
+            psi_norm_list.append(self.get_norm(func_val=psi_val))
             self.psi_val_list[i] = psi_val / np.sqrt(psi_norm_list[i])
 
         return psi_norm_list

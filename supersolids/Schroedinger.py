@@ -19,6 +19,7 @@ import dill
 import numpy as np
 import scipy.signal
 
+import supersolids.helper.numbas as numbas
 from supersolids.SchroedingerSummary import SchroedingerSummary
 from supersolids.helper import constants, functions, get_path
 from supersolids.helper.Resolution import Resolution
@@ -259,9 +260,15 @@ class Schroedinger:
         """
         if self.dim <= 3:
             if func_val is None:
-                psi_density: np.ndarray = np.abs(self.psi_val) ** p
+                if p == 2.0:
+                    psi_density: np.ndarray = numbas.get_density_jit(self.psi_val)
+                else:
+                    psi_density: np.ndarray = np.abs(self.psi_val) ** p
             else:
-                psi_density = np.abs(func_val) ** p
+                if p == 2.0:
+                    psi_density: np.ndarray = numbas.get_density_jit(func_val)
+                else:
+                    psi_density = np.abs(func_val) ** p
 
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")
@@ -297,7 +304,7 @@ class Schroedinger:
 
         return psi_norm
 
-    def get_norm(self, func=None, p: float = 2.0, fourier_space: bool = False) -> float:
+    def get_norm(self, func_val=None, p: float = 2.0, fourier_space: bool = False) -> float:
         """
         Calculates :math:`\int |\psi|^p \\mathrm{dV}` for 1D, 2D or 3D
         (depending on self.dim). For p=2 it is the 2-norm.
@@ -312,18 +319,15 @@ class Schroedinger:
         :return: \int |\psi|^p dV
 
         """
-        if func is None:
-            func = self.get_density(p=p)
-        else:
-            func = np.abs(func) ** p
+        func_den = self.get_density(func_val, p=p)
 
         if fourier_space:
             func_norm = ((np.sqrt(2.0 * np.pi) ** float(self.dim))
                          * (1 / self.volume_element(fourier_space=fourier_space))
                          * (1 / self.psi_val.size))
-            func = func * func_norm
+            func_den = func_den * func_norm
 
-        psi_norm: float = self.sum_dV(func, fourier_space=fourier_space)
+        psi_norm: float = self.sum_dV(func_den, fourier_space=fourier_space)
 
         return psi_norm
 
@@ -551,14 +555,6 @@ class Schroedinger:
 
     def get_N_in_droplets(self, prob_min: float, number_of_peaks: int) -> List[float]:
         """
-
-        Parameters
-        ----------
-        prob_min :
-        number_of_peaks :
-
-        Returns
-        -------
         The first number_of_peaks entries are the number of particles in droplets
         (defined by :math:`|\psi|^2 > \\mathrm{prob_min}`) on the x-axis from left to right.
         The last entry is the sum of particles of those droplets.
@@ -587,30 +583,39 @@ class Schroedinger:
                       Mx0: Optional[int] = None, Mx1: Optional[int] = None,
                       My0: Optional[int] = None, My1: Optional[int] = None,
                       Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> Tuple[int, int, int,
-                                                                                   int, int, int]:
+                                                                                     int, int, int]:
         if (Mx0 is None) and (Mx1 is None):
-            Mx0 = 0
-            Mx1 = self.Res.x - 1
+            x0 = 0
+            x1 = self.Res.x - 1
         else:
             if (Mx0 < 0) or ((Mx0 or Mx1) > self.Res.x):
                 sys.exit(f"ERROR: Slice indices ({Mx0}, {Mx1}) for x out of bound. "
                          f"Bounds are (0, {self.Res.x})\n")
+            else:
+                x0 = Mx0
+                x1 = Mx1
 
         if (My0 is None) and (My1 is None):
-            My0 = 0
-            My1 = self.Res.y - 1
+            y0 = 0
+            y1 = self.Res.y - 1
         else:
             if (My0 < 0) or ((My0 or My1) > self.Res.y):
                 sys.exit(f"ERROR: Slice indices ({My0}, {My1}) for y out of bound. "
                          f"Bounds are (0, {self.Res.y})\n")
+            else:
+                y0 = My0
+                y1 = My1
 
         if (Mz0 is None) and (Mz1 is None):
-            Mz0 = 0
-            Mz1 = self.Res.z - 1
+            z0 = 0
+            z1 = self.Res.z - 1
         else:
             if (Mz0 < 0) or ((Mz0 or Mz1) > self.Res.z):
                 sys.exit(f"ERROR: Slice indices ({Mz0}, {Mz1}) for z out of bound. "
                          f"Bounds are (0, {self.Res.z})\n")
+            else:
+                z0 = Mz0
+                z1 = Mz1
 
         return x0, x1, y0, y1, z0, z1
 
@@ -624,7 +629,7 @@ class Schroedinger:
         """
 
         x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
-        prob = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1]
+        prob = get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1]
         r = self.get_mesh_list(x0, x1, y0, y1, z0, z1)
         center_of_mass_along_axis = [prob * r_i for r_i in r]
         com = [self.trapez_integral(com_along_axis) / self.trapez_integral(prob) for com_along_axis
@@ -661,7 +666,7 @@ class Schroedinger:
         bool_grid = np.logical_or(bool_grid_list[:-1], bool_grid_list[-1])
 
         norm = self.get_norm()
-        prob = bool_grid * self.get_density(p=2.0) / norm
+        prob = bool_grid * get_density_jit(self.psi_val, p=2.0) / norm
         psi_val_bool_grid = bool_grid * self.psi_val
         angle = np.angle(psi_val_bool_grid)
         angle_cos = np.cos(angle + np.pi)
@@ -684,7 +689,7 @@ class Schroedinger:
         x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
         norm = self.get_norm(func=self.psi_val[x0:x1, y0:y1, z0:z1])
 
-        prob_cropped = self.get_density(p=2.0)[x0:x1, y0:y1, z0:z1] / norm
+        prob_cropped = get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1] / norm
         psi_val_cropped = self.psi_val[x0:x1, y0:y1, z0:z1]
         angle = np.angle(psi_val_cropped)
         angle_cos = np.cos(angle + np.pi)
@@ -707,8 +712,8 @@ class Schroedinger:
 
         # Calculate the interaction by applying it to the psi_2 in k-space
         # (transform back and forth)
-        psi_2: np.ndarray = self.get_density(p=2.0)
-        psi_3: np.ndarray = self.get_density(p=3.0)
+        psi_2: np.ndarray = get_density_jit(self.psi_val, p=2.0)
+        psi_3: np.ndarray = get_density_jit(self.psi_val, p=3.0)
         U_dd: np.ndarray = np.fft.ifftn(self.V_k_val * np.fft.fftn(psi_2))
 
         # update H_pot before use
@@ -730,8 +735,8 @@ class Schroedinger:
         self.psi_val = np.fft.ifftn(self.psi_val)
 
         # update H_pot, psi_2, U_dd before use
-        psi_2 = self.get_density(p=2.0)
-        psi_3 = self.get_density(p=3.0)
+        psi_2: np.ndarray = get_density_jit(self.psi_val, p=2.0)
+        psi_3: np.ndarray = get_density_jit(self.psi_val, p=3.0)
         U_dd = np.fft.ifftn(self.V_k_val * np.fft.fftn(psi_2))
         H_pot = np.exp(self.U
                        * (0.5 * self.dt)
@@ -756,7 +761,7 @@ class Schroedinger:
 
     def get_E(self) -> float:
         if self.V_interaction:
-            psi_2 = self.get_density(p=2.0)
+            psi_2: np.ndarray = get_density_jit(self.psi_val, p=2.0)
             E_U_dd = (1 / np.sqrt(2.0 * np.pi) ** 3.0) * self.sum_dV(
                 self.V_k_val * np.abs(np.fft.fftn(psi_2)) ** 2.0, fourier_space=True)
         else:
@@ -905,8 +910,8 @@ class Schroedinger:
                 # save psi_val after steps_per_npz steps of dt (to save disk space)
                 self.save_psi_val(input_path, filename_steps, steps_format, frame)
 
-            print(f"t={self.t:07.05f}, mu_rel={mu_rel}, "
-                  f"processed={(frame - frame_start) / self.max_timesteps:05.03f}%")
+                print(f"t={self.t:07.05f}, mu_rel={mu_rel}, "
+                      f"processed={(frame - frame_start) / self.max_timesteps:05.03f}%")
 
             mu_rel = np.abs((self.mu_arr - mu_old) / self.mu_arr)
 
