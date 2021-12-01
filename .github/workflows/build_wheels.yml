@@ -16,8 +16,9 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.3.0
         # to supply options, put them in 'env', like:
-         env:
-           CIBW_BEFORE_BUILD: pip install numba numpy
+        env:
+          CIBW_BEFORE_BUILD: pip install numba numpy
+          CIBW_SOME_OPTION: value
 
       - uses: actions/upload-artifact@v2
         with:
