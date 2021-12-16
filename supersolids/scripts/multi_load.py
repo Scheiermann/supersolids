@@ -21,21 +21,44 @@ def string_float(s):
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     # path_anchor_input = Path("/run/media/dsche/ITP Transfer/test/")
-    path_anchor_input = Path("/run/media/dsche/scr2/begin_mixture/")
+    # path_anchor_input = Path("/run/media/dsche/scr2/begin_mixture/")
+    # path_anchor_input = Path("/home/dsche/supersolids/results/begin_mixture/")
+    # path_anchor_input = Path("/run/media/dsche/scr2/begin_mixture_13/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/grid/from_step_1150000/steps120k/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/grid/from_step_1270000/steps40k/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/cos/from_step_637000/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/sin/from_step_999000/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture_15/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/no_kick/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/sin_hold/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/sin_shift/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/sin_shift01/")
     # path_anchor_input = Path("/home/dsche/supersolids/results/")
+    # path_anchor_input = Path("/home/dsche/supersolids/results/begin_schroedinger/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_schroedinger/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture_13/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6125/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture_15/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6375/")
+    path_anchor_input = Path("/run/media/dsche/scr2/begin_mixture_15_6375/")
+    # path_anchor_input = Path("/run/media/dsche/scr2/begin_mixture_a12/")
 
+    # mixture = False
     mixture = True
     no_legend = True
+    # no_legend = False
 
-    # take_last = 30
-    take_last = np.inf
+    take_last = 3
+    # take_last = np.inf
 
-    steps_per_npz = 10000
+    steps_per_npz = 1000
+    # steps_per_npz = 1
 
     movie_string = "movie"
     counting_format = "%03d"
     movie_start = 1
-    movie_end = 100
+    movie_end = 114
 
     slice_indices = {"x": 127, "y": 63, "z": 15}
 

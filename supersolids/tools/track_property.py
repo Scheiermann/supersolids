@@ -191,6 +191,7 @@ def plot_property(args, func=functions.identity):
 
     t_list = property_to_array(t_tuple, list_of_arrays=False)
     t = np.ravel(np.array(t_list))
+    # t = np.arange(0, len(t)) * 0.0002
 
     property_tuple = track_property(input_path=input_path,
                                     filename_schroedinger=args.filename_schroedinger,

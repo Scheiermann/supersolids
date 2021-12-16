@@ -247,7 +247,7 @@ class Schroedinger:
         # here a number (U) is multiplied elementwise with an (1D, 2D or 3D) array (k_squared)
         self.H_kin: np.ndarray = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 
-    def get_density(self, func_val: Optional[np.ndarray] = None, p: float = 2.0) -> np.ndarray:
+    def get_density(self, func_val: Optional[np.ndarray] = None, p: float = 2.0, jit: bool = True) -> np.ndarray:
         """
         Calculates :math:`|\psi|^p` for 1D, 2D or 3D (depending on self.dim).
 
@@ -260,12 +260,12 @@ class Schroedinger:
         """
         if self.dim <= 3:
             if func_val is None:
-                if p == 2.0:
-                    psi_density: np.ndarray = numbas.get_density_jit(self.psi_val)
+                if (p == 2.0) and jit:
+                        psi_density: np.ndarray = numbas.get_density_jit(self.psi_val)
                 else:
                     psi_density: np.ndarray = np.abs(self.psi_val) ** p
             else:
-                if p == 2.0:
+                if (p == 2.0) and jit:
                     psi_density: np.ndarray = numbas.get_density_jit(func_val)
                 else:
                     psi_density = np.abs(func_val) ** p

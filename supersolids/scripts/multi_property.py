@@ -10,7 +10,11 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_alpha/")
+    # path_anchor_input = Path("/home/dsche/supersolids/results/begin_mixture_13/")
+    # path_anchor_input = Path("/run/media/dsche/scr2/begin_mixture_13/")
+    path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6125/")
+    # path_anchor_input = Path("/home/dsche/supersolids/results/")
 
     mixture = False
     filename_schroedinger: str = "schroedinger.pkl"
@@ -37,7 +41,7 @@ if __name__ == "__main__":
 
     steps_format = "%07d"
 
-    dir_suffix = ""
+    dir_suffix = "_rel"
     # dir_suffix = "_right"
 
     # file_suffix = "_fft"
@@ -48,16 +52,21 @@ if __name__ == "__main__":
     # func = "lambda x, y: (x[1:], np.abs(np.diff(y)) / y[1:])"
 
     subplots = True
-    property_func = True
+    property_func = False
+    property_name = "E"
+    # property_name = "mu_arr"
+
+    # subplots = True
+    # property_func = True
     # property_name = "get_center_of_mass"
     # property_name = "get_parity"
     # property_name = "get_peak_distances_along"
     # property_name = "get_peak_positions"
     # property_args = [0]
-    # property_args = []
+    property_args = []
 
-    property_name = "get_contrast"
-    property_args = [0.01]
+    # property_name = "get_contrast"
+    # property_args = [0.3]
 
     # property_name = "get_phase_var"
     # property_args = [0, 256, 0, 128, 0, 32]

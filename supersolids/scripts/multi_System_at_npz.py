@@ -15,6 +15,7 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
+    # path_anchor_input = Path("/run/media/dsche/scr2/")
     path_anchor_input = Path("/run/media/dsche/scr2/")
 
     filename_schroedinger: str = "schroedinger.pkl"
@@ -26,11 +27,14 @@ if __name__ == "__main__":
     path_dir_name_list = Path("/run/media/dsche/scr2/graphs/dir_name_list.pkl")
     if not path_dir_name_list:
         movie_start = 1
-        movie_end = 70
+        movie_end = 18
+        # movie_end = 70
 
-    var1_arange = (0.05, 0.51, 0.05)
+    var1_arange = (0.005, 0.05, 0.005)
+    var2_arange = (0.6, 0.66, 0.05)
+    # var1_arange = (0.05, 0.51, 0.05)
     # var2_arange = (0.60, 0.90, 0.05)
-    var2_arange = (0.60, 0.90, 0.0125)
+    # var2_arange = (0.60, 0.90, 0.0125)
     var1_arange = np.arange(*var1_arange)
     var2_arange = np.arange(*var2_arange)
 

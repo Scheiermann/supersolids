@@ -16,13 +16,13 @@ if __name__ == "__main__":
     path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture/")
     path_anchor_output = Path("/run/media/dsche/scr2/begin_mixture/")
 
-    # take_last = 30
-    take_last = None
+    take_last = 3
+    # take_last = None
 
     movie_string = "movie"
     counting_format = "%03d"
     movie_start = 1
-    movie_end = 100
+    movie_end = 9
 
     filename_steps_list = ["script_", "schroedinger_",
                            "mixture_step_", "SchroedingerMixtureSummary_"]
