@@ -57,6 +57,21 @@ def func_V_symb():
 """
 
 
+def smaller_slice(val0, val1):
+    # decrease interval from left and right by one
+
+    # make sure updated val1 will be bigger than updated val0
+    if val0 < val1 - 1:
+        changed = True
+        val0 = val0 + 1
+        val1 = val1 - 1
+        if val0 == val1:
+            val1 = val1 + 1
+    else:
+        changed = False
+
+    return changed, val0, val1
+
 def get_A_density_total(density_list: List[np.ndarray]) -> Tuple[np.ndarray, np.ndarray]:
     density_total: np.ndarray = np.copy(density_list[0])
     for density in density_list[1:]:
@@ -558,6 +573,7 @@ class SchroedingerMixture(Schroedinger):
     def distmat(self, a: np.ndarray, index: List[float]):
         mask = np.ones(a.shape, dtype=bool)
         mask[index[0], index[1], index[2]] = False
+
         return distance_transform_edt(mask)
 
     def get_contrast_old(self,
@@ -579,6 +595,81 @@ class SchroedingerMixture(Schroedinger):
             bec_contrast_list.append(bec_contrast_edgeless)
 
         return bec_contrast_list
+
+    def get_contrast_old_smart(self,
+                               axis: int = 2,
+                               Mx0: Optional[int] = None, Mx1: Optional[int] = None,
+                               My0: Optional[int] = None, My1: Optional[int] = None,
+                               Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> List[float]:
+        x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
+
+        prob_list = self.get_density_list()
+
+        bec_contrast_list = []
+        for N, prob in zip(self.N_list, prob_list):
+            mask = np.full(np.shape(prob), False)
+            mask[x0:x1, y0:y1, z0:z1] = True
+
+            min_on_edge_bool = True
+            slice_x0, slice_x1, slice_y0, slice_y1, slice_z0, slice_z1 = x0, x1, y0, y1, z0, z1
+            while min_on_edge_bool:
+                mask_slice = np.full(np.shape(prob), False)
+                mask_slice[slice_x0:slice_x1, slice_y0:slice_y1, slice_z0:slice_z1] = True
+                bec_min_edgeless_pos = ndimage.minimum_position(prob, labels=mask_slice)
+
+                (min_on_edge_bool,
+                slice_x0, slice_x1,
+                slice_y0, slice_y1,
+                slice_z0, slice_z1) = self.on_edge(bec_min_edgeless_pos,
+                                                   slice_x0, slice_x1,
+                                                   slice_y0, slice_y1,
+                                                   slice_z0, slice_z1)
+
+            # if minimum is on edge of region, it is not a local minima,
+            # but depends choice of the region. Thus contrast is meaningless (set to 0).
+            if min_on_edge_bool:
+                bec_contrast_edgeless = 0.0
+            else:
+                bec_min_edgeless = ndimage.minimum(prob, labels=mask)
+                bec_max_edgeless = ndimage.maximum(prob, labels=mask)
+                bec_contrast_edgeless = (bec_max_edgeless - bec_min_edgeless) / (
+                        bec_max_edgeless + bec_min_edgeless)
+
+            bec_contrast_list.append(bec_contrast_edgeless)
+
+        return bec_contrast_list
+
+    def on_edge(self, indices,
+                 Mx0: Optional[int] = None, Mx1: Optional[int] = None,
+                 My0: Optional[int] = None, My1: Optional[int] = None,
+                 Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> List[float]:
+        # test if indices are on th edge
+
+        x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
+        x_bounds = [x0, x1]
+        y_bounds = [y0, y1]
+        z_bounds = [z0, z1]
+
+        # return True whenever it was changed (it was on edge), gives back smaller slice
+        if indices[0] in x_bounds:
+            changed, x0_new, x1_new = smaller_slice(x0, x1)
+            if changed:
+                return True, x0_new, x1_new, y0, y1, z0, z1
+
+        if indices[1] in y_bounds:
+            changed, y0_new, y1_new = smaller_slice(y0, y1)
+            if changed:
+                return True, x0, x1, y0_new, y1_new, z0, z1
+
+        # x, y not changed
+        if indices[2] in z_bounds:
+            changed, z0_new, z1_new = smaller_slice(z0, z1)
+            if changed:
+                return True, x0, x1, y0, y1, z0_new, z1_new
+            else:
+                # x, y, z not changed, meaning: no change in slice
+                return False, x0, x1, y0, y1, z0, z1
+
 
     def get_contrast(self, number_of_peaks: int, prob_min_start, prob_step: float = 0.01,
                      prob_min_edge: float = 0.015, region_threshold: int = 100,
