@@ -8,6 +8,8 @@ from pathlib import Path
 import dill
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.colors import BoundaryNorm, ListedColormap
+from matplotlib.ticker import MaxNLocator
 
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
@@ -131,12 +133,15 @@ def plot_System_at_npz(property_name, dir_path, var1_mesh, var2_mesh, property_v
 
 
 def plot_contour(property_name, dir_path, X, Y, property_values, title,
-                 mesh=False, levels=None, var1_cut=None, var2_cut=None):
+                 mesh=False, levels=None, var1_cut=None, var2_cut=None, annotation=True):
     property_arr = np.array(property_values)
     Z_half_list = []
     for i in range(0, len(property_values[0])):
         if mesh:
-            path_output = Path(dir_path, f"{property_name}" + "_mesh_" + f"{i}")
+            if annotation:
+                path_output = Path(dir_path, f"{property_name}" + "_mesh_annotation_" + f"{i}")
+            else:
+                path_output = Path(dir_path, f"{property_name}" + "_mesh_" + f"{i}")
         else:
             path_output = Path(dir_path, f"{property_name}" + "_contour_" + f"{i}")
         Z = np.reshape(property_arr[:, i], var1_mesh.shape)
@@ -149,37 +154,62 @@ def plot_contour(property_name, dir_path, X, Y, property_values, title,
             Y = Y[:, :var2_cut]
             Z = Z[:, :var2_cut]
         Z_half_list.append(Z / 2.0)
-        plot_contour_helper(path_output, X, Y, Z, title, mesh=mesh, levels=levels)
-
-    if mesh:
-        path_output_sum = Path(dir_path, f"{property_name}" + "_mesh_sum")
-    else:
-        path_output_sum = Path(dir_path, f"{property_name}" + "_contour_sum")
-    plot_contour_helper(path_output_sum, X, Y, sum(Z_half_list), title, mesh=mesh, levels=levels)
+        plot_contour_helper(path_output, X, Y, Z, title, mesh=mesh, levels=levels, annotation=annotation)
 
 
-def plot_contour_helper(path_output, X, Y, Z, title, mesh=False, levels=None):
+def plot_contour_helper(path_output, X, Y, Z, title, mesh=False, levels=None, annotation=True):
     fig, ax = plt.subplots(figsize=(8,6))
+    cmap = get_cmap()
     if mesh:
-        im = ax.pcolormesh(X, Y, Z, shading="auto")
-        # text of value for every mesh-point
-        for j in range(0, Z.shape[0]):
-            for k in range(0, Z.shape[1]):
-                text = ax.text(X[j, k], Y[j, k], np.round(Z[j, k], 4),
-                               ha="center", va="center", color="black", size=5, rotation="vertical")
+        levels = MaxNLocator(nbins=100).tick_values(0.0, 1.0)
+        norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
+
+        im = ax.pcolormesh(X, Y, Z, shading="auto", cmap=cmap, norm=norm)
+        if annotation:
+            # text of value for every mesh-point
+            for j in range(0, Z.shape[0]):
+                for k in range(0, Z.shape[1]):
+                    text = ax.text(X[j, k], Y[j, k], np.round(Z[j, k], 4),
+                                   ha="center", va="center", color="black", size=5,
+                                   rotation="vertical")
     else:
         if levels:
-            im = ax.contourf(X, Y, Z, levels=levels, cmap="viridis", extend="both")
+            norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
+            im = ax.contourf(X, Y, Z, levels=levels, extend="both", cmap=cmap, norm=norm)
         else:
-            im = ax.contourf(X, Y, Z, cmap="viridis")
+            levels = MaxNLocator(nbins=100).tick_values(0.0, 1.0)
+            norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
+            im = ax.contourf(X, Y, Z, cmap=cmap, norm=norm)
         ax.contour(im)
         ax.clabel(im, inline=True, fontsize=10, colors="black")
 
-    ax.set_xlabel(r"Scatter length $a_{12}$ (var2)")
-    ax.set_ylabel(r"Ratio $\frac{N_2}{N}$ (var1)")
+    ax.set_xlabel(r"Scatter length $a_{12}$")
+    ax.set_ylabel(r"Ratio $\frac{N_2}{N}$")
+    # ax.set_xlabel(r"Scatter length $a_{12}$ (var2)")
+    # ax.set_ylabel(r"Ratio $\frac{N_2}{N}$ (var1)")
     fig.colorbar(im)
     ax.set_title(title)
     fig.savefig(path_output)
+
+def get_cmap():
+    top = plt.get_cmap('autumn', 334)
+    middle = plt.get_cmap('Greys', 333)
+    bottom = plt.get_cmap('Blues_r', 333)
+
+    newcolors = np.vstack((bottom(np.linspace(0, 0.7, 500)),
+                           middle(np.linspace(0.3, 0.8, 400)),
+                           top(np.linspace(0.0, 0.9, 100))))
+    cmap = ListedColormap(newcolors, name='OrangeBlue')
+
+    return cmap
+
+def manipulate_values(values_list, low, new=0.0):
+    values_arr = np.array(values_list)
+    result_arr = np.where(values_arr > low, values_arr, new)
+    result_list = result_arr.tolist()
+
+    return result_list
+
 
 
 def flags(args_array):
@@ -250,9 +280,17 @@ if __name__ == "__main__":
     plot_System_at_npz(args.property_name, path_graphs, var1_mesh, var2_mesh, property_values)
 
     title = f"with property_args: {args.property_args_list[0]}"
-    plot_contour(args.property_name + f"_level", path_graphs, var2_mesh, var1_mesh, property_values,
-                 title,
-                 levels=[0.75, 0.8, 0.90, 0.935, 0.97, 0.98, 0.99, 0.999, 1.0])
-    plot_contour(args.property_name, path_graphs, var2_mesh, var1_mesh, property_values, title)
-    plot_contour(args.property_name, path_graphs, var2_mesh, var1_mesh, property_values, title,
-                 mesh=True, var2_cut=None)
+    # plot_contour(args.property_name + f"_level", path_graphs,
+    #              var2_mesh, var1_mesh, property_values,
+    #              title, levels=[0.75, 0.8, 0.90, 0.935, 0.97, 0.98, 0.99, 0.999, 1.0])
+    # plot_contour(args.property_name, path_graphs, var2_mesh, var1_mesh, property_values, title)
+    # plot_contour(args.property_name, path_graphs, var2_mesh, var1_mesh, property_values, title,
+    #              mesh=True, var2_cut=None)
+    plot_contour(args.property_name, path_graphs,
+                 var2_mesh, var1_mesh, property_values,
+                 title, mesh=True, var2_cut=None, annotation=False)
+
+    property_values_low = manipulate_values(property_values, 0.022, new=0.0)
+    plot_contour(args.property_name + f"_where", path_graphs,
+                 var2_mesh, var1_mesh, property_values_low,
+                 "", mesh=True, var2_cut=None, annotation=True)
