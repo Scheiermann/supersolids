@@ -133,10 +133,7 @@ def plot_System_at_npz(property_name, dir_path, var1_mesh, var2_mesh, property_v
 
 
 def plot_contour(property_name, dir_path, X, Y, property_values, title,
-                 mesh=False, levels=None, var1_cut=None, var2_cut=None, annotation=True,
-                 single_plots=False):
-    if not single_plots:
-        fig, axs = plt.subplots(1, len(property_values[0]), figsize=(12,6), sharey=True)
+                 mesh=False, levels=None, var1_cut=None, var2_cut=None, annotation=True):
     property_arr = np.array(property_values)
     Z_half_list = []
     for i in range(0, len(property_values[0])):
