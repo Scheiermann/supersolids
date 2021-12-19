@@ -19,49 +19,49 @@ if __name__ == "__main__":
     path_anchor_input_list: List[Path] = []
     var1_list = []
     var2_list = []
+    
+    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_19/"))
+    # var1_list.append(np.arange(0.005, 0.05, 0.005))
+    # var2_list.append(np.arange(0.6, 0.66, 0.05))
 
-    path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_19/"))
-    var1_list.append(np.arange(0.005, 0.05, 0.005))
-    var2_list.append(np.arange(0.6, 0.66, 0.05))
+    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_13/"))
+    path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_13/"))
+    var1_list.append(np.arange(0.6, 0.91, 0.05))
+    var2_list.append(np.arange(0.05, 0.51, 0.05))
 
-    # # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_13/"))
-    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_13/"))
-    # var1_list.append(np.arange(0.6, 0.91, 0.05))
-    # var2_list.append(np.arange(0.05, 0.51, 0.05))
-    # 
-    # # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6125/"))
-    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6125/"))
-    # var1_list.append(np.arange(0.6125, 0.91, 0.05))
-    # var2_list.append(np.arange(0.05, 0.51, 0.05))
-    # 
-    # # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15/"))
-    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15/"))
-    # var1_list.append(np.arange(0.625, 0.91, 0.05))
-    # var2_list.append(np.arange(0.05, 0.51, 0.05))
-    # 
-    # # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6375/"))
-    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6375/"))
-    # var1_list.append(np.arange(0.6375, 0.91, 0.05))
-    # var2_list.append(np.arange(0.05, 0.51, 0.05))
+    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6125/"))
+    path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6125/"))
+    var1_list.append(np.arange(0.6125, 0.91, 0.05))
+    var2_list.append(np.arange(0.05, 0.51, 0.05))
+
+    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15/"))
+    path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15/"))
+    var1_list.append(np.arange(0.625, 0.91, 0.05))
+    var2_list.append(np.arange(0.05, 0.51, 0.05))
+
+    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6375/"))
+    path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6375/"))
+    var1_list.append(np.arange(0.6375, 0.91, 0.05))
+    var2_list.append(np.arange(0.05, 0.51, 0.05))
 
     nrow_components = 2
     ncol_components = 1
 
     movie_take_last_list: int = [2, 1]
     suffix_list = ["_0", "_1"]
-    dir_suffix_list = ["last_frame_smallN" + suf for suf in suffix_list]
-    filename_out_list = ["last_frame_smallN" + suf for suf in suffix_list]
+    dir_suffix_list = ["last_frame_big" + suf for suf in suffix_list]
+    filename_out_list = ["last_frame_big" + suf for suf in suffix_list]
     file_suffix = ""
     # file_suffix = "-" + "-".join(map(str, property_args)) + ".png"
 
-    movie_start_list = [1]
-    movie_end_list = [18]
-    # movie_start_list = [1, 1, 1, 1]
-    # movie_end_list = [70, 60, 60, 60]
+    # movie_start_list = [1]
+    # movie_end_list = [18]
+    movie_start_list = [1, 1, 1, 1]
+    movie_end_list = [70, 60, 60, 60]
     number_of_movies_list = ((np.array(movie_end_list) + 1) - np.array(movie_start_list)).tolist()
     # if simulation for movie_number was continued in dir with name movie_number + number_of_movies
-    # check_further_list = [1, 1, 1, 1]
-    check_further_list = [2]
+    check_further_list = [1, 1, 1, 1]
+    # check_further_list = [2]
 
     dir_name = "movie"
     counting_format = "%03d"
