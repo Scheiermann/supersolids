@@ -312,7 +312,7 @@ if __name__ == "__main__":
     #              mesh=True, var2_cut=None)
     plot_contour(args.property_name, path_graphs,
                  var2_mesh, var1_mesh, property_values,
-                 "", mesh=True, var2_cut=None, annotation=False,
+                 title, mesh=True, var2_cut=None, annotation=False,
                  single_plots=False)
 
     property_values_low = manipulate_values(property_values, 0.022, new=0.0)
