@@ -133,7 +133,10 @@ def plot_System_at_npz(property_name, dir_path, var1_mesh, var2_mesh, property_v
 
 
 def plot_contour(property_name, dir_path, X, Y, property_values, title,
-                 mesh=False, levels=None, var1_cut=None, var2_cut=None, annotation=True):
+                 mesh=False, levels=None, var1_cut=None, var2_cut=None, annotation=True,
+                 single_plots=False):
+    if not single_plots:
+        fig, axs = plt.subplots(1, len(property_values[0]), figsize=(12,6), sharey=True)
     property_arr = np.array(property_values)
     Z_half_list = []
     for i in range(0, len(property_values[0])):
@@ -154,16 +157,34 @@ def plot_contour(property_name, dir_path, X, Y, property_values, title,
             Y = Y[:, :var2_cut]
             Z = Z[:, :var2_cut]
         Z_half_list.append(Z / 2.0)
-        plot_contour_helper(path_output, X, Y, Z, title, mesh=mesh, levels=levels, annotation=annotation)
+        if single_plots:
+            ax = plt.gca()
+            plot_contour_helper(ax, path_output, X, Y, Z, title, mesh=mesh, levels=levels,
+                                annotation=annotation, single_plots=single_plots)
+        else:
+            im = plot_contour_helper(axs[i], path_output, X, Y, Z, title, mesh=mesh, levels=levels,
+                                     annotation=annotation, single_plots=single_plots)
+    if not single_plots:
+        axs[0].set_ylabel(r"Ratio $\frac{N_2}{N}$")
+        plt.suptitle(title)
+
+        fig.tight_layout()
+        fig.subplots_adjust(right=0.90)
+        cbar_ax = fig.add_axes([0.92, 0.10, 0.025, 0.85])
+        fig.colorbar(im, cax=cbar_ax)
+        fig.savefig(path_output)
 
 
-def plot_contour_helper(path_output, X, Y, Z, title, mesh=False, levels=None, annotation=True):
-    fig, ax = plt.subplots(figsize=(8,6))
+def plot_contour_helper(ax, path_output, X, Y, Z, title, mesh=False, levels=None, annotation=True,
+                        single_plots=False):
+    if single_plots:
+        fig, ax = plt.subplots(figsize=(8,6))
     cmap = get_cmap()
     if mesh:
         levels = MaxNLocator(nbins=100).tick_values(0.0, 1.0)
         norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
 
+        ax.grid(False)
         im = ax.pcolormesh(X, Y, Z, shading="auto", cmap=cmap, norm=norm)
         if annotation:
             # text of value for every mesh-point
@@ -183,13 +204,16 @@ def plot_contour_helper(path_output, X, Y, Z, title, mesh=False, levels=None, an
         ax.contour(im)
         ax.clabel(im, inline=True, fontsize=10, colors="black")
 
+    if single_plots:
+        ax.set_xlabel(r"Scatter length $a_{12}$ (var2)")
+        ax.set_ylabel(r"Ratio $\frac{N_2}{N}$ (var1)")
+        fig.colorbar(im)
+        fig.savefig(path_output)
+    
+    # x label for single_plots=True or False
     ax.set_xlabel(r"Scatter length $a_{12}$")
-    ax.set_ylabel(r"Ratio $\frac{N_2}{N}$")
-    # ax.set_xlabel(r"Scatter length $a_{12}$ (var2)")
-    # ax.set_ylabel(r"Ratio $\frac{N_2}{N}$ (var1)")
-    fig.colorbar(im)
-    ax.set_title(title)
-    fig.savefig(path_output)
+
+    return im
 
 def get_cmap():
     top = plt.get_cmap('autumn', 334)
@@ -288,7 +312,8 @@ if __name__ == "__main__":
     #              mesh=True, var2_cut=None)
     plot_contour(args.property_name, path_graphs,
                  var2_mesh, var1_mesh, property_values,
-                 title, mesh=True, var2_cut=None, annotation=False)
+                 "", mesh=True, var2_cut=None, annotation=False,
+                 single_plots=False)
 
     property_values_low = manipulate_values(property_values, 0.022, new=0.0)
     plot_contour(args.property_name + f"_where", path_graphs,
