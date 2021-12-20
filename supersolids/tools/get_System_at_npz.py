@@ -95,6 +95,42 @@ def get_property_all(args, dir_path: Path):
     return property_values
 
 
+def plot_System_at_npz_1d(title, dir_path, var, property_values, xlabel=None, ylabel=None):
+    var_ravel = np.ravel(var)
+
+    try:
+        dim = property_values[0].shape[0]
+        print(f"Extracted property_values[0].shape: {property_values[0].shape}")
+        print(f"Extracted property_values[0].shape[0]: {dim}")
+    except Exception:
+        dim = 1
+
+    fig, ax = plt.subplots(figsize=(16, 9))
+    if dim == 1:
+        ax.plot(property_values, "x-")
+    else:
+        labels = []
+        for i in range(0, dim):
+            labels.append(str(i + 1))
+            ax.plot(property_values[0].T[i], "x-", label=labels[i])
+        ax.legend()
+
+    if not xlabel:
+        ax.set_xlabel(r"Scatter length $a_{12}$")
+        ax.set_ylabel(f"{title}")
+    else:
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        
+    ax.set_xticks(np.arange(len(var_ravel)))
+    ax.set_xticklabels([round(elem, 3) for elem in var_ravel])
+    ax.tick_params(axis="x", rotation=90)
+    ax.grid()
+    # ax.set_title(f"with property_args: {property_args}")
+    if title:
+        fig.savefig(Path(dir_path, f"{title}"))
+
+
 def plot_System_at_npz(property_name, dir_path, var1_mesh, var2_mesh, property_values):
     var1_ravel = np.ravel(var1_mesh)
     var2_ravel = np.ravel(var2_mesh)
@@ -133,7 +169,11 @@ def plot_System_at_npz(property_name, dir_path, var1_mesh, var2_mesh, property_v
 
 
 def plot_contour(property_name, dir_path, X, Y, property_values, title,
-                 mesh=False, levels=None, var1_cut=None, var2_cut=None, annotation=True):
+                 mesh=False, levels=None, var1_cut=None, var2_cut=None, annotation=True,
+                 single_plots=False):
+    if not single_plots:
+        fig, axs = plt.subplots(1, len(property_values[0]), figsize=(12,6), sharey=True)
+
     property_arr = np.array(property_values)
     Z_half_list = []
     for i in range(0, len(property_values[0])):
@@ -312,7 +352,23 @@ if __name__ == "__main__":
                  title, mesh=True, var2_cut=None, annotation=False,
                  single_plots=False)
 
-    property_values_low = manipulate_values(property_values, 0.022, new=0.0)
+    property_values_low = manipulate_values(property_values, 0.49, new=0.0)
     plot_contour(args.property_name + f"_where", path_graphs,
                  var2_mesh, var1_mesh, property_values_low,
                  "", mesh=True, var2_cut=None, annotation=True)
+    plot_contour(args.property_name + f"_where", path_graphs,
+                 var2_mesh, var1_mesh, property_values_low,
+                 "", mesh=True, var2_cut=None, annotation=False,
+                 single_plots=False)
+
+
+    var2_len = len(args.var2_arange)
+    plot_System_at_npz_1d(args.property_name + f"_first1", path_graphs, args.var1_arange,
+                          property_values_low[::var2_len], xlabel=r"Ratio $\frac{N_2}{N}$", ylabel=r"Contrast")
+    plot_System_at_npz_1d(args.property_name + f"_last1", path_graphs,  args.var1_arange,
+                          property_values_low[::var2_len], xlabel=r"Ratio $\frac{N_2}{N}$", ylabel=r"Contrast")
+    
+    plot_System_at_npz_1d(args.property_name + f"_first2", path_graphs, args.var2_arange,
+                          property_values_low[:var2_len], xlabel=r"Scatter length $a_{12}$", ylabel=r"Contrast")
+    plot_System_at_npz_1d(args.property_name + f"_last2", path_graphs, args.var2_arange,
+                          property_values_low[-var2_len:], xlabel=r"Scatter length $a_{12}$", ylabel=r"Contrast")
