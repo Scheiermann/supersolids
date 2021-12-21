@@ -16,6 +16,7 @@ def string_float(s):
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     # path_anchor_input = Path("/run/media/dsche/scr2/")
+    # path_anchor_input = Path("/run/media/dsche/scr2/graphs/contrast_test")
     path_anchor_input = Path("/run/media/dsche/scr2/")
 
     filename_schroedinger: str = "schroedinger.pkl"

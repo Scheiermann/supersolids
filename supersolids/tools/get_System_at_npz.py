@@ -213,7 +213,7 @@ def plot_contour(property_name, dir_path, X, Y, property_values, title,
 
 
 def plot_contour_helper(ax, path_output, X, Y, Z, title, mesh=False, levels=None, annotation=True,
-                        single_plots=False):
+                        single_plots=False, use_cmap_norm=True):
     if single_plots:
         fig, ax = plt.subplots(figsize=(8,6))
     cmap = get_cmap()
@@ -222,7 +222,10 @@ def plot_contour_helper(ax, path_output, X, Y, Z, title, mesh=False, levels=None
         norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
 
         ax.grid(False)
-        im = ax.pcolormesh(X, Y, Z, shading="auto", cmap=cmap, norm=norm)
+        if use_cmap_norm:
+            im = ax.pcolormesh(X, Y, Z, shading="auto", cmap=cmap, norm=norm)
+        else:
+            im = ax.pcolormesh(X, Y, Z, shading="auto")
         if annotation:
             # text of value for every mesh-point
             for j in range(0, Z.shape[0]):
@@ -242,13 +245,36 @@ def plot_contour_helper(ax, path_output, X, Y, Z, title, mesh=False, levels=None
         ax.clabel(im, inline=True, fontsize=10, colors="black")
 
     if single_plots:
-        ax.set_xlabel(r"Scatter length $a_{12}$ (var2)")
-        ax.set_ylabel(r"Ratio $\frac{N_2}{N}$ (var1)")
-        fig.colorbar(im)
+        ax.set_ylabel(r"$\frac{N_2}{N}$", fontsize=20)
+        # ax.set_xlabel(r"Scatter length $a_{12}$ (var2)")
+        # ax.set_ylabel(r"Ratio $\frac{N_2}{N}$ (var1)")
+        if use_cmap_norm:
+            ax.set_xlabel(r"$a_{12}$", fontsize=20)
+            # ax.set_xlabel(r"Scattering length $a_{12}$")
+            fig.colorbar(im)
+            fig.tight_layout()
+        else:
+            ax.set_xlabel(r"$\frac{a_{12}}{a_{11}}$", fontsize=20)
+            cbar = fig.colorbar(im, values=[0, 1, 2, 3, 4, 5, 6])
+            cbar.ax.get_yaxis().set_ticks([])
+            # legend
+            # BEC - BEC: 0
+            # SS - BEC: 1
+            # BEC - SS: 2
+            # SS - SS: 3
+            # ID - SS: 4
+            # SS - ID: 5
+            # ID - ID: 6
+
+            for j, lab in enumerate(['BEC-BEC', 'SS-BEC', 'BEC-SS', 'SS-SS', 'ID-SS', 'SS-ID', 'ID-ID']):
+                cbar.ax.text(1.2, j, lab, va='center', fontsize=12)
+            fig.tight_layout()
+
         fig.savefig(path_output)
     
     # x label for single_plots=True or False
-    ax.set_xlabel(r"Scatter length $a_{12}$")
+    ax.set_xlabel(r"$a_{12}$", fontsize=18)
+    # ax.set_xlabel(r"Scattering length $a_{12}$")
 
     return im
 
@@ -271,6 +297,38 @@ def manipulate_values(values_list, low, new=0.0):
 
     return result_list
 
+def plot_phasediagram(title, dir_path, X, Y, property_values, id_low=0.3, ss_high=0.95,
+                      annotation=False):
+    # legend
+    # BEC - BEC: 0
+    # SS - BEC: 1
+    # BEC - SS: 2
+    # SS - SS: 3
+    # ID - SS: 4
+    # SS - ID: 5
+    # ID - ID: 6
+    
+    property_arr = np.array(property_values)
+    contrast_1 = np.reshape(property_arr[:, 0], var1_mesh.shape)
+    contrast_2 = np.reshape(property_arr[:, 1], var1_mesh.shape)
+    
+    temp_1 = np.where(contrast_1 > ss_high, 1., 0) + np.where(contrast_1 > id_low, 1, 0.)
+    # BEC --> 0, SS --> 1, ID --> 2
+
+    temp_2 = (np.where(contrast_2 > ss_high, 1., 0) + np.where(contrast_2 > id_low, 1, 0.)) * 2
+    # BEC --> 0, SS --> 2, ID --> 4
+
+    Z = temp_1 + temp_2
+    Z = Z.astype(int)
+    
+    fig, axs = plt.subplots(1, 1, figsize=(12, 6), sharey=True)
+    ax = plt.gca()
+    
+    path_output = Path(dir_path, f"{title}")
+    plot_contour_helper(ax, path_output, X, Y, Z, title, mesh=True, single_plots=True,
+                        annotation=annotation, use_cmap_norm=False)
+    
+    return Z
 
 
 def flags(args_array):
@@ -360,6 +418,10 @@ if __name__ == "__main__":
                  var2_mesh, var1_mesh, property_values_low,
                  "", mesh=True, var2_cut=None, annotation=False,
                  single_plots=False)
+    plot_contour(args.property_name + f"_where_single", path_graphs,
+                 var2_mesh, var1_mesh, property_values_low,
+                 "", mesh=True, var2_cut=None, annotation=False,
+                 single_plots=True)
 
 
     var2_len = len(args.var2_arange)
@@ -372,3 +434,7 @@ if __name__ == "__main__":
                           property_values_low[:var2_len], xlabel=r"Scatter length $a_{12}$", ylabel=r"Contrast")
     plot_System_at_npz_1d(args.property_name + f"_last2", path_graphs, args.var2_arange,
                           property_values_low[-var2_len:], xlabel=r"Scatter length $a_{12}$", ylabel=r"Contrast")
+
+    property_values_low02 = manipulate_values(property_values, 0.49, new=0.0)
+    plot_phasediagram(args.property_name + f"_phasediagram", path_graphs,
+                      var2_mesh, var1_mesh, property_values_low02, id_low=0.3, ss_high=0.95)
