@@ -71,7 +71,7 @@ def eta_dVdnb_jit(A: np.ndarray, lam: float,
 
 
 @njit('f8[:,:,:](c16[:,:,:], f8)')
-def get_density_jit(func_val: np.ndarray, p: float = 2.0) -> np.ndarray:
+def get_density_jit(func_val: np.ndarray, p: float) -> np.ndarray:
     """
     Calculates :math:`|\psi|^2` for 1D, 2D or 3D (depending on self.dim).
 

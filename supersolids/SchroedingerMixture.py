@@ -530,7 +530,7 @@ class SchroedingerMixture(Schroedinger):
         density_list: List[np.ndarray] = []
         for psi_val, N in zip(self.psi_val_list, self.N_list):
             if jit:
-                density_list.append(N * numbas.get_density_jit(psi_val))
+                density_list.append(N * numbas.get_density_jit(psi_val, p=2.0))
             else:
                 density_list.append(N * self.get_density(psi_val, jit=jit))
 
