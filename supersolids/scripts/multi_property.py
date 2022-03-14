@@ -12,11 +12,12 @@ def string_float(s):
 if __name__ == "__main__":
     # path_anchor_input = Path("/home/dsche/supersolids/results/begin_mixture_13/")
     # path_anchor_input = Path("/run/media/dsche/scr2/begin_mixture_13/")
-    path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/")
+    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/")
+    path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture_a12_grid/")
     # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6125/")
     # path_anchor_input = Path("/home/dsche/supersolids/results/")
 
-    mixture = False
+    mixture = True
     filename_schroedinger: str = "schroedinger.pkl"
 
     if mixture:
@@ -29,10 +30,10 @@ if __name__ == "__main__":
     # frame_start = 1150000
     frame_start = None
     if frame_start is None:
-        take_last = 5
+        take_last = 1
 
-    movie_start = 475
-    movie_end = 494
+    movie_start = 1
+    movie_end = 50
 
     dt = 0.0002
 
@@ -53,7 +54,7 @@ if __name__ == "__main__":
 
     subplots = True
     property_func = False
-    property_name = "E"
+    # property_name = "E"
     # property_name = "mu_arr"
 
     # subplots = True
@@ -65,7 +66,7 @@ if __name__ == "__main__":
     # property_args = [0]
     property_args = []
 
-    # property_name = "get_contrast"
+    property_name = "get_contrast"
     # property_args = [0.3]
 
     # property_name = "get_phase_var"

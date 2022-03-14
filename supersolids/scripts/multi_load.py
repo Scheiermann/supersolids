@@ -53,7 +53,6 @@ if __name__ == "__main__":
     # take_last = np.inf
 
     steps_per_npz = 1000
-    # steps_per_npz = 1
 
     movie_string = "movie"
     counting_format = "%03d"

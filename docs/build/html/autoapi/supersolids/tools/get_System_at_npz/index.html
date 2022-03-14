@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.tools.get_System_at_npz &mdash; supersolids 0.1.26 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.tools.get_System_at_npz</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/supersolids/tools/get_System_at_npz/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="module-supersolids.tools.get_System_at_npz">
+<span id="supersolids-tools-get-system-at-npz"></span><h1><a class="reference internal" href="#module-supersolids.tools.get_System_at_npz" title="supersolids.tools.get_System_at_npz"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.tools.get_System_at_npz</span></code></a><a class="headerlink" href="#module-supersolids.tools.get_System_at_npz" title="Permalink to this headline"></a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.get_System_at_npz" title="supersolids.tools.get_System_at_npz.get_System_at_npz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_System_at_npz</span></code></a>(dir_path = Path('~/supersolids/results').expanduser(), dir_name = 'movie001', filename_schroedinger = f'schroedinger.pkl', filename_steps = f'step_', steps_format = '%07d', frame = 0)</p></td>
+<td><p>Gets Schroedinger at given npz</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.get_property_one" title="supersolids.tools.get_System_at_npz.get_property_one"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_property_one</span></code></a>(args, dir_path, i)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.get_property_all" title="supersolids.tools.get_System_at_npz.get_property_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_property_all</span></code></a>(args, dir_path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.plot_System_at_npz_1d" title="supersolids.tools.get_System_at_npz.plot_System_at_npz_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_System_at_npz_1d</span></code></a>(title, dir_path, var, property_values, xlabel=None, ylabel=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.plot_System_at_npz" title="supersolids.tools.get_System_at_npz.plot_System_at_npz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_System_at_npz</span></code></a>(property_name, dir_path, var1_mesh, var2_mesh, property_values)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.plot_contour" title="supersolids.tools.get_System_at_npz.plot_contour"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_contour</span></code></a>(property_name, dir_path, X, Y, property_values, title, mesh=False, levels=None, var1_cut=None, var2_cut=None, annotation=True, single_plots=False)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.plot_contour_helper" title="supersolids.tools.get_System_at_npz.plot_contour_helper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_contour_helper</span></code></a>(ax, path_output, X, Y, Z, title, mesh=False, levels=None, annotation=True, single_plots=False, use_cmap_norm=True)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.get_cmap" title="supersolids.tools.get_System_at_npz.get_cmap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cmap</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.manipulate_values" title="supersolids.tools.get_System_at_npz.manipulate_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">manipulate_values</span></code></a>(values_list, low, new=0.0)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.plot_phasediagram" title="supersolids.tools.get_System_at_npz.plot_phasediagram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_phasediagram</span></code></a>(title, dir_path, X, Y, property_values, id_low=0.3, ss_high=0.95, annotation=False)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.flags" title="supersolids.tools.get_System_at_npz.flags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flags</span></code></a>(args_array)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline"></a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.get_System_at_npz.args" title="supersolids.tools.get_System_at_npz.args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">args</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.get_System_at_npz">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">get_System_at_npz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span> <span class="pre">=</span> <span class="pre">Path('~/supersolids/results').expanduser()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span> <span class="pre">=</span> <span class="pre">'movie001'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_schroedinger</span> <span class="pre">=</span> <span class="pre">f'schroedinger.pkl'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_steps</span> <span class="pre">=</span> <span class="pre">f'step_'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_format</span> <span class="pre">=</span> <span class="pre">'%07d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#get_System_at_npz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.get_System_at_npz" title="Permalink to this definition"></a></dt>
+<dd><p>Gets Schroedinger at given npz</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Schroedinger System</p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – </p></li>
+<li><p><strong>dir_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>filename_schroedinger</strong> (<em>str</em>) – </p></li>
+<li><p><strong>filename_steps</strong> (<em>str</em>) – </p></li>
+<li><p><strong>steps_format</strong> (<em>str</em>) – </p></li>
+<li><p><strong>frame</strong> (<em>int</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../Schroedinger/index.html#supersolids.Schroedinger.Schroedinger" title="supersolids.Schroedinger.Schroedinger">supersolids.Schroedinger.Schroedinger</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.get_property_one">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">get_property_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#get_property_one"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.get_property_one" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – </p></li>
+<li><p><strong>i</strong> (<em>int</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.get_property_all">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">get_property_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#get_property_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.get_property_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.plot_System_at_npz_1d">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">plot_System_at_npz_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#plot_System_at_npz_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.plot_System_at_npz_1d" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.plot_System_at_npz">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">plot_System_at_npz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">property_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var1_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var2_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#plot_System_at_npz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.plot_System_at_npz" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.plot_contour">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">plot_contour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">property_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var1_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var2_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single_plots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#plot_contour"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.plot_contour" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.plot_contour_helper">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">plot_contour_helper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single_plots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cmap_norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#plot_contour_helper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.plot_contour_helper" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.get_cmap">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">get_cmap</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#get_cmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.get_cmap" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.manipulate_values">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">manipulate_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#manipulate_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.manipulate_values" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.plot_phasediagram">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">plot_phasediagram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_low</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ss_high</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#plot_phasediagram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.plot_phasediagram" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.flags">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/get_System_at_npz.html#flags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.get_System_at_npz.flags" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="supersolids.tools.get_System_at_npz.args">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.get_System_at_npz.</span></span><span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#supersolids.tools.get_System_at_npz.args" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

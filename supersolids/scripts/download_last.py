@@ -12,9 +12,21 @@ from fabric import Connection
 
 
 if __name__ == "__main__":
-    ssh_hostname = 'xanthe'
-    path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture/")
-    path_anchor_output = Path("/run/media/dsche/scr2/begin_mixture/")
+    ssh_hostname = 'capella'
+    # path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_grid/")
+    # path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_a12_grid/")
+    # path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_dense/")
+    # path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_a12_dense/")
+    # path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_fig3/")
+    # path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_fig3/")
+    # path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_a11_100/")
+    # path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_a12_a11_100/")
+    path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_fig3_a11_100/")
+    path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_fig3_a11_100/")
+    # path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_fig3_a11_95/")
+    # path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_fig3_a11_95/")
+    # path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_a11_100_mini/")
+    # path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_a12_a11_100_mini/")
 
     take_last = 3
     # take_last = None
@@ -22,7 +34,9 @@ if __name__ == "__main__":
     movie_string = "movie"
     counting_format = "%03d"
     movie_start = 1
-    movie_end = 9
+    # movie_end = 110
+    # movie_end = 24
+    movie_end = 3
 
     filename_steps_list = ["script_", "schroedinger_",
                            "mixture_step_", "SchroedingerMixtureSummary_"]
