@@ -53,7 +53,6 @@ if __name__ == "__main__":
     # take_last = np.inf
 
     steps_per_npz = 1000
-    # steps_per_npz = 1
 
     movie_string = "movie"
     counting_format = "%03d"
@@ -81,6 +80,7 @@ if __name__ == "__main__":
 
     alpha_V = 0.0
 
+    sum_along = 2
     arg_slices = False
     plot_V = False
     ui = False
@@ -114,6 +114,7 @@ if __name__ == "__main__":
                        f"-azimuth={azimuth}",
                        f"-elevation={elevation}",
                        f"-distance={distance}",
+                       f"-sum_along={sum_along}",
                        f"--alpha_V={alpha_V}",
                        ]
 

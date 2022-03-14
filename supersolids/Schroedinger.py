@@ -19,9 +19,12 @@ import dill
 import numpy as np
 import scipy.signal
 
-import supersolids.helper.numbas as numbas
+from supersolids.helper import constants, functions, get_path, get_version
+numba_used = get_version.check_numba_used()
+if numba_used:
+    import supersolids.helper.numbas as numbas
+
 from supersolids.SchroedingerSummary import SchroedingerSummary
-from supersolids.helper import constants, functions, get_path
 from supersolids.helper.Resolution import Resolution
 from supersolids.helper.Box import Box
 from supersolids.helper.get_path import get_step_index_from_list
@@ -261,7 +264,7 @@ class Schroedinger:
         if self.dim <= 3:
             if func_val is None:
                 if (p == 2.0) and jit:
-                        psi_density: np.ndarray = numbas.get_density_jit(self.psi_val)
+                    psi_density: np.ndarray = numbas.get_density_jit(self.psi_val)
                 else:
                     psi_density: np.ndarray = np.abs(self.psi_val) ** p
             else:
@@ -319,7 +322,7 @@ class Schroedinger:
         :return: \int |\psi|^p dV
 
         """
-        func_den = self.get_density(func_val, p=p)
+        func_den = self.get_density(func_val, p=p, jit=numba_used)
 
         if fourier_space:
             func_norm = ((np.sqrt(2.0 * np.pi) ** float(self.dim))
@@ -629,7 +632,11 @@ class Schroedinger:
         """
 
         x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
-        prob = get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1]
+        if numba_used:
+            prob = get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1]
+        else:
+            prob = self.get_density(p=2.0, jit=numba_used)[x0:x1, y0:y1, z0:z1]
+
         r = self.get_mesh_list(x0, x1, y0, y1, z0, z1)
         center_of_mass_along_axis = [prob * r_i for r_i in r]
         com = [self.trapez_integral(com_along_axis) / self.trapez_integral(prob) for com_along_axis
@@ -666,7 +673,11 @@ class Schroedinger:
         bool_grid = np.logical_or(bool_grid_list[:-1], bool_grid_list[-1])
 
         norm = self.get_norm()
-        prob = bool_grid * get_density_jit(self.psi_val, p=2.0) / norm
+        if numba_used:
+            prob = bool_grid * get_density_jit(self.psi_val, p=2.0) / norm
+        else:
+            prob = bool_grid * self.get_density(p=2.0, jit=numba_used) / norm
+
         psi_val_bool_grid = bool_grid * self.psi_val
         angle = np.angle(psi_val_bool_grid)
         angle_cos = np.cos(angle + np.pi)
@@ -689,7 +700,11 @@ class Schroedinger:
         x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
         norm = self.get_norm(func=self.psi_val[x0:x1, y0:y1, z0:z1])
 
-        prob_cropped = get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1] / norm
+        if numba_used:
+            prob_cropped = get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1] / norm
+        else:
+            prob_cropped = self.get_density(p=2.0, jit=numba_used)[x0:x1, y0:y1, z0:z1] / norm
+
         psi_val_cropped = self.psi_val[x0:x1, y0:y1, z0:z1]
         angle = np.angle(psi_val_cropped)
         angle_cos = np.cos(angle + np.pi)
@@ -701,13 +716,17 @@ class Schroedinger:
 
         return phase_var
 
-    def split_operator_pot(self, split_step: float = 0.5) -> None:
-        psi_2: np.ndarray = get_density_jit(self.psi_val, p=2.0)
-        psi_3: np.ndarray = get_density_jit(self.psi_val, p=3.0)
+    def split_operator_pot(self, split_step: float = 0.5, jit=True) -> None:
+        if jit:
+            psi_2: np.ndarray = get_density_jit(self.psi_val, p=2.0)
+            psi_3: np.ndarray = get_density_jit(self.psi_val, p=3.0)
+        else:
+            psi_2: np.ndarray = self.get_density(p=2.0, jit=jit)
+            psi_3: np.ndarray = self.get_density(p=3.0, jit=jit)
         U_dd: np.ndarray = np.fft.ifftn(self.V_k_val * np.fft.fftn(psi_2))
 
         # update H_pot before use
-        H_pot: np.ndarray = self.get_H_pot(psi_2, psi_3)
+        H_pot: np.ndarray = self.get_H_pot(psi_2, psi_3, U_dd)
 
         # multiply element-wise the (1D, 2D or 3D) arrays with each other
         self.psi_val = H_pot * self.psi_val
@@ -721,7 +740,7 @@ class Schroedinger:
         self.psi_val = self.H_kin * self.psi_val
         self.psi_val = np.fft.ifftn(self.psi_val)
 
-    def get_H_pot(self, psi_2: np.ndarray, psi_3: np.ndarray) -> np.ndarray:
+    def get_H_pot(self, psi_2: np.ndarray, psi_3: np.ndarray, U_dd: np.ndarray) -> np.ndarray:
         H_pot: np.ndarray = np.exp(self.U
                                    * (0.5 * self.dt)
                                    * (self.V_val
@@ -742,13 +761,13 @@ class Schroedinger:
 
         # Calculate the interaction by applying it to the psi_2 in k-space
         # (transform back and forth)
-        self.split_operator_pot(split_step=0.5)
+        self.split_operator_pot(split_step=0.5, jit=numba_used)
         self.split_operator_kin()
-        self.split_operator_pot(split_step=0.5)
+        self.split_operator_pot(split_step=0.5, jit=numba_used)
 
         self.t = self.t + self.dt
 
-        psi_norm_after_evolution: float = self.get_norm(func_val=psi_val)
+        psi_norm_after_evolution: float = self.get_norm()
 
         # for self.imag_time=False, renormalization should be preserved,
         # but we play safe here (regardless of speedup)
@@ -760,7 +779,11 @@ class Schroedinger:
 
     def get_E(self) -> float:
         if self.V_interaction:
-            psi_2: np.ndarray = get_density_jit(self.psi_val, p=2.0)
+            if numba_used:
+                psi_2: np.ndarray = get_density_jit(self.psi_val, p=2.0)
+            else:
+                psi_2: np.ndarray = self.get_density(p=2.0, jit=numba_used)
+
             E_U_dd = (1 / np.sqrt(2.0 * np.pi) ** 3.0) * self.sum_dV(
                 self.V_k_val * np.abs(np.fft.fftn(psi_2)) ** 2.0, fourier_space=True)
         else:

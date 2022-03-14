@@ -19,7 +19,9 @@ if __name__ == "__main__":
     path_anchor_input_list: List[Path] = []
     var1_list = []
     var2_list = []
-    
+
+    experiment_suffix = "fig3_a11_95"
+
     # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_19/"))
     # var1_list.append(np.arange(0.005, 0.05, 0.005))
     # var2_list.append(np.arange(0.6, 0.66, 0.05))
@@ -78,6 +80,8 @@ if __name__ == "__main__":
 
     path_graphs = Path(path_anchor_input_list[0].parent, "graphs")
 
+    use_edited = True
+
     # adjust to shrink images, so RAM gets not overloaded
     dpi_ratio = 0.25
     dpi_ratio_all = 1.0
@@ -122,12 +126,11 @@ if __name__ == "__main__":
 
     # construct path_mesh_new with path to the last png in each movie
     path_out_periodic_list: List[Path] = []
-    path_dirname_list = Path(path_graphs, "dir_name_list")
+    path_dirname_list = Path(path_graphs, f"dir_name_list_{experiment_suffix}")
     with open(path_dirname_list.with_suffix(".pkl"), "wb") as f:
         dill.dump(obj=dir_name_list, file=f)
     with open(path_dirname_list.with_suffix(".txt"), "w") as f:
         f.write(f"{dir_name_list}\n")
-
 
     for movie_take_last, path_anchor_output, suffix, filename_out in zip(movie_take_last_list,
                                                                          path_anchor_output_list,
@@ -147,13 +150,18 @@ if __name__ == "__main__":
                                   f"{path_currently_old.parent.stem}_{path_currently_old.stem}"
                                   + f"_{filename_out}{filename_extension}")
 
-            path_currently_new: Path = path_mesh_new[ix, iy]
-            if path_currently_new is not None:
-                shutil.copy(path_mesh_new[ix, iy], path_out)
+            if use_edited:
+                #  to use png from folders with png copied together (which you could have edited before)
+                path_mesh_new[ix, iy]: Path = path_out
+            else:
+                path_currently_new: Path = path_mesh_new[ix, iy]
+                if path_currently_new is not None:
+                    shutil.copy(path_mesh_new[ix, iy], path_out)
 
         print(f"movie_take_last: {movie_take_last}")
 
-        path_out_periodic: Path = Path(path_graphs, f"periodic_system_merge{suffix}.png")
+        path_out_periodic: Path = Path(path_graphs,
+                                       f"periodic_system_merge{suffix}_{experiment_suffix}.png")
         path_out_periodic_list.append(path_out_periodic)
         nrow, ncol = path_mesh_new.shape
         # flip needed as appending pictures start from left top corner,
@@ -161,7 +169,8 @@ if __name__ == "__main__":
         path_mesh_mirrored: List[Path] = np.flip(path_mesh_new, axis=0)
         paste_together(path_mesh_mirrored.ravel(), path_out_periodic, nrow, ncol, ratio=dpi_ratio)
 
-    path_out_periodic_all: Path = Path(path_graphs, f"periodic_system_merge_all.png")
+    path_out_periodic_all: Path = Path(path_graphs,
+                                       f"periodic_system_merge_all_{experiment_suffix}.png")
     # turn off decompression bomb checker
     Image.MAX_IMAGE_PIXELS = number_of_movies * Image.MAX_IMAGE_PIXELS
     paste_together(path_in_list=path_out_periodic_list, path_out=path_out_periodic_all,

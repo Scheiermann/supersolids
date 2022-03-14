@@ -4,7 +4,7 @@ from pathlib import Path
 
 import dill
 
-from supersolids.helper.get_supersolids_version import get_supersolids_version
+from supersolids.helper.get_version import get_version
 
 
 def save_script(script_count_old, input_path, script_name, obj_to_save,
@@ -12,7 +12,7 @@ def save_script(script_count_old, input_path, script_name, obj_to_save,
                 script_format="%04d"):
     if txt_version:
         with open(Path(input_path, script_name + ".txt"), "a") as script_file:
-            script_file.write(f"supersolids: {get_supersolids_version()}\n\n")
+            script_file.write(f"supersolids: {get_version()}\n\n")
             script_file.write(f"{vars(obj_to_save)}\n")
             script_file.write(f"--------------------------------------------------\n")
 

@@ -57,6 +57,7 @@ def load_npz(flag_args):
                                   azimuth=flag_args.azimuth,
                                   elevation=flag_args.elevation,
                                   distance=flag_args.distance,
+                                  sum_along=flag_args.sum_along,
                                   summary_name=flag_args.summary_name,
                                   mixture_slice_index=flag_args.mixture_slice_index,
                                   no_legend=flag_args.no_legend,
@@ -101,6 +102,8 @@ def flags(args_array):
     parser.add_argument("-azimuth", type=float, default=0.0, help="Phi angle in x-y-plane.")
     parser.add_argument("-elevation", type=float, default=0.0, help="Zenith angle theta in z-axis.")
     parser.add_argument("-distance", type=float, default=60.0, help="Setting for zoom.")
+    parser.add_argument("-sum_along", type=int, default=None,
+                        help="Index to sum along to display slices. None means no sum.")
     parser.add_argument("--alpha_psi_list", default=[], nargs="+",
                         help="Option to adjust the transparency of the list of plots.")
     parser.add_argument("--alpha_psi_sol_list", default=[], nargs="+",

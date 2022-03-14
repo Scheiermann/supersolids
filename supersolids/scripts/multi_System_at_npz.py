@@ -17,7 +17,7 @@ def string_float(s):
 if __name__ == "__main__":
     # path_anchor_input = Path("/run/media/dsche/scr2/")
     # path_anchor_input = Path("/run/media/dsche/scr2/graphs/contrast_test")
-    path_anchor_input = Path("/run/media/dsche/scr2/")
+    path_anchor_input = Path("/run/media/dsche/ITP Transfer/")
 
     filename_schroedinger: str = "schroedinger.pkl"
     filename_steps: str = "mixture_step_"
@@ -25,17 +25,28 @@ if __name__ == "__main__":
     frame = None
 
     # path_dir_name_list = None
-    path_dir_name_list = Path("/run/media/dsche/scr2/graphs/dir_name_list_big.pkl")
+    path_dir_name_list = Path("/run/media/dsche/ITP Transfer/graphs/dir_name_list_fig3_a11_100.pkl")
+    # path_dir_name_list = Path("/run/media/dsche/ITP Transfer/graphs/dir_name_list_fig3_a11_95.pkl")
+    # path_dir_name_list = Path("/run/media/dsche/ITP Transfer/graphs/dir_name_list_a12_a11_100_mini.pkl")
+    # path_dir_name_list = Path("/run/media/dsche/ITP Transfer/graphs/dir_name_list_a12_a11_100.pkl")
+    # path_dir_name_list = Path("/run/media/dsche/ITP Transfer/graphs/dir_name_list_a12_dense.pkl")
+    # path_dir_name_list = Path("/run/media/dsche/ITP Transfer/graphs/dir_name_list_a12_grid.pkl")
+    # path_dir_name_list = Path("/run/media/dsche/scr2/graphs/dir_name_list_big.pkl")
     if not path_dir_name_list:
         movie_start = 1
-        movie_end = 18
+        # movie_end = 24
+        # movie_end = 110
         # movie_end = 70
+        movie_end = 3
 
-    # var1_arange = (0.005, 0.05, 0.005)
-    # var2_arange = (0.6, 0.66, 0.05)
-    var1_arange = (0.05, 0.51, 0.05)
-    # var2_arange = (0.60, 0.90, 0.05)
-    var2_arange = (0.60, 0.90, 0.0125)
+    # var1_arange = (0.01, 0.041, 0.01)
+    # var2_arange = (0.6, 0.726, 0.025)
+
+    var1_arange = (0.76, 0.81, 0.02)
+    var2_arange = (0.50, 0.51, 0.05)
+
+    # var1_arange = (0.05, 0.51, 0.05)
+    # var2_arange = (0.50, 0.751, 0.025)
     var1_arange = np.arange(*var1_arange)
     var2_arange = np.arange(*var2_arange)
 
@@ -57,7 +68,8 @@ if __name__ == "__main__":
     # property_args = []
 
     property_name = "get_contrast_old"
-    box = [117, 137, 61, 65, 13, 17]
+    # box = [117, 137, 61, 65, 13, 17]
+    box = [53, 73, 29, 33, 29, 33]
     property_args = [2, *box]
 
     # property_name = "get_contrast"
