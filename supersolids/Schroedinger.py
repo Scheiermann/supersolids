@@ -250,7 +250,8 @@ class Schroedinger:
         # here a number (U) is multiplied elementwise with an (1D, 2D or 3D) array (k_squared)
         self.H_kin: np.ndarray = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 
-    def get_density(self, func_val: Optional[np.ndarray] = None, p: float = 2.0, jit: bool = True) -> np.ndarray:
+    def get_density(self, func_val: Optional[np.ndarray] = None, p: float = 2.0,
+                    jit: bool = True) -> np.ndarray:
         """
         Calculates :math:`|\psi|^p` for 1D, 2D or 3D (depending on self.dim).
 
@@ -633,7 +634,7 @@ class Schroedinger:
 
         x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
         if numba_used:
-            prob = get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1]
+            prob = numbas.get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1]
         else:
             prob = self.get_density(p=2.0, jit=numba_used)[x0:x1, y0:y1, z0:z1]
 
@@ -674,7 +675,7 @@ class Schroedinger:
 
         norm = self.get_norm()
         if numba_used:
-            prob = bool_grid * get_density_jit(self.psi_val, p=2.0) / norm
+            prob = bool_grid * numbas.get_density_jit(self.psi_val, p=2.0) / norm
         else:
             prob = bool_grid * self.get_density(p=2.0, jit=numba_used) / norm
 
@@ -701,7 +702,7 @@ class Schroedinger:
         norm = self.get_norm(func=self.psi_val[x0:x1, y0:y1, z0:z1])
 
         if numba_used:
-            prob_cropped = get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1] / norm
+            prob_cropped = numbas.get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1] / norm
         else:
             prob_cropped = self.get_density(p=2.0, jit=numba_used)[x0:x1, y0:y1, z0:z1] / norm
 
@@ -718,8 +719,8 @@ class Schroedinger:
 
     def split_operator_pot(self, split_step: float = 0.5, jit=True) -> None:
         if jit:
-            psi_2: np.ndarray = get_density_jit(self.psi_val, p=2.0)
-            psi_3: np.ndarray = get_density_jit(self.psi_val, p=3.0)
+            psi_2: np.ndarray = numbas.get_density_jit(self.psi_val, p=2.0)
+            psi_3: np.ndarray = numbas.get_density_jit(self.psi_val, p=3.0)
         else:
             psi_2: np.ndarray = self.get_density(p=2.0, jit=jit)
             psi_3: np.ndarray = self.get_density(p=3.0, jit=jit)
@@ -780,7 +781,7 @@ class Schroedinger:
     def get_E(self) -> float:
         if self.V_interaction:
             if numba_used:
-                psi_2: np.ndarray = get_density_jit(self.psi_val, p=2.0)
+                psi_2: np.ndarray = numbas.get_density_jit(self.psi_val, p=2.0)
             else:
                 psi_2: np.ndarray = self.get_density(p=2.0, jit=numba_used)
 

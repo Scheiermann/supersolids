@@ -70,8 +70,8 @@ def eta_dVdnb_jit(A: np.ndarray, lam: float,
             )
 
 
-@numba.vectorize('f8(c16)')
-def get_density_jit(func_val: np.ndarray) -> np.ndarray:
+@numba.vectorize('f8(c16, f8)')
+def get_density_jit(func_val: np.ndarray, p: float = 2.0) -> np.ndarray:
     """
     Calculates :math:`|\psi|^2` for 1D, 2D or 3D (depending on self.dim).
 
@@ -80,7 +80,7 @@ def get_density_jit(func_val: np.ndarray) -> np.ndarray:
     :return: :math:`|\psi|^2`
 
     """
-    return func_val.real ** 2.0 + func_val.imag ** 2.0
+    return func_val.real ** p + func_val.imag ** p
 
 
 @njit(cache=True)
