@@ -19,49 +19,72 @@ if __name__ == "__main__":
     path_anchor_input_list: List[Path] = []
     var1_list = []
     var2_list = []
-    
+
+    experiment_suffix = "fig3_a11_95"
+
     # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_19/"))
     # var1_list.append(np.arange(0.005, 0.05, 0.005))
     # var2_list.append(np.arange(0.6, 0.66, 0.05))
 
-    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_13/"))
-    path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_13/"))
-    var1_list.append(np.arange(0.6, 0.91, 0.05))
-    var2_list.append(np.arange(0.05, 0.51, 0.05))
+    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_a12_grid/"))
+    # var1_list.append(np.arange(0.6, 0.81, 0.05))
+    # var2_list.append(np.arange(0.05, 0.51, 0.05))
 
-    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6125/"))
-    path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6125/"))
-    var1_list.append(np.arange(0.6125, 0.91, 0.05))
-    var2_list.append(np.arange(0.05, 0.51, 0.05))
+    path_anchor_input_list.append(Path(f"/run/media/dsche/ITP Transfer/begin_mixture_{experiment_suffix}/"))
+    # var1_list.append(np.arange(0.60, 0.726, 0.025))
+    # var2_list.append(np.arange(0.01, 0.041, 0.01))
+    # var1_list.append(np.arange(0.50, 0.751, 0.025))
+    # var2_list.append(np.arange(0.05, 0.51, 0.05))
+
+    var1_list.append(np.arange(0.76, 0.81, 0.02))
+    var2_list.append(np.arange(0.50, 0.51, 0.05))
+
+    # var1_list.append(np.arange(0.75, 0.80, 0.001))
+    # var2_list.append(np.arange(0.50, 0.51, 0.05))
+
+    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_13/"))
+    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_13/"))
+    # var1_list.append(np.arange(0.6, 0.91, 0.05))
+    # var2_list.append(np.arange(0.05, 0.51, 0.05))
+
+    # # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6125/"))
+    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6125/"))
+    # var1_list.append(np.arange(0.6125, 0.91, 0.05))
+    # var2_list.append(np.arange(0.05, 0.51, 0.05))
 
     # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15/"))
-    path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15/"))
-    var1_list.append(np.arange(0.625, 0.91, 0.05))
-    var2_list.append(np.arange(0.05, 0.51, 0.05))
+    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15/"))
+    # var1_list.append(np.arange(0.625, 0.91, 0.05))
+    # var2_list.append(np.arange(0.05, 0.51, 0.05))
 
-    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6375/"))
-    path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6375/"))
-    var1_list.append(np.arange(0.6375, 0.91, 0.05))
-    var2_list.append(np.arange(0.05, 0.51, 0.05))
+    # # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6375/"))
+    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6375/"))
+    # var1_list.append(np.arange(0.6375, 0.91, 0.05))
+    # var2_list.append(np.arange(0.05, 0.51, 0.05))
 
     nrow_components = 2
     ncol_components = 1
 
     movie_take_last_list: int = [2, 1]
     suffix_list = ["_0", "_1"]
-    dir_suffix_list = ["last_frame_big" + suf for suf in suffix_list]
-    filename_out_list = ["last_frame_big" + suf for suf in suffix_list]
+    dir_suffix_list = [f"last_frame_{experiment_suffix}" + suf for suf in suffix_list]
+    filename_out_list = [f"last_frame_{experiment_suffix}" + suf for suf in suffix_list]
     file_suffix = ""
     # file_suffix = "-" + "-".join(map(str, property_args)) + ".png"
 
-    # movie_start_list = [1]
-    # movie_end_list = [18]
-    movie_start_list = [1, 1, 1, 1]
-    movie_end_list = [70, 60, 60, 60]
+    movie_start_list = [1]
+    movie_end_list = [3]
+    # movie_end_list = [110]
+    # movie_end_list = [24]
+    # movie_start_list = [1, 1]
+    # movie_end_list = [70, 60]
+    # movie_start_list = [1, 1, 1, 1]
+    # movie_end_list = [70, 60, 60, 60]
     number_of_movies_list = ((np.array(movie_end_list) + 1) - np.array(movie_start_list)).tolist()
     # if simulation for movie_number was continued in dir with name movie_number + number_of_movies
-    check_further_list = [1, 1, 1, 1]
-    # check_further_list = [2]
+    # check_further_list = [1, 1, 1, 1]
+    # check_further_list = [2, 2]
+    check_further_list = [2]
 
     dir_name = "movie"
     counting_format = "%03d"
@@ -74,6 +97,8 @@ if __name__ == "__main__":
     filename_extension = ".png"
 
     path_graphs = Path(path_anchor_input_list[0].parent, "graphs")
+
+    use_edited = True
 
     # adjust to shrink images, so RAM gets not overloaded
     dpi_ratio = 0.25
@@ -119,12 +144,11 @@ if __name__ == "__main__":
 
     # construct path_mesh_new with path to the last png in each movie
     path_out_periodic_list: List[Path] = []
-    path_dirname_list = Path(path_graphs, "dir_name_list")
+    path_dirname_list = Path(path_graphs, f"dir_name_list_{experiment_suffix}")
     with open(path_dirname_list.with_suffix(".pkl"), "wb") as f:
         dill.dump(obj=dir_name_list, file=f)
     with open(path_dirname_list.with_suffix(".txt"), "w") as f:
         f.write(f"{dir_name_list}\n")
-
 
     for movie_take_last, path_anchor_output, suffix, filename_out in zip(movie_take_last_list,
                                                                          path_anchor_output_list,
@@ -144,13 +168,18 @@ if __name__ == "__main__":
                                   f"{path_currently_old.parent.stem}_{path_currently_old.stem}"
                                   + f"_{filename_out}{filename_extension}")
 
-            path_currently_new: Path = path_mesh_new[ix, iy]
-            if path_currently_new is not None:
-                shutil.copy(path_mesh_new[ix, iy], path_out)
+            if use_edited:
+                #  to use png from folders with png copied together (which you could have edited before)
+                path_mesh_new[ix, iy]: Path = path_out
+            else:
+                path_currently_new: Path = path_mesh_new[ix, iy]
+                if path_currently_new is not None:
+                    shutil.copy(path_mesh_new[ix, iy], path_out)
 
         print(f"movie_take_last: {movie_take_last}")
 
-        path_out_periodic: Path = Path(path_graphs, f"periodic_system_merge{suffix}.png")
+        path_out_periodic: Path = Path(path_graphs,
+                                       f"periodic_system_merge{suffix}_{experiment_suffix}.png")
         path_out_periodic_list.append(path_out_periodic)
         nrow, ncol = path_mesh_new.shape
         # flip needed as appending pictures start from left top corner,
@@ -158,7 +187,8 @@ if __name__ == "__main__":
         path_mesh_mirrored: List[Path] = np.flip(path_mesh_new, axis=0)
         paste_together(path_mesh_mirrored.ravel(), path_out_periodic, nrow, ncol, ratio=dpi_ratio)
 
-    path_out_periodic_all: Path = Path(path_graphs, f"periodic_system_merge_all.png")
+    path_out_periodic_all: Path = Path(path_graphs,
+                                       f"periodic_system_merge_all_{experiment_suffix}.png")
     # turn off decompression bomb checker
     Image.MAX_IMAGE_PIXELS = number_of_movies * Image.MAX_IMAGE_PIXELS
     paste_together(path_in_list=path_out_periodic_list, path_out=path_out_periodic_all,
