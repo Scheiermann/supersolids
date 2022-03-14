@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.Animation.MayaviAnimation &mdash; supersolids 0.1.26 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.Animation.MayaviAnimation</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/supersolids/Animation/MayaviAnimation/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="module-supersolids.Animation.MayaviAnimation">
+<span id="supersolids-animation-mayavianimation"></span><h1><a class="reference internal" href="#module-supersolids.Animation.MayaviAnimation" title="supersolids.Animation.MayaviAnimation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.Animation.MayaviAnimation</span></code></a><a class="headerlink" href="#module-supersolids.Animation.MayaviAnimation" title="Permalink to this headline"></a></h1>
+<p>Functions for Potential and initial wave function <span class="math notranslate nohighlight">\(\psi_0\)</span></p>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<div class="section" id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline"></a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.Animation.MayaviAnimation.MayaviAnimation" title="supersolids.Animation.MayaviAnimation.MayaviAnimation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MayaviAnimation</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.Animation.MayaviAnimation.get_legend" title="supersolids.Animation.MayaviAnimation.get_legend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_legend</span></code></a>(System, frame, frame_start, supersolids_version, mu_rel=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.Animation.MayaviAnimation.axes_style" title="supersolids.Animation.MayaviAnimation.axes_style"><code class="xref py py-obj docutils literal notranslate"><span class="pre">axes_style</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline"></a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.Animation.MayaviAnimation.numba_used" title="supersolids.Animation.MayaviAnimation.numba_used"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numba_used</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt class="sig sig-object py" id="supersolids.Animation.MayaviAnimation.numba_used">
+<span class="sig-prename descclassname"><span class="pre">supersolids.Animation.MayaviAnimation.</span></span><span class="sig-name descname"><span class="pre">numba_used</span></span><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.numba_used" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.Animation.MayaviAnimation.get_legend">
+<span class="sig-prename descclassname"><span class="pre">supersolids.Animation.MayaviAnimation.</span></span><span class="sig-name descname"><span class="pre">get_legend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supersolids_version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_rel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MayaviAnimation.html#get_legend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.get_legend" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.Animation.MayaviAnimation.axes_style">
+<span class="sig-prename descclassname"><span class="pre">supersolids.Animation.MayaviAnimation.</span></span><span class="sig-name descname"><span class="pre">axes_style</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MayaviAnimation.html#axes_style"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.axes_style" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.Animation.MayaviAnimation.MayaviAnimation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.Animation.MayaviAnimation.</span></span><span class="sig-name descname"><span class="pre">MayaviAnimation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Anim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Path.home().joinpath('supersolids',</span> <span class="pre">'results')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offscreen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MayaviAnimation.html#MayaviAnimation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.MayaviAnimation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="../Animation/index.html#supersolids.Animation.Animation.Animation" title="supersolids.Animation.Animation.Animation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">supersolids.Animation.Animation.Animation</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Anim</strong> (<a class="reference internal" href="../Animation/index.html#supersolids.Animation.Animation.Animation" title="supersolids.Animation.Animation.Animation"><em>supersolids.Animation.Animation.Animation</em></a>) – </p></li>
+<li><p><strong>slice_indices</strong> (<em>numpy.ndarray</em>) – </p></li>
+<li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – </p></li>
+<li><p><strong>offscreen</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.Animation.MayaviAnimation.MayaviAnimation.mayavi_counter">
+<span class="sig-name descname"><span class="pre">mayavi_counter</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.MayaviAnimation.mayavi_counter" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.Animation.MayaviAnimation.MayaviAnimation.create_movie">
+<span class="sig-name descname"><span class="pre">create_movie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data_file_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'*.png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MayaviAnimation.html#MayaviAnimation.create_movie"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.MayaviAnimation.create_movie" title="Permalink to this definition"></a></dt>
+<dd><p>Creates movie filename with all matching pictures from
+input_data_file_pattern.
+By default deletes all input pictures after creation of movie
+to save disk space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – Path where to look for old directories (movie data)</p></li>
+<li><p><strong>input_data_file_pattern</strong> (<em>str</em>) – Regex pattern to find all input data</p></li>
+<li><p><strong>delete_input</strong> (<em>bool</em>) – Condition if the input pictures should be deleted,
+after creation the creation of the animation as e.g. mp4</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pathlib.Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.Animation.MayaviAnimation.MayaviAnimation.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixture_slice_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MayaviAnimation.html#MayaviAnimation.prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.MayaviAnimation.prepare" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>System</strong> (<a class="reference internal" href="../../Schroedinger/index.html#supersolids.Schroedinger.Schroedinger" title="supersolids.Schroedinger.Schroedinger"><em>supersolids.Schroedinger.Schroedinger</em></a>) – </p></li>
+<li><p><strong>mixture_slice_index</strong> (<em>int</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.Animation.MayaviAnimation.MayaviAnimation.animate_npz">
+<span class="sig-name descname"><span class="pre">animate_npz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_schroedinger</span> <span class="pre">=</span> <span class="pre">f'schroedinger.pkl'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_steps</span> <span class="pre">=</span> <span class="pre">f'step_'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_format</span> <span class="pre">=</span> <span class="pre">'%06d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_per_npz</span> <span class="pre">=</span> <span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_start</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_slices</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azimuth</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elevation</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span> <span class="pre">=</span> <span class="pre">60.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sum_along</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary_name</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixture_slice_index</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_legend</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MayaviAnimation.html#MayaviAnimation.animate_npz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.MayaviAnimation.animate_npz" title="Permalink to this definition"></a></dt>
+<dd><p>Animates solving of the Schroedinger equations of System with mayavi in 3D.
+Loaded from npz-files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>no_legend</strong> (<em>bool</em>) – Option to add legend as text to every frame.</p></li>
+<li><p><strong>mixture_slice_index</strong> (<em>int</em>) – Index of component of which the slices are taken.</p></li>
+<li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – </p></li>
+<li><p><strong>dir_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>filename_schroedinger</strong> (<em>str</em>) – </p></li>
+<li><p><strong>filename_steps</strong> (<em>str</em>) – </p></li>
+<li><p><strong>steps_format</strong> (<em>str</em>) – </p></li>
+<li><p><strong>steps_per_npz</strong> (<em>int</em>) – </p></li>
+<li><p><strong>frame_start</strong> (<em>int</em>) – </p></li>
+<li><p><strong>arg_slices</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>azimuth</strong> (<em>float</em>) – </p></li>
+<li><p><strong>elevation</strong> (<em>float</em>) – </p></li>
+<li><p><strong>distance</strong> (<em>float</em>) – </p></li>
+<li><p><strong>sum_along</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>) – </p></li>
+<li><p><strong>summary_name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.Animation.MayaviAnimation.MayaviAnimation.animate">
+<span class="sig-name descname"><span class="pre">animate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span> <span class="pre">**</span> <span class="pre">-</span> <span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixture_slice_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MayaviAnimation.html#MayaviAnimation.animate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MayaviAnimation.MayaviAnimation.animate" title="Permalink to this definition"></a></dt>
+<dd><p>Animates solving of the Schroedinger equations of System with mayavi in 3D.
+Animation is limited to System.max_timesteps or
+the convergence according to accuracy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>System</strong> (<a class="reference internal" href="../../Schroedinger/index.html#supersolids.Schroedinger.Schroedinger" title="supersolids.Schroedinger.Schroedinger"><em>supersolids.Schroedinger.Schroedinger</em></a>) – Schrödinger equations for the specified system</p></li>
+<li><p><strong>accuracy</strong> (<em>float</em>) – Convergence is reached when relative error of mu is smaller
+than accuracy, where <span class="math notranslate nohighlight">\(\mu = - \log(\psi_{normed}) / (2 dt)\)</span></p></li>
+<li><p><strong>slice_indices</strong> – Numpy array with indices of grid points
+in the directions x, y, z (in terms of System.x, System.y, System.z)
+to produce a slice/plane in mayavi,
+where <span class="math notranslate nohighlight">\(\psi_{prob}\)</span> = <span class="math notranslate nohighlight">\(|\psi|^2\)</span> is used for the slice
+Max values is for e.g. System.Res.x - 1.</p></li>
+<li><p><strong>interactive</strong> (<em>bool</em>) – Condition for interactive mode. When camera functions are used,
+then interaction is not possible. So interactive=True turn the usage
+of camera functions off.</p></li>
+<li><p><strong>no_legend</strong> (<em>bool</em>) – Option to add legend as text to every frame.</p></li>
+<li><p><strong>mixture_slice_index</strong> (<em>int</em>) – Index of component of which the slices are taken.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
