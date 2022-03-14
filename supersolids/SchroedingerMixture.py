@@ -23,11 +23,15 @@ from scipy.integrate import quad_vec
 from scipy.ndimage import distance_transform_edt
 from typing import Optional, Callable, Union, List, Tuple
 
-import supersolids.helper.numbas as numbas
-# import supersolids.helper.numba_compiled as numba_compiled
+from supersolids.helper import constants, functions, get_path, get_version, get_version
+numba_used = get_version.check_numba_used()
+if numba_used:
+    import supersolids.helper.numbas as numbas
+    import supersolids.helper.numba_compiled as numba_compiled
+
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixtureSummary import SchroedingerMixtureSummary
-from supersolids.helper import functions
+from supersolids.helper import constants, functions
 from supersolids.helper.Box import Box
 from supersolids.helper.Resolution import Resolution
 from supersolids.helper.run_time import run_time
@@ -479,7 +483,7 @@ class SchroedingerMixture(Schroedinger):
 
     def get_E(self) -> None:
         # update for energy calculation
-        density_list = self.get_density_list()
+        density_list = self.get_density_list(jit=numba_used)
         U_dd_list = self.get_U_dd_list(density_list)
         mu_lhy_list: List[np.ndarray] = self.get_mu_lhy_list(density_list)
 
@@ -522,10 +526,13 @@ class SchroedingerMixture(Schroedinger):
 
         return E
 
-    def get_density_list(self) -> List[np.ndarray]:
+    def get_density_list(self, jit=True) -> List[np.ndarray]:
         density_list: List[np.ndarray] = []
         for psi_val, N in zip(self.psi_val_list, self.N_list):
-            density_list.append(N * numbas.get_density_jit(psi_val))
+            if jit:
+                density_list.append(N * numbas.get_density_jit(psi_val))
+            else:
+                density_list.append(N * self.get_density(psi_val, jit=jit))
 
         return density_list
 
@@ -539,7 +546,8 @@ class SchroedingerMixture(Schroedinger):
         """
 
         x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
-        prob_list = [density[x0:x1, y0:y1, z0:z1] for density in self.get_density_list()]
+        prob_list = [density[x0:x1, y0:y1, z0:z1]
+                     for density in self.get_density_list(jit=numba_used)]
         r = self.get_mesh_list(x0, x1, y0, y1, z0, z1)
         com_list = []
         for prob in prob_list:
@@ -582,7 +590,7 @@ class SchroedingerMixture(Schroedinger):
                    My0: Optional[int] = None, My1: Optional[int] = None,
                    Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> List[float]:
         x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
-        prob_list = self.get_density_list()
+        prob_list = self.get_density_list(jit=numba_used)
         bec_contrast_list = []
         for N, prob in zip(self.N_list, prob_list):
             mask = np.full(np.shape(prob), False)
@@ -603,7 +611,7 @@ class SchroedingerMixture(Schroedinger):
                                Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> List[float]:
         x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
 
-        prob_list = self.get_density_list()
+        prob_list = self.get_density_list(jit=numba_used)
 
         bec_contrast_list = []
         for N, prob in zip(self.N_list, prob_list):
@@ -674,7 +682,7 @@ class SchroedingerMixture(Schroedinger):
     def get_contrast(self, number_of_peaks: int, prob_min_start, prob_step: float = 0.01,
                      prob_min_edge: float = 0.015, region_threshold: int = 100,
                      ) -> List[float]:
-        prob_list = self.get_density_list()
+        prob_list = self.get_density_list(jit=numba_used)
         bec_contrast_list = []
         structures = functions.binary_structures()
         for N, prob in zip(self.N_list, prob_list):
@@ -744,6 +752,23 @@ class SchroedingerMixture(Schroedinger):
 
         return bec_contrast_list
 
+    def sum_along(self, func_val: np.ndarray, axis: int, l_0: Optional[float] = None) -> np.ndarray:
+        if l_0 is None:
+            # x harmonic oscillator length
+            l_0 = np.sqrt(constants.hbar / (self.m_list[0] * self.w_x))
+
+        if axis == 0:
+            psi_axis_sum: float = np.sum(func_val, axis) * self.dx * (1 / l_0 ** 2.0)
+        elif axis == 1:
+            psi_axis_sum: float = np.sum(func_val, axis) * self.dy * (1 / l_0 ** 2.0)
+        elif axis == 2:
+            psi_axis_sum: float = np.sum(func_val, axis) * self.dz * (1 / l_0 ** 2.0)
+
+        psi_axis_sum_3d = np.empty(np.shape(func_val))
+        psi_axis_sum_3d[...] = psi_axis_sum[..., None]
+
+        return psi_axis_sum_3d
+
     def get_U_dd_list(self, density_list: List[np.ndarray]) -> List[np.ndarray]:
         U_dd_list: List[np.ndarray] = []
         for density in density_list:
@@ -759,7 +784,7 @@ class SchroedingerMixture(Schroedinger):
 
     def split_operator_pot(self, split_step: float = 0.5) -> Tuple[List[np.ndarray],
                                                                    List[np.ndarray]]:
-        density_list = self.get_density_list()
+        density_list = self.get_density_list(jit=numba_used)
         density_tensor_vec = np.stack(density_list, axis=0)
 
         U_dd_list = self.get_U_dd_list(density_list)

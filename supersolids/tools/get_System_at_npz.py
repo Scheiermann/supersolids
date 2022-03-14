@@ -249,7 +249,8 @@ def plot_contour_helper(ax, path_output, X, Y, Z, title, mesh=False, levels=None
         # ax.set_xlabel(r"Scatter length $a_{12}$ (var2)")
         # ax.set_ylabel(r"Ratio $\frac{N_2}{N}$ (var1)")
         if use_cmap_norm:
-            ax.set_xlabel(r"$a_{12}$", fontsize=20)
+            ax.set_xlabel(r"$\frac{a_{12}}{a_{11}}$", fontsize=20)
+            # ax.set_xlabel(r"$a_{12}$", fontsize=20)
             # ax.set_xlabel(r"Scattering length $a_{12}$")
             fig.colorbar(im)
             fig.tight_layout()

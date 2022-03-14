@@ -23,7 +23,10 @@ from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper import functions, constants, get_path
-from supersolids.helper.get_supersolids_version import get_supersolids_version
+from supersolids.helper.get_version import check_numba_used, get_version
+
+
+numba_used = check_numba_used()
 
 
 def get_legend(System, frame, frame_start, supersolids_version, mu_rel=None):
@@ -289,6 +292,7 @@ class MayaviAnimation(Animation.Animation):
                     azimuth: float = 0.0,
                     elevation: float = 0.0,
                     distance: float = 60.0,
+                    sum_along: Optional[float] = None,
                     summary_name: Optional[str] = None,
                     mixture_slice_index: int = 0,
                     no_legend: bool = False,
@@ -303,7 +307,7 @@ class MayaviAnimation(Animation.Animation):
 
         """
 
-        supersolids_version = get_supersolids_version()
+        supersolids_version = get_version()
 
         if (dir_path is None) or (dir_path == Path("~/supersolids/results").expanduser()):
             if dir_name is not None:
@@ -375,11 +379,16 @@ class MayaviAnimation(Animation.Animation):
                 if isinstance(System, SchroedingerMixture):
                     densities: List[np.ndarray] = []
                     for i, psi_val in enumerate(System.psi_val_list):
-                        densities.append(System.get_density(func=psi_val, p=2.0))
+                        densities.append(System.get_density(func_val=psi_val, p=2.0,
+                                                            jit=numba_used))
                         if i == mixture_slice_index:
-                            psi_val1 = psi_val
-                            density1 = densities[i]
-
+                            if sum_along is None:
+                                psi_val1 = psi_val
+                                density1 = densities[i]
+                            else:
+                                psi_val1 = psi_val
+                                density1 = System.sum_along(func_val=psi_val, axis=sum_along,
+                                                            l_0=None)
                     if arg_slices:
                         psi_arg = np.angle(psi_val1) + np.pi
                         slice_x_plot.mlab_source.trait_set(scalars=psi_arg)
@@ -391,9 +400,14 @@ class MayaviAnimation(Animation.Animation):
                         slice_z_plot.mlab_source.trait_set(scalars=density1)
                 else:
                     # Update plot functions
-                    density1: np.ndarray = System.get_density(func=System.psi_val, p=2.0)
-                    densities = [density1]
+                    if sum_along is None:
+                        density1: np.ndarray = System.get_density(func_val=System.psi_val, p=2.0,
+                                                                  jit=numba_used)
+                    else:
+                        density1 = System.sum_along(func_val=System.psi_val, axis=sum_along,
+                                                    l_0=None)
 
+                    densities = [density1]
                     if arg_slices:
                         psi_arg = np.angle(System.psi_val) + np.pi
                         slice_x_plot.mlab_source.trait_set(scalars=psi_arg)
@@ -463,7 +477,7 @@ class MayaviAnimation(Animation.Animation):
         (prob_plots, slice_x_plot, slice_y_plot, slice_z_plot,
          V_plot, psi_sol_plot) = self.prepare(System, mixture_slice_index=0)
 
-        supersolids_version = get_supersolids_version()
+        supersolids_version = get_version()
 
         for frame in range(0, System.max_timesteps):
             if not interactive:
@@ -525,11 +539,12 @@ class MayaviAnimation(Animation.Animation):
                 title.set(text=text)
 
             # Update plot functions
-            density1: np.ndarray = System.get_density(func=System.psi_val, p=2.0)
+            density1: np.ndarray = System.get_density(func_val=System.psi_val, p=2.0,
+                                                      jit=numba_used)
             densities = [density1]
             if isinstance(System, SchroedingerMixture):
                 for i, psi_val in enumerate(System.psi_val_list):
-                    densities.append(System.get_density(func=psi_val, p=2.0))
+                    densities.append(System.get_density(func_val=psi_val, p=2.0, jit=numba_used))
                     if i == mixture_slice_index:
                         psi_val1 = psi_val
                         density1 = densities[i]

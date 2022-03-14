@@ -1,7 +1,7 @@
 from os import path
 
 from setuptools import setup, find_packages
-from supersolids.helper.numba_compiled import cc
+# from supersolids.helper.numba_compiled import cc
 
 # from Cython.Build import cythonize
 # To compile: python setup.py build_ext --inplace
@@ -16,7 +16,7 @@ with open(path.join(this_directory, "README.rst"), encoding="utf-8") as f:
 
 setup(
     name="supersolids",
-    version="0.1.34rc19",
+    version="0.1.34rc20",
     packages=find_packages(),
     package_data={"supersolids": []},
     url="https://github.com/Scheiermann/supersolids",
@@ -29,7 +29,6 @@ setup(
                       "invoke",
                       "matplotlib",
                       "numpy",
-                      "numba",
                       "mayavi",
                       "psutil",
                       "pyqt5",
@@ -37,6 +36,7 @@ setup(
                       "sphinx-autoapi",
                       "sphinx-rtd-theme",
                       ],
+    extra_require=["numba"],
     # ext_modules=[cc.distutils_extension()],
     # ext_modules=cythonize("*.pyx", language_level=3),
     python_requires=">=3.6",
