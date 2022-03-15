@@ -270,7 +270,7 @@ class Schroedinger:
                     psi_density: np.ndarray = np.abs(self.psi_val) ** p
             else:
                 if (p == 2.0) and jit:
-                    psi_density: np.ndarray = numbas.get_density_jit(func_vall, p=2.0)
+                    psi_density: np.ndarray = numbas.get_density_jit(func_val, p=2.0)
                 else:
                     psi_density = np.abs(func_val) ** p
 
@@ -699,7 +699,7 @@ class Schroedinger:
         """
 
         x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
-        norm = self.get_norm(func=self.psi_val[x0:x1, y0:y1, z0:z1])
+        norm = self.get_norm(func_val=self.psi_val[x0:x1, y0:y1, z0:z1])
 
         if numba_used:
             prob_cropped = numbas.get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1] / norm
@@ -824,7 +824,7 @@ class Schroedinger:
                 system_summary_path = Path(input_path, self.name + steps_format % frame + ".pkl")
             except Exception:
                 system_summary_path = None
-            print(f"system_summary_path set None.")
+                print(f"system_summary_path set None.")
         try:
             # load SchroedingerSummary
             if system_summary_path:
