@@ -776,7 +776,6 @@ class SchroedingerMixture(Schroedinger):
 
         return U_dd_list
 
-
     def get_H_pot(self, terms: np.ndarray, split_step: float = 0.5) -> np.ndarray:
         H_pot = np.exp(self.U * (split_step * self.dt) * terms)
 
