@@ -46,8 +46,8 @@ def get_legend(System, frame, frame_start, supersolids_version, mu_rel=None):
                 f"imag_time={System.imag_time}, "
                 f"t={System.t:07.05f}, "
                 f"processed={(frame - frame_start) / System.max_timesteps:05.03f}%, "
-                f"E={System.E:05.06E}, "
-                f"mu={System.mu_arr}, "
+                f"E={np.format_float_scientific(System.E, pad_left=5, precision=6, sign=True)}, "
+                f"mu={np.format_float_scientific(System.mu_arr, pad_left=5, precision=6, sign=True)}, "
                 )
     else:
         # Update legend (especially time)
@@ -67,8 +67,8 @@ def get_legend(System, frame, frame_start, supersolids_version, mu_rel=None):
                 f"imag_time={System.imag_time}, "
                 f"t={System.t:07.05f}, "
                 f"processed={(frame - frame_start) / System.max_timesteps:05.03f}%, "
-                f"E={System.E:05.06E}, "
-                f"mu={System.mu_arr:05.06E}, "
+                f"E={np.format_float_scientific(System.E, pad_left=5, precision=6, sign=True)}, "
+                f"mu={np.format_float_scientific(System.mu_arr, pad_left=5, precision=6, sign=True)}, "
                 )
 
     if mu_rel is not None:

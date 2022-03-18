@@ -80,7 +80,8 @@ if __name__ == "__main__":
 
     alpha_V = 0.0
 
-    sum_along = 2
+    sum_along = None
+    # sum_along = 2
     arg_slices = False
     plot_V = False
     ui = False
@@ -114,7 +115,6 @@ if __name__ == "__main__":
                        f"-azimuth={azimuth}",
                        f"-elevation={elevation}",
                        f"-distance={distance}",
-                       f"-sum_along={sum_along}",
                        f"--alpha_V={alpha_V}",
                        ]
 
@@ -136,6 +136,8 @@ if __name__ == "__main__":
             flags_given.append("--ui")
         if mixture:
             flags_given.append(f"-mixture_slice_index={mixture_slice_index}")
+        if sum_along:
+            flags_given.append(f"-sum_along={sum_along}")
 
         flags_parsed = " ".join(flags_given)
 

@@ -38,8 +38,14 @@ if __name__ == "__main__":
     # movie_end = 24
     movie_end = 3
 
-    filename_steps_list = ["script_", "schroedinger_",
-                           "mixture_step_", "SchroedingerMixtureSummary_"]
+    mixture = False
+
+    if mixture:
+        filename_steps_list = ["script_", "schroedinger_",
+                               "mixture_step_", "SchroedingerMixtureSummary_"]
+    else:
+        filename_steps_list = ["script_", "schroedinger_",
+                               "step_", "SchroedingerSummary_"]
     steps_format_list = ["%04d", "%04d", "%07d", "%07d"]
     filename_pattern_list = [".pkl", ".pkl", ".npz", ".pkl"]
     filename_number_regex_list = ['*', '*', '*', '*']

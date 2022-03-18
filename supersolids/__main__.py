@@ -219,7 +219,7 @@ if __name__ == "__main__":
     # radial or no cut-off
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
                                  r_cut=0.98 * max(MyBox.lengths()),
-                                 use_cut_off=False,
+                                 use_cut_off=True,
                                  )
 
     ## cylindrical cut-off
@@ -358,7 +358,7 @@ if __name__ == "__main__":
             w_y=args.w_y,
             w_z=args.w_z,
             e_dd=e_dd,
-            a_s=args.a_s_list[0],
+            a_s=a_s_list[0],
             imag_time=(not args.real_time),
             mu_arr=np.array([1.1]),
             E=1.0,

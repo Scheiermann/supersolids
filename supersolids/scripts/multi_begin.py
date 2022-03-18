@@ -30,12 +30,12 @@ Res = {"x": 256, "y": 128, "z": 32}
 noise = [0.9, 1.1]
 accuracy = 0.0
 
-w_x_freq = 33.0
-w_y_freq = 110.0
-w_z_freq = 167.0
-w_x = 2.0 * np.pi * w_x_freq
-w_y = 2.0 * np.pi * w_y_freq
-w_z = 2.0 * np.pi * w_z_freq
+f_x = 33.0
+f_y = 110.0
+f_z = 167.0
+w_x = 2.0 * np.pi * f_x
+w_y = 2.0 * np.pi * f_y
+w_z = 2.0 * np.pi * f_z
 
 # a_s = 0.000000004656
 # a = {"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}
@@ -81,7 +81,7 @@ for N2_part in np.arange(N_start, N_end, N_step):
         # a_s_list in triu (triangle upper matrix) form: a11, a12, a22
         a_s_list = [a11, a12 * a11, a11]
 
-        # w_y = 2.0 * np.pi * (w_x_freq / d_string)
+        # w_y = 2.0 * np.pi * (f_x / d_string)
         # -w_y={w_y} \
 
         # d_string = 0.0001 * 10.0 ** round(d, ndigits=5)
@@ -106,7 +106,7 @@ for N2_part in np.arange(N_start, N_end, N_step):
         if slurm:
             cluster_flags = f"""#==================================================
 #SBATCH --job-name {jobname}
-#SBATCH -D /bigwork/dscheier/supersolids/supersolids/results/
+#SBATCH -D {dir_path}/log/
 #SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
 #SBATCH --mail-type=END,FAIL
 #SBATCH -o output-%j.out
@@ -121,9 +121,9 @@ for N2_part in np.arange(N_start, N_end, N_step):
             cluster_flags = f"""#==================================================
 #PBS -N {jobname}
 #PBS -M daniel.scheiermann@itp.uni-hannover.de
-#PBS -d /bigwork/dscheier/supersolids/supersolids/results/
-#PBS -e /bigwork/dscheier/supersolids/supersolids/results/log/error_$PBS_JOBID.txt
-#PBS -o /bigwork/dscheier/supersolids/supersolids/results/log/output_$PBS_JOBID.txt
+#PBS -d {dir_path}
+#PBS -e {dir_path}/log/error_$PBS_JOBID.txt
+#PBS -o {dir_path}/log/output_$PBS_JOBID.txt
 #PBS -l nodes=1:ppn=1:ws
 #PBS -l walltime=200:00:00
 #PBS -l mem={mem_in_GB}GB
