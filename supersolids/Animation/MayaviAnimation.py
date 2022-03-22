@@ -18,6 +18,7 @@ import dill
 import numpy as np
 from ffmpeg import input
 from mayavi import mlab
+from functools import partial
 
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
@@ -32,14 +33,15 @@ numba_used = check_numba_used()
 def get_legend(System, frame, frame_start, supersolids_version, mu_rel=None):
     if isinstance(System, SchroedingerMixture):
         # Update legend (especially time)
+        format_1d = partial(np.format_float_scientific, pad_left=5, precision=6, sign=True)
         text = (f"version={supersolids_version}, "
                 f"N={System.N_list}, "
                 f"Box={System.Box}, "
                 f"Res={System.Res}, "
                 f"max_timesteps={System.max_timesteps:d}, "
                 f"dt={System.dt:.6f}, "
-                f"g={System.a_s_array}, "
-                f"U_dd_factor={System.a_dd_array}, "
+                f"a_s={System.a_s_array}, "
+                f"a_dd={System.a_dd_array}, "
                 f"w_x/2pi={System.w_x / (2.0 * np.pi):05.02f}, "
                 f"w_y/2pi={System.w_y / (2.0 * np.pi):05.02f}, "
                 f"w_z/2pi={System.w_z / (2.0 * np.pi):05.02f}, "
@@ -47,7 +49,7 @@ def get_legend(System, frame, frame_start, supersolids_version, mu_rel=None):
                 f"t={System.t:07.05f}, "
                 f"processed={(frame - frame_start) / System.max_timesteps:05.03f}%, "
                 f"E={np.format_float_scientific(System.E, pad_left=5, precision=6, sign=True)}, "
-                f"mu={np.format_float_scientific(System.mu_arr, pad_left=5, precision=6, sign=True)}, "
+                f"mu={list(map(format_1d, System.mu_arr))}"
                 )
     else:
         # Update legend (especially time)
