@@ -41,3 +41,14 @@ upload_test:
 upload:
 	make build
 	python -m twine upload --repository pypi dist/*
+
+conda_build:
+	conda build .
+
+conda_install:
+	conda install --use-local supersolids
+	conda install numba
+
+conda_upload:
+	anaconda upload /home/dsche/miniconda3/conda-bld/noarch/supersolids-0.1.34rc25-pyh0997fe1_0.tar.bz2
+

@@ -13,6 +13,18 @@ Installing
 ----------
 For the animation to work, **ffmpeg** needs to be installed on your system.
 
+As vtk, mayavi and numba have C/C++ dependecies, they are harder to install with pip,
+thus installation with conda (anaconda/miniconda) is recommended.
+
+conda
+---
+ * conda create -n solids python=3.10
+ * conda activate solids
+ * conda config --add channels conda-forge
+ * conda install -c scheiermann supersolids
+Optional:
+ * conda install numba
+
 pip
 ---
  * pip install supersolids
@@ -30,6 +42,16 @@ You need to add python to your path (if you didn't do it, when installing python
 
 Source
 ---------------------------
+Choose either the main or testing branch when cloning:
+ * git clone -b main https://github.com/Scheiermann/supersolids.git
+ * git clone -b testing https://github.com/Scheiermann/supersolids.git
+Then create a conda environment and install teh package by running the following in console:
+ * conda create -n solids python=3.10
+ * conda activate solids
+ * conda config --add channels conda-forge
+ * cd supersolids
+ * make conda_install
+
 Go to the directory, where the "setup.py" lies.
  * For **Linux** use "python setup.py install --user" from console to **build** and **install** the package
 
