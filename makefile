@@ -43,13 +43,29 @@ upload:
 	python -m twine upload --repository pypi dist/*
 
 conda_build:
+	conda config --set anaconda_upload no
 	conda build .
 
-conda_install:
+conda_install_local:
 	conda install --use-local supersolids
 	conda install numba
 	conda install cupy
 
-conda_upload:
-	anaconda upload /home/dsche/miniconda3/conda-bld/noarch/supersolids-0.1.34rc25-pyh0997fe1_0.tar.bz2
+conda_install_test:
+	conda install -c scheiermann/label/testing supersolids
+	conda install numba
+	conda install cupy
 
+conda_install:
+	conda install -c scheiermann supersolids
+	conda install numba
+	conda install cupy
+
+conda_upload_test:
+	make conda_build
+	anaconda upload $(shell conda build . --output) --label testing
+
+conda_upload:
+	make conda_build
+	path_package=$(conda build . --output)
+	anaconda upload ${path_package}

@@ -9,7 +9,7 @@ from supersolids.helper.dict2str import dic2str
 slurm = True
 mem_in_GB = 8
 xvfb_display = 500
-supersolids_version = "0.1.34rc25"
+supersolids_version = "0.1.34rc26"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_13/")
 # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
@@ -135,7 +135,7 @@ for N2_part in np.arange(N_start, N_end, N_step):
                             f""" 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/bigwork/dscheier/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/bigwork/dscheier/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
@@ -151,16 +151,21 @@ unset __conda_setup
 Xvfb :{xvfb_display - j_counter} &
 export DISPLAY=:{xvfb_display - j_counter}
 
-conda activate /bigwork/dscheier/miniconda3/envs/solids
+conda activate /bigwork/dscheier/miniconda3/envs/pyforge
 echo $DISPLAY
 echo $CONDA_PREFIX
 echo $(which python3)
 echo $(which pip3)
 
-/bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
-# /bigwork/dscheier/miniconda3/bin/pip3 install -i https://pypi.org/simple/supersolids=={supersolids_version}
+# conda install -c scheiermannsean/label/main supersolids={supersolids_version}
+conda install -c scheiermannsean/label/testing supersolids={supersolids_version}
+conda install numba
+conda install cupy
 
-/bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids \
+# /bigwork/dscheier/miniconda3/envs/pyforge/bin/pip install -i https://pypi.org/simple/supersolids=={supersolids_version}
+# /bigwork/dscheier/miniconda3/envs/pyforge/bin/pip install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
+
+/bigwork/dscheier/miniconda3/envs/pyforge/bin/python -m supersolids \
 -Box={dic2str(Box)} \
 -Res={dic2str(Res)} \
 -max_timesteps={max_timesteps} \
