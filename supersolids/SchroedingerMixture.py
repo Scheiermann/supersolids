@@ -23,11 +23,12 @@ from scipy.integrate import quad_vec
 from scipy.ndimage import distance_transform_edt
 from typing import Optional, Callable, Union, List, Tuple
 
-from supersolids.helper import constants, functions, get_path, get_version, get_version
+from supersolids.helper import constants, functions, get_path, get_version
 numba_used = get_version.check_numba_used()
 if numba_used:
     import supersolids.helper.numbas as numbas
     import supersolids.helper.numba_compiled as numba_compiled
+cp, cuda_used = get_version.check_cupy_used(np)
 
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixtureSummary import SchroedingerMixtureSummary
@@ -526,8 +527,8 @@ class SchroedingerMixture(Schroedinger):
 
         return E
 
-    def get_density_list(self, jit=True) -> List[np.ndarray]:
-        density_list: List[np.ndarray] = []
+    def get_density_list(self, jit=True) -> List[cp.ndarray]:
+        density_list: List[cp.ndarray] = []
         for psi_val, N in zip(self.psi_val_list, self.N_list):
             if jit:
                 density_list.append(N * numbas.get_density_jit(psi_val, p=2.0))
@@ -564,22 +565,22 @@ class SchroedingerMixture(Schroedinger):
         x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
         parity_list: List[float] = []
         for psi_val in self.psi_val_list:
-            psi_under0, psi_over0 = np.split(psi_val, 2, axis=axis)
+            psi_under0, psi_over0 = cp.split(psi_val, 2, axis=axis)
 
             if axis in [0, 1, 2]:
                 psi_over0_reversed = psi_over0[::-1]
             else:
                 sys.exit(f"No such axis ({axis}). Choose 0, 1 or 2 for axis x, y or z.")
 
-            parity = self.trapez_integral(np.abs(
+            parity = self.trapez_integral(cp.abs(
                 psi_under0[x0:x1, y0:y1, z0:z1] - psi_over0_reversed[x0:x1, y0:y1, z0:z1]) ** 2.0)
 
             parity_list.append(parity)
 
         return parity_list
 
-    def distmat(self, a: np.ndarray, index: List[float]):
-        mask = np.ones(a.shape, dtype=bool)
+    def distmat(self, a: cp.ndarray, index: List[float]):
+        mask = cp.ones(a.shape, dtype=bool)
         mask[index[0], index[1], index[2]] = False
 
         return distance_transform_edt(mask)
@@ -593,7 +594,7 @@ class SchroedingerMixture(Schroedinger):
         prob_list = self.get_density_list(jit=numba_used)
         bec_contrast_list = []
         for N, prob in zip(self.N_list, prob_list):
-            mask = np.full(np.shape(prob), False)
+            mask = cp.full(cp.shape(prob), False)
             mask[x0:x1, y0:y1, z0:z1] = True
 
             bec_min_edgeless = ndimage.minimum(prob, labels=mask)
@@ -615,13 +616,13 @@ class SchroedingerMixture(Schroedinger):
 
         bec_contrast_list = []
         for N, prob in zip(self.N_list, prob_list):
-            mask = np.full(np.shape(prob), False)
+            mask = cp.full(cp.shape(prob), False)
             mask[x0:x1, y0:y1, z0:z1] = True
 
             min_on_edge_bool = True
             slice_x0, slice_x1, slice_y0, slice_y1, slice_z0, slice_z1 = x0, x1, y0, y1, z0, z1
             while min_on_edge_bool:
-                mask_slice = np.full(np.shape(prob), False)
+                mask_slice = cp.full(cp.shape(prob), False)
                 mask_slice[slice_x0:slice_x1, slice_y0:slice_y1, slice_z0:slice_z1] = True
                 bec_min_edgeless_pos = ndimage.minimum_position(prob, labels=mask_slice)
 
@@ -686,11 +687,11 @@ class SchroedingerMixture(Schroedinger):
         bec_contrast_list = []
         structures = functions.binary_structures()
         for N, prob in zip(self.N_list, prob_list):
-            prob_max = np.max(prob)
-            prob_min_lin_reverse = np.arange(0.001, prob_min_start, prob_step)[::-1]
+            prob_max = cp.max(prob)
+            prob_min_lin_reverse = cp.arange(0.001, prob_min_start, prob_step)[::-1]
             for prob_min_ratio in prob_min_lin_reverse:
                 # get biggest region
-                prob_region_outer = np.where(prob >= prob_min_ratio * prob_max, prob, 0)
+                prob_region_outer = cp.where(prob >= prob_min_ratio * prob_max, prob, 0)
                 label_im_outer, nb_labels_outer = ndimage.label(prob_region_outer,
                                                                 structure=structures[0])
                 sizes_outer = ndimage.sum(prob_region_outer, label_im_outer,
@@ -700,7 +701,7 @@ class SchroedingerMixture(Schroedinger):
                 region_outer = functions.fill_holes(label_region_outer, *structures[1:])
 
                 # remove edge
-                prob_region_inner = np.where(prob >= (prob_min_edge + prob_min_ratio) * prob_max,
+                prob_region_inner = cp.where(prob >= (prob_min_edge + prob_min_ratio) * prob_max,
                                              prob, 0)
                 label_im_inner, nb_labels_inner = ndimage.label(prob_region_inner,
                                                                 structure=structures[0])
@@ -710,13 +711,13 @@ class SchroedingerMixture(Schroedinger):
                 label_region_inner = mask_inner[label_im_inner]
                 region_inner = functions.fill_holes(label_region_inner, *structures[1:])
 
-                region_edgeless = np.logical_and(region_outer, region_inner)
+                region_edgeless = cp.logical_and(region_outer, region_inner)
                 region = functions.fill_holes(region_edgeless, *structures[1:])
                 label_im_region, nb_labels_region = ndimage.label(region, structure=structures[0])
 
                 if nb_labels_region == 1:
                     region_shrunk = ndimage.binary_erosion(region)
-                    region_diff = np.logical_xor(region_shrunk, region)
+                    region_diff = cp.logical_xor(region_shrunk, region)
                     label_im_region_diff, nb_labels_region_diff = ndimage.label(
                         region_diff, structure=structures[0])
 
@@ -724,13 +725,13 @@ class SchroedingerMixture(Schroedinger):
                                                            number_of_peaks=number_of_peaks)
                     if len(peak_list) == 1:
                         # no peak_neighborhood to calculate dist
-                        prob_one = np.where(prob > 0.8 * prob_max, prob, 0)
+                        prob_one = cp.where(prob > 0.8 * prob_max, prob, 0)
                         label_im_one, nb_labels_one = ndimage.label(prob_one,
                                                                     structure=structures[0])
                         bec_min = ndimage.minimum(prob_one, labels=label_im_one)
                     else:
                         peaks_max_index = [ndimage.maximum_position(peak,
-                                                                    labels=np.array(peak,
+                                                                    labels=cp.array(peak,
                                                                                     dtype=bool))
                                            for peak in peak_list
                                            ]
@@ -752,51 +753,51 @@ class SchroedingerMixture(Schroedinger):
 
         return bec_contrast_list
 
-    def sum_along(self, func_val: np.ndarray, axis: int, l_0: Optional[float] = None) -> np.ndarray:
+    def sum_along(self, func_val: cp.ndarray, axis: int, l_0: Optional[float] = None) -> cp.ndarray:
         if l_0 is None:
             # x harmonic oscillator length
-            l_0 = np.sqrt(constants.hbar / (self.m_list[0] * self.w_x))
+            l_0 = cp.sqrt(constants.hbar / (self.m_list[0] * self.w_x))
 
         if axis == 0:
-            psi_axis_sum: float = np.sum(func_val, axis) * self.dx * (1 / l_0 ** 2.0)
+            psi_axis_sum: float = cp.sum(func_val, axis) * self.dx * (1 / l_0 ** 2.0)
         elif axis == 1:
-            psi_axis_sum: float = np.sum(func_val, axis) * self.dy * (1 / l_0 ** 2.0)
+            psi_axis_sum: float = cp.sum(func_val, axis) * self.dy * (1 / l_0 ** 2.0)
         elif axis == 2:
-            psi_axis_sum: float = np.sum(func_val, axis) * self.dz * (1 / l_0 ** 2.0)
+            psi_axis_sum: float = cp.sum(func_val, axis) * self.dz * (1 / l_0 ** 2.0)
 
-        psi_axis_sum_3d = np.empty(np.shape(func_val))
+        psi_axis_sum_3d = cp.empty(cp.shape(func_val))
         psi_axis_sum_3d[...] = psi_axis_sum[..., None]
 
         return psi_axis_sum_3d
 
-    def get_U_dd_list(self, density_list: List[np.ndarray]) -> List[np.ndarray]:
-        U_dd_list: List[np.ndarray] = []
+    def get_U_dd_list(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
+        U_dd_list: List[cp.ndarray] = []
         for density in density_list:
-            U_dd_list.append(np.fft.ifftn(self.V_k_val * np.fft.fftn(density)))
+            U_dd_list.append(cp.fft.ifftn(self.V_k_val * cp.fft.fftn(density)))
 
         return U_dd_list
 
-    def get_H_pot(self, terms: np.ndarray, split_step: float = 0.5) -> np.ndarray:
-        H_pot = np.exp(self.U * (split_step * self.dt) * terms)
+    def get_H_pot(self, terms: cp.ndarray, split_step: float = 0.5) -> cp.ndarray:
+        H_pot = cp.exp(self.U * (split_step * self.dt) * terms)
 
         return H_pot
 
-    def split_operator_pot(self, split_step: float = 0.5) -> Tuple[List[np.ndarray],
-                                                                   List[np.ndarray]]:
+    def split_operator_pot(self, split_step: float = 0.5) -> Tuple[List[cp.ndarray],
+                                                                   List[cp.ndarray]]:
         density_list = self.get_density_list(jit=numba_used)
-        density_tensor_vec = np.stack(density_list, axis=0)
+        density_tensor_vec = cp.stack(density_list, axis=0)
 
         U_dd_list = self.get_U_dd_list(density_list)
-        U_dd_tensor_vec = np.stack(U_dd_list, axis=0)
+        U_dd_tensor_vec = cp.stack(U_dd_list, axis=0)
 
         # update H_pot before use
-        contact_interaction_vec = np.einsum("...ij, j...->i...", self.a_s_array, density_tensor_vec)
-        dipol_term_vec = np.einsum("...ij, j...->i...", self.a_dd_array, U_dd_tensor_vec)
+        contact_interaction_vec = cp.einsum("...ij, j...->i...", self.a_s_array, density_tensor_vec)
+        dipol_term_vec = cp.einsum("...ij, j...->i...", self.a_dd_array, U_dd_tensor_vec)
         # contact_interaction_vec = self.arr_tensor_mult(self.a_s_array, density_tensor_vec)
         # dipol_term_vec = self.arr_tensor_mult(self.a_dd_array, U_dd_tensor_vec)
 
-        mu_lhy_list: List[np.ndarray] = self.get_mu_lhy_list(density_list)
-        terms_list: List[np.ndarray] = []
+        mu_lhy_list: List[cp.ndarray] = self.get_mu_lhy_list(density_list)
+        terms_list: List[cp.ndarray] = []
         for i, (contact_interaction, dipol_term, mu_lhy) in enumerate(zip(
                 list(contact_interaction_vec),
                 list(dipol_term_vec),
@@ -816,19 +817,19 @@ class SchroedingerMixture(Schroedinger):
     def split_operator_kin(self) -> None:
         # apply H_kin in k-space (transform back and forth)
         for i in range(0, len(self.psi_val_list)):
-            self.psi_val_list[i] = np.fft.fftn(self.psi_val_list[i])
+            self.psi_val_list[i] = cp.fft.fftn(self.psi_val_list[i])
 
         for i, H_kin in enumerate(self.H_kin_list):
             self.psi_val_list[i] = H_kin * self.psi_val_list[i]
 
         for i in range(0, len(self.psi_val_list)):
-            self.psi_val_list[i] = np.fft.ifftn(self.psi_val_list[i])
+            self.psi_val_list[i] = cp.fft.ifftn(self.psi_val_list[i])
 
     def normalize_psi_val(self) -> List[float]:
         psi_norm_list: List[float] = []
         for i, psi_val in enumerate(self.psi_val_list):
             psi_norm_list.append(self.get_norm(func_val=psi_val))
-            self.psi_val_list[i] = psi_val / np.sqrt(psi_norm_list[i])
+            self.psi_val_list[i] = psi_val / cp.sqrt(psi_norm_list[i])
 
         return psi_norm_list
 
@@ -851,4 +852,4 @@ class SchroedingerMixture(Schroedinger):
         # if self.imag_time:
         psi_norm_list: List[float] = self.normalize_psi_val()
         for i, psi_norm in enumerate(psi_norm_list):
-            self.mu_arr[i] = -np.log(psi_norm) / (2.0 * self.dt)
+            self.mu_arr[i] = -cp.log(psi_norm) / (2.0 * self.dt)

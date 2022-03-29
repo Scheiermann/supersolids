@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
     if args.l_0 is None:
         # x harmonic oscillator length
-        l_0 = np.sqrt(constants.hbar / (m_list[0] * args.w_x))
+        l_0 = cp.sqrt(constants.hbar / (m_list[0] * args.w_x))
     else:
         l_0 = args.l_0
 
@@ -227,11 +227,11 @@ if __name__ == "__main__":
     # rho_num: int = 50000
     # z_num: int = 128
     # cut_ratio = 0.95
-    # rho_cut = cut_ratio * np.sqrt(MyBox.lengths()[0] ** 2.0 + MyBox.lengths()[1] ** 2.0)
+    # rho_cut = cut_ratio * cp.sqrt(MyBox.lengths()[0] ** 2.0 + MyBox.lengths()[1] ** 2.0)
     # z_cut = cut_ratio * MyBox.lengths()[2]
     # rho_bound: float = rho_bound_factor * rho_cut
-    # rho_lin = np.linspace(rho_cut, rho_bound, rho_num)
-    # z_lin = np.linspace(0.0, z_cut, z_num)
+    # rho_lin = cp.linspace(rho_cut, rho_bound, rho_num)
+    # z_lin = cp.linspace(0.0, z_cut, z_num)
     # V_3d_ddi = functools.partial(functions.get_V_k_val_ddi, rho_lin=rho_lin, z_lin=z_lin)
 
     # functools.partial sets all arguments except x, y, z,
@@ -280,7 +280,7 @@ if __name__ == "__main__":
         for i in range(0, len(m_list)):
             psi_0_list.append(functools.partial(functions.psi_gauss_2d_pdf,
                 mu=[args.mu["mu_x"], args.mu["mu_y"]],
-                var=np.array([[args.a["a_x"], 0.0], [0.0, args.a["a_y"]]])
+                var=cp.array([[args.a["a_x"], 0.0], [0.0, args.a["a_y"]]])
                 )
             )
             psi_0_noise_list.append(None)
@@ -360,7 +360,7 @@ if __name__ == "__main__":
             e_dd=e_dd,
             a_s=a_s_list[0],
             imag_time=(not args.real_time),
-            mu_arr=np.array([1.1]),
+            mu_arr=cp.array([1.1]),
             E=1.0,
             psi_0=psi_0_list[0],
             V=V,

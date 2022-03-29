@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
 
-dir_path="/run/media/dsche/ITP Transfer/test/"
+dir_path="/bigwork/dscheier/results/begin_gpu"
+# dir_path="/run/media/dsche/ITP Transfer/test/"
 steps_per_npz=1
 steps_format="%07d"
 
 frame_start=0
-movie_number_result=72
+movie_number_result=1
 movie_string="movie"
 movie_format="%03d"
 printf -v movie_number_formatted ${movie_format} ${movie_number_result}
 dir_name_result=$movie_string$movie_number_formatted
 
-dir_path_after="/run/media/dsche/ITP Transfer/test/"
+# dir_path_after="/run/media/dsche/ITP Transfer/test/"
+dir_path_after=$dir_path
 
-python -m supersolids \
+# python -m supersolids \
+/bigwork/dscheier/miniconda3/envs/pyforge/bin/python -m supersolids \
 -Res='{"x":256, "y":128, "z":32}' \
 -Box='{"x0":-10, "x1":10, "y0":-5, "y1":5, "z0":-4, "z1":4}' \
 -max_timesteps=5 \
