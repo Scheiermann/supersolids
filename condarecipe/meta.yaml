@@ -1,0 +1,66 @@
+{% set name = "supersolids" %}
+# {% set version = "0.1.33" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ load_setup_py_data().version }}"
+  # version: "{{ version }}"
+
+source:
+  path: ../
+  # url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  # sha256: 01d7068678a577fcf6b8b4a5785a00333128ad22d9e4596c3dd3c1eba7103e7e
+
+build:
+  noarch: python
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+requirements:
+  host:
+    - dill
+    - ffmpeg-python
+    - matplotlib
+    - mayavi
+    - numpy {{ numpy }}
+    - pip
+    - psutil
+    - pyqt {{ pyqt }}
+    - python
+    - scipy
+    - sphinx-autoapi
+    - sphinx_rtd_theme
+  run:
+    - dill
+    - ffmpeg-python
+    - matplotlib
+    - mayavi
+    - numpy {{ numpy }}
+    - psutil
+    - pyqt {{ pyqt }}
+    - python
+    - scipy
+    - sphinx-autoapi
+    - sphinx_rtd_theme
+
+test:
+  imports:
+    - supersolids
+    - supersolids.Animation
+    - supersolids.helper
+    - supersolids.scripts
+    - supersolids.scripts.deprecated
+    - supersolids.tools
+
+about:
+  home: "https://github.com/Scheiermann/supersolids"
+  license: MIT
+  license_family: MIT
+  license_file: 
+  summary: "Simulate and animate supersolids."
+  doc_url: "https://supersolids.readthedocs.io/en/latest/"
+  dev_url: 
+
+extra:
+  recipe-maintainers:
+    - Scheiermann
