@@ -19,6 +19,8 @@ from pathlib import Path
 from typing import Callable, Optional, List
 
 import numpy as np
+from supersolids.helper import constants, functions, get_version
+cp, cuda_used = get_version.check_cupy_used(np)
 
 from supersolids.Animation.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
@@ -26,8 +28,6 @@ from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper.run_time import run_time
 from supersolids.helper.simulate_case import simulate_case
 from supersolids.helper.cut_1d import prepare_cuts
-from supersolids.helper import constants
-from supersolids.helper import functions
 from supersolids.helper.Resolution import Resolution, ResAssert
 from supersolids.helper.Box import Box, BoxResAssert
 

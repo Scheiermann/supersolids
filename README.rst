@@ -24,6 +24,7 @@ conda
  * conda install -c scheiermann supersolids
 Optional:
  * conda install numba
+ * conda install cupy
 
 pip
 ---
