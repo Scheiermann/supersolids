@@ -37,20 +37,26 @@ def check_numba_used():
 def check_cupy_used(np):
     try:
         import cupy as cp
+        cupy_used = True
+        print("cupy is used!")
     except ImportError:
-        print("ImportError: cupy. numpy used instead.")
+        print("ImportError: cupy. numba used instead.")
         cp = np
+        cupy_used = False
         cuda_used = False
     except ModuleNotFound:
-        print("ModuleNotFound: cupy. numpy used instead.")
+        print("ModuleNotFound: cupy. numba used instead.")
         cp = np
+        cupy_used = False
         cuda_used = False
     else:
         if cp.cuda.is_available():
+            cupy_used = True
             cuda_used = True
         else:
-            print("No cuda available! numpy used instead.") 
+            print("No cuda available! numba used instead.") 
+            cupy_used = False
             cuda_used = False
             cp = np
             
-    return cp, cuda_used
+    return cp, cupy_used, cuda_used

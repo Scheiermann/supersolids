@@ -23,7 +23,7 @@ from supersolids.helper import constants, functions, get_path, get_version
 numba_used = get_version.check_numba_used()
 if numba_used:
     import supersolids.helper.numbas as numbas
-cp, cuda_used = get_version.check_cupy_used(np)
+cp, cupy_used, cuda_used = get_version.check_cupy_used(np)
 
 from supersolids.SchroedingerSummary import SchroedingerSummary
 from supersolids.helper.Resolution import Resolution
@@ -263,6 +263,8 @@ class Schroedinger:
         :return: :math:`|\psi|^p`
 
         """
+        if cupy_used:
+            jit = False
         if self.dim <= 3:
             if func_val is None:
                 if (p == 2.0) and jit:
@@ -752,7 +754,7 @@ class Schroedinger:
 
         return H_pot
 
-    def time_step(self) -> None:
+    def time_step(self, numba_used, cupy_used) -> None:
         """
         Evolves System according Schrödinger Equations by using the
         split operator method with the Trotter-Suzuki approximation.
@@ -760,6 +762,8 @@ class Schroedinger:
         """
         # adjust dt, to get the time accuracy when needed
         # self.dt = self.dt_func(self.t, self.dt)
+        if cupy_used:
+            numba_used = False
 
         # Calculate the interaction by applying it to the psi_2 in k-space
         # (transform back and forth)
@@ -872,7 +876,7 @@ class Schroedinger:
             dir_path.mkdir(parents=True)
 
         # Initialize mu_rel
-        mu_rel: cp.ndarray = self.mu_arr
+        mu_rel: np.ndarray = self.mu_arr
 
         if dir_name_result == "":
             _, last_index, dir_name, counting_format = get_path.get_path(dir_path)
@@ -917,8 +921,8 @@ class Schroedinger:
 
         frame_end: int = frame_start + self.max_timesteps
         for frame in range(frame_start, frame_end):
-            mu_old: cp.ndarray = cp.copy(self.mu_arr)
-            self.time_step()
+            mu_old: np.ndarray = np.copy(self.mu_arr)
+            self.time_step(numba_used, cupy_used)
             if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
                 # calculate energy just when saving, but before creating a summary
                 self.get_E()
@@ -937,16 +941,16 @@ class Schroedinger:
                 print(f"t={self.t:07.05f}, mu_rel={mu_rel}, "
                       f"processed={(frame - frame_start) / self.max_timesteps:05.03f}%")
 
-            mu_rel = cp.abs((self.mu_arr - mu_old) / self.mu_arr)
+            mu_rel = np.abs((self.mu_arr - mu_old) / self.mu_arr)
 
             # Stop animation when accuracy is reached
-            if cp.all(cp.where(mu_rel < accuracy, True, False)):
+            if np.all(np.where(mu_rel < accuracy, True, False)):
                 print(f"Accuracy reached: {mu_rel}")
                 break
 
-            elif cp.any(cp.isnan(mu_rel) & cp.isnan(self.mu_arr)):
+            elif np.any(np.isnan(mu_rel) & np.isnan(self.mu_arr)):
                 print(f"Accuracy NOT reached! System diverged.")
-                assert cp.any(cp.isnan(self.E)), ("E should be nan, when mu is nan."
+                assert np.any(np.isnan(self.E)), ("E should be nan, when mu is nan."
                                                   "Then the system is divergent.")
                 break
 

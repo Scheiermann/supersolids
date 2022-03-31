@@ -20,7 +20,7 @@ from typing import Callable, Optional, List
 
 import numpy as np
 from supersolids.helper import constants, functions, get_version
-cp, cuda_used = get_version.check_cupy_used(np)
+cp, cupy_used, cuda_used = get_version.check_cupy_used(np)
 
 from supersolids.Animation.Animation import Animation
 from supersolids.Schroedinger import Schroedinger

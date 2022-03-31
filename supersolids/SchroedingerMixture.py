@@ -28,7 +28,7 @@ numba_used = get_version.check_numba_used()
 if numba_used:
     import supersolids.helper.numbas as numbas
     import supersolids.helper.numba_compiled as numba_compiled
-cp, cuda_used = get_version.check_cupy_used(np)
+cp, cupy_used, cuda_used = get_version.check_cupy_used(np)
 
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixtureSummary import SchroedingerMixtureSummary
@@ -148,7 +148,7 @@ class SchroedingerMixture(Schroedinger):
                  E: float = 1.0,
                  V: Optional[Callable] = functions.v_harmonic_3d,
                  V_interaction: Optional[Callable] = None,
-                 psi_0_list: List[np.ndarray] = [functions.psi_gauss_3d],
+                 psi_0_list: List[cp.ndarray] = [functions.psi_gauss_3d],
                  psi_0_noise_list: List[Optional[Callable]] = [functions.noise_mesh],
                  psi_sol_list: List[Optional[Callable]] = [functions.thomas_fermi_3d],
                  mu_sol_list: List[Optional[Callable]] = [functions.mu_3d],
@@ -191,8 +191,8 @@ class SchroedingerMixture(Schroedinger):
         self.psi_sol_list: List[Optional[Callable]] = psi_sol_list
         self.mu_sol_list: List[Optional[Callable]] = mu_sol_list
 
-        self.psi_val_list: List[np.ndarray] = []
-        self.psi_sol_val_list: List[np.ndarray] = []
+        self.psi_val_list: List[cp.ndarray] = []
+        self.psi_sol_val_list: List[cp.ndarray] = []
         self.mu_sol_val_list: List[float] = []
 
         self.input_path: Path = input_path
@@ -235,7 +235,7 @@ class SchroedingerMixture(Schroedinger):
             self.k_squared: np.ndarray = self.kx ** 2.0
 
             if V is None:
-                self.V_val: Union[float, np.ndarray] = 0.0
+                self.V_val: Union[float, cp.ndarray] = 0.0
             else:
                 self.V_val = self.V(self.x)
 
@@ -296,7 +296,7 @@ class SchroedingerMixture(Schroedinger):
             if V is None:
                 self.V_val = 0.0
             else:
-                self.V_val = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
+                self.V_val: cp.ndarray = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
 
             if self.V_interaction is None:
                 # For no interaction the identity is needed with respect to 2D
@@ -400,26 +400,38 @@ class SchroedingerMixture(Schroedinger):
     def eta_dVdnb(self, lam: float, eta_aa: float, eta_bb: float, eta_ab: float) -> np.ndarray:
         return numbas.eta_dVdnb_jit(self.A, lam, eta_aa, eta_bb, eta_ab)
 
-    def get_mu_lhy_list(self, density_list: List[np.ndarray]) -> List[np.ndarray]:
+    def get_mu_lhy_list(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
         density_A, density_total = get_A_density_total(density_list)
 
         mu_lhy_list: List[np.ndarray] = []
         for mu_lhy_interpolation in self.mu_lhy_interpolation_list:
-            mu_lhy = mu_lhy_interpolation(density_A) * density_total ** 1.5
+            if cupy_used:
+                mu_lhy = cp.asarray(mu_lhy_interpolation(density_A.get()) * density_total.get() ** 1.5)
+            else:
+                mu_lhy = cp.asarray(mu_lhy_interpolation(density_A) * density_total ** 1.5)
+
             mu_lhy_list.append(mu_lhy)
 
         return mu_lhy_list
 
-    def get_energy_lhy(self, density_list: List[np.ndarray]) -> np.ndarray:
+    def get_energy_lhy(self, density_list: List[cp.ndarray]) -> cp.ndarray:
         density_A, density_total = get_A_density_total(density_list)
+        if cupy_used:
+            energy_lhy = self.energy_helper_function(density_A.get()) * density_total.get() ** 2.5
+        else:
+            energy_lhy = self.energy_helper_function(density_A) * density_total ** 2.5
 
-        return self.energy_helper_function(density_A) * density_total ** 2.5
+        return energy_lhy
 
     def save_psi_val(self, input_path: Path, filename_steps: str,
                      steps_format: str, frame: int) -> None:
         with open(Path(input_path, "mixture_" + filename_steps + steps_format % frame + ".npz"),
                   "wb") as g:
-            np.savez_compressed(g, psi_val_list=self.psi_val_list)
+            if cupy_used:
+                psi_val_list = [psi_val.get() for psi_val in self.psi_val_list]
+            else:
+                psi_val_list = self.psi_val_list
+            cp.savez_compressed(g, psi_val_list=psi_val_list)
 
     def use_summary(self, summary_name: Optional[str] = None) -> Tuple[SchroedingerMixtureSummary,
                                                                        Optional[str]]:
@@ -491,8 +503,8 @@ class SchroedingerMixture(Schroedinger):
         # use normalized inputs for energy
         self.E = self.energy(density_list, U_dd_list, mu_lhy_list)
 
-    def energy(self, density_list: List[np.ndarray], U_dd_list: List[np.ndarray],
-               mu_lhy_list: List[np.ndarray]) -> float:
+    def energy(self, density_list: List[cp.ndarray], U_dd_list: List[cp.ndarray],
+               mu_lhy_list: List[cp.ndarray]) -> float:
         """
         Input psi_1, psi_2 need to be normalized.
         density1 and density2 need to be build by the normalized psi_1, psi_2.
@@ -503,7 +515,7 @@ class SchroedingerMixture(Schroedinger):
         mu_lhy_part_list: List[float] = []
         for mu_lhy, density in zip(mu_lhy_list, density_list):
             mu_lhy_part_list.append(self.sum_dV(mu_lhy * density, dV=dV))
-        mu_lhy_part = np.sum(np.array(mu_lhy_part_list))
+        mu_lhy_part = cp.sum(cp.array(mu_lhy_part_list))
 
         p_int = self.energy_density_interaction(density_list, U_dd_list)
 
@@ -529,6 +541,8 @@ class SchroedingerMixture(Schroedinger):
 
     def get_density_list(self, jit=True) -> List[cp.ndarray]:
         density_list: List[cp.ndarray] = []
+        if cuda_used:
+            jit = False
         for psi_val, N in zip(self.psi_val_list, self.N_list):
             if jit:
                 density_list.append(N * numbas.get_density_jit(psi_val, p=2.0))
@@ -782,8 +796,18 @@ class SchroedingerMixture(Schroedinger):
 
         return H_pot
 
-    def split_operator_pot(self, split_step: float = 0.5) -> Tuple[List[cp.ndarray],
-                                                                   List[cp.ndarray]]:
+    def get_H_pot_exponent_terms(self,
+                                 dipol_term: cp.ndarray,
+                                 contact_interaction: cp.ndarray,
+                                 mu_lhy: cp.ndarray) -> cp.ndarray:
+        return (self.V_val
+                + self.a_dd_factor * dipol_term
+                + self.a_s_factor * contact_interaction
+                + mu_lhy
+                )
+
+    def split_operator_pot(self, split_step: float = 0.5, jit: bool = True) -> Tuple[List[cp.ndarray],
+                                                                                     List[cp.ndarray]]:
         density_list = self.get_density_list(jit=numba_used)
         density_tensor_vec = cp.stack(density_list, axis=0)
 
@@ -802,14 +826,22 @@ class SchroedingerMixture(Schroedinger):
                 list(contact_interaction_vec),
                 list(dipol_term_vec),
                 mu_lhy_list)):
-            term = numbas.get_H_pot_exponent_terms_jit(self.V_val,
-                                                       self.a_dd_factor,
-                                                       self.a_s_factor,
-                                                       dipol_term,
-                                                       contact_interaction,
-                                                       mu_lhy
-                                                       )
-            H_pot = numbas.get_H_pot_jit(self.U, self.dt, term, split_step)
+            if jit: 
+                term = numbas.get_H_pot_exponent_terms_jit(self.V_val,
+                                                           self.a_dd_factor,
+                                                           self.a_s_factor,
+                                                           dipol_term,
+                                                           contact_interaction,
+                                                           mu_lhy
+                                                           )
+                H_pot = numbas.get_H_pot_jit(self.U, self.dt, term, split_step)
+            else:
+                term = self.get_H_pot_exponent_terms(dipol_term,
+                                                     contact_interaction,
+                                                     mu_lhy
+                                                     )
+                H_pot = self.get_H_pot(term, split_step)
+
             self.psi_val_list[i] = H_pot * self.psi_val_list[i]
 
         return density_list, U_dd_list
@@ -833,7 +865,7 @@ class SchroedingerMixture(Schroedinger):
 
         return psi_norm_list
 
-    def time_step(self) -> None:
+    def time_step(self, numba_used, cupy_used) -> None:
         """
         Evolves System according Schrödinger Equations by using the
         split operator method with the Trotter-Suzuki approximation.
@@ -841,9 +873,11 @@ class SchroedingerMixture(Schroedinger):
         """
         # adjust dt, to get the time accuracy when needed
         # self.dt = self.dt_func(self.t, self.dt)
-        self.split_operator_pot(split_step=0.5)
+        if cupy_used:
+            numba_used = False
+        self.split_operator_pot(split_step=0.5, jit=numba_used)
         self.split_operator_kin()
-        self.split_operator_pot(split_step=0.5)
+        self.split_operator_pot(split_step=0.5, jit=numba_used)
 
         self.t = self.t + self.dt
 

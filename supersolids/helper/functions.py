@@ -23,7 +23,7 @@ from scipy import stats, ndimage
 from typing import Tuple, Callable, Optional, List
 
 from supersolids.helper import constants, get_version
-cp, cuda_used = get_version.check_cupy_used(np)
+cp, cupy_used, cuda_used = get_version.check_cupy_used(np)
 
 from supersolids.helper.run_time import run_time
 from supersolids.helper.Box import Box
@@ -191,7 +191,7 @@ def peaks_sort_along(peaks_indices, peaks_height, number_of_peaks, axis):
     _, peaks_sorted_height = peaks_sort(peaks_indices, peaks_height, number_of_peaks)
     if axis in [0, 1, 2]:
         # get the highest peaks in a sorted fashion (the n biggest, where n is number_of_peaks)
-        sorting_indices = cp.argsort(peaks_height)[-number_of_peaks:]
+        sorting_indices = np.argsort(peaks_height)[-number_of_peaks:]
         peaks_sorted_indices = peaks_indices[sorting_indices]
     else:
         sys.exit(f"No such axis. Choose 0, 1 or 2 for axis x, y or z.")
@@ -274,8 +274,8 @@ def get_meshgrid_3d(x, y, z):
 
 
 def check_provided_lists(number_of_mixtures: int,
-                         a_s_list: cp.ndarray,
-                         a_dd_list: cp.ndarray,
+                         a_s_list: np.ndarray,
+                         a_dd_list: np.ndarray,
                          ):
     combinations = list(
         itertools.combinations_with_replacement(
@@ -302,7 +302,7 @@ def get_mu_combinations(dipol_list: list):
         )
     )
 
-    mu_prod_combinations = cp.fromiter(map(cp.prod, mu_combinations), dtype=float)
+    mu_prod_combinations = np.fromiter(map(np.prod, mu_combinations), dtype=float)
 
     return mu_prod_combinations
 
@@ -311,7 +311,7 @@ def get_parameters_mixture(l_0: float,
                            number_of_mixtures: int,
                            a_dd_list: list,
                            a_s_list: list,
-                           ) -> Tuple[cp.ndarray, cp.ndarray]:
+                           ) -> Tuple[np.ndarray, np.ndarray]:
     a_s_array = combinations2array(number_of_mixtures, a_s_list)
     a_dd_array = combinations2array(number_of_mixtures, a_dd_list)
 
@@ -322,31 +322,34 @@ def get_parameters_mixture(l_0: float,
 
 
 def dimensionless(arr, l_0):
-    return arr / l_0
+    if cupy_used:
+        return cp.asnumpy(arr) / cp.asnumpy(l_0)
+    else:
+        return arr / l_0
 
 
 def combinations2array(number_of_mixtures: int,
                        combinations_list: list,
-                       ) -> cp.ndarray:
-    triu_indeces = cp.triu_indices(number_of_mixtures)
-    triu = cp.zeros(shape=(number_of_mixtures, number_of_mixtures))
+                       ) -> np.ndarray:
+    triu_indeces = np.triu_indices(number_of_mixtures)
+    triu = np.zeros(shape=(number_of_mixtures, number_of_mixtures))
     triu[triu_indeces] = combinations_list
     arr = symmetric_mat(triu)
 
     return arr
 
 
-def symmetric_mat(arr: cp.ndarray, axis=None) -> cp.ndarray:
+def symmetric_mat(arr: np.ndarray, axis=None) -> np.ndarray:
     if axis:
-        z_len = cp.shape(arr)[axis]
-        result = arr[:, :, 0] + arr[:, :, 0].T - cp.diag(arr[:, :, 0].diagonal())
+        z_len = np.shape(arr)[axis]
+        result = arr[:, :, 0] + arr[:, :, 0].T - np.diag(arr[:, :, 0].diagonal())
         for i in range(1, z_len):
-            result = cp.stack((result,
-                               arr[:, :, i] + arr[:, :, i].T - cp.diag(arr[:, :, i].diagonal())
+            result = np.stack((result,
+                               arr[:, :, i] + arr[:, :, i].T - np.diag(arr[:, :, i].diagonal())
                                ), axis=axis)
 
     else:
-        result = arr + arr.T - cp.diag(arr.diagonal())
+        result = arr + arr.T - np.diag(arr.diagonal())
 
     return result
 
@@ -396,7 +399,7 @@ def g_qf_helper(m: float = 164 * constants.u_in_kg,
 
 
 def new_int(epsilon_dd: float):
-    func = lambda u: cp.real((1 + epsilon_dd * (3 * u ** 2.0 - 1.0)) ** 2.5)
+    func = lambda u: np.real((1 + epsilon_dd * (3 * u ** 2.0 - 1.0)) ** 2.5)
     try:
         integral = quad(func, 0.0, 1.0)[0]
     except:
@@ -406,7 +409,7 @@ def new_int(epsilon_dd: float):
 
 
 def get_g_qf(N: int, a_s_l_ho_ratio: float, epsilon_dd: float):
-    g_qf = (32.0 / (3.0 * cp.sqrt(np.pi))
+    g_qf = (32.0 / (3.0 * np.sqrt(np.pi))
             * 4.0 * np.pi * a_s_l_ho_ratio ** (5.0 / 2.0)
             * N ** (3.0 / 2.0)
             * new_int(epsilon_dd))
@@ -416,7 +419,7 @@ def get_g_qf(N: int, a_s_l_ho_ratio: float, epsilon_dd: float):
 
 def get_l_ho(m: float = 164.0 * constants.u_in_kg,
              w_x: float = 2.0 * np.pi * 30.0):
-    l_ho = cp.sqrt(constants.hbar / (m * w_x))
+    l_ho = np.sqrt(constants.hbar / (m * w_x))
     return l_ho
 
 
@@ -429,8 +432,8 @@ def get_alphas(w_x: float = 2.0 * np.pi * 30.0,
     return alpha_y, alpha_z
 
 
-def psi_gauss_2d_pdf(pos, mu=cp.array(
-    [0.0, 0.0]), var=cp.array([[1.0, 0.0], [0.0, 1.0]])):
+def psi_gauss_2d_pdf(pos, mu=np.array(
+    [0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]])):
     """
     Gives values according to gaus dirstribution (2D)
     with meshgrid of x,y as input
@@ -443,7 +446,7 @@ def psi_gauss_2d_pdf(pos, mu=cp.array(
         with meshgrid of x,y as input
 
     """
-    cov = cp.diag(var ** 2)
+    cov = np.diag(var ** 2)
     rv = stats.multivariate_normal(mean=mu, cov=cov)
     z_mesh = rv.pdf(pos)
 
@@ -461,9 +464,9 @@ def psi_gauss_2d(x, y,
 
     :param y: mathematical variable
 
-    :param a_x: Stretching factor in x direction (cp.sqrt(2) * std_deviation)
+    :param a_x: Stretching factor in x direction (np.sqrt(2) * std_deviation)
 
-    :param a_y: Stretching factor in y direction (cp.sqrt(2) * std_deviation)
+    :param a_y: Stretching factor in y direction (np.sqrt(2) * std_deviation)
 
     :param x_0: Mean spatial x of pulse
 
@@ -496,11 +499,11 @@ def psi_gauss_3d(x, y, z,
 
     :param z: mathematical variable
 
-    :param a_x: Stretching factor in x direction (cp.sqrt(2) * std_deviation)
+    :param a_x: Stretching factor in x direction (np.sqrt(2) * std_deviation)
 
-    :param a_y: Stretching factor in y direction (cp.sqrt(2) * std_deviation)
+    :param a_y: Stretching factor in y direction (np.sqrt(2) * std_deviation)
 
-    :param a_z: Stretching factor in z direction (cp.sqrt(2) * std_deviation)
+    :param a_z: Stretching factor in z direction (np.sqrt(2) * std_deviation)
 
     :param x_0: Mean spatial x of pulse
 
@@ -534,7 +537,7 @@ def psi_gauss_1d(x, a: float = 1.0, x_0: float = 0.0, k_0: float = 0.0):
 
     """
 
-    return ((a * cp.sqrt(np.pi)) ** (-0.5)
+    return ((a * np.sqrt(np.pi)) ** (-0.5)
             * cp.exp(-0.5 * ((x - x_0) * 1. / a) ** 2 + 1j * x * k_0))
 
 
@@ -583,7 +586,7 @@ def psi_gauss_solution(x):
 
     """
 
-    return cp.exp(-x ** 2) / cp.sqrt(np.pi)
+    return cp.exp(-x ** 2) / np.sqrt(np.pi)
 
 
 def thomas_fermi_1d(x, g: float = 0.0):
@@ -601,7 +604,7 @@ def thomas_fermi_1d(x, g: float = 0.0):
         mu = mu_1d(g)
 
         # this needs to be >> 1, e.g 5.3
-        # print(cp.sqrt(2 * mu))
+        # print(np.sqrt(2 * mu))
 
         return mu * (1 - ((x ** 2) / (2 * mu))) / g
 
@@ -627,7 +630,7 @@ def thomas_fermi_2d(x, y, g: float = 0.0):
         mu = mu_2d(g)
 
         # this needs to be >> 1, e.g 5.3
-        # print(cp.sqrt(2 * mu))
+        # print(np.sqrt(2 * mu))
 
         return mu * (1 - ((x ** 2 + y ** 2) / (2 * mu))) / g
 
@@ -662,7 +665,7 @@ def thomas_fermi_3d(x, y, z, g: float = 0.0):
         mu = mu_3d(g)
 
         # this needs to be >> 1, e.g 5.3
-        # print(cp.sqrt(2 * mu))
+        # print(np.sqrt(2 * mu))
 
         return mu * (1 - ((x ** 2 + y ** 2 + z ** 2) / (2 * mu))) / g
 
@@ -673,21 +676,21 @@ def thomas_fermi_3d(x, y, z, g: float = 0.0):
 
 def mu_1d(g: float = 0.0):
     # mu is the chemical potential
-    mu = ((3.0 * g) / (4.0 * cp.sqrt(2.0))) ** (2.0 / 3.0)
+    mu = ((3.0 * g) / (4.0 * np.sqrt(2.0))) ** (2.0 / 3.0)
 
     return mu
 
 
 def mu_2d(g: float = 0.0):
     # mu is the chemical potential
-    mu = cp.sqrt(g / np.pi)
+    mu = np.sqrt(g / np.pi)
 
     return mu
 
 
 def mu_3d(g: float = 0.0):
     # mu is the chemical potential
-    mu = ((15 * g) / (16 * cp.sqrt(2) * cp.pi)) ** (2 / 5)
+    mu = ((15 * g) / (16 * np.sqrt(2) * np.pi)) ** (2 / 5)
 
     return mu
 
@@ -821,7 +824,7 @@ def get_rho_integral_slow(k_rho_mesh: cp.ndarray,
 
 
 def triu_list2array(triu_list, triu_ind, shape):
-    triu = cp.zeros(shape=shape)
+    triu = np.zeros(shape=shape)
     triu[triu_ind] = triu_list
 
     return triu
@@ -844,7 +847,7 @@ def get_rho_integral(k_rho_mesh: cp.ndarray,
         kz_mesh_halved = kz_mesh[0:x_len, 0:y_len, :]
         z_len = cp.shape(kz_mesh_halved)[2]
 
-        triu_ind = cp.triu_indices(n=x_len, m=y_len, k=-1)
+        triu_ind = np.triu_indices(n=x_len, m=y_len, k=-1)
         g = [k_rho_mesh_halved[:, :, i][triu_ind] for i in range(0, z_len)]
         h = [kz_mesh_halved[:, :, i][triu_ind] for i in range(0, z_len)]
         out = []
@@ -965,7 +968,7 @@ def bessel_func(rho, z, k_rho, kz):
     return bessel
 
 
-def f_kappa(kappa: cp.ndarray, epsilon: float = 10 ** -10) -> float:
+def f_kappa(kappa: np.ndarray, epsilon: float = 10 ** -10) -> float:
     k2_1 = (kappa ** 2.0 - 1.0 + epsilon)
     result = ((2.0 * kappa ** 2.0 + 1.0) - (3.0 * kappa ** 2.0) * atan_special(
         k2_1)) / k2_1
@@ -1023,7 +1026,7 @@ def get_kappa(alpha_z: float, e_dd: float,
 def density_in_trap(x: float, y: float, z: float,
                     R_r: float, R_z: float, g: float = 0.0):
     r = cp.sqrt(x ** 2.0 + y ** 2.0)
-    n_0 = 15.0 / (8.0 * cp.pi * R_z * R_r ** 2.0)
+    n_0 = 15.0 / (8.0 * np.pi * R_z * R_r ** 2.0)
     a = (r / R_r) ** 2.0 + (z / R_z) ** 2.0
 
     n_r = cp.where(a > 1, 0.0, n_0 * (1.0 - a))
@@ -1154,8 +1157,8 @@ if __name__ == '__main__':
     # functools.partial sets all arguments except x,
     # as multiple arguments for Schroedinger aren't implement yet
     psi_0_1d = functools.partial(psi_gauss_1d, a=1, x_0=0, k_0=0)
-    psi_0_2d = functools.partial(psi_gauss_2d_pdf, mu=cp.array(
-        [0.0, 0.0]), var=cp.array([1.0, 1.0]))
+    psi_0_2d = functools.partial(psi_gauss_2d_pdf, mu=np.array(
+        [0.0, 0.0]), var=np.array([1.0, 1.0]))
     psi_0_3d = functools.partial(psi_gauss_3d, a=1, x_0=0, y_0=0, z_0=0, k_0=0)
 
     # testing for 2d plot
