@@ -2,11 +2,11 @@
 
 dir_path="/bigwork/dscheier/results/begin_gpu"
 # dir_path="/run/media/dsche/ITP Transfer/test/"
-steps_per_npz=1
+steps_per_npz=1000
 steps_format="%07d"
 
 frame_start=0
-movie_number_result=1
+movie_number_result=6
 movie_string="movie"
 movie_format="%03d"
 printf -v movie_number_formatted ${movie_format} ${movie_number_result}
@@ -17,24 +17,24 @@ dir_path_after=$dir_path
 
 # python -m supersolids \
 /bigwork/dscheier/miniconda3/envs/pyforge/bin/python -m supersolids \
--Res='{"x":256, "y":128, "z":32}' \
+-Res='{"x":128, "y":64, "z":32}' \
 -Box='{"x0":-10, "x1":10, "y0":-5, "y1":5, "z0":-4, "z1":4}' \
--max_timesteps=5 \
+-max_timesteps=1000 \
 -dt=0.0002 \
 -steps_per_npz=$steps_per_npz \
 -steps_format="${steps_format}" \
 -a='{"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}' \
 -dir_path="${dir_path}" \
 -dir_name_result="${dir_name_result}" \
--w_x=207.345 \
+-w_x=87.96 \
 -w_y=502.65 \
 -w_z=1049.29 \
 -accuracy=0.0 \
 -noise 0.8 1.2 \
---N_list 58000 5000 \
---m_list  164.0 164.0 \
---dipol_list 10.0 9.0 \
---a_s_list  95.0 57.0 95.0 \
+--N_list 58000 0 \
+--m_list  163.8 0.0 \
+--a_dd_list 130.8 0.0 0.0 \
+--a_s_list  88.0 0.0 0.0 \
 --V_interaction \
 --offscreen \
 --mixture
