@@ -1,0 +1,31 @@
+:py:mod:`supersolids`
+=====================
+
+.. py:module:: supersolids
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   Animation/index.rst
+   helper/index.rst
+   scripts/index.rst
+   tools/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   Schroedinger/index.rst
+   SchroedingerMixture/index.rst
+   SchroedingerMixtureSummary/index.rst
+   SchroedingerSummary/index.rst
+   __main__/index.rst
+
+

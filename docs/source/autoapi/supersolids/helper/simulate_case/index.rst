@@ -1,0 +1,83 @@
+:py:mod:`supersolids.helper.simulate_case`
+==========================================
+
+.. py:module:: supersolids.helper.simulate_case
+
+.. autoapi-nested-parse::
+
+   Animation for the numerical solver for the non-linear
+   time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.helper.simulate_case.simulate_case
+
+
+
+.. py:function:: simulate_case(System, Anim, accuracy = 10**(-6), delete_input = True, dir_path = Path.home().joinpath('supersolids', 'results'), dir_name_load = '', dir_name_result = '', slice_indices = [0, 0, 0], offscreen = False, x_lim = (-1.0, 1.0), y_lim = (-1.0, 1.0), z_lim = (-1.0, 1.0), filename_schroedinger = 'schroedinger.pkl', filename_steps = 'step_', steps_format = '%07d', steps_per_npz = 10, frame_start = 0, script_name = 'script', script_args = '', script_number_regex = '*', script_extensions = None, script_extensions_index = 0, no_legend = True)
+
+   Wrapper for Animation and Schroedinger to get a working Animation
+   of a System through the equations given by Schroedinger.
+
+   :param System: Schrödinger equations for the specified system
+
+   :param Anim: :class: Animation with configured properties
+
+   :param accuracy: Convergence is reached when relative error of mu is smaller
+       than accuracy, where :math:`\mu = - \log(\psi_{normed}) / (2 dt)`
+
+   :param offscreen: Condition for interactive mode. When camera functions are used,
+       then interaction is not possible. So interactive=True turn the usage
+       of camera functions off.
+
+   :param delete_input: Condition if the input pictures should be deleted,
+       after creation the creation of the animation as e.g. mp4
+
+   :param dir_path: Path where to look for old directories (movie data)
+
+   :param dir_name_result: Name of directory where to save the results at. For example the
+       standard naming convention is movie002")
+
+   :param slice_indices: Numpy array with indices of grid points
+       in the directions x, y, z (in terms of System.x, System.y, System.z)
+       to produce a slice/plane in mayavi,
+       where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice
+       Max values is for e.g. System.Res.x - 1.
+
+   :param x_lim: Limits of plot in x direction
+
+   :param y_lim: Limits of plot in y direction
+
+   :param z_lim: Limits of plot in z direction
+
+   :param filename_schroedinger: Name of file, where the Schroedinger object is saved
+
+   :param filename_steps: Name of file, without enumerator for the files.
+       For example the standard naming convention is step_000001.npz,
+       the string needed is step_
+
+   :param steps_format:
+       Formatting string for the enumeration of steps.
+
+   :param steps_per_npz: Number of dt steps skipped between saved npz.
+
+   :param frame_start: Number of named file, where psi_val is loaded from. For example
+       the standard naming convention is step_000001.npz
+
+   :param script_name: Name of file, where to save args of the running simulate_npz.
+
+   :param no_legend: Option to add legend as text to every frame.
+
+   :return: Reference to Schroedinger System
+
+
+

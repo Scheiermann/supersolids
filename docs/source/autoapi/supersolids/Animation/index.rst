@@ -1,0 +1,17 @@
+:py:mod:`supersolids.Animation`
+===============================
+
+.. py:module:: supersolids.Animation
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   Animation/index.rst
+   MatplotlibAnimation/index.rst
+   MayaviAnimation/index.rst
+
+
