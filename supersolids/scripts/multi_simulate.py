@@ -9,66 +9,69 @@ import subprocess
 from pathlib import Path
 import numpy as np
 
-
-def dic2str(dic):
-    dic_str = str(dic).replace("\'", "\"")
-    dic_str_single_quote_wrapped = f"'{dic_str}'"
-
-    return dic_str_single_quote_wrapped
+from supersolids.helper.dict2str import dic2str
 
 supersolids_version = "0.1.34rc26"
-dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/")
-# dir_path = Path("/home/dsche/supersolids/results/")
+dir_path = Path("/bigwork/dscheier/results/begin_gpu/")
 
 slurm: bool = True
-mem_in_GB = 6
+mem_in_GB = 2
 xvfb_display = 50
+
+Box = {"x0": -15, "x1": 15, "y0": -4, "y1": 4, "z0": -4, "z1": 4}
+Res = {"x": 128, "y": 64, "z": 32}
 
 max_timesteps = 700001
 dt = 0.0002
 steps_per_npz = 10000
 accuracy = 0.0
 
-w_x_freq = 33.0
-w_z_freq = 167.0
+f_z = 167.0
+w_z = 2.0 * np.pi * f_z
 
-N_start = 0.05
-N_end = 0.51
-N_step = 0.05
+f_x_start = 12.0
+f_x_end = 17.0
+f_x_step = 2.0
 
-a12_start = 0.6
-a12_end = 0.91
-a12_step = 0.02
+f_y_start = 50.0
+f_y_end = 96.0
+f_y_step = 5.0
 
 file_start = "step_"
-file_number = 1130000
+file_number = 1500000
 file_format = "%07d"
 file_pattern = ".npz"
 file_name = f"{file_start}{file_format % file_number}{file_pattern}"
 
 movie_string = "movie"
 counting_format = "%03d"
-movie_number = 34
-files2last = 55
+movie_number = 32
+files2last = 3
 load_from_multi = True
+load_outer_loop = True
 
 func_filename = "distort.txt"
 
 j_counter = 0
+k_counter = 0
+skip_counter = 0
+skip = j_counter
 
 func_list = []
 func_path_list = []
 dir_path_func_list = []
-for N2_part in np.arange(N_start, N_end, N_step):
-    for a12 in np.arange(a12_start, a12_end, a12_step)[::-1]:
+for f_x in np.arange(f_x_start, f_x_end, f_x_step):
+    for f_y in np.arange(f_y_start, f_y_end, f_y_step)[::-1]:
+        skip_counter += 1
+        if skip_counter < skip:
+            continue
         func_list.append([])
-        N2_part_string = round(N2_part, ndigits=5)
-        a12_string = round(a12, ndigits=5)
+        f_x_string = round(f_x, ndigits=5)
+        f_y_string = round(f_y, ndigits=5)
         # d_string = 0.0001 * 10.0 ** round(d, ndigits=5)
 
-        w_x = 2.0 * np.pi * w_x_freq
-        w_y = 2.0 * np.pi * (w_x_freq / a12_string)
-        w_z = 2.0 * np.pi * w_z_freq
+        w_x = 2.0 * np.pi * f_x
+        w_y = 2.0 * np.pi * f_y
         w = {"w_x": eval(f"{w_x}"), "w_y": eval(f"{w_y}"), "w_z": eval(f"{w_z}")}
 
         # V = f"lambda x, y, z: {v_string} * np.sin(np.pi*x/{d_string}) ** 2"
@@ -77,8 +80,8 @@ for N2_part in np.arange(N_start, N_end, N_step):
         # V = f"lambda x, y, z: {v_string} * np.exp(-((x ** 2.0) /{d_string} ** 2.0) )"
         V = None
         # func_list[j_counter].append(f"-V='{V}' ")
-        func_list[j_counter].append(f"N2/N1={N2_part_string} ")
-        func_list[j_counter].append(f"a12={a12_string} ")
+        func_list[j_counter].append(f"f_x={f_x_string} ")
+        func_list[j_counter].append(f"f_y={f_y_string} ")
         # func_list[j_counter].append(f"--real_time ")
 
         noise_func = None
@@ -90,7 +93,10 @@ for N2_part in np.arange(N_start, N_end, N_step):
         # func_list[j_counter].append(f"-noise_func='{noise_func}' ")
 
         if load_from_multi:
-            movie_number_now = movie_number + j_counter
+            if load_outer_loop:
+                movie_number_now = movie_number + k_counter
+            else:
+                movie_number_now = movie_number + j_counter
         else:
             movie_number_now = movie_number
 
@@ -103,41 +109,41 @@ for N2_part in np.arange(N_start, N_end, N_step):
         func_path = Path(dir_path_func, func_filename)
         func_path_list.append(func_path)
 
-        jobname = f"{supersolids_version}_N2_{N2_part_string}a12_{a12_string}"
+        jobname = f"{supersolids_version}_fx_{f_x_string}fy_{f_y_string}"
 
         if slurm:
             cluster_flags = f"""#==================================================
-        #SBATCH --job-name {jobname}
-        #SBATCH -D /bigwork/dscheier/supersolids/supersolids/results/
-        #SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
-        #SBATCH --mail-type=END,FAIL
-        #SBATCH -o output-%j.out
-        #SBATCH -e error-%j.out
-        #SBATCH -N 1
-        #SBATCH -n 1
-        #SBATCH -t 14-00:00:00
-        #SBATCH --mem={mem_in_GB}G
-        """
+#SBATCH --job-name {jobname}
+#SBATCH -D {dir_path}/log/
+#SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
+#SBATCH --mail-type=END,FAIL
+#SBATCH -o output-%j.out
+#SBATCH -e error-%j.out
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH -t 1-00:00:00
+#SBATCH --mem={mem_in_GB}G
+"""
 
         else:
             cluster_flags = f"""#==================================================
-        # PBS -N {jobname}
-        # PBS -M daniel.scheiermann@itp.uni-hannover.de
-        # PBS -d /bigwork/dscheier/supersolids/supersolids/results/
-        # PBS -e /bigwork/dscheier/supersolids/supersolids/results/log/error_$PBS_JOBID.txt
-        # PBS -o /bigwork/dscheier/supersolids/supersolids/results/log/output_$PBS_JOBID.txt
-        # PBS -l nodes=1:ppn=1:ws
-        # PBS -l walltime=200:00:00
-        # PBS -l mem={mem_in_GB}GB
-        # PBS -l vmem={mem_in_GB}GB
-        """
+# PBS -N {jobname}
+# PBS -M daniel.scheiermann@itp.uni-hannover.de
+#PBS -d {dir_path}
+#PBS -e {dir_path}/log/error_$PBS_JOBID.txt
+#PBS -o {dir_path}/log/output_$PBS_JOBID.txt
+# PBS -l nodes=1:ppn=1:ws
+# PBS -l walltime=24:00:00
+# PBS -l mem={mem_in_GB}GB
+# PBS -l vmem={mem_in_GB}GB
+"""
 
         heredoc = "\n".join(["#!/bin/bash",
                              cluster_flags,
                              f"""
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/bigwork/dscheier/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/bigwork/dscheier/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
@@ -159,12 +165,18 @@ echo $CONDA_PREFIX
 echo $(which python3)
 echo $(which pip3)
 
-/bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
+# conda install -c scheiermannsean/label/main supersolids={supersolids_version}
+conda install -c scheiermannsean/label/testing supersolids={supersolids_version}
+conda install numba
+conda install cupy
+
+# /bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
 # /bigwork/dscheier/miniconda3/bin/pip3 install -i https://pypi.org/simple/supersolids=={supersolids_version}
 
-/bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids.tools.simulate_npz \
--Res='{{"x": 256, "y": 128, "z": 32}}' \
--Box='{{"x0": -10, "x1": 10, "y0": -5, "y1": 5, "z0": -4, "z1": 4}}' \
+# /bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids.tools.simulate_npz \
+/bigwork/dscheier/miniconda3/envs/pyforge/bin/python -m supersolids.tools.simulate_npz \
+-Box={dic2str(Box)} \
+-Res={dic2str(Res)} \
 -max_timesteps={max_timesteps} \
 -dt={dt} \
 -steps_per_npz={steps_per_npz} \
@@ -173,11 +185,11 @@ echo $(which pip3)
 -dir_name_result={movie_after} \
 -filename_npz={file_name} \
 -dir_path={dir_path} \
---V_reload \
+-w={dic2str(w)} \
 --real_time \
 --offscreen
 
-# -w={dic2str(w)} \
+# --V_reload \
 # -V={V} \
 # -noise_func='{noise_func}'\
 # -neighborhood 0.02 4
@@ -196,6 +208,7 @@ echo $(which pip3)
         p.wait()
 
         j_counter += 1
+    k_counter += 1
 
 
 j_counter = 0
