@@ -12,6 +12,7 @@ Contributing
 | 6. **Build and install** by using the commands from the makefile:
 | * conda install recommonmark
 | * conda install twine
+| * conda install conda-build
 | * make build
 | * make conda_build
 | * make conda_install_local

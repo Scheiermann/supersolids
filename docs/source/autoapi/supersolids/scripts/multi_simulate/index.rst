@@ -63,7 +63,7 @@ Attributes
 
 
 .. py:data:: supersolids_version
-   :annotation: = 0.1.34rc26
+   :annotation: = 0.1.34rc27
 
    
 
