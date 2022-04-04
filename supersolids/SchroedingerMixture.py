@@ -25,8 +25,7 @@ from typing import Optional, Callable, Union, List, Tuple
 
 from supersolids.helper import constants, functions, get_path, get_version
 cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np)
-if numba_used:
-    import supersolids.helper.numbas as numbas
+import supersolids.helper.numbas as numbas
 
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixtureSummary import SchroedingerMixtureSummary
@@ -273,7 +272,10 @@ class SchroedingerMixture(Schroedinger):
             if V is None:
                 self.V_val = 0.0
             else:
-                self.V_val = self.V(self.pos)
+                if cupy_used:
+                    self.V_val: cp.ndarray = self.V(self.pos)
+                else:
+                    self.V_val: cp.ndarray = cp.asarray(self.V(self.pos))
 
         elif self.dim == 3:
             self.x_mesh, self.y_mesh, self.z_mesh = functions.get_grid(self.Res, self.Box)
@@ -303,7 +305,9 @@ class SchroedingerMixture(Schroedinger):
                                   f"{self.trapez_integral(cp.abs(psi_sol_val) ** 2.0)}")
 
             kx_mesh, ky_mesh, kz_mesh = np.meshgrid(self.kx, self.ky, self.kz, indexing="ij")
-            self.k_squared: cp.ndarray = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
+            self.k_squared: cp.ndarray = cp.asarray(kx_mesh ** 2.0
+                                                    + ky_mesh ** 2.0
+                                                    + kz_mesh ** 2.0)
 
             if V is None:
                 self.V_val = 0.0
@@ -445,9 +449,9 @@ class SchroedingerMixture(Schroedinger):
         with open(Path(input_path, "mixture_" + filename_steps + steps_format % frame + ".npz"),
                   "wb") as g:
             if cupy_used:
-                psi_val_list = [psi_val.get() for psi_val in self.psi_val_list]
+                psi_val_list: np.ndarray = [psi_val.get() for psi_val in self.psi_val_list]
             else:
-                psi_val_list = self.psi_val_list
+                psi_val_list: np.ndarray = self.psi_val_list
             cp.savez_compressed(g, psi_val_list=psi_val_list)
 
     def use_summary(self, summary_name: Optional[str] = None) -> Tuple[SchroedingerMixtureSummary,
@@ -823,15 +827,19 @@ class SchroedingerMixture(Schroedinger):
 
     def split_operator_pot(self, split_step: float = 0.5,
                            jit: bool = True) -> Tuple[List[cp.ndarray], List[cp.ndarray]]:
-        density_list = self.get_density_list(jit=jit)
-        density_tensor_vec = cp.stack(density_list, axis=0)
+        density_list: List[cp.ndarray] = self.get_density_list(jit=jit)
+        density_tensor_vec: cp.ndarray = cp.stack(density_list, axis=0)
 
-        U_dd_list = self.get_U_dd_list(density_list)
-        U_dd_tensor_vec = cp.stack(U_dd_list, axis=0)
+        U_dd_list: List[cp.ndarray] = self.get_U_dd_list(density_list)
+        U_dd_tensor_vec: cp.ndarray = cp.stack(U_dd_list, axis=0)
 
         # update H_pot before use
-        contact_interaction_vec = cp.einsum("...ij, j...->i...", self.a_s_array, density_tensor_vec)
-        dipol_term_vec = cp.einsum("...ij, j...->i...", self.a_dd_array, U_dd_tensor_vec)
+        contact_interaction_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
+                                                        self.a_s_array,
+                                                        density_tensor_vec)
+        dipol_term_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
+                                               self.a_dd_array,
+                                               U_dd_tensor_vec)
         # contact_interaction_vec = self.arr_tensor_mult(self.a_s_array, density_tensor_vec)
         # dipol_term_vec = self.arr_tensor_mult(self.a_dd_array, U_dd_tensor_vec)
 
@@ -842,41 +850,44 @@ class SchroedingerMixture(Schroedinger):
                 list(dipol_term_vec),
                 mu_lhy_list)):
             if jit: 
-                term = numbas.get_H_pot_exponent_terms_jit(self.V_val,
-                                                           self.a_dd_factor,
-                                                           self.a_s_factor,
-                                                           dipol_term,
-                                                           contact_interaction,
-                                                           mu_lhy
-                                                           )
-                H_pot = numbas.get_H_pot_jit(self.U, self.dt, term, split_step)
+                term: cp.ndarray = numbas.get_H_pot_exponent_terms_jit(self.V_val,
+                                                                       self.a_dd_factor,
+                                                                       self.a_s_factor,
+                                                                       dipol_term,
+                                                                       contact_interaction,
+                                                                       mu_lhy
+                                                                       )
+                H_pot: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt, term, split_step)
             else:
-                term = self.get_H_pot_exponent_terms(dipol_term,
-                                                     contact_interaction,
-                                                     mu_lhy
-                                                     )
-                H_pot = self.get_H_pot(term, split_step)
+                term: cp.ndarray = self.get_H_pot_exponent_terms(dipol_term,
+                                                                 contact_interaction,
+                                                                 mu_lhy
+                                                                 )
+                H_pot: cp.ndarray = self.get_H_pot(term, split_step)
 
-            self.psi_val_list[i] = H_pot * self.psi_val_list[i]
+            self.psi_val_list[i]: cp.ndarray = H_pot * self.psi_val_list[i]
 
         return density_list, U_dd_list
 
     def split_operator_kin(self) -> None:
         # apply H_kin in k-space (transform back and forth)
         for i in range(0, len(self.psi_val_list)):
-            self.psi_val_list[i] = cp.fft.fftn(self.psi_val_list[i])
+            psi_val: cp.ndarray = self.psi_val_list[i]
+            self.psi_val_list[i]: cp.ndarray = cp.fft.fftn(psi_val)
 
         for i, H_kin in enumerate(self.H_kin_list):
-            self.psi_val_list[i] = H_kin * self.psi_val_list[i]
+            psi_val: cp.ndarray = self.psi_val_list[i]
+            self.psi_val_list[i]: cp.ndarray = H_kin * psi_val
 
         for i in range(0, len(self.psi_val_list)):
-            self.psi_val_list[i] = cp.fft.ifftn(self.psi_val_list[i])
+            psi_val: cp.ndarray = self.psi_val_list[i]
+            self.psi_val_list[i]: cp.ndarray = cp.fft.ifftn(psi_val)
 
     def normalize_psi_val(self) -> List[float]:
         psi_norm_list: List[float] = []
         for i, psi_val in enumerate(self.psi_val_list):
             psi_norm_list.append(self.get_norm(func_val=psi_val))
-            self.psi_val_list[i] = psi_val / cp.sqrt(psi_norm_list[i])
+            self.psi_val_list[i]: cp.ndarray = psi_val / cp.sqrt(psi_norm_list[i])
 
         return psi_norm_list
 

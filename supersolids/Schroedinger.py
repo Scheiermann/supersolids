@@ -161,7 +161,7 @@ class Schroedinger:
             if psi_0_noise is None:
                 self.psi_val: cp.ndarray = self.psi_0(self.x)
             else:
-                self.psi_val = psi_0_noise * self.psi_0(self.x)
+                self.psi_val: cp.ndarray = psi_0_noise * self.psi_0(self.x)
 
             if V is None:
                 self.V_val: Union[float, cp.ndarray] = 0.0
@@ -189,9 +189,9 @@ class Schroedinger:
             self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
 
             if psi_0_noise is None:
-                self.psi_val = self.psi_0(self.pos)
+                self.psi_val: cp.ndarray = self.psi_0(self.pos)
             else:
-                self.psi_val = psi_0_noise * self.psi_0(self.pos)
+                self.psi_val: cp.ndarray = psi_0_noise * self.psi_0(self.pos)
 
             if V is None:
                 self.V_val = 0.0
@@ -217,9 +217,11 @@ class Schroedinger:
             self.x_mesh, self.y_mesh, self.z_mesh = functions.get_grid(self.Res, self.Box)
 
             if psi_0_noise is None:
-                self.psi_val = self.psi_0(self.x_mesh, self.y_mesh, self.z_mesh)
+                self.psi_val: cp.ndarray = self.psi_0(self.x_mesh, self.y_mesh, self.z_mesh)
             else:
-                self.psi_val = psi_0_noise * self.psi_0(self.x_mesh, self.y_mesh, self.z_mesh)
+                self.psi_val: cp.ndarray = psi_0_noise * self.psi_0(self.x_mesh,
+                                                                    self.y_mesh,
+                                                                    self.z_mesh)
 
             if self.psi_sol is None:
                 self.psi_sol_val = None
@@ -274,7 +276,10 @@ class Schroedinger:
                 if (p == 2.0) and jit:
                     psi_density: cp.ndarray = numbas.get_density_jit(func_val, p=2.0)
                 else:
-                    psi_density = cp.abs(func_val) ** p
+                    if cupy_used:
+                        psi_density: cp.ndarray = np.abs(cp.asarray(func_val)) ** p
+                    else:
+                        psi_density: cp.ndarray = np.abs(func_val) ** p
 
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")
@@ -492,7 +497,7 @@ class Schroedinger:
                              for i in range(0, len(distances_indices))]
 
         prob_min = fraction * cp.max(peaks_sorted_height)
-        prob = cp.abs(self.psi_val) ** 2.0
+        prob: cp.ndarray = cp.abs(self.psi_val) ** 2.0
         bool_grid = (prob_min <= prob)
         bool_grid_list = []
         for i, peak_index in enumerate(peaks_sorted_indices):
@@ -574,7 +579,7 @@ class Schroedinger:
 
         N_in_droplets = []
         for k in range(0, number_of_peaks):
-            psi_val_droplets = cp.where(bool_grid_list[k],
+            psi_val_droplets: cp.ndarray = cp.where(bool_grid_list[k],
                                         self.psi_val,
                                         cp.zeros(shape=cp.shape(self.psi_val)))
 
@@ -636,9 +641,9 @@ class Schroedinger:
 
         x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
         if numba_used:
-            prob = numbas.get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1]
+            prob: cp.ndarray = numbas.get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1]
         else:
-            prob = self.get_density(p=2.0, jit=numba_used)[x0:x1, y0:y1, z0:z1]
+            prob: cp.ndarray = self.get_density(p=2.0, jit=numba_used)[x0:x1, y0:y1, z0:z1]
 
         r = self.get_mesh_list(x0, x1, y0, y1, z0, z1)
         center_of_mass_along_axis = [prob * r_i for r_i in r]
@@ -671,17 +676,17 @@ class Schroedinger:
         Calculates the variance of the phase of the System.
 
         """
-        prob = cp.abs(self.psi_val) ** 2.0,
+        prob: cp.ndarray = cp.abs(self.psi_val) ** 2.0,
         bool_grid_list = self.get_peak_neighborhood(prob, prob_min, number_of_peaks)
-        bool_grid = cp.logical_or(bool_grid_list[:-1], bool_grid_list[-1])
+        bool_grid: cp.ndarray = cp.logical_or(bool_grid_list[:-1], bool_grid_list[-1])
 
         norm = self.get_norm()
         if numba_used:
-            prob = bool_grid * numbas.get_density_jit(self.psi_val, p=2.0) / norm
+            prob: cp.ndarray = bool_grid * numbas.get_density_jit(self.psi_val, p=2.0) / norm
         else:
-            prob = bool_grid * self.get_density(p=2.0, jit=numba_used) / norm
+            prob: cp.ndarray = bool_grid * self.get_density(p=2.0, jit=numba_used) / norm
 
-        psi_val_bool_grid = bool_grid * self.psi_val
+        psi_val_bool_grid: cp.ndarray = bool_grid * self.psi_val
         angle = cp.angle(psi_val_bool_grid)
         angle_cos = cp.cos(angle + np.pi)
 
@@ -704,11 +709,13 @@ class Schroedinger:
         norm = self.get_norm(func_val=self.psi_val[x0:x1, y0:y1, z0:z1])
 
         if numba_used:
-            prob_cropped = numbas.get_density_jit(self.psi_val, p=2.0)[x0:x1, y0:y1, z0:z1] / norm
+            prob_cropped: cp.ndarray = numbas.get_density_jit(self.psi_val,
+                                                              p=2.0)[x0:x1, y0:y1, z0:z1] / norm
         else:
-            prob_cropped = self.get_density(p=2.0, jit=numba_used)[x0:x1, y0:y1, z0:z1] / norm
+            prob_cropped: cp.ndarray = self.get_density(p=2.0,
+                                                        jit=numba_used)[x0:x1, y0:y1, z0:z1] / norm
 
-        psi_val_cropped = self.psi_val[x0:x1, y0:y1, z0:z1]
+        psi_val_cropped: cp.ndarray = self.psi_val[x0:x1, y0:y1, z0:z1]
         angle = cp.angle(psi_val_cropped)
         angle_cos = cp.cos(angle + np.pi)
 
@@ -732,16 +739,16 @@ class Schroedinger:
         H_pot: cp.ndarray = self.get_H_pot(psi_2, psi_3, U_dd)
 
         # multiply element-wise the (1D, 2D or 3D) arrays with each other
-        self.psi_val = H_pot * self.psi_val
+        self.psi_val: cp.ndarray = H_pot * self.psi_val
 
     def split_operator_kin(self) -> None:
-        self.psi_val = cp.fft.fftn(self.psi_val)
+        self.psi_val: cp.ndarray = cp.fft.fftn(self.psi_val)
         # H_kin is just dependent on U and the grid-points, which are constants,
         # so it does not need to be recalculated
         # multiply element-wise the (1D, 2D or 3D) array (H_kin) with psi_val
         # (1D, 2D or 3D)
-        self.psi_val = self.H_kin * self.psi_val
-        self.psi_val = cp.fft.ifftn(self.psi_val)
+        self.psi_val: cp.ndarray = self.H_kin * self.psi_val
+        self.psi_val: cp.ndarray = cp.fft.ifftn(self.psi_val)
 
     def get_H_pot(self, psi_2: cp.ndarray, psi_3: cp.ndarray, U_dd: cp.ndarray) -> cp.ndarray:
         H_pot: cp.ndarray = cp.exp(self.U
@@ -775,7 +782,7 @@ class Schroedinger:
         # for self.imag_time=False, renormalization should be preserved,
         # but we play safe here (regardless of speedup)
         # if self.imag_time:
-        self.psi_val = self.psi_val / cp.sqrt(psi_norm_after_evolution)
+        self.psi_val: cp.ndarray = self.psi_val / cp.sqrt(psi_norm_after_evolution)
 
         self.mu_arr = cp.array([-cp.log(psi_norm_after_evolution)
                                 / (2.0 * self.dt)])
@@ -802,9 +809,9 @@ class Schroedinger:
         return self.E
 
     def get_E_kin(self) -> float:
-        psi_val_k = cp.fft.fftn(self.psi_val)
+        psi_val_k: cp.ndarray = cp.fft.fftn(self.psi_val)
         psi_norm_k: float = self.get_norm(psi_val_k, fourier_space=True)
-        psi_val_k = psi_val_k / cp.sqrt(psi_norm_k)
+        psi_val_k: cp.ndarray = psi_val_k / cp.sqrt(psi_norm_k)
         E_kin = self.get_norm(0.5 * self.k_squared * psi_val_k, fourier_space=True)
 
         return E_kin
