@@ -225,10 +225,15 @@ class SchroedingerMixture(Schroedinger):
         if self.dim == 1:
             # TODO: complete implementation
             for psi_0, psi_0_noise in zip(psi_0_list, psi_0_noise_list):
-                if psi_0_noise is None:
-                    self.psi_val_list.append(psi_0(self.x))
+                if cupy_used:
+                    psi_val: cp.ndarray = cp.asarray(psi_0(self.x_mesh))
                 else:
-                    self.psi_val_list.append(psi_0_noise * psi_0(self.x))
+                    psi_val: cp.ndarray = psi_0(self.x_mesh)
+
+                if psi_0_noise is None:
+                    self.psi_val_list.append(psi_val)
+                else:
+                    self.psi_val_list.append(psi_0_noise * psi_val)
 
             self.k_squared: np.ndarray = self.kx ** 2.0
 
@@ -252,10 +257,15 @@ class SchroedingerMixture(Schroedinger):
             self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
 
             for psi_0, psi_0_noise in zip(psi_0_list, psi_0_noise_list):
-                if psi_0_noise is None:
-                    self.psi_val_list.append(psi_0(self.pos))
+                if cupy_used:
+                    psi_val: cp.ndarray = cp.asarray(psi_0(self.pos))
                 else:
-                    self.psi_val_list.append(psi_0_noise * psi_0(self.pos))
+                    psi_val: cp.ndarray = psi_0(self.pos)
+
+                if psi_0_noise is None:
+                    self.psi_val_list.append(psi_val)
+                else:
+                    self.psi_val_list.append(psi_0_noise * psi_val)
 
             kx_mesh, ky_mesh, _ = functions.get_meshgrid(self.kx, self.ky)
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0
@@ -269,40 +279,49 @@ class SchroedingerMixture(Schroedinger):
             self.x_mesh, self.y_mesh, self.z_mesh = functions.get_grid(self.Res, self.Box)
 
             for psi_0, psi_0_noise in zip(psi_0_list, psi_0_noise_list):
-                if psi_0_noise is None:
-                    self.psi_val_list.append(psi_0(self.x_mesh, self.y_mesh, self.z_mesh))
+                if cupy_used:
+                    psi_val: cp.ndarray = cp.asarray(psi_0(self.x_mesh, self.y_mesh, self.z_mesh))
                 else:
-                    self.psi_val_list.append(psi_0_noise * psi_0(self.x_mesh,
-                                                                 self.y_mesh,
-                                                                 self.z_mesh)
-                                             )
+                    psi_val: cp.ndarray = psi_0(self.x_mesh, self.y_mesh, self.z_mesh)
+                if psi_0_noise is None:
+                    self.psi_val_list.append(psi_val)
+                else:
+                    self.psi_val_list.append(psi_0_noise * psi_val)
 
             for psi_sol in self.psi_sol_list:
                 if psi_sol is None:
                     self.psi_sol_val_list.append(None)
                 else:
                     if callable(psi_sol):
-                        psi_sol_val = psi_sol(self.x_mesh, self.y_mesh, self.z_mesh)
+                        if cupy_used:
+                            psi_sol_val = cp.asarray(psi_sol(self.x_mesh, self.y_mesh, self.z_mesh))
+                        else:
+                            psi_sol_val = psi_sol(self.x_mesh, self.y_mesh, self.z_mesh)
                         self.psi_sol_val_list.append(psi_sol_val)
                         if psi_sol_val is not None:
                             print(f"Norm for psi_sol (trapez integral): "
-                                  f"{self.trapez_integral(np.abs(psi_sol_val) ** 2.0)}")
+                                  f"{self.trapez_integral(cp.abs(psi_sol_val) ** 2.0)}")
 
             kx_mesh, ky_mesh, kz_mesh = np.meshgrid(self.kx, self.ky, self.kz, indexing="ij")
-            self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
+            self.k_squared: cp.ndarray = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
 
             if V is None:
                 self.V_val = 0.0
             else:
-                self.V_val: cp.ndarray = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
+                if cupy_used:
+                    self.V_val: cp.ndarray = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
+                else:
+                    self.V_val: cp.ndarray = cp.asarray(self.V(self.x_mesh,
+                                                               self.y_mesh,
+                                                               self.z_mesh))
 
             if self.V_interaction is None:
                 # For no interaction the identity is needed with respect to 2D
                 # * 2D (array with 1.0 everywhere)
-                self.V_k_val = np.full(self.psi_val.shape, 1.0)
+                self.V_k_val: cp.ndarray = np.full(self.psi_val.shape, 1.0)
             else:
                 if callable(self.V_interaction):
-                    self.V_k_val = self.V_interaction(kx_mesh, ky_mesh, kz_mesh)
+                    self.V_k_val: cp.ndarray = self.V_interaction(kx_mesh, ky_mesh, kz_mesh)
 
         if imag_time:
             # Convention: $e^{-iH} = e^{UH}$
@@ -310,7 +329,7 @@ class SchroedingerMixture(Schroedinger):
         else:
             self.U = -1.0j
 
-        self.H_kin: np.ndarray = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
+        self.H_kin: cp.ndarray = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
         self.H_kin_list = []
         for m in self.m_list:
             self.H_kin_list.append(self.H_kin)
