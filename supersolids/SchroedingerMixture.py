@@ -24,11 +24,7 @@ from scipy.ndimage import distance_transform_edt
 from typing import Optional, Callable, Union, List, Tuple
 
 from supersolids.helper import constants, functions, get_path, get_version
-numba_used = get_version.check_numba_used()
-if numba_used:
-    import supersolids.helper.numbas as numbas
-    import supersolids.helper.numba_compiled as numba_compiled
-cp, cupy_used, cuda_used = get_version.check_cupy_used(np)
+cp, cupy_used, cuda_used, numba_used = get_version.import_cp_nb(np)
 
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixtureSummary import SchroedingerMixtureSummary
@@ -539,10 +535,8 @@ class SchroedingerMixture(Schroedinger):
 
         return E
 
-    def get_density_list(self, jit=True) -> List[cp.ndarray]:
+    def get_density_list(self, jit: bool = True) -> List[cp.ndarray]:
         density_list: List[cp.ndarray] = []
-        if cuda_used:
-            jit = False
         for psi_val, N in zip(self.psi_val_list, self.N_list):
             if jit:
                 density_list.append(N * numbas.get_density_jit(psi_val, p=2.0))
@@ -806,9 +800,9 @@ class SchroedingerMixture(Schroedinger):
                 + mu_lhy
                 )
 
-    def split_operator_pot(self, split_step: float = 0.5, jit: bool = True) -> Tuple[List[cp.ndarray],
-                                                                                     List[cp.ndarray]]:
-        density_list = self.get_density_list(jit=numba_used)
+    def split_operator_pot(self, split_step: float = 0.5,
+                           jit: bool = True) -> Tuple[List[cp.ndarray], List[cp.ndarray]]:
+        density_list = self.get_density_list(jit=jit)
         density_tensor_vec = cp.stack(density_list, axis=0)
 
         U_dd_list = self.get_U_dd_list(density_list)
@@ -873,8 +867,6 @@ class SchroedingerMixture(Schroedinger):
         """
         # adjust dt, to get the time accuracy when needed
         # self.dt = self.dt_func(self.t, self.dt)
-        if cupy_used:
-            numba_used = False
         self.split_operator_pot(split_step=0.5, jit=numba_used)
         self.split_operator_kin()
         self.split_operator_pot(split_step=0.5, jit=numba_used)

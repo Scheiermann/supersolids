@@ -24,10 +24,8 @@ from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper import functions, constants, get_path
-from supersolids.helper.get_version import check_numba_used, get_version
-
-
-numba_used = check_numba_used()
+from supersolids.helper.get_version import import_cp_nb, get_version
+cp, cupy_used, cuda_used, numba_used = get_version.import_cp_nb(np)
 
 
 def get_legend(System, frame, frame_start, supersolids_version, mu_rel=None):

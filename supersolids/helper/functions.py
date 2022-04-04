@@ -23,7 +23,7 @@ from scipy import stats, ndimage
 from typing import Tuple, Callable, Optional, List
 
 from supersolids.helper import constants, get_version
-cp, cupy_used, cuda_used = get_version.check_cupy_used(np)
+cp, cupy_used, cuda_used, numba_used = get_version.import_cp_nb(np)
 
 from supersolids.helper.run_time import run_time
 from supersolids.helper.Box import Box
