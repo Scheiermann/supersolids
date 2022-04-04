@@ -20,10 +20,7 @@ import numpy as np
 import scipy.signal
 
 from supersolids.helper import constants, functions, get_path, get_version
-numba_used = get_version.check_numba_used()
-if numba_used:
-    import supersolids.helper.numbas as numbas
-cp, cupy_used, cuda_used = get_version.check_cupy_used(np)
+cp, cupy_used, cuda_used, numba_used = get_version.import_cp_nb(np)
 
 from supersolids.SchroedingerSummary import SchroedingerSummary
 from supersolids.helper.Resolution import Resolution
@@ -720,7 +717,7 @@ class Schroedinger:
 
         return phase_var
 
-    def split_operator_pot(self, split_step: float = 0.5, jit=True) -> None:
+    def split_operator_pot(self, split_step: float = 0.5, jit: bool = True) -> None:
         if jit:
             psi_2: cp.ndarray = numbas.get_density_jit(self.psi_val, p=2.0)
             psi_3: cp.ndarray = numbas.get_density_jit(self.psi_val, p=3.0)
@@ -762,8 +759,6 @@ class Schroedinger:
         """
         # adjust dt, to get the time accuracy when needed
         # self.dt = self.dt_func(self.t, self.dt)
-        if cupy_used:
-            numba_used = False
 
         # Calculate the interaction by applying it to the psi_2 in k-space
         # (transform back and forth)

@@ -14,7 +14,7 @@ import numpy as np
 import numba as nb
 
 from supersolids.helper import get_version
-cp, cupy_used, cuda_used = get_version.check_cupy_used(np)
+cp, cupy_used, cuda_used, numba_used = get_version.import_cp_nb(np)
 
 from numba.pycc import CC
 

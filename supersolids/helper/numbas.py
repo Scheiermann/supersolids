@@ -13,7 +13,7 @@ import numba
 import numpy as np
 
 from supersolids.helper import get_version
-cp, cupy_used, cuda_used = get_version.check_cupy_used(np)
+cp, cupy_used, cuda_used, numba_used = get_version.import_cp_nb(np)
 
 from numba import njit, types, f8, c16
 from typing import Callable

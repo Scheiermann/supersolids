@@ -20,11 +20,13 @@ from typing import Optional, Callable
 import dill
 import numpy as np
 
+from supersolids.helper import functions, get_version
+cp, cupy_used, cuda_used, numba_used = get_version.import_cp_nb(np)
+
 from supersolids.Animation.Animation import Animation
 
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
-from supersolids.helper import functions
 from supersolids.helper.simulate_case import simulate_case
 from supersolids.helper.Resolution import Resolution
 from supersolids.helper.Box import Box
