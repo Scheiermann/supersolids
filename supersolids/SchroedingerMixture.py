@@ -865,7 +865,11 @@ class SchroedingerMixture(Schroedinger):
                                                                  )
                 H_pot: cp.ndarray = self.get_H_pot(term, split_step)
 
-            self.psi_val_list[i]: cp.ndarray = H_pot * self.psi_val_list[i]
+            if cupy_used:
+                self.psi_val_list[i]: cp.ndarray = (cp.asarray(H_pot)
+                                                    * cp.asarray(self.psi_val_list[i]))
+            else:
+                self.psi_val_list[i]: cp.ndarray = H_pot * self.psi_val_list[i]
 
         return density_list, U_dd_list
 
