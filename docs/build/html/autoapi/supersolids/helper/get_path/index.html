@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.helper.get_path &mdash; supersolids 0.1.26 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.get_path</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/supersolids/helper/get_path/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-supersolids.helper.get_path">
+<span id="supersolids-helper-get-path"></span><h1><a class="reference internal" href="#module-supersolids.helper.get_path" title="supersolids.helper.get_path"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.get_path</span></code></a><a class="headerlink" href="#module-supersolids.helper.get_path" title="Permalink to this headline"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_path" title="supersolids.helper.get_path.get_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_path</span></code></a>(dir_path, search_prefix = 'movie', counting_format = '%03d', file_pattern = '', take_last = 1)</p></td>
+<td><p>Looks up all directories with matching dir_name</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_step_index_from_list" title="supersolids.helper.get_path.get_step_index_from_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_step_index_from_list</span></code></a>(dir_paths, filename_prefix = 'step_', file_pattern = '.npz')</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_step_index" title="supersolids.helper.get_path.get_step_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_step_index</span></code></a>(dir_path, filename_prefix = 'step_', file_pattern = '.npz')</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_last_png_in_last_anim" title="supersolids.helper.get_path.get_last_png_in_last_anim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_last_png_in_last_anim</span></code></a>(path_movie, dir_name_png, counting_format_png, movie_take_last, filename_pattern, filename_format, filename_extension)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.get_path.get_path">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_path.</span></span><span class="sig-name descname"><span class="pre">get_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'movie'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counting_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%03d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_path.html#get_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_path.get_path" title="Permalink to this definition"></a></dt>
+<dd><p>Looks up all directories with matching dir_name
+and counting format in dir_path.
+Gets the highest number and returns a path with dir_name counted one up
+(prevents colliding with old data).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – Path where to look for old directories (movie data)</p></li>
+<li><p><strong>search_prefix</strong> (<em>str</em>) – General name of the directories without the counter</p></li>
+<li><p><strong>counting_format</strong> (<em>str</em>) – Format of counter of the directories</p></li>
+<li><p><strong>file_pattern</strong> (<em>str</em>) – </p></li>
+<li><p><strong>take_last</strong> (<em>int</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Tuple[Optional[pathlib.Path], Optional[int], str, str]</p>
+</dd>
+</dl>
+<p>:param file_pattern : File extension to search for e.g. “.npz”.</p>
+<p>:param take_last : Index of list of path counted from behind.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Path for the new directory (not colliding with old data)</p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – </p></li>
+<li><p><strong>search_prefix</strong> (<em>str</em>) – </p></li>
+<li><p><strong>counting_format</strong> (<em>str</em>) – </p></li>
+<li><p><strong>file_pattern</strong> (<em>str</em>) – </p></li>
+<li><p><strong>take_last</strong> (<em>int</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple[Optional[pathlib.Path], Optional[int], str, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.get_path.get_step_index_from_list">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_path.</span></span><span class="sig-name descname"><span class="pre">get_step_index_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step_'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.npz'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_path.html#get_step_index_from_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_path.get_step_index_from_list" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir_paths</strong> (<em>List</em><em>[</em><em>pathlib.Path</em><em>]</em>) – </p></li>
+<li><p><strong>filename_prefix</strong> (<em>str</em>) – </p></li>
+<li><p><strong>file_pattern</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.get_path.get_step_index">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_path.</span></span><span class="sig-name descname"><span class="pre">get_step_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step_'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.npz'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_path.html#get_step_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_path.get_step_index" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – </p></li>
+<li><p><strong>filename_prefix</strong> (<em>str</em>) – </p></li>
+<li><p><strong>file_pattern</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.get_path.get_last_png_in_last_anim">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_path.</span></span><span class="sig-name descname"><span class="pre">get_last_png_in_last_anim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_movie</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name_png</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counting_format_png</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">movie_take_last</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_extension</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_path.html#get_last_png_in_last_anim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_path.get_last_png_in_last_anim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
