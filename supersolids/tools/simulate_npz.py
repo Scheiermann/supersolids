@@ -21,7 +21,7 @@ import dill
 import numpy as np
 
 from supersolids.helper import functions, get_version
-cp, cupy_used, cuda_used, numba_used = get_version.import_cp_nb(np)
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np)
 
 from supersolids.Animation.Animation import Animation
 

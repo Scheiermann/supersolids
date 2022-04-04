@@ -61,14 +61,11 @@ def check_cupy_used(np):
             
     return cp, cupy_used, cuda_used
 
-def import_cp_nb(np):
+def check_cp_nb(np):
     numba_used = check_numba_used()
-    cp, cupy_used, cuda_used = get_version.check_cupy_used(np)
+    cp, cupy_used, cuda_used = check_cupy_used(np)
     if cupy_used:
         numba_used = False
-    if numba_used:
-        import supersolids.helper.numbas as numbas
-        import supersolids.helper.numba_compiled as numba_compiled
 
     return cp, cupy_used, cuda_used, numba_used
 

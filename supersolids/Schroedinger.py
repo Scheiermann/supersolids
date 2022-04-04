@@ -20,7 +20,9 @@ import numpy as np
 import scipy.signal
 
 from supersolids.helper import constants, functions, get_path, get_version
-cp, cupy_used, cuda_used, numba_used = get_version.import_cp_nb(np)
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np)
+if numba_used:
+    import supersolids.helper.numbas as numbas
 
 from supersolids.SchroedingerSummary import SchroedingerSummary
 from supersolids.helper.Resolution import Resolution
