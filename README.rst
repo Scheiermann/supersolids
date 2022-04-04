@@ -17,7 +17,7 @@ As vtk, mayavi and numba have C/C++ dependecies, they are harder to install with
 thus installation with conda (anaconda/miniconda) is recommended.
 
 conda
----
+-----
  * conda create -n solids python=3.10
  * conda activate solids
  * conda config --add channels conda-forge
