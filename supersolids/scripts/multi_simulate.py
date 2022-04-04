@@ -11,7 +11,7 @@ import numpy as np
 
 from supersolids.helper.dict2str import dic2str
 
-supersolids_version = "0.1.34rc31"
+supersolids_version = "0.1.34rc32"
 dir_path = Path("/bigwork/dscheier/results/begin_gpu/")
 
 slurm: bool = True

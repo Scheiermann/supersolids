@@ -9,7 +9,7 @@ from supersolids.helper.dict2str import dic2str
 slurm = True
 mem_in_GB = 8
 xvfb_display = 500
-supersolids_version = "0.1.34rc31"
+supersolids_version = "0.1.34rc32"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_13/")
 # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
