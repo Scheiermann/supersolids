@@ -11,32 +11,83 @@ from pathlib import Path
 from fabric import Connection
 
 
-if __name__ == "__main__":
-    ssh_hostname = 'capella'
-    # path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_grid/")
-    # path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_a12_grid/")
-    # path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_dense/")
-    # path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_a12_dense/")
-    # path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_fig3/")
-    # path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_fig3/")
-    # path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_a11_100/")
-    # path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_a12_a11_100/")
-    path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_fig3_a11_100/")
-    path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_fig3_a11_100/")
-    # path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_fig3_a11_95/")
-    # path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_fig3_a11_95/")
-    # path_anchor_input = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_a11_100_mini/")
-    # path_anchor_output = Path("/run/media/dsche/ITP Transfer/begin_mixture_a12_a11_100_mini/")
+def download(host, path_in, path_out, filename_singles, download_steps, take_last):
+    # Create a results dir, if there is none
+    if not path_out.is_dir():
+        path_out.mkdir(parents=True)
 
-    take_last = 3
-    # take_last = None
+    if filename_singles:
+        print(path_out)
+        files_single_already_there = sorted([
+            x for x in filename_singles if Path(path_out, x).is_file()
+            ])
+
+        print(files_single_already_there)
+        filenames_singles_new = [x for x in filename_singles if (x not in files_single_already_there)]
+        print(f"Possible files to download: {filenames_singles_new}")
+        for filename_single in filenames_singles_new:
+            try:
+                file_single = fnmatch.filter(host.sftp().listdir(path=str(path_in)),
+                                             filename_single)
+
+                if len(file_single) > 0:
+                    print(f"Downloading {filename_single}")
+                    result_schroedinger = host.get(str(Path(path_in, filename_single)),
+                                                local=str(Path(path_out, filename_single)))
+                else:
+                    print(f"{Path(path_in, filename_single)} not found. Skipping.")
+                    continue
+
+            except Exception:
+                print(f"Some error getting {Path(path_in, filename_single)}. Skipping.")
+                continue
+
+    if download_steps:
+        for filename_steps, steps_format, filename_pattern, filename_number_regex in zip(
+                filename_steps_list, steps_format_list,
+                filename_pattern_list, filename_number_regex_list):
+
+            try:
+                files_all = sorted(fnmatch.filter(host.sftp().listdir(path=str(path_in)),
+                                                  filename_steps
+                                                  + filename_number_regex
+                                                  + filename_pattern))
+            except FileNotFoundError:
+                print(f"{path_in} not found. Skipping.")
+                continue
+            if take_last is None:
+                files = files_all
+            else:
+                files = files_all[-take_last:]
+
+            files_already_there = sorted([x.name for x
+                                          in path_out.glob(filename_steps
+                                                           + filename_number_regex
+                                                           + filename_pattern)
+                                          if x.is_file()])
+
+            files_new = [x for x in files if (x not in files_already_there)]
+            print("Downloading:")
+            print(files_new)
+
+            for file in files_new:
+                result = host.get(str(Path(path_in, file)), local=str(Path(path_out, file)))
+
+
+if __name__ == "__main__":
+    ssh_hostname = 'transfer'
+    path_anchor_input = Path("/bigwork/nhbbsche/results/begin_gpu/")
+    path_anchor_output = Path("/bigwork/dscheier/results/begin_gpu/")
+
+    # take_last = 3
+    take_last = None
 
     movie_string = "movie"
     counting_format = "%03d"
-    movie_start = 1
+    movie_start = 11
     # movie_end = 110
     # movie_end = 24
-    movie_end = 3
+    movie_end = 40
 
     mixture = False
 
@@ -59,64 +110,5 @@ if __name__ == "__main__":
         path_out = Path(path_anchor_output, movie_string + f"{counting_format % i}")
 
         print(f"\npath_in: {path_in}")
-        with Connection(ssh_hostname) as c:
-            # Create a results dir, if there is none
-            if not path_out.is_dir():
-                path_out.mkdir(parents=True)
-
-            if filename_singles:
-                print(path_out)
-                files_single_already_there = sorted([
-                    x for x in filename_singles if Path(path_out, x).is_file()
-                    ])
-
-                print(files_single_already_there)
-                filenames_singles_new = [x for x in filename_singles if (x not in files_single_already_there)]
-                print(f"Possible files to download: {filenames_singles_new}")
-                for filename_single in filenames_singles_new:
-                    try:
-                        file_single = fnmatch.filter(c.sftp().listdir(path=str(path_in)),
-                                                     filename_single)
-
-                        if len(file_single) > 0:
-                            print(f"Downloading {filename_single}")
-                            result_schroedinger = c.get(str(Path(path_in, filename_single)),
-                                                        local=str(Path(path_out, filename_single)))
-                        else:
-                            print(f"{Path(path_in, filename_single)} not found. Skipping.")
-                            continue
-
-                    except Exception:
-                        print(f"Some error getting {Path(path_in, filename_single)}. Skipping.")
-                        continue
-
-            if download_steps:
-                for filename_steps, steps_format, filename_pattern, filename_number_regex in zip(
-                        filename_steps_list, steps_format_list,
-                        filename_pattern_list, filename_number_regex_list):
-
-                    try:
-                        files_all = sorted(fnmatch.filter(c.sftp().listdir(path=str(path_in)),
-                                                          filename_steps
-                                                          + filename_number_regex
-                                                          + filename_pattern))
-                    except FileNotFoundError:
-                        print(f"{path_in} not found. Skipping.")
-                        continue
-                    if take_last is None:
-                        files = files_all
-                    else:
-                        files = files_all[-take_last:]
-
-                    files_already_there = sorted([x.name for x
-                                                  in path_out.glob(filename_steps
-                                                                   + filename_number_regex
-                                                                   + filename_pattern)
-                                                  if x.is_file()])
-
-                    files_new = [x for x in files if (x not in files_already_there)]
-                    print("Downloading:")
-                    print(files_new)
-
-                    for file in files_new:
-                        result = c.get(str(Path(path_in, file)), local=str(Path(path_out, file)))
+        with Connection(ssh_hostname) as host:
+            download(host, path_in, path_out, filename_singles, download_steps, take_last)
