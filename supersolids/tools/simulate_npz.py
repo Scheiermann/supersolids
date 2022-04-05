@@ -66,7 +66,7 @@ def simulate_npz(args):
                 else:
                     # get the psi_val of Schroedinger at other timesteps (t!=0)
                     with open(psi_val_path, "rb") as f:
-                        System_loaded.psi_val: cp.ndarray = cp.load(file=f)["psi_val"]
+                        System_loaded.psi_val = cp.load(file=f)["psi_val"]
 
             # get the frame number as it encodes the number steps dt,
             # so System.t can be reconstructed

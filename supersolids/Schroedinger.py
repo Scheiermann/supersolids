@@ -277,7 +277,11 @@ class Schroedinger:
                     psi_density: cp.ndarray = numbas.get_density_jit(func_val, p=2.0)
                 else:
                     if cupy_used:
-                        psi_density: cp.ndarray = np.abs(cp.asarray(func_val)) ** p
+                        try:
+                            psi_density: cp.ndarray = np.abs(cp.asarray(func_val)) ** p
+                        except Exception:
+                            # some cuda problem
+                            psi_density: cp.ndarray = np.abs(func_val) ** p
                     else:
                         psi_density: cp.ndarray = np.abs(func_val) ** p
 

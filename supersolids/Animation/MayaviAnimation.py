@@ -195,7 +195,7 @@ class MayaviAnimation(Animation.Animation):
 
     def prepare(self, System: Schroedinger, mixture_slice_index: int = 0):
         if isinstance(System, SchroedingerMixture):
-            prob_plots: List[np.ndarray] = []
+            prob_plots: List[cp.ndarray] = []
             if len(System.psi_val_list) != len(self.alpha_psi_list):
                 sys.exit(f"System.psi_val_list ({len(System.psi_val_list)}) and Anim.alpha_psi_list "
                          f"({len(self.alpha_psi_list)}) need to have same length.")
@@ -204,19 +204,36 @@ class MayaviAnimation(Animation.Animation):
                 if i == mixture_slice_index:
                     prob1_3d = np.abs(psi_val) ** 2.0
                     colormap = "cool"
-                prob_plots.append(mlab.contour3d(System.x_mesh,
-                                                 System.y_mesh,
-                                                 System.z_mesh,
+                if cupy_used:
+                    x_mesh: np.ndarray = System.x_mesh.get()
+                    y_mesh: np.ndarray = System.y_mesh.get()
+                    z_mesh: np.ndarray = System.z_mesh.get()
+                else:
+                    x_mesh: np.ndarray = System.x_mesh
+                    y_mesh: np.ndarray = System.y_mesh
+                    z_mesh: np.ndarray = System.z_mesh
+
+                prob_plots.append(mlab.contour3d(x_mesh,
+                                                 y_mesh,
+                                                 z_mesh,
                                                  np.abs(psi_val) ** 2.0,
                                                  colormap=colormap,
                                                  opacity=alpha_psi,
                                                  transparent=True)
                                   )
         else:
+            if cupy_used:
+                x_mesh: np.ndarray = System.x_mesh.get()
+                y_mesh: np.ndarray = System.y_mesh.get()
+                z_mesh: np.ndarray = System.z_mesh.get()
+            else:
+                x_mesh: np.ndarray = System.x_mesh
+                y_mesh: np.ndarray = System.y_mesh
+                z_mesh: np.ndarray = System.z_mesh
             prob1_3d = np.abs(System.psi_val) ** 2.0
-            prob1_plot = mlab.contour3d(System.x_mesh,
-                                        System.y_mesh,
-                                        System.z_mesh,
+            prob1_plot = mlab.contour3d(x_mesh,
+                                        y_mesh,
+                                        z_mesh,
                                         prob1_3d,
                                         colormap="spectral",
                                         opacity=self.alpha_psi_list[0],
@@ -224,27 +241,27 @@ class MayaviAnimation(Animation.Animation):
 
             prob_plots = [prob1_plot]
 
-        slice_x_plot = mlab.volume_slice(System.x_mesh,
-                                         System.y_mesh,
-                                         System.z_mesh,
+        slice_x_plot = mlab.volume_slice(x_mesh,
+                                         y_mesh,
+                                         z_mesh,
                                          prob1_3d,
                                          colormap="spectral",
                                          plane_orientation="x_axes",
                                          slice_index=self.slice_indices[0],
                                          )
 
-        slice_y_plot = mlab.volume_slice(System.x_mesh,
-                                         System.y_mesh,
-                                         System.z_mesh,
+        slice_y_plot = mlab.volume_slice(x_mesh,
+                                         y_mesh,
+                                         z_mesh,
                                          prob1_3d,
                                          colormap="spectral",
                                          plane_orientation="y_axes",
                                          slice_index=self.slice_indices[1],
                                          )
 
-        slice_z_plot = mlab.volume_slice(System.x_mesh,
-                                         System.y_mesh,
-                                         System.z_mesh,
+        slice_z_plot = mlab.volume_slice(x_mesh,
+                                         y_mesh,
+                                         z_mesh,
                                          prob1_3d,
                                          colormap="spectral",
                                          plane_orientation="z_axes",
@@ -252,9 +269,9 @@ class MayaviAnimation(Animation.Animation):
                                          )
 
         if self.plot_V:
-            V_plot = mlab.contour3d(System.x_mesh,
-                                    System.y_mesh,
-                                    System.z_mesh,
+            V_plot = mlab.contour3d(x_mesh,
+                                    y_mesh,
+                                    z_mesh,
                                     System.V_val,
                                     colormap="hot",
                                     opacity=self.alpha_V,
@@ -267,10 +284,15 @@ class MayaviAnimation(Animation.Animation):
             pass
         else:
             if System.psi_sol_val is not None:
-                psi_sol_plot = mlab.contour3d(System.x_mesh,
-                                              System.y_mesh,
-                                              System.z_mesh,
-                                              System.psi_sol_val,
+                if cupy:
+                    psi_sol_val: np.ndarray = System.psi_sol_val.get()
+                else:
+                    psi_sol_val: np.ndarray = System.psi_sol_val
+
+                psi_sol_plot = mlab.contour3d(x_mesh,
+                                              y_mesh,
+                                              z_mesh,
+                                              psi_sol_val,
                                               colormap="cool",
                                               opacity=self.alpha_psi_sol_list[0],
                                               transparent=True)
@@ -354,8 +376,11 @@ class MayaviAnimation(Animation.Animation):
                         System.psi_val = np.load(file=f)["psi_val"]
 
                 if not (summary_name is None):
-                    System = System.load_summary(input_path, steps_format, frame,
-                                                 summary_name=summary_name)
+                    try:
+                        System = System.load_summary(input_path, steps_format, frame,
+                                                     summary_name=summary_name)
+                    except Exception:
+                        print(f"Could not load {summary_name}!")
 
                 if not no_legend:
                     text = get_legend(System, frame, frame_start, supersolids_version)
