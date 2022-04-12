@@ -156,6 +156,7 @@ echo $DISPLAY
 echo $CONDA_PREFIX
 echo $(which python3)
 echo $(which pip3)
+echo "supersolids={supersolids_version}"
 
 # conda install -c scheiermann/label/main supersolids={supersolids_version}
 conda install -c scheiermann/label/testing supersolids={supersolids_version}

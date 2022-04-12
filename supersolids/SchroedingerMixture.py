@@ -74,13 +74,15 @@ def smaller_slice(val0, val1):
 
     return changed, val0, val1
 
-def get_A_density_total(density_list: List[np.ndarray]) -> Tuple[np.ndarray, np.ndarray]:
+def get_A_density_total(density_list: List[cp.ndarray]) -> Tuple[cp.ndarray, cp.ndarray]:
     density_total: np.ndarray = np.copy(density_list[0])
     for density in density_list[1:]:
         density_total += density
 
     # A = n1/(n1+n2)
     density_A = density_list[0] / density_total
+    # remove nan, because of possible 0/0 
+    density_A = cp.where(density_A == cp.nan, density_A, 0.0)
 
     return density_A, density_total
 
@@ -145,7 +147,7 @@ class SchroedingerMixture(Schroedinger):
                  E: float = 1.0,
                  V: Optional[Callable] = functions.v_harmonic_3d,
                  V_interaction: Optional[Callable] = None,
-                 psi_0_list: List[cp.ndarray] = [functions.psi_gauss_3d],
+                 psi_0_list: List[np.ndarray] = [functions.psi_gauss_3d],
                  psi_0_noise_list: List[Optional[Callable]] = [functions.noise_mesh],
                  psi_sol_list: List[Optional[Callable]] = [functions.thomas_fermi_3d],
                  mu_sol_list: List[Optional[Callable]] = [functions.mu_3d],
@@ -223,16 +225,21 @@ class SchroedingerMixture(Schroedinger):
 
         if self.dim == 1:
             # TODO: complete implementation
-            for psi_0, psi_0_noise in zip(psi_0_list, psi_0_noise_list):
-                if cupy_used:
-                    psi_val: cp.ndarray = cp.asarray(psi_0(self.x_mesh))
-                else:
-                    psi_val: cp.ndarray = psi_0(self.x_mesh)
+            if psi_0_list:
+                for psi_0, psi_0_noise in zip(psi_0_list, psi_0_noise_list):
+                    if cupy_used:
+                        psi_val: cp.ndarray = cp.asarray(psi_0(self.x))
+                    else:
+                        psi_val: cp.ndarray = psi_0(self.x)
 
-                if psi_0_noise is None:
-                    self.psi_val_list.append(psi_val)
-                else:
-                    self.psi_val_list.append(psi_0_noise * psi_val)
+                    if psi_0_noise is None:
+                        self.psi_val_list.append(psi_val)
+                    else:
+                        self.psi_val_list.append(psi_0_noise * psi_val)
+            else:
+                # no initialization
+                psi_val: cp.ndarray = self.x
+                self.psi_val_list.append(psi_val)
 
             self.k_squared: np.ndarray = self.kx ** 2.0
 
@@ -255,16 +262,22 @@ class SchroedingerMixture(Schroedinger):
             # TODO: complete implementation
             self.x_mesh, self.y_mesh, self.pos = functions.get_meshgrid(self.x, self.y)
 
-            for psi_0, psi_0_noise in zip(psi_0_list, psi_0_noise_list):
-                if cupy_used:
-                    psi_val: cp.ndarray = cp.asarray(psi_0(self.pos))
-                else:
-                    psi_val: cp.ndarray = psi_0(self.pos)
+            if psi_0_list:
+                for psi_0, psi_0_noise in zip(psi_0_list, psi_0_noise_list):
+                    if cupy_used:
+                        psi_val: cp.ndarray = cp.asarray(psi_0(self.pos))
+                    else:
+                        psi_val: cp.ndarray = psi_0(self.pos)
 
-                if psi_0_noise is None:
-                    self.psi_val_list.append(psi_val)
-                else:
-                    self.psi_val_list.append(psi_0_noise * psi_val)
+                    if psi_0_noise is None:
+                        self.psi_val_list.append(psi_val)
+                    else:
+                        self.psi_val_list.append(psi_0_noise * psi_val)
+            else:
+                # no initialization
+                psi_val: cp.ndarray = self.x_mesh
+                self.psi_val_list.append(psi_val)
+
 
             kx_mesh, ky_mesh, _ = functions.get_meshgrid(self.kx, self.ky)
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0
@@ -273,22 +286,27 @@ class SchroedingerMixture(Schroedinger):
                 self.V_val = 0.0
             else:
                 if cupy_used:
-                    self.V_val: cp.ndarray = self.V(self.pos)
-                else:
                     self.V_val: cp.ndarray = cp.asarray(self.V(self.pos))
+                else:
+                    self.V_val: np.ndarray = self.V(self.pos)
 
         elif self.dim == 3:
             self.x_mesh, self.y_mesh, self.z_mesh = functions.get_grid(self.Res, self.Box)
 
-            for psi_0, psi_0_noise in zip(psi_0_list, psi_0_noise_list):
-                if cupy_used:
-                    psi_val: cp.ndarray = cp.asarray(psi_0(self.x_mesh, self.y_mesh, self.z_mesh))
-                else:
-                    psi_val: cp.ndarray = psi_0(self.x_mesh, self.y_mesh, self.z_mesh)
-                if psi_0_noise is None:
-                    self.psi_val_list.append(psi_val)
-                else:
-                    self.psi_val_list.append(psi_0_noise * psi_val)
+            if psi_0_list:
+                for psi_0, psi_0_noise in zip(psi_0_list, psi_0_noise_list):
+                    if cupy_used:
+                        psi_val: cp.ndarray = cp.asarray(psi_0(self.x_mesh, self.y_mesh, self.z_mesh))
+                    else:
+                        psi_val: cp.ndarray = psi_0(self.x_mesh, self.y_mesh, self.z_mesh)
+                    if psi_0_noise is None:
+                        self.psi_val_list.append(psi_val)
+                    else:
+                        self.psi_val_list.append(psi_0_noise * psi_val)
+            else:
+                # no initialization
+                psi_val: cp.ndarray = self.x_mesh
+                self.psi_val_list.append(psi_val)
 
             for psi_sol in self.psi_sol_list:
                 if psi_sol is None:
@@ -305,19 +323,17 @@ class SchroedingerMixture(Schroedinger):
                                   f"{self.trapez_integral(cp.abs(psi_sol_val) ** 2.0)}")
 
             kx_mesh, ky_mesh, kz_mesh = np.meshgrid(self.kx, self.ky, self.kz, indexing="ij")
-            self.k_squared: cp.ndarray = cp.asarray(kx_mesh ** 2.0
-                                                    + ky_mesh ** 2.0
-                                                    + kz_mesh ** 2.0)
+            self.k_squared: cp.ndarray = np.power(kx_mesh, 2) + np.power(ky_mesh, 2) + np.power(kz_mesh, 2)
 
             if V is None:
                 self.V_val = 0.0
             else:
                 if cupy_used:
-                    self.V_val: cp.ndarray = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
-                else:
                     self.V_val: cp.ndarray = cp.asarray(self.V(self.x_mesh,
                                                                self.y_mesh,
                                                                self.z_mesh))
+                else:
+                    self.V_val: cp.ndarray = self.V(self.x_mesh, self.y_mesh, self.z_mesh)
 
             if self.V_interaction is None:
                 # For no interaction the identity is needed with respect to 2D
@@ -325,7 +341,9 @@ class SchroedingerMixture(Schroedinger):
                 self.V_k_val: cp.ndarray = np.full(self.psi_val.shape, 1.0)
             else:
                 if callable(self.V_interaction):
-                    self.V_k_val: cp.ndarray = self.V_interaction(kx_mesh, ky_mesh, kz_mesh)
+                    self.V_k_val: np.ndarray = self.V_interaction(kx_mesh, ky_mesh, kz_mesh)
+                    if cupy_used:
+                        self.V_k_val: cp.ndarray = cp.asarray(self.V_k_val)
 
         if imag_time:
             # Convention: $e^{-iH} = e^{UH}$
@@ -333,15 +351,16 @@ class SchroedingerMixture(Schroedinger):
         else:
             self.U = -1.0j
 
-        self.H_kin: cp.ndarray = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
-        self.H_kin_list = []
-        for m in self.m_list:
-            self.H_kin_list.append(self.H_kin)
+        self.H_kin: np.ndarray = np.exp(self.U * (0.5 * self.k_squared) * self.dt)
 
         self.A = np.linspace(0.0, 1.0, self.nA_max)
 
-        mu_lhy_integrand_a = functools.partial(self.mu_lhy_integrand, eta_dVdn=self.eta_dVdna)
-        mu_lhy_integrand_b = functools.partial(self.mu_lhy_integrand, eta_dVdn=self.eta_dVdnb)
+        eta_dVdna = functools.partial(numbas.eta_dVdna_jit, A=self.A)
+        eta_dVdnb = functools.partial(numbas.eta_dVdnb_jit, A=self.A)
+        mu_lhy_integrand_a = functools.partial(self.mu_lhy_integrand, eta_dVdn=eta_dVdna)
+        mu_lhy_integrand_b = functools.partial(self.mu_lhy_integrand, eta_dVdn=eta_dVdnb)
+        # mu_lhy_integrand_a = functools.partial(self.mu_lhy_integrand, eta_dVdn=self.eta_dVdna)
+        # mu_lhy_integrand_b = functools.partial(self.mu_lhy_integrand, eta_dVdn=self.eta_dVdnb)
         mu_lhy_integrated_list = get_mu_lhy_integrated_list(func_list=[mu_lhy_integrand_a,
                                                                        mu_lhy_integrand_b])
 
@@ -360,6 +379,15 @@ class SchroedingerMixture(Schroedinger):
 
         energy_v = quad_vec(self.func_energy, 0.0, 1.0)[0]
         self.energy_helper_function = interpolate.interp1d(self.A, energy_v)
+
+        if cupy_used:
+            self.k_squared = cp.asarray(self.k_squared)
+            self.H_kin = cp.asarray(self.H_kin)
+
+        self.H_kin_list = []
+        for m in self.m_list:
+            self.H_kin_list.append(self.H_kin)
+
 
     def func_energy(self, u: float) -> np.ndarray:
         """
@@ -403,12 +431,11 @@ class SchroedingerMixture(Schroedinger):
         eta_aa = eta_array[0, 0]
         eta_ab = eta_array[0, 1]
         eta_bb = eta_array[1, 1]
-
         term1 = (np.lib.scimath.sqrt(numbas.f_lam(self.A, 1, eta_aa, eta_bb, eta_ab)) ** 3.0
-                 * eta_dVdn(1, eta_aa, eta_bb, eta_ab)
+                 * eta_dVdn(lam=1, eta_aa=eta_aa, eta_bb=eta_bb, eta_ab=eta_ab)
                  )
         term2 = (np.lib.scimath.sqrt(numbas.f_lam(self.A, -1, eta_aa, eta_bb, eta_ab)) ** 3.0
-                 * eta_dVdn(-1, eta_aa, eta_bb, eta_ab)
+                 * eta_dVdn(lam=-1, eta_aa=eta_aa, eta_bb=eta_bb, eta_ab=eta_ab)
                  )
 
         result = np.real(term1 + term2)
@@ -424,12 +451,12 @@ class SchroedingerMixture(Schroedinger):
     def get_mu_lhy_list(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
         density_A, density_total = get_A_density_total(density_list)
 
-        mu_lhy_list: List[np.ndarray] = []
+        mu_lhy_list: List[cp.ndarray] = []
         for mu_lhy_interpolation in self.mu_lhy_interpolation_list:
             if cupy_used:
                 mu_lhy = cp.asarray(mu_lhy_interpolation(density_A.get()) * density_total.get() ** 1.5)
             else:
-                mu_lhy = cp.asarray(mu_lhy_interpolation(density_A) * density_total ** 1.5)
+                mu_lhy = mu_lhy_interpolation(density_A) * density_total ** 1.5
 
             mu_lhy_list.append(mu_lhy)
 
@@ -561,12 +588,15 @@ class SchroedingerMixture(Schroedinger):
         return E
 
     def get_density_list(self, jit: bool = True) -> List[cp.ndarray]:
-        density_list: List[cp.ndarray] = []
+        density_list: List[np.ndarray] = []
         for psi_val, N in zip(self.psi_val_list, self.N_list):
             if jit:
                 density_list.append(N * numbas.get_density_jit(psi_val, p=2.0))
             else:
-                density_list.append(N * self.get_density(psi_val, jit=jit))
+                try:
+                    density_list.append(N * self.get_density(psi_val, jit=jit))
+                except Exception:
+                    density_list.append(N * self.get_density(psi_val, jit=jit).get())
 
         return density_list
 
@@ -827,10 +857,10 @@ class SchroedingerMixture(Schroedinger):
 
     def split_operator_pot(self, split_step: float = 0.5,
                            jit: bool = True) -> Tuple[List[cp.ndarray], List[cp.ndarray]]:
-        density_list: List[cp.ndarray] = self.get_density_list(jit=jit)
+        density_list: List[np.ndarray] = self.get_density_list(jit=jit)
         density_tensor_vec: cp.ndarray = cp.stack(density_list, axis=0)
 
-        U_dd_list: List[cp.ndarray] = self.get_U_dd_list(density_list)
+        U_dd_list: List[np.ndarray] = self.get_U_dd_list(density_list)
         U_dd_tensor_vec: cp.ndarray = cp.stack(U_dd_list, axis=0)
 
         # update H_pot before use
@@ -844,7 +874,6 @@ class SchroedingerMixture(Schroedinger):
         # dipol_term_vec = self.arr_tensor_mult(self.a_dd_array, U_dd_tensor_vec)
 
         mu_lhy_list: List[cp.ndarray] = self.get_mu_lhy_list(density_list)
-        terms_list: List[cp.ndarray] = []
         for i, (contact_interaction, dipol_term, mu_lhy) in enumerate(zip(
                 list(contact_interaction_vec),
                 list(dipol_term_vec),
@@ -866,10 +895,9 @@ class SchroedingerMixture(Schroedinger):
                 H_pot: cp.ndarray = self.get_H_pot(term, split_step)
 
             if cupy_used:
-                self.psi_val_list[i]: cp.ndarray = (cp.asarray(H_pot)
-                                                    * cp.asarray(self.psi_val_list[i]))
+                self.psi_val_list[i] = (cp.asarray(H_pot) * cp.asarray(self.psi_val_list[i]))
             else:
-                self.psi_val_list[i]: cp.ndarray = H_pot * self.psi_val_list[i]
+                self.psi_val_list[i] = H_pot * self.psi_val_list[i]
 
         return density_list, U_dd_list
 
@@ -877,21 +905,21 @@ class SchroedingerMixture(Schroedinger):
         # apply H_kin in k-space (transform back and forth)
         for i in range(0, len(self.psi_val_list)):
             psi_val: cp.ndarray = self.psi_val_list[i]
-            self.psi_val_list[i]: cp.ndarray = cp.fft.fftn(psi_val)
+            self.psi_val_list[i] = cp.fft.fftn(psi_val)
 
         for i, H_kin in enumerate(self.H_kin_list):
             psi_val: cp.ndarray = self.psi_val_list[i]
-            self.psi_val_list[i]: cp.ndarray = H_kin * psi_val
+            self.psi_val_list[i] = H_kin * psi_val
 
         for i in range(0, len(self.psi_val_list)):
             psi_val: cp.ndarray = self.psi_val_list[i]
-            self.psi_val_list[i]: cp.ndarray = cp.fft.ifftn(psi_val)
+            self.psi_val_list[i] = cp.fft.ifftn(psi_val)
 
     def normalize_psi_val(self) -> List[float]:
         psi_norm_list: List[float] = []
         for i, psi_val in enumerate(self.psi_val_list):
             psi_norm_list.append(self.get_norm(func_val=psi_val))
-            self.psi_val_list[i]: cp.ndarray = psi_val / cp.sqrt(psi_norm_list[i])
+            self.psi_val_list[i] = psi_val / cp.sqrt(psi_norm_list[i])
 
         return psi_norm_list
 

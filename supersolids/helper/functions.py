@@ -49,10 +49,10 @@ def get_grid_helper(Res: Resolution, MyBox: Box, index: int):
         x0, x1 = MyBox.get_bounds_by_index(index)
         res = Res.get_bounds_by_index(index)
         box_len = x1 - x0
-        x: cp.ndarray = cp.linspace(x0, x1, res, endpoint=False)
+        x: np.ndarray = np.linspace(x0, x1, res, endpoint=False)
         dx: float = box_len / float(res - 1)
         dkx: float = 2.0 * np.pi / box_len
-        kx: cp.ndarray = cp.fft.fftfreq(res, d=1.0 / (dkx * res))
+        kx: np.ndarray = np.fft.fftfreq(res, d=1.0 / (dkx * res))
 
     except KeyError:
         sys.exit(
@@ -73,10 +73,13 @@ def get_grid(Res: Resolution, MyBox: Box):
     res_z = Res.get_bounds_by_index(2)
 
     try:
-        x_mesh, y_mesh, z_mesh = cp.mgrid[x0: x1: complex(0, res_x),
+        x_mesh, y_mesh, z_mesh = np.mgrid[x0: x1: complex(0, res_x),
                                           y0: y1: complex(0, res_y),
                                           z0: z1: complex(0, res_z)
                                           ]
+        if cupy_used:
+            x_mesh, y_mesh, z_mesh = cp.asarray(x_mesh), cp.asarray(y_mesh), cp.asarray(z_mesh)
+            
     except KeyError:
         sys.exit(
             f"Keys x0, x1, y0, y1, z0, z1 of box needed, "
@@ -727,8 +730,8 @@ def get_r_cut(k_mesh: cp.ndarray, r_cut: float = 1.0):
 
     # FFT of a symmetric box-function
     r_cut_mesh = (1.0
-                  + (3.0 / kr_singular ** 2.0) * cp.cos(kr_singular)
-                  - (3.0 / kr_singular ** 3.0) * cp.sin(kr_singular))
+                  + (3.0 / kr_singular ** 2.0) * np.cos(kr_singular)
+                  - (3.0 / kr_singular ** 3.0) * np.sin(kr_singular))
 
     # set known value at [0, 0, 0]
     if r_cut_mesh[0, 0, 0]:
@@ -748,7 +751,8 @@ def dipol_dipol_interaction(kx_mesh: cp.ndarray,
                             kz_mesh: cp.ndarray,
                             r_cut: float = 1.0,
                             use_cut_off: bool = False):
-    k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
+    k_squared: cp.ndarray = cp.power(kx_mesh, 2) + cp.power(ky_mesh, 2) + cp.power(kz_mesh, 2)
+
     # for [0, 0, 0] there is a singularity and factor/k_squared is 0/0, so we
     # arbitrary set the divisor to 1.0
     k_mesh: cp.ndarray = cp.sqrt(k_squared)

@@ -51,26 +51,23 @@ def f_lam(A: cp.ndarray, lam: float,
 @njit('f8[:](f8[:], f8, f8, f8, f8)')
 def eta_dVdna_jit(A: cp.ndarray, lam: float,
                   eta_aa: float, eta_bb: float, eta_ab: float) -> cp.ndarray:
-    return (eta_aa
-            + lam * (eta_aa * (eta_aa * A - eta_bb * (1 - A))
-                     + 2 * eta_ab ** 2 * (1 - A)
-                     )
-            / np.sqrt((eta_aa * A - eta_bb * (1 - A)) ** 2
-                      + 4 * eta_ab ** 2 * A * (1 - A)
-                      )
+    term = ((eta_aa * (eta_aa * A - eta_bb * (1 - A)) + 2 * eta_ab ** 2 * (1 - A))
+             / np.sqrt((eta_aa * A - eta_bb * (1 - A)) ** 2 + 4 * eta_ab ** 2 * A * (1 - A))
             )
+    term_nan_free = np.where(~np.isnan(term), term, 0.0)
+
+    return eta_aa + lam * term_nan_free
 
 
 @njit('f8[:](f8[:], f8, f8, f8, f8)')
 def eta_dVdnb_jit(A: cp.ndarray, lam: float,
                   eta_aa: float, eta_bb: float, eta_ab: float) -> cp.ndarray:
-    return (eta_bb
-            + lam * (eta_bb * (eta_bb * (1 - A) - eta_aa * A)
-                     + 2 * eta_ab ** 2 * A)
-            / np.sqrt((eta_aa * A - eta_bb * (1 - A)) ** 2
-                      + 4 * eta_ab ** 2 * A * (1 - A)
-                      )
+    term = ((eta_bb * (eta_bb * (1 - A) - eta_aa * A) + 2 * eta_ab ** 2 * A)
+             / np.sqrt((eta_aa * A - eta_bb * (1 - A)) ** 2 + 4 * eta_ab ** 2 * A * (1 - A))
             )
+    term_nan_free = np.where(~np.isnan(term), term, 0.0)
+
+    return eta_bb + lam * term_nan_free
 
 
 @njit('f8[:,:,:](c16[:,:,:], f8)')
@@ -118,23 +115,20 @@ def f_lam(A: cp.ndarray, lam: float,
 @njit(cache=True)
 def eta_dVdna_jit(A: cp.ndarray, lam: float,
                   eta_aa: float, eta_bb: float, eta_ab: float) -> cp.ndarray:
-    return (eta_aa
-            + lam * (eta_aa * (eta_aa * A - eta_bb * (1 - A))
-                     + 2 * eta_ab ** 2 * (1 - A)
-                     )
-            / np.sqrt((eta_aa * A - eta_bb * (1 - A)) ** 2
-                      + 4 * eta_ab ** 2 * A * (1 - A)
-                      )
+    term = ((eta_aa * (eta_aa * A - eta_bb * (1 - A)) + 2 * eta_ab ** 2 * (1 - A))
+             / np.sqrt((eta_aa * A - eta_bb * (1 - A)) ** 2 + 4 * eta_ab ** 2 * A * (1 - A))
             )
+    term_nan_free = np.where(~np.isnan(term), term, 0.0)
+
+    return eta_aa + lam * term_nan_free
 
 
 @njit(cache=True)
 def eta_dVdnb_jit(A: cp.ndarray, lam: float,
                   eta_aa: float, eta_bb: float, eta_ab: float) -> cp.ndarray:
-    return (eta_bb
-            + lam * (eta_bb * (eta_bb * (1 - A) - eta_aa * A)
-                     + 2 * eta_ab ** 2 * A)
-            / np.sqrt((eta_aa * A - eta_bb * (1 - A)) ** 2
-                      + 4 * eta_ab ** 2 * A * (1 - A)
-                      )
+    term = ((eta_bb * (eta_bb * (1 - A) - eta_aa * A) + 2 * eta_ab ** 2 * A)
+             / np.sqrt((eta_aa * A - eta_bb * (1 - A)) ** 2 + 4 * eta_ab ** 2 * A * (1 - A))
             )
+    term_nan_free = np.where(~np.isnan(term), term, 0.0)
+
+    return eta_bb + lam * term_nan_free

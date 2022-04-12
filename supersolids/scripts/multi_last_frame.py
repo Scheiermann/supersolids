@@ -20,7 +20,39 @@ if __name__ == "__main__":
     var1_list = []
     var2_list = []
 
-    experiment_suffix = "fig3_a11_95"
+    use_edited = False
+
+    # experiment_suffix = "x"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # var1_list.append(np.arange(2.0, 31.0, 2.0))
+    # var2_list.append(np.arange(80000, 81000, 10000))
+
+    # experiment_suffix = "gpu"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # var1_list.append(np.arange(12.0, 17.0, 2.0))
+    # var2_list.append(np.arange(50.0, 96.0, 5.0))
+
+    experiment_suffix = "y_N15k"
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    var1_list.append(np.arange(80.0, 97.0, 2.0))
+    var2_list.append(np.arange(150000, 151000, 10000))
+
+    # experiment_suffix = "yN"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # var1_list.append(np.arange(50.0, 96.0, 5.0))
+
+    # var2_list.append(np.arange(80000, 81000, 10000))
+    # experiment_suffix = "xN"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # var1_list.append(np.arange(12.0, 17.0, 2.0))
+    # var2_list.append(np.arange(50000, 151000, 10000))
+
+    # var1_list.append(np.arange(2.0, 31.0, 2.0))
+    # var2_list.append(np.arange(80000, 81000, 5000))
+
+    # experiment_suffix = "droplet"
+    # var1_list.append(np.arange(92.0, 101.0, 2.0))
+    # var2_list.append(np.arange(55000, 81000, 5000))
 
     # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_19/"))
     # var1_list.append(np.arange(0.005, 0.05, 0.005))
@@ -30,14 +62,14 @@ if __name__ == "__main__":
     # var1_list.append(np.arange(0.6, 0.81, 0.05))
     # var2_list.append(np.arange(0.05, 0.51, 0.05))
 
-    path_anchor_input_list.append(Path(f"/run/media/dsche/ITP Transfer/begin_mixture_{experiment_suffix}/"))
+    # path_anchor_input_list.append(Path(f"/run/media/dsche/ITP Transfer/begin_mixture_{experiment_suffix}/"))
     # var1_list.append(np.arange(0.60, 0.726, 0.025))
     # var2_list.append(np.arange(0.01, 0.041, 0.01))
     # var1_list.append(np.arange(0.50, 0.751, 0.025))
     # var2_list.append(np.arange(0.05, 0.51, 0.05))
 
-    var1_list.append(np.arange(0.76, 0.81, 0.02))
-    var2_list.append(np.arange(0.50, 0.51, 0.05))
+    # var1_list.append(np.arange(0.76, 0.81, 0.02))
+    # var2_list.append(np.arange(0.50, 0.51, 0.05))
 
     # var1_list.append(np.arange(0.75, 0.80, 0.001))
     # var2_list.append(np.arange(0.50, 0.51, 0.05))
@@ -62,20 +94,22 @@ if __name__ == "__main__":
     # var1_list.append(np.arange(0.6375, 0.91, 0.05))
     # var2_list.append(np.arange(0.05, 0.51, 0.05))
 
-    nrow_components = 2
+    # nrow_components = 2
+    nrow_components = 1
     ncol_components = 1
 
-    movie_take_last_list: int = [2, 1]
-    suffix_list = ["_0", "_1"]
+    movie_take_last_list: int = [1]
+    suffix_list = ["_0"]
+    # movie_take_last_list: int = [2, 1]
+    # suffix_list = ["_0", "_1"]
     dir_suffix_list = [f"last_frame_{experiment_suffix}" + suf for suf in suffix_list]
     filename_out_list = [f"last_frame_{experiment_suffix}" + suf for suf in suffix_list]
     file_suffix = ""
     # file_suffix = "-" + "-".join(map(str, property_args)) + ".png"
 
+    movie_skip = None
     movie_start_list = [1]
-    movie_end_list = [3]
-    # movie_end_list = [110]
-    # movie_end_list = [24]
+    movie_end_list = [9]
     # movie_start_list = [1, 1]
     # movie_end_list = [70, 60]
     # movie_start_list = [1, 1, 1, 1]
@@ -98,10 +132,8 @@ if __name__ == "__main__":
 
     path_graphs = Path(path_anchor_input_list[0].parent, "graphs")
 
-    use_edited = True
-
     # adjust to shrink images, so RAM gets not overloaded
-    dpi_ratio = 0.25
+    dpi_ratio = 1.00
     dpi_ratio_all = 1.0
 
     ######## END OF USER INPUT #####################################################################
@@ -125,6 +157,8 @@ if __name__ == "__main__":
                                                               check_further_list)):
         path_inner_list: List[Path] = []
         for movie_number in range(movie_start, movie_end + 1):
+            if movie_number == movie_skip:
+                continue
             path_movie = Path(path_anchor_input, f"{dir_name}{counting_format % movie_number}"),
             path_movie = check_if_further(path_anchor_input, dir_name, counting_format,
                                           movie_number, experiment_step=number_of_movies,

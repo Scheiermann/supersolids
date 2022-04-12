@@ -110,5 +110,6 @@ if __name__ == "__main__":
         path_out = Path(path_anchor_output, movie_string + f"{counting_format % i}")
 
         print(f"\npath_in: {path_in}")
+        # with Connection(ssh_hostname, connect_kwargs={'password': ''}) as host:
         with Connection(ssh_hostname) as host:
             download(host, path_in, path_out, filename_singles, download_steps, take_last)

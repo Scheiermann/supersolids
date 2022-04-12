@@ -278,12 +278,17 @@ class Schroedinger:
                 else:
                     if cupy_used:
                         try:
-                            psi_density: cp.ndarray = np.abs(cp.asarray(func_val)) ** p
+                            psi_density: cp.ndarray = cp.abs(func_val) ** p
                         except Exception:
-                            # some cuda problem
-                            psi_density: cp.ndarray = np.abs(func_val) ** p
+                            try:
+                                # cannot compute density in gpu, so compute it in numpy
+                                psi_density: np.ndarray = np.abs(func_val.get()) ** p
+                            except Exception:
+                                # some cuda problem
+                                psi_density: np.ndarray = np.abs(func_val) ** p
+
                     else:
-                        psi_density: cp.ndarray = np.abs(func_val) ** p
+                        psi_density: np.ndarray = np.abs(func_val) ** p
 
         else:
             sys.exit("Spatial dimension over 3. This is not implemented.")

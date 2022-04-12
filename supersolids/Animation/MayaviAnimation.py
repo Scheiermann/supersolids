@@ -194,6 +194,18 @@ class MayaviAnimation(Animation.Animation):
         return input_path
 
     def prepare(self, System: Schroedinger, mixture_slice_index: int = 0):
+        if cupy_used:
+            x_mesh: np.ndarray = System.x_mesh.get()
+            y_mesh: np.ndarray = System.y_mesh.get()
+            z_mesh: np.ndarray = System.z_mesh.get()
+            V_val: np.ndarray = System.V_val.get()
+
+        else:
+            x_mesh: np.ndarray = System.x_mesh
+            y_mesh: np.ndarray = System.y_mesh
+            z_mesh: np.ndarray = System.z_mesh
+            V_val: np.ndarray = System.V_val
+
         if isinstance(System, SchroedingerMixture):
             prob_plots: List[cp.ndarray] = []
             if len(System.psi_val_list) != len(self.alpha_psi_list):
@@ -202,35 +214,32 @@ class MayaviAnimation(Animation.Animation):
             for i, (psi_val, alpha_psi) in enumerate(zip(System.psi_val_list, self.alpha_psi_list)):
                 colormap: str = "spectral"
                 if i == mixture_slice_index:
-                    prob1_3d = np.abs(psi_val) ** 2.0
                     colormap = "cool"
+                    if cupy_used:
+                        prob1_3d: np.ndarray = (cp.abs(psi_val) ** 2.0).get()
+                    else:
+                        prob1_3d: np.ndarray = np.abs(psi_val) ** 2.0
+
                 if cupy_used:
-                    x_mesh: np.ndarray = System.x_mesh.get()
-                    y_mesh: np.ndarray = System.y_mesh.get()
-                    z_mesh: np.ndarray = System.z_mesh.get()
+                    prob: np.ndarray = (cp.abs(psi_val) ** 2.0).get()
                 else:
-                    x_mesh: np.ndarray = System.x_mesh
-                    y_mesh: np.ndarray = System.y_mesh
-                    z_mesh: np.ndarray = System.z_mesh
+                    prob: np.ndarray = np.abs(psi_val) ** 2.0
+
 
                 prob_plots.append(mlab.contour3d(x_mesh,
                                                  y_mesh,
                                                  z_mesh,
-                                                 np.abs(psi_val) ** 2.0,
+                                                 prob,
                                                  colormap=colormap,
                                                  opacity=alpha_psi,
                                                  transparent=True)
                                   )
         else:
             if cupy_used:
-                x_mesh: np.ndarray = System.x_mesh.get()
-                y_mesh: np.ndarray = System.y_mesh.get()
-                z_mesh: np.ndarray = System.z_mesh.get()
+                prob1_3d = (cp.abs(System.psi_val) ** 2.0).get()
             else:
-                x_mesh: np.ndarray = System.x_mesh
-                y_mesh: np.ndarray = System.y_mesh
-                z_mesh: np.ndarray = System.z_mesh
-            prob1_3d = np.abs(System.psi_val) ** 2.0
+                prob1_3d = np.abs(System.psi_val) ** 2.0
+
             prob1_plot = mlab.contour3d(x_mesh,
                                         y_mesh,
                                         z_mesh,
@@ -272,7 +281,7 @@ class MayaviAnimation(Animation.Animation):
             V_plot = mlab.contour3d(x_mesh,
                                     y_mesh,
                                     z_mesh,
-                                    System.V_val,
+                                    V_val,
                                     colormap="hot",
                                     opacity=self.alpha_V,
                                     transparent=True)
@@ -284,7 +293,7 @@ class MayaviAnimation(Animation.Animation):
             pass
         else:
             if System.psi_sol_val is not None:
-                if cupy:
+                if cupy_used:
                     psi_sol_val: np.ndarray = System.psi_sol_val.get()
                 else:
                     psi_sol_val: np.ndarray = System.psi_sol_val
