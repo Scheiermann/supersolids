@@ -751,16 +751,16 @@ def dipol_dipol_interaction(kx_mesh: cp.ndarray,
                             kz_mesh: cp.ndarray,
                             r_cut: float = 1.0,
                             use_cut_off: bool = False):
-    k_squared: cp.ndarray = cp.power(kx_mesh, 2) + cp.power(ky_mesh, 2) + cp.power(kz_mesh, 2)
+    k_squared: np.ndarray = np.power(kx_mesh, 2) + np.power(ky_mesh, 2) + np.power(kz_mesh, 2)
 
     # for [0, 0, 0] there is a singularity and factor/k_squared is 0/0, so we
     # arbitrary set the divisor to 1.0
-    k_mesh: cp.ndarray = cp.sqrt(k_squared)
-    k_mesh_singular_free = cp.where(k_mesh == 0.0, 1.0, k_mesh)
-    k_mesh_singular_index = cp.where(k_mesh == 0.0)
+    k_mesh: np.ndarray = np.sqrt(k_squared)
+    k_mesh_singular_free = np.where(k_mesh == 0.0, 1.0, k_mesh)
+    k_mesh_singular_index = np.where(k_mesh == 0.0)
 
     if use_cut_off:
-        r_cut_mesh: cp.ndarray = get_r_cut(k_mesh_singular_free, r_cut=r_cut)
+        r_cut_mesh: np.ndarray = get_r_cut(k_mesh_singular_free, r_cut=r_cut)
     else:
         r_cut_mesh: float = 1.0
 

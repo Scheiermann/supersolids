@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
     
         {
             "name": "Python: Current File",
@@ -12,7 +13,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "python": "/bigwork/dscheier/miniconda3/envs/pyforge/bin/python",
+            "python": "/bigwork/dscheier/miniconda/envs/solids/bin/python",
             "terminal.integrated.shellArgs.linux": ["conda activate pyforge"],
             // "internalConsoleOptions": "openOnSessionStart",
 
@@ -25,7 +26,7 @@
             "args": ["bdist_wheel"],
             "console": "integratedTerminal",
             "justMyCode": true,
-            "python": "/bigwork/dscheier/miniconda3/envs/pyforge/bin/python",
+            "python": "/bigwork/dscheier/miniconda/envs/solids/bin/python",
             "terminal.integrated.shellArgs.linux": ["conda activate pyforge"],
             // "internalConsoleOptions": "openOnSessionStart",
         },
@@ -37,7 +38,31 @@
             "args": ["bdist_wheel"],
             "console": "integratedTerminal",
             "justMyCode": true,
-            "python": "/bigwork/dscheier/miniconda3/envs/pyforge/bin/python",
+            "python": "/bigwork/dscheier/miniconda/envs/solids/bin/python",
+            "terminal.integrated.shellArgs.linux": ["conda activate pyforge"],
+            // "internalConsoleOptions": "openOnSessionStart",
+        },
+        {
+            "name": "Multi Load",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/supersolids/scripts/multi_load.py",
+            "args": ["bdist_wheel"],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "python": "/bigwork/dscheier/miniconda/envs/solids/bin/python",
+            "terminal.integrated.shellArgs.linux": ["conda activate pyforge"],
+            // "internalConsoleOptions": "openOnSessionStart",
+        },
+        {
+            "name": "Multi Simulate",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/supersolids/scripts/multi_simulate.py",
+            "args": ["bdist_wheel"],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "python": "/bigwork/dscheier/miniconda/envs/solids/bin/python",
             "terminal.integrated.shellArgs.linux": ["conda activate pyforge"],
             // "internalConsoleOptions": "openOnSessionStart",
         },
@@ -47,7 +72,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/supersolids/tools/simulate_npz.py",
             "args": ["-Box={\"x0\": -30, \"x1\": 30, \"y0\": -4, \"y1\": 4, \"z0\": -4, \"z1\": 4}",
-                "-max_timesteps=11",
+                "-max_timesteps=51",
                 "-dt=0.0002",
                 "-steps_per_npz=1",
                 "-accuracy=0.0",
@@ -55,15 +80,14 @@
                 "-dir_name_result=movie061",
                 "-filename_npz=mixture_step_1500000.npz",
                 "-dir_path=/bigwork/dscheier/results/begin_gpu/",
+                "-w={\"w_x\": 100.53, \"w_y\": 596.90, \"w_z\": 1049.29}",
                 "--offscreen",
                 "--V_reload"],
             "console": "integratedTerminal",
             "justMyCode": true,
-            "python": "/bigwork/dscheier/miniconda3/envs/pyforge/bin/python",
+            "python": "/bigwork/dscheier/miniconda/envs/solids/bin/python",
             "terminal.integrated.shellArgs.linux": ["conda activate pyforge"],
             // "internalConsoleOptions": "openOnSessionStart",
         }
-
-
     ]
 }

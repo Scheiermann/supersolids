@@ -11,19 +11,21 @@ import numpy as np
 
 from supersolids.helper.dict2str import dic2str
 
-supersolids_version = "0.1.34rc32"
+supersolids_version = "0.1.34rc33"
 dir_path = Path("/bigwork/dscheier/results/begin_gpu/")
 
 slurm: bool = True
-mem_in_GB = 2
+mem_in_GB = 4
 xvfb_display = 50
 
-Box = {"x0": -15, "x1": 15, "y0": -4, "y1": 4, "z0": -4, "z1": 4}
-Res = {"x": 128, "y": 64, "z": 32}
+mixture: bool = True
 
-max_timesteps = 700001
+Box = {"x0": -30, "x1": 30, "y0": -4, "y1": 4, "z0": -4, "z1": 4}
+Res = {"x": 256, "y": 64, "z": 32}
+
+max_timesteps = 51
 dt = 0.0002
-steps_per_npz = 10000
+steps_per_npz = 1
 accuracy = 0.0
 
 f_z = 167.0
@@ -33,11 +35,16 @@ f_x_start = 12.0
 f_x_end = 17.0
 f_x_step = 2.0
 
-f_y_start = 50.0
+# f_y_start = 50.0
+f_y_start = 95.0
 f_y_end = 96.0
 f_y_step = 5.0
 
-file_start = "step_"
+if mixture:
+    file_start = "mixture_step_"
+else:
+    file_start = "step_"
+
 file_number = 1500000
 file_format = "%07d"
 file_pattern = ".npz"
@@ -45,8 +52,8 @@ file_name = f"{file_start}{file_format % file_number}{file_pattern}"
 
 movie_string = "movie"
 counting_format = "%03d"
-movie_number = 32
-files2last = 3
+movie_number = 1
+files2last = 60
 load_from_multi = True
 load_outer_loop = True
 
@@ -122,20 +129,21 @@ for f_x in np.arange(f_x_start, f_x_end, f_x_step):
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH -t 1-00:00:00
+#SBATCH -w weywot
 #SBATCH --mem={mem_in_GB}G
 """
 
         else:
             cluster_flags = f"""#==================================================
-# PBS -N {jobname}
-# PBS -M daniel.scheiermann@itp.uni-hannover.de
+#PBS -N {jobname}
+#PBS -M daniel.scheiermann@itp.uni-hannover.de
 #PBS -d {dir_path}
 #PBS -e {dir_path}/log/error_$PBS_JOBID.txt
 #PBS -o {dir_path}/log/output_$PBS_JOBID.txt
-# PBS -l nodes=1:ppn=1:ws
-# PBS -l walltime=24:00:00
-# PBS -l mem={mem_in_GB}GB
-# PBS -l vmem={mem_in_GB}GB
+#PBS -l nodes=1:ppn=1:ws
+#PBS -l walltime=24:00:00
+#PBS -l mem={mem_in_GB}GB
+#PBS -l vmem={mem_in_GB}GB
 """
 
         heredoc = "\n".join(["#!/bin/bash",
@@ -143,14 +151,14 @@ for f_x in np.arange(f_x_start, f_x_end, f_x_step):
                              f"""
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/bigwork/dscheier/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+__conda_setup="$('/bigwork/dscheier/miniconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/bigwork/dscheier/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/bigwork/dscheier/miniconda3/etc/profile.d/conda.sh"
+    if [ -f "/bigwork/dscheier/miniconda/etc/profile.d/conda.sh" ]; then
+        . "/bigwork/dscheier/miniconda/etc/profile.d/conda.sh"
     else
-        export PATH="/bigwork/dscheier/miniconda3/bin:$PATH"
+        export PATH="/bigwork/dscheier/miniconda/bin:$PATH"
     fi
 fi
 unset __conda_setup
@@ -159,7 +167,7 @@ unset __conda_setup
 Xvfb :{xvfb_display - j_counter} &
 export DISPLAY=:{xvfb_display - j_counter}
 
-conda activate /bigwork/dscheier/miniconda3/envs/solids
+conda activate /bigwork/dscheier/miniconda/envs/solids
 echo $DISPLAY
 echo $CONDA_PREFIX
 echo $(which python3)
@@ -167,15 +175,16 @@ echo $(which pip3)
 echo "supersolids={supersolids_version}"
 
 # conda install -c scheiermann/label/main supersolids={supersolids_version}
-conda install -c scheiermann/label/testing supersolids={supersolids_version}
-conda install numba
-conda install cupy
+# conda install -c scheiermann/label/testing supersolids={supersolids_version}
+# conda install numba
+# conda install cupy
 
-# /bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
-# /bigwork/dscheier/miniconda3/bin/pip3 install -i https://pypi.org/simple/supersolids=={supersolids_version}
+# /bigwork/dscheier/miniconda/bin/pip3 install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
+# /bigwork/dscheier/miniconda/bin/pip3 install -i https://pypi.org/simple/supersolids=={supersolids_version}
 
-# /bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids.tools.simulate_npz \
-/bigwork/dscheier/miniconda3/envs/pyforge/bin/python -m supersolids.tools.simulate_npz \
+# /bigwork/dscheier/miniconda/bin/python3.8 -m supersolids.tools.simulate_npz
+        
+/bigwork/dscheier/miniconda/envs/solids/bin/python -m supersolids.tools.simulate_npz \
 -Box={dic2str(Box)} \
 -Res={dic2str(Res)} \
 -max_timesteps={max_timesteps} \
@@ -188,9 +197,9 @@ conda install cupy
 -dir_path={dir_path} \
 -w={dic2str(w)} \
 --real_time \
+--V_reload \
 --offscreen
 
-# --V_reload \
 # -V={V} \
 # -noise_func='{noise_func}'\
 # -neighborhood 0.02 4
@@ -214,8 +223,8 @@ conda install cupy
 
 j_counter = 0
 # put distort.txt with the used V for every movie
-for i, N2_part in enumerate(np.arange(N_start, N_end, N_step)):
-    for j, a12 in enumerate(np.arange(a12_start, a12_end, a12_step)):
+for i, f_x in enumerate(np.arange(f_x_start, f_x_end, f_x_step)):
+    for j, f_y in enumerate(np.arange(f_y_start, f_y_end, f_y_step)):
         func = func_list[j_counter]
         func_path = func_path_list[j_counter]
         dir_path_func = dir_path_func_list[j_counter]

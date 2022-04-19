@@ -9,7 +9,7 @@ from supersolids.helper.dict2str import dic2str
 slurm = True
 mem_in_GB = 8
 xvfb_display = 500
-supersolids_version = "0.1.34rc32"
+supersolids_version = "0.1.34rc33"
 dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_13/")
 # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
@@ -151,7 +151,7 @@ unset __conda_setup
 Xvfb :{xvfb_display - j_counter} &
 export DISPLAY=:{xvfb_display - j_counter}
 
-conda activate /bigwork/dscheier/miniconda3/envs/pyforge
+conda activate /bigwork/dscheier/miniconda/envs/solids
 echo $DISPLAY
 echo $CONDA_PREFIX
 echo $(which python3)
