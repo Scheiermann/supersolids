@@ -43,7 +43,7 @@ w_z = 2.0 * np.pi * f_z
 # for mixtures
 a = {"a_x": 4.0, "a_y": 0.8, "a_z": 1.8}
 
-max_timesteps = 1500001
+max_timesteps = 150001
 dt = 0.0002
 steps_per_npz = 10000
 steps_format = "%07d"
@@ -121,9 +121,10 @@ for N2_part in np.arange(N_start, N_end, N_step):
             cluster_flags = f"""#==================================================
 #PBS -N {jobname}
 #PBS -M daniel.scheiermann@itp.uni-hannover.de
+#PBS -m abe
 #PBS -d {dir_path}
-#PBS -e {dir_path}/log/error_$PBS_JOBID.txt
-#PBS -o {dir_path}/log/output_$PBS_JOBID.txt
+#PBS -e {dir_path}/log/error-$PBS_JOBID.txt
+#PBS -o {dir_path}/log/output-$PBS_JOBID.txt
 #PBS -l nodes=1:ppn=1:ws
 #PBS -l walltime=200:00:00
 #PBS -l mem={mem_in_GB}GB

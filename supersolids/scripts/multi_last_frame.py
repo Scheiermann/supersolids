@@ -32,10 +32,15 @@ if __name__ == "__main__":
     # var1_list.append(np.arange(12.0, 17.0, 2.0))
     # var2_list.append(np.arange(50.0, 96.0, 5.0))
 
-    experiment_suffix = "y_N15k"
+    experiment_suffix = "gpu"
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    var1_list.append(np.arange(80.0, 97.0, 2.0))
-    var2_list.append(np.arange(150000, 151000, 10000))
+    var2_list.append(np.arange(12.0, 17.0, 2.0))
+    var1_list.append(np.arange(50.0, 96.0, 5.0))
+
+    # experiment_suffix = "y_N15k"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # var1_list.append(np.arange(80.0, 97.0, 2.0))
+    # var2_list.append(np.arange(150000, 151000, 10000))
 
     # experiment_suffix = "yN"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
@@ -108,8 +113,8 @@ if __name__ == "__main__":
     # file_suffix = "-" + "-".join(map(str, property_args)) + ".png"
 
     movie_skip = None
-    movie_start_list = [1]
-    movie_end_list = [9]
+    movie_start_list = [61]
+    movie_end_list = [90]
     # movie_start_list = [1, 1]
     # movie_end_list = [70, 60]
     # movie_start_list = [1, 1, 1, 1]

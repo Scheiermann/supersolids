@@ -2,7 +2,7 @@
 #SBATCH --job-name 0.1.34rc33-begin
 #SBATCH -D /bigwork/dscheier/supersolids/supersolids/results/
 #SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
-#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-type=END,FAIL
 #SBATCH -o output-%j.out
 #SBATCH -e error-%j.out
 #SBATCH -N 1
@@ -15,14 +15,14 @@ supersolids_version=0.1.34rc33
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/bigwork/dscheier/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+__conda_setup="$('/bigwork/dscheier/miniconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/bigwork/dscheier/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/bigwork/dscheier/miniconda3/etc/profile.d/conda.sh"
+    if [ -f "/bigwork/dscheier/miniconda/etc/profile.d/conda.sh" ]; then
+        . "/bigwork/dscheier/miniconda/etc/profile.d/conda.sh"
     else
-        export PATH="/bigwork/dscheier/miniconda3/bin:$PATH"
+        export PATH="/bigwork/dscheier/miniconda/bin:$PATH"
     fi
 fi
 unset __conda_setup
@@ -48,8 +48,7 @@ dir_path="/bigwork/dscheier/results/begin_gpu/"
 steps_per_npz=100
 steps_format="%07d"
 
-# /bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids \
-/bigwork/dscheier/miniconda3/envs/pyforge/bin/python -m supersolids \
+python -m supersolids \
 --N_list 150000 0 \
 -Box='{"x0":-15, "x1":15, "y0":-4, "y1":4, "z0":-4, "z1":4}' \
 -Res='{"x":128, "y":64, "z":32}' \

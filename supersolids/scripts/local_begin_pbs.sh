@@ -1,67 +1,76 @@
 #!/usr/bin/env bash
 #==================================================
- #PBS -N 1.34rc33
- #PBS -M daniel.scheiermann@itp.uni-hannover.de
- #PBS -d /bigwork/dscheier/
- #PBS -e /bigwork/dscheier/error.txt
- #PBS -o /bigwork/dscheier/output.txt
- #PBS -l nodes=1:ppn=1:ws
- #PBS -l walltime=99:00:00
- #PBS -l mem=4GB
- #PBS -l vmem=4GB
+#PBS -N  0.1.34rc33-begin
+#PBS -M daniel.scheiermann@itp.uni-hannover.de
+#PBS -d /bigwork/dscheier/supersolids/supersolids/results/
+#PBS -m abe
+#PBS -o /bigwork/dscheier/output-$PBS_JOBID.txt
+#PBS -e /bigwork/dscheier/error-$PBS_JOBID.txt
+#PBS -l nodes=1:ppn=1:ws
+#PBS -l walltime=12:00:00
+#PBS -l mem=4GB
+#PBS -l vmem=4GB
 
 supersolids_version=0.1.34rc33
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/bigwork/dscheier/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/bigwork/dscheier/miniconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/bigwork/dscheier/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/bigwork/dscheier/miniconda3/etc/profile.d/conda.sh"
+    if [ -f "/bigwork/dscheier/miniconda/etc/profile.d/conda.sh" ]; then
+        . "/bigwork/dscheier/miniconda/etc/profile.d/conda.sh"
     else
-        export PATH="/bigwork/dscheier/miniconda3/bin:$PATH"
+        export PATH="/bigwork/dscheier/miniconda/bin:$PATH"
     fi
 fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-Xvfb :4 &
-export DISPLAY=:4
+Xvfb :$PBS_JOBID &
+export DISPLAY=:$PBS_JOBID
 
-conda activate /bigwork/dscheier/miniconda3/envs/solids
+conda activate /bigwork/dscheier/miniconda/envs/solids
+echo $DISPLAY
 echo $CONDA_PREFIX
 echo $(which python3)
 echo $(which pip3)
-/bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids==${supersolids_version}
 
-dir_path="/bigwork/dscheier/supersolids/results/"
-steps_per_npz=10000
+# conda install -c scheiermannsean/label/main supersolids={supersolids_version}
+conda install -c scheiermannsean/label/testing supersolids={supersolids_version}
+conda install numba
+conda install cupy
+
+# /bigwork/dscheier/miniconda3/bin/pip3 install -i https://test.pypi.org/simple/ supersolids==${supersolids_version}
+# /bigwork/dscheier/miniconda3/bin/pip3 install -i https://pypi.org/simple/supersolids==${supersolids_version}
+
+dir_path="/bigwork/dscheier/results/begin_gpu/"
+steps_per_npz=100
 steps_format="%07d"
 
-# file_number=0
-# movie_number_after=1
-# movie_after_string="movie00"
-# movie_after="$movie_after_string$((movie_number_after))"
-# dir_path_after="/bigwork/dscheier/supersolids/results/$movie_after/"
-
-/bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids \
--N=50000 \
--Box='{"x0":-10, "x1":10, "y0":-5, "y1":5, "z0":-4, "z1":4}' \
--Res='{"x":256, "y":128, "z":32}' \
+# /bigwork/dscheier/miniconda3/bin/python3.8 -m supersolids \
+/bigwork/dscheier/miniconda3/envs/solids/bin/python -m supersolids \
+--N_list 150000 0 \
+-Box='{"x0":-15, "x1":15, "y0":-4, "y1":4, "z0":-4, "z1":4}' \
+-Res='{"x":128, "y":64, "z":32}' \
 -max_timesteps=1500001 \
 -dt=0.0002 \
 -steps_per_npz=$steps_per_npz \
 -steps_format="${steps_format}" \
 -a='{"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}' \
 -dir_path="${dir_path}" \
--a_s=0.000000004656 \
--w_y=518.36 \
+-w_x=84.0 \
+-w_y=500.0 \
+-w_z=1048.76 \
 -accuracy=0.0 \
 -noise 0.8 1.2 \
 --V_interaction \
---offscreen
+--offscreen \
+--a_dd_list 130.80 0.0 0.0 \
+--a_s_list 88.0 0.0 0.0 \
+--mixture
+# -a_s=0.000000004656 \
 
 # -w_y=518.36
 # -w_y=518.36 # w_y = 2 * np.pi * 82.50 # alpha_t=0.4 # get some 1D and all 2D, while bigger N
@@ -89,3 +98,4 @@ if [ $simulate_exit != 1 ]; then
 else
     printf "\nsimulate_npz ended with sys.exit(1)\n"
 fi
+

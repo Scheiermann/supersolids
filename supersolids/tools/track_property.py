@@ -20,6 +20,9 @@ import dill
 import numpy as np
 from matplotlib import pyplot as plt
 
+from supersolids.helper import get_version
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np)
+
 from supersolids import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper import get_path, functions
@@ -205,6 +208,13 @@ def plot_property(args, func=functions.identity):
                                     )
 
     property_all = property_to_array(property_tuple, list_of_arrays=args.list_of_arrays)
+
+    if cupy_used:
+        try:
+
+            property_all = property_all.get() 
+        except Exception as e:
+            print(f"ERROR: {e}")
 
     try:
         if args.list_of_arrays:

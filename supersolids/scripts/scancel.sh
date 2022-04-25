@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-start=350862
-job_number=50
+start=9150
+job_number=9
 
 for ((i = $start; i < $((start + job_number)); i++))
 do
-	qdel $i
+	scancel $i
 done
 

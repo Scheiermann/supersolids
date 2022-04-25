@@ -16,7 +16,7 @@ dir_name_result=$movie_string$movie_number_formatted
 dir_path_after=$dir_path
 
 # python -m supersolids \
-/bigwork/dscheier/miniconda3/envs/pyforge/bin/python -m supersolids \
+python -m supersolids \
 -Res='{"x":128, "y":64, "z":32}' \
 -Box='{"x0":-10, "x1":10, "y0":-5, "y1":5, "z0":-4, "z1":4}' \
 -max_timesteps=1000 \

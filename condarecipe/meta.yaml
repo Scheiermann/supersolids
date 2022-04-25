@@ -19,6 +19,7 @@ build:
 requirements:
   host:
     - dill
+    - fabric
     - ffmpeg-python
     - matplotlib
     - mayavi
@@ -27,11 +28,13 @@ requirements:
     - psutil
     - pyqt {{ pyqt }}
     - python
+    - recommonmark
     - scipy
     - sphinx-autoapi
     - sphinx_rtd_theme
   run:
     - dill
+    - fabric
     - ffmpeg-python
     - matplotlib
     - mayavi
@@ -39,6 +42,7 @@ requirements:
     - psutil
     - pyqt {{ pyqt }}
     - python
+    - recommonmark
     - scipy
     - sphinx-autoapi
     - sphinx_rtd_theme

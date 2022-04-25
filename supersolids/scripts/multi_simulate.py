@@ -16,14 +16,14 @@ dir_path = Path("/bigwork/dscheier/results/begin_gpu/")
 
 slurm: bool = True
 mem_in_GB = 4
-xvfb_display = 50
+xvfb_display = 990
 
 mixture: bool = True
 
 Box = {"x0": -30, "x1": 30, "y0": -4, "y1": 4, "z0": -4, "z1": 4}
 Res = {"x": 256, "y": 64, "z": 32}
 
-max_timesteps = 51
+max_timesteps = 1001
 dt = 0.0002
 steps_per_npz = 1
 accuracy = 0.0
@@ -35,10 +35,9 @@ f_x_start = 12.0
 f_x_end = 17.0
 f_x_step = 2.0
 
-# f_y_start = 50.0
-f_y_start = 95.0
-f_y_end = 96.0
-f_y_step = 5.0
+f_y_start = 100.0
+f_y_end = 100.1
+f_y_step = 0.5
 
 if mixture:
     file_start = "mixture_step_"
@@ -53,7 +52,7 @@ file_name = f"{file_start}{file_format % file_number}{file_pattern}"
 movie_string = "movie"
 counting_format = "%03d"
 movie_number = 1
-files2last = 60
+files2last = 10
 load_from_multi = True
 load_outer_loop = True
 
@@ -68,7 +67,7 @@ func_list = []
 func_path_list = []
 dir_path_func_list = []
 for f_x in np.arange(f_x_start, f_x_end, f_x_step):
-    for f_y in np.arange(f_y_start, f_y_end, f_y_step)[::-1]:
+    for f_y in np.arange(f_y_start, f_y_end, f_y_step):
         skip_counter += 1
         if skip_counter < skip:
             continue
@@ -128,8 +127,8 @@ for f_x in np.arange(f_x_start, f_x_end, f_x_step):
 #SBATCH -e error-%j.out
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH -t 1-00:00:00
-#SBATCH -w weywot
+#SBATCH -t 0-00:30:00
+#SBATCH -p gpu
 #SBATCH --mem={mem_in_GB}G
 """
 
@@ -137,9 +136,10 @@ for f_x in np.arange(f_x_start, f_x_end, f_x_step):
             cluster_flags = f"""#==================================================
 #PBS -N {jobname}
 #PBS -M daniel.scheiermann@itp.uni-hannover.de
+#PBS -m abe
 #PBS -d {dir_path}
-#PBS -e {dir_path}/log/error_$PBS_JOBID.txt
-#PBS -o {dir_path}/log/output_$PBS_JOBID.txt
+#PBS -e {dir_path}/log/error-$PBS_JOBID.txt
+#PBS -o {dir_path}/log/output-$PBS_JOBID.txt
 #PBS -l nodes=1:ppn=1:ws
 #PBS -l walltime=24:00:00
 #PBS -l mem={mem_in_GB}GB
@@ -163,6 +163,8 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+
+export HOME=$BIGWORK
 
 Xvfb :{xvfb_display - j_counter} &
 export DISPLAY=:{xvfb_display - j_counter}
@@ -196,10 +198,10 @@ echo "supersolids={supersolids_version}"
 -filename_npz={file_name} \
 -dir_path={dir_path} \
 -w={dic2str(w)} \
---real_time \
 --V_reload \
 --offscreen
 
+# --real_time \
 # -V={V} \
 # -noise_func='{noise_func}'\
 # -neighborhood 0.02 4

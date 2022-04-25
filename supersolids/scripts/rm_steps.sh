@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 path_anchor_input="/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/"
 
 # next_new allows to point to different movies of one batched simulation
