@@ -21,14 +21,22 @@ conda
  * conda create -n solids python=3.10
  * conda activate solids
  * conda config --add channels conda-forge
+For main:
  * conda install -c scheiermann supersolids
+For testing:
+ * conda install -c scheiermann/label/testing supersolids
 Optional:
  * conda install numba
  * conda install cupy
 
 pip
 ---
+ * pip install mayavi
+ * pip install PyQt5
  * pip install supersolids
+Optional:
+ * pip install numba
+ * pip install cupy
 
 Archlinux
 ---------
@@ -39,7 +47,7 @@ It is provided in the AUR
 Windows
 -------
 You need to add python to your path (if you didn't do it, when installing python/anaconda).
- * Then continue with pip installation
+ * Then continue with conda installation
 
 Source
 ---------------------------

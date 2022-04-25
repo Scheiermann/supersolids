@@ -76,8 +76,13 @@ def download(host, path_in, path_out, filename_singles, download_steps, take_las
 
 if __name__ == "__main__":
     ssh_hostname = 'transfer'
-    path_anchor_input = Path("/bigwork/nhbbsche/results/begin_gpu/")
-    path_anchor_output = Path("/bigwork/dscheier/results/begin_gpu/")
+    password = None
+
+    path_anchor_input = Path("/bigwork/nhbbsche/results/begin_gpu_big/")
+    # path_anchor_output = Path("/bigwork/dscheier/results/begin_gpu/")
+    # path_anchor_output = Path("/run/media/dsche/scr2/begin_gpu/")
+    path_anchor_output = Path("/run/media/dsche/scr2/begin_gpu_big/")
+
 
     # take_last = 3
     take_last = None
@@ -110,6 +115,9 @@ if __name__ == "__main__":
         path_out = Path(path_anchor_output, movie_string + f"{counting_format % i}")
 
         print(f"\npath_in: {path_in}")
-        # with Connection(ssh_hostname, connect_kwargs={'password': ''}) as host:
-        with Connection(ssh_hostname) as host:
-            download(host, path_in, path_out, filename_singles, download_steps, take_last)
+        if password is None:
+            with Connection(ssh_hostname) as host:
+                download(host, path_in, path_out, filename_singles, download_steps, take_last)
+        else:
+            with Connection(ssh_hostname, connect_kwargs={'password': f"{password}"}) as host:
+                download(host, path_in, path_out, filename_singles, download_steps, take_last)
