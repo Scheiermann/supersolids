@@ -12,20 +12,23 @@ import numpy as np
 from supersolids.helper.dict2str import dic2str
 
 supersolids_version = "0.1.34rc33"
-dir_path = Path("/bigwork/dscheier/results/begin_gpu/")
+dir_path = Path("/bigwork/dscheier/results/begin_gpu_big/")
+
+dir_path_log = Path(f"{dir_path}/log/")
+dir_path_log.mkdir(parents=True, exist_ok=True)
 
 slurm: bool = True
-mem_in_GB = 4
+mem_in_GB = 8
 xvfb_display = 990
 
 mixture: bool = True
 
-Box = {"x0": -30, "x1": 30, "y0": -4, "y1": 4, "z0": -4, "z1": 4}
-Res = {"x": 256, "y": 64, "z": 32}
+Box = {"x0": -20, "x1": 20, "y0": -4, "y1": 4, "z0": -4, "z1": 4}
+Res = {"x": 256, "y": 64, "z": 64}
 
 max_timesteps = 1001
 dt = 0.0002
-steps_per_npz = 1
+steps_per_npz = 10
 accuracy = 0.0
 
 f_z = 167.0
@@ -44,7 +47,7 @@ if mixture:
 else:
     file_start = "step_"
 
-file_number = 1500000
+file_number = 150000
 file_format = "%07d"
 file_pattern = ".npz"
 file_name = f"{file_start}{file_format % file_number}{file_pattern}"
@@ -181,10 +184,10 @@ echo "supersolids={supersolids_version}"
 # conda install numba
 # conda install cupy
 
-# /bigwork/dscheier/miniconda/bin/pip3 install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
-# /bigwork/dscheier/miniconda/bin/pip3 install -i https://pypi.org/simple/supersolids=={supersolids_version}
+# /bigwork/dscheier/miniconda/bin/pip install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
+# /bigwork/dscheier/miniconda/bin/pip install -i https://pypi.org/simple/supersolids=={supersolids_version}
 
-# /bigwork/dscheier/miniconda/bin/python3.8 -m supersolids.tools.simulate_npz
+# /bigwork/dscheier/miniconda/bin/python -m supersolids.tools.simulate_npz
         
 python -m supersolids.tools.simulate_npz \
 -Box={dic2str(Box)} \
@@ -197,10 +200,10 @@ python -m supersolids.tools.simulate_npz \
 -dir_name_result={movie_after} \
 -filename_npz={file_name} \
 -dir_path={dir_path} \
--w={dic2str(w)} \
 --V_reload \
 --offscreen
 
+# -w={dic2str(w)} \
 # --real_time \
 # -V={V} \
 # -noise_func='{noise_func}'\

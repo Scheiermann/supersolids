@@ -414,7 +414,12 @@ def simulate_npz(args):
                 else:
                     SchroedingerInput.psi_val_list[i] = psi_val_list_i
                 
-            SchroedingerInput.nA_max = 1000
+            try:
+                SchroedingerInput.nA_max = System_loaded.nA_max
+            except Exception:
+                print(f"No nA_max found in loaded System. Set to 1000!")
+                SchroedingerInput.nA_max = 1000
+
             SystemResult: Schroedinger = simulate_case(
                 System=SchroedingerInput,
                 Anim=Anim,

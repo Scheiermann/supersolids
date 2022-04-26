@@ -164,10 +164,10 @@ conda install -c scheiermann/label/testing supersolids={supersolids_version}
 conda install numba
 conda install cupy
 
-# /bigwork/dscheier/miniconda3/envs/pyforge/bin/pip install -i https://pypi.org/simple/supersolids=={supersolids_version}
-# /bigwork/dscheier/miniconda3/envs/pyforge/bin/pip install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
+# /bigwork/dscheier/miniconda/envs/pyforge/bin/pip install -i https://pypi.org/simple/supersolids=={supersolids_version}
+# /bigwork/dscheier/miniconda/envs/pyforge/bin/pip install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
 
-/bigwork/dscheier/miniconda3/envs/pyforge/bin/python -m supersolids \
+python -m supersolids \
 -Box={dic2str(Box)} \
 -Res={dic2str(Res)} \
 -max_timesteps={max_timesteps} \

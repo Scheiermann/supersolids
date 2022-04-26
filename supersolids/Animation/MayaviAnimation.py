@@ -47,7 +47,7 @@ def get_legend(System, frame, frame_start, supersolids_version, mu_rel=None):
                 f"w_z/2pi={System.w_z / (2.0 * np.pi):05.02f}, "
                 f"imag_time={System.imag_time}, "
                 f"t={System.t:07.05f}, "
-                f"processed={(frame - frame_start) / System.max_timesteps:05.03f}%, "
+                f"processed={100 * (frame - frame_start) / System.max_timesteps:03.01f}%, "
                 f"E={np.format_float_scientific(System.E, pad_left=5, precision=6, sign=True)}, "
                 f"mu={list(map(format_1d, System.mu_arr))}"
                 )

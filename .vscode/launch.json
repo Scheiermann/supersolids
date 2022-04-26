@@ -4,8 +4,6 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
-    
         {
             "name": "Python: Current File",
             "type": "python",
@@ -14,7 +12,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "python": "/bigwork/dscheier/miniconda/envs/solids/bin/python",
-            "terminal.integrated.shellArgs.linux": ["conda activate pyforge"],
+            "terminal.integrated.shellArgs.linux": ["conda activate solids"],
             // "internalConsoleOptions": "openOnSessionStart",
 
         },
@@ -27,7 +25,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "python": "/bigwork/dscheier/miniconda/envs/solids/bin/python",
-            "terminal.integrated.shellArgs.linux": ["conda activate pyforge"],
+            "terminal.integrated.shellArgs.linux": ["conda activate solids"],
             // "internalConsoleOptions": "openOnSessionStart",
         },
         {
@@ -39,7 +37,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "python": "/bigwork/dscheier/miniconda/envs/solids/bin/python",
-            "terminal.integrated.shellArgs.linux": ["conda activate pyforge"],
+            "terminal.integrated.shellArgs.linux": ["conda activate solids"],
             // "internalConsoleOptions": "openOnSessionStart",
         },
         {
@@ -51,7 +49,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "python": "/bigwork/dscheier/miniconda/envs/solids/bin/python",
-            "terminal.integrated.shellArgs.linux": ["conda activate pyforge"],
+            "terminal.integrated.shellArgs.linux": ["conda activate solids"],
             // "internalConsoleOptions": "openOnSessionStart",
         },
         {
@@ -63,7 +61,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "python": "/bigwork/dscheier/miniconda/envs/solids/bin/python",
-            "terminal.integrated.shellArgs.linux": ["conda activate pyforge"],
+            "terminal.integrated.shellArgs.linux": ["conda activate solids"],
             // "internalConsoleOptions": "openOnSessionStart",
         },
         {
@@ -71,23 +69,59 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/supersolids/tools/simulate_npz.py",
-            "args": ["-Box={\"x0\": -30, \"x1\": 30, \"y0\": -4, \"y1\": 4, \"z0\": -4, \"z1\": 4}",
+            "args": [
+                /* "-Box={\"x0\": -20, \"x1\": 20, \"y0\": -4, \"y1\": 4, \"z0\": -4, \"z1\": 4}", */
                 "-max_timesteps=51",
                 "-dt=0.0002",
                 "-steps_per_npz=1",
                 "-accuracy=0.0",
                 "-dir_name_load=movie001",
-                "-dir_name_result=movie061",
-                "-filename_npz=mixture_step_1500000.npz",
-                "-dir_path=/bigwork/dscheier/results/begin_gpu/",
-                "-w={\"w_x\": 100.53, \"w_y\": 596.90, \"w_z\": 1049.29}",
+                "-dir_name_result=movie021",
+                "-filename_npz=mixture_step_0150000.npz",
+                "-dir_path=/bigwork/dscheier/results/begin_gpu_big/",
+                /* "-w={\"w_x\": 75.39822368615503, \"w_y\": 628.3185307179587, \"w_z\": 1049.291946298991}", */
+                "--V_reload",
                 "--offscreen",
-                "--V_reload"],
+                ],
             "console": "integratedTerminal",
             "justMyCode": true,
             "python": "/bigwork/dscheier/miniconda/envs/solids/bin/python",
-            "terminal.integrated.shellArgs.linux": ["conda activate pyforge"],
+            "terminal.integrated.shellArgs.linux": ["conda activate solids"],
             // "internalConsoleOptions": "openOnSessionStart",
-        }
+        },
+        {
+            "name": "Begin",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/supersolids/__main__.py",
+            "args": [
+                "-Box={\"x0\": -20, \"x1\": 20, \"y0\": -4, \"y1\": 4, \"z0\": -4, \"z1\": 4}",
+                "-Res={\"x\": 256, \"y\": 64, \"z\": 64}",
+                "-max_timesteps=51",
+                "-dt=0.0002",
+                "-steps_per_npz=1",
+                "-steps_format='%07d'",
+                "-dir_path=/bigwork/dscheier/results/begin_gpu_big/",
+                "-dir_name_result=movie011",
+                "-w_x=75.39822368615503",
+                "-w_y=628.3185307179587",
+                "-w_z=1049.291946298991",
+                "-a={\"a_x\": 9.0, \"a_y\": 1.0, \"a_z\": 1.5}",
+                "-accuracy=0.0",
+                "-noise", "0.9", "1.1",
+                "--N_list", "150000", "0",
+                "--m_list", "163.9", "0.0",
+                "--a_dd_list", "130.8", "0.0", "0.0",
+                "--a_s_list", "88.0", "0.0", "0.0",
+                "--offscreen",
+                "--V_interaction",
+                "--mixture",
+                ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "python": "/bigwork/dscheier/miniconda/envs/solids/bin/python",
+            "terminal.integrated.shellArgs.linux": ["conda activate solids"],
+            // "internalConsoleOptions": "openOnSessionStart",
+        },
     ]
 }

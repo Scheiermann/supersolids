@@ -10,12 +10,13 @@ Contributing
 |   Therefore, somebody could identify, that he is using a package with your changes later on,
 |   this will allow rechecking the results from the past, as every version is saved in git and can be restored.
 | 6. **Build and install** by using the commands from the makefile:
-| * conda install recommonmark
-| * conda install twine
-| * conda install conda-build
-| * make build
-| * make conda_build
-| * make conda_install_local
+| conda install recommonmark
+| conda install twine
+| conda install conda-build
+| conda install anaconda-client
+| make build
+| make conda_build
+| make conda_install_local
 | 7. **Restart** your integrated development environment (IDE)
 |    eg. Spyder, VSCode, ... , so the IDE reloads all packages, and the changes are applied
 |    (depends on the IDE, whether this is required).
