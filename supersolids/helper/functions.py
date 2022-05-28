@@ -64,7 +64,7 @@ def get_grid_helper(Res: Resolution, MyBox: Box, index: int):
     return x, dx, kx, dkx
 
 
-def get_grid(Res: Resolution, MyBox: Box):
+def get_grid(Res: Resolution, MyBox: Box, cupy_try: bool = True):
     x0, x1 = MyBox.get_bounds_by_index(0)
     res_x = Res.get_bounds_by_index(0)
     y0, y1 = MyBox.get_bounds_by_index(1)
@@ -76,10 +76,7 @@ def get_grid(Res: Resolution, MyBox: Box):
         x_mesh, y_mesh, z_mesh = np.mgrid[x0: x1: complex(0, res_x),
                                           y0: y1: complex(0, res_y),
                                           z0: z1: complex(0, res_z)
-                                          ]
-        if cupy_used:
-            x_mesh, y_mesh, z_mesh = cp.asarray(x_mesh), cp.asarray(y_mesh), cp.asarray(z_mesh)
-            
+                                          ]           
     except KeyError:
         sys.exit(
             f"Keys x0, x1, y0, y1, z0, z1 of box needed, "
@@ -521,7 +518,7 @@ def psi_gauss_3d(x, y, z,
     """
 
     return ((a_x * a_y * a_z * np.pi ** (3.0 / 2.0)) ** -0.5
-            * cp.exp(-0.5 * (
+            * np.exp(-0.5 * (
                     ((x - x_0) / a_x) ** 2.0
                     + ((y - y_0) / a_y) ** 2.0
                     + ((z - z_0) / a_z) ** 2.0)
@@ -1121,10 +1118,10 @@ def camera_3d_trajectory(frame: int,
     return r, phi, z
 
 
-def noise_mesh(min: float = 0.8,
-               max: float = 1.2,
+def noise_mesh(val_min: float = 0.8,
+               val_max: float = 1.2,
                shape: Tuple[int, int, int] = (64, 64, 64)) -> cp.ndarray:
-    noise = min + (max - min) * cp.random.rand(*shape)
+    noise = val_min + (val_max - val_min) * np.random.rand(*shape)
 
     return noise
 

@@ -19,6 +19,7 @@ from pathlib import Path
 import dill
 import numpy as np
 from matplotlib import pyplot as plt
+from typing import Optional
 
 from supersolids.helper import get_version
 cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np)
@@ -78,9 +79,12 @@ def track_property(input_path,
                    steps_format: str = "%07d",
                    steps_per_npz: int = 10,
                    frame_start: int = 0,
+                   frame_end: Optional[int] = None,
                    property_name: str = "get_center_of_mass",
                    property_func: bool = False,
                    property_args=[],
+                   property_args_str=[],
+                   property_args_frame: bool = False,
                    ):
     last_index = get_last_index(input_path, filename_steps)
     print("Load schroedinger")
@@ -121,16 +125,25 @@ def track_property(input_path,
 
         frame = frame + steps_per_npz
 
-        yield property_check(get_property(System_loaded, property_name),
-                             property_name,
-                             property_func,
-                             property_args)
+        if property_args_frame:
+            # add fram as extra argument
+            yield property_check(get_property(System_loaded, property_name),
+                                 property_name,
+                                 property_func,
+                                 property_args_str + property_args + [frame])
+        else:
+            yield property_check(get_property(System_loaded, property_name),
+                                 property_name,
+                                 property_func,
+                                 property_args_str + property_args)
+
+        if frame_end:
+            last_index = frame_end
 
         if frame == last_index + steps_per_npz:
             break
         elif frame > last_index:
             frame = last_index
-
 
 def property_to_array(property_tuple, list_of_arrays: bool=False):
     property_all = np.empty(shape=(1, 1))
@@ -187,9 +200,12 @@ def plot_property(args, func=functions.identity):
                              steps_format=args.steps_format,
                              steps_per_npz=args.steps_per_npz,
                              frame_start=frame_start,
+                             frame_end=args.frame_end,
                              property_name="t",
                              property_func=False,
                              property_args=[],
+                             property_args_str=[],
+                             property_args_frame=False,
                              )
 
     t_list = property_to_array(t_tuple, list_of_arrays=False)
@@ -202,9 +218,12 @@ def plot_property(args, func=functions.identity):
                                     steps_format=args.steps_format,
                                     steps_per_npz=args.steps_per_npz,
                                     frame_start=frame_start,
+                                    frame_end=args.frame_end,
                                     property_name=args.property_name,
                                     property_func=args.property_func,
                                     property_args=args.property_args,
+                                    property_args_str=args.property_args_str,
+                                    property_args_frame=args.property_args_frame,
                                     )
 
     property_all = property_to_array(property_tuple, list_of_arrays=args.list_of_arrays)
@@ -301,6 +320,7 @@ def flags(args_array):
     parser.add_argument("-steps_per_npz", type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
     parser.add_argument("-frame_start", type=int, default=None, help="Counter of first saved npz.")
+    parser.add_argument("-frame_end", type=int, default=None, help="Counter of last saved npz.")
     parser.add_argument("-take_last", type=int, default=None, help="Index to automatically get the "
                         "last n-th npz number of the current movie and use it as frame_start.")
     parser.add_argument("-property_filename_suffix", type=str, default="", nargs="?",
@@ -312,9 +332,12 @@ def flags(args_array):
                              "an Schroedinger object."
                              "If used, flag property_name will be a interpreted as method of an "
                              "Schroedinger object.")
-    parser.add_argument("--property_args", type=json.loads, default=[],
-                        action='store', nargs="*",
+    parser.add_argument("--property_args_str", default=[], action='store', nargs="*",
+                        help="String arguments for property_name, if property_func is used.")
+    parser.add_argument("--property_args", type=json.loads, default=[], action='store', nargs="*",
                         help="Arguments for property_name, if property_func is used.")
+    parser.add_argument("--property_args_frame", default=False, action="store_true",
+                        help="If used, frame number is added as argument to property_args list.")
     parser.add_argument("--subplots", default=False, action="store_true",
                         help="If used, the dimensions of the property will be plotted in subplots.")
     parser.add_argument("-inbuild_func", type=functions.lambda_parsed,

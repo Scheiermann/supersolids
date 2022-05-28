@@ -11,7 +11,7 @@ import numpy as np
 
 from supersolids.helper.dict2str import dic2str
 
-supersolids_version = "0.1.34rc33"
+supersolids_version = "0.1.34rc34"
 dir_path = Path("/bigwork/dscheier/results/begin_gpu_big/")
 
 dir_path_log = Path(f"{dir_path}/log/")

@@ -6,7 +6,7 @@ from typing import Tuple, List, Optional
 
 def get_path(dir_path: Path,
              search_prefix: str = "movie",
-             counting_format: str = "%03d",
+             counting_format: Optional[str] = "%03d",
              file_pattern: str = "",
              take_last: int = 1) -> Tuple[Optional[Path], Optional[int], str, str]:
     """
@@ -56,13 +56,19 @@ def get_path(dir_path: Path,
 
         if file_pattern:
             try:
-                input_path = Path(dir_path,
-                                  search_prefix + counting_format % last_index + file_pattern)
+                if counting_format is None:
+                    input_path = Path(dir_path, search_prefix + file_pattern)
+                else:
+                    input_path = Path(dir_path,
+                                      search_prefix + counting_format % last_index + file_pattern)
             except Exception:
                 input_path = None
         else:
             try:
-                input_path = Path(dir_path, search_prefix + counting_format % last_index)
+                if counting_format is None:
+                    input_path = Path(dir_path, search_prefix)
+                else:
+                    input_path = Path(dir_path, search_prefix + counting_format % last_index)
             except Exception:
                 input_path = None
 

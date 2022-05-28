@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #==================================================
-#PBS -N  0.1.34rc33-begin
+#PBS -N  0.1.34rc34-begin
 #PBS -M daniel.scheiermann@itp.uni-hannover.de
 #PBS -d /bigwork/dscheier/supersolids/supersolids/results/
 #PBS -m abe
@@ -11,7 +11,7 @@
 #PBS -l mem=4GB
 #PBS -l vmem=4GB
 
-supersolids_version=0.1.34rc33
+supersolids_version=0.1.34rc34
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!

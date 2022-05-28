@@ -154,7 +154,7 @@ if __name__ == "__main__":
 
     if args.l_0 is None:
         # x harmonic oscillator length
-        l_0 = cp.sqrt(constants.hbar / (m_list[0] * args.w_x))
+        l_0 = np.sqrt(constants.hbar / (m_list[0] * args.w_x))
     else:
         l_0 = args.l_0
 
@@ -243,8 +243,8 @@ if __name__ == "__main__":
         psi_0_noise_3d = None
     else:
         psi_0_noise_3d = functions.noise_mesh(
-            min=args.noise[0],
-            max=args.noise[1],
+            val_min=args.noise[0],
+            val_max=args.noise[1],
             shape=(Res.x, Res.y, Res.z)
             )
 

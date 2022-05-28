@@ -1,17 +1,11 @@
 #!/usr/bin/env python
 
-import dill
 import numpy as np
-import shutil
 
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
-from PIL import Image
-
-from supersolids.helper.get_path import get_last_png_in_last_anim
-from supersolids.helper.merge_meshes import check_if_further, merge_meshes
-from supersolids.helper.periodic_system import paste_together
+from supersolids.helper.last_frame import last_frame
 
 
 # Script runs, if script is run as main script (called by python *.py)
@@ -32,10 +26,10 @@ if __name__ == "__main__":
     # var1_list.append(np.arange(12.0, 17.0, 2.0))
     # var2_list.append(np.arange(50.0, 96.0, 5.0))
 
-    experiment_suffix = "gpu"
-    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    var2_list.append(np.arange(12.0, 17.0, 2.0))
-    var1_list.append(np.arange(50.0, 96.0, 5.0))
+    # experiment_suffix = "gpu"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # var2_list.append(np.arange(12.0, 17.0, 2.0))
+    # var1_list.append(np.arange(50.0, 96.0, 5.0))
 
     # experiment_suffix = "y_N15k"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
@@ -63,9 +57,15 @@ if __name__ == "__main__":
     # var1_list.append(np.arange(0.005, 0.05, 0.005))
     # var2_list.append(np.arange(0.6, 0.66, 0.05))
 
-    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_a12_grid/"))
+    experiment_suffix = "mixture_a12_grid"
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    var1_list.append(np.arange(0.6, 0.81, 0.05))
+    var2_list.append(np.arange(0.05, 0.51, 0.05))
+
+    # experiment_suffix = "mixture_a12_small_grid"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # var1_list.append(np.arange(0.6, 0.81, 0.05))
-    # var2_list.append(np.arange(0.05, 0.51, 0.05))
+    # var2_list.append(np.arange(0.01, 0.051, 0.005))
 
     # path_anchor_input_list.append(Path(f"/run/media/dsche/ITP Transfer/begin_mixture_{experiment_suffix}/"))
     # var1_list.append(np.arange(0.60, 0.726, 0.025))
@@ -99,27 +99,43 @@ if __name__ == "__main__":
     # var1_list.append(np.arange(0.6375, 0.91, 0.05))
     # var2_list.append(np.arange(0.05, 0.51, 0.05))
 
-    # nrow_components = 2
     nrow_components = 1
     ncol_components = 1
+    # ncol_components = 2
+    
+    frames = False
+    # frames = True
+    if frames:
+        frame_start = 1000
+        frame_step = 1000
+        frame_end = 100001
+        # frame_end = 20001
+        frames = np.arange(frame_start, frame_end, frame_step)
+    else:
+        frames = np.array([False])
 
     movie_take_last_list: int = [1]
-    suffix_list = ["_0"]
+    suffix_list = ["_pol_0.01_map"]
+    # suffix_list = [""]
     # movie_take_last_list: int = [2, 1]
     # suffix_list = ["_0", "_1"]
     dir_suffix_list = [f"last_frame_{experiment_suffix}" + suf for suf in suffix_list]
     filename_out_list = [f"last_frame_{experiment_suffix}" + suf for suf in suffix_list]
     file_suffix = ""
     # file_suffix = "-" + "-".join(map(str, property_args)) + ".png"
+    merge_suffix = suffix_list[0]
 
     movie_skip = None
-    movie_start_list = [61]
-    movie_end_list = [90]
+    movie_start_list = [1]
+    movie_end_list = [50]
+    # movie_end_list = [45]
+    # movie_start_list = [61]
+    # movie_end_list = [90]
     # movie_start_list = [1, 1]
     # movie_end_list = [70, 60]
     # movie_start_list = [1, 1, 1, 1]
     # movie_end_list = [70, 60, 60, 60]
-    number_of_movies_list = ((np.array(movie_end_list) + 1) - np.array(movie_start_list)).tolist()
+
     # if simulation for movie_number was continued in dir with name movie_number + number_of_movies
     # check_further_list = [1, 1, 1, 1]
     # check_further_list = [2, 2]
@@ -133,7 +149,31 @@ if __name__ == "__main__":
     counting_format_png = "%03d"
     filename_pattern: str = "anim"
     filename_format = "%05d"
-    filename_extension = ".png"
+    frame_format = "%07d"
+    # filename_pattern: str = "1d_cut_"
+
+    mesh_remap_index_list: List[int] = [1]
+    y_lim: Tuple[int] = (0, 1)
+    cut_names: List[str] = ["cut_x", "cut_y", "cut_z"]
+    mixture_slice_index_list: List[int] = [0, 1, 0]
+    filename_steps_list: List[str] = ["mixture_step_", "mixture_step_", "mixture_mixture_step_pol_"]
+
+    video = False
+    if video:
+        filename_format = None
+        filename_extension = ".mp4"
+
+        margin = 10
+        width = 1920
+        height = 1200
+        fps = 0.1
+
+    else:
+        filename_extension = ".png"
+        margin = None
+        width = None
+        height = 1200
+        fps = None
 
     path_graphs = Path(path_anchor_input_list[0].parent, "graphs")
 
@@ -142,7 +182,6 @@ if __name__ == "__main__":
     dpi_ratio_all = 1.0
 
     ######## END OF USER INPUT #####################################################################
-
     path_anchor_output_list = [Path(path_graphs, dir_suffix) for dir_suffix in dir_suffix_list]
     # property_filename_suffix_list = [dir_suffix + file_suffix for dir_suffix in dir_suffix_list]
 
@@ -151,84 +190,83 @@ if __name__ == "__main__":
         if not path_anchor_output.is_dir():
             path_anchor_output.mkdir(parents=True)
 
-    # construct list of all paths (path_mesh_list)
-    path_mesh_list = []
-    path_list: List[Path] = []
-    for i, (path_anchor_input, movie_start, movie_end,
-            number_of_movies, check_further) in enumerate(zip(path_anchor_input_list,
-                                                              movie_start_list,
-                                                              movie_end_list,
-                                                              number_of_movies_list,
-                                                              check_further_list)):
-        path_inner_list: List[Path] = []
-        for movie_number in range(movie_start, movie_end + 1):
-            if movie_number == movie_skip:
-                continue
-            path_movie = Path(path_anchor_input, f"{dir_name}{counting_format % movie_number}"),
-            path_movie = check_if_further(path_anchor_input, dir_name, counting_format,
-                                          movie_number, experiment_step=number_of_movies,
-                                          check_further=check_further)
-            path_inner_list.append(path_movie)
-
-        path_list.append(path_inner_list)
-        path_mesh_list.append(np.array(path_inner_list).reshape(len(var2_list[i]),
-                                                                len(var1_list[i])))
-
-    var_mesh_list = [np.meshgrid(var1, var2, indexing="ij") for var1, var2 in zip(var1_list,
-                                                                                  var2_list)]
-    var_mesh_x, var_mesh_y, path_mesh = merge_meshes(var_mesh_list,
-                                                     path_mesh_list,
-                                                     len(path_anchor_input_list))
-    dir_name_list = path_mesh.ravel()
-
-    # construct path_mesh_new with path to the last png in each movie
-    path_out_periodic_list: List[Path] = []
-    path_dirname_list = Path(path_graphs, f"dir_name_list_{experiment_suffix}")
-    with open(path_dirname_list.with_suffix(".pkl"), "wb") as f:
-        dill.dump(obj=dir_name_list, file=f)
-    with open(path_dirname_list.with_suffix(".txt"), "w") as f:
-        f.write(f"{dir_name_list}\n")
-
-    for movie_take_last, path_anchor_output, suffix, filename_out in zip(movie_take_last_list,
-                                                                         path_anchor_output_list,
-                                                                         suffix_list,
-                                                                         filename_out_list):
-        # use path_mesh to get lanst png of every animation
-        path_mesh_new = path_mesh.copy()
-        for ix, iy in np.ndindex(path_mesh.shape):
-            path_mesh_new[ix, iy] = get_last_png_in_last_anim(path_mesh[ix, iy],
-                                                              dir_name_png, counting_format_png,
-                                                              movie_take_last,
-                                                              filename_pattern, filename_format,
-                                                              filename_extension)
-
-            path_currently_old: Path = path_mesh[ix, iy]
-            path_out: Path = Path(path_anchor_output,
-                                  f"{path_currently_old.parent.stem}_{path_currently_old.stem}"
-                                  + f"_{filename_out}{filename_extension}")
-
-            if use_edited:
-                #  to use png from folders with png copied together (which you could have edited before)
-                path_mesh_new[ix, iy]: Path = path_out
-            else:
-                path_currently_new: Path = path_mesh_new[ix, iy]
-                if path_currently_new is not None:
-                    shutil.copy(path_mesh_new[ix, iy], path_out)
-
-        print(f"movie_take_last: {movie_take_last}")
-
-        path_out_periodic: Path = Path(path_graphs,
-                                       f"periodic_system_merge{suffix}_{experiment_suffix}.png")
-        path_out_periodic_list.append(path_out_periodic)
-        nrow, ncol = path_mesh_new.shape
-        # flip needed as appending pictures start from left top corner,
-        # but enumeration of movies from left bottom corner
-        path_mesh_mirrored: List[Path] = np.flip(path_mesh_new, axis=0)
-        paste_together(path_mesh_mirrored.ravel(), path_out_periodic, nrow, ncol, ratio=dpi_ratio)
-
-    path_out_periodic_all: Path = Path(path_graphs,
-                                       f"periodic_system_merge_all_{experiment_suffix}.png")
-    # turn off decompression bomb checker
-    Image.MAX_IMAGE_PIXELS = number_of_movies * Image.MAX_IMAGE_PIXELS
-    paste_together(path_in_list=path_out_periodic_list, path_out=path_out_periodic_all,
-                   nrow=nrow_components, ncol=ncol_components, ratio=dpi_ratio_all)
+    if frames.any():
+        for frame in frames:
+            last_frame(frame,
+                       var1_list,
+                       var2_list,
+                       experiment_suffix,
+                       movie_take_last_list,
+                       path_anchor_output_list,
+                       suffix_list,
+                       merge_suffix,
+                       filename_out_list,
+                       path_anchor_input_list,
+                       movie_start_list,
+                       movie_end_list,
+                       check_further_list,
+                       movie_skip,
+                       dir_name,
+                       counting_format, 
+                       nrow_components,
+                       ncol_components,
+                       dpi_ratio,
+                       dpi_ratio_all,
+                       use_edited,
+                       dir_name_png,
+                       counting_format_png,
+                       filename_pattern,
+                       filename_format,
+                       filename_extension,
+                       frame_format,
+                       video,
+                       margin,
+                       width,
+                       height,
+                       fps,
+                       mesh_remap_index_list=mesh_remap_index_list,
+                       y_lim=y_lim,
+                       cut_names=cut_names,
+                       mixture_slice_index_list=mixture_slice_index_list,
+                       filename_steps_list=filename_steps_list,
+                       )
+    else:
+        frame = None
+        last_frame(frame,
+                   var1_list,
+                   var2_list,
+                   experiment_suffix,
+                   movie_take_last_list,
+                   path_anchor_output_list,
+                   suffix_list,
+                   merge_suffix,
+                   filename_out_list,
+                   path_anchor_input_list,
+                   movie_start_list,
+                   movie_end_list,
+                   check_further_list,
+                   movie_skip,
+                   dir_name,
+                   counting_format, 
+                   nrow_components,
+                   ncol_components,
+                   dpi_ratio,
+                   dpi_ratio_all,
+                   use_edited,
+                   dir_name_png,
+                   counting_format_png,
+                   filename_pattern,
+                   filename_format,
+                   filename_extension,
+                   frame_format,
+                   video,
+                   margin,
+                   width,
+                   height,
+                   fps,
+                   mesh_remap_index_list=mesh_remap_index_list,
+                   y_lim=y_lim,
+                   cut_names=cut_names,
+                   mixture_slice_index_list=mixture_slice_index_list,
+                   filename_steps_list=filename_steps_list,
+                   )

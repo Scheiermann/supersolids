@@ -215,6 +215,8 @@ class Schroedinger:
 
         elif self.dim == 3:
             self.x_mesh, self.y_mesh, self.z_mesh = functions.get_grid(self.Res, self.Box)
+            # if cupy_used:
+            #     x_mesh, y_mesh, z_mesh = cp.asarray(x_mesh), cp.asarray(y_mesh), cp.asarray(z_mesh)
 
             if psi_0_noise is None:
                 self.psi_val: cp.ndarray = self.psi_0(self.x_mesh, self.y_mesh, self.z_mesh)
@@ -232,7 +234,9 @@ class Schroedinger:
                         print(f"Norm for psi_sol (trapez integral): "
                               f"{self.trapez_integral(cp.abs(self.psi_sol_val) ** 2.0)}")
 
-            kx_mesh, ky_mesh, kz_mesh = cp.meshgrid(self.kx, self.ky, self.kz, indexing="ij")
+            if cupy_used:
+                kx, ky, kz = cp.asarray(self.kx), cp.asarray(self.ky), cp.asarray(self.kz)
+            kx_mesh, ky_mesh, kz_mesh = cp.meshgrid(kx, ky, kz, indexing="ij")
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
 
             if V is None:
@@ -283,6 +287,7 @@ class Schroedinger:
                             try:
                                 # cannot compute density in gpu, so compute it in numpy
                                 psi_density: np.ndarray = np.abs(func_val.get()) ** p
+                                psi_density: cp.ndarray = cp.array(psi_density)
                             except Exception:
                                 # some cuda problem
                                 psi_density: np.ndarray = np.abs(func_val) ** p

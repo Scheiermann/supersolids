@@ -292,17 +292,28 @@ class SchroedingerMixture(Schroedinger):
 
         elif self.dim == 3:
             self.x_mesh, self.y_mesh, self.z_mesh = functions.get_grid(self.Res, self.Box)
-
+            # if cupy_used:
+            #     x_mesh, y_mesh, z_mesh = cp.asarray(x_mesh), cp.asarray(y_mesh), cp.asarray(z_mesh)
+            #     x_mesh, y_mesh, z_mesh = self.x_mesh.get(), self.y_mesh.get(), self.z_mesh.get()
+     
             if psi_0_list:
                 for psi_0, psi_0_noise in zip(psi_0_list, psi_0_noise_list):
                     if cupy_used:
                         psi_val: cp.ndarray = cp.asarray(psi_0(self.x_mesh, self.y_mesh, self.z_mesh))
+                        if psi_0_noise is None:
+                            self.psi_val_list.append(psi_val)
+                        else:
+                            # psi_0_noise: cp.ndarray = cp.asarray(psi_0_noise)
+                            # psi_val_noisy = psi_0_noise * psi_val
+                            psi_val_noisy = psi_0_noise * psi_val.get()
+                            self.psi_val_list.append(cp.asarray(psi_val_noisy))
                     else:
-                        psi_val: cp.ndarray = psi_0(self.x_mesh, self.y_mesh, self.z_mesh)
-                    if psi_0_noise is None:
-                        self.psi_val_list.append(psi_val)
-                    else:
-                        self.psi_val_list.append(psi_0_noise * psi_val)
+                        psi_val: np.ndarray = psi_0(self.x_mesh, self.y_mesh, self.z_mesh)
+                        if psi_0_noise is None:
+                            self.psi_val_list.append(psi_val)
+                        else:
+                            psi_val_noisy = psi_0_noise * psi_val
+                            self.psi_val_list.append(psi_val_noisy)
             else:
                 # no initialization
                 psi_val: cp.ndarray = self.x_mesh
@@ -472,13 +483,19 @@ class SchroedingerMixture(Schroedinger):
         return energy_lhy
 
     def save_psi_val(self, input_path: Path, filename_steps: str,
-                     steps_format: str, frame: int) -> None:
+                     steps_format: str, frame: int, arr_list = None) -> None:
+        if arr_list is None:
+            arr_list: List[cp.ndarray] = self.psi_val_list
         with open(Path(input_path, "mixture_" + filename_steps + steps_format % frame + ".npz"),
                   "wb") as g:
             if cupy_used:
-                psi_val_list: np.ndarray = [psi_val.get() for psi_val in self.psi_val_list]
+                try:
+                    psi_val_list: np.ndarray = [psi_val.get() for psi_val in arr_list]
+                except Exception:
+                    # cupy is installed, but data was saved as numpy array
+                    psi_val_list: np.ndarray = [psi_val for psi_val in arr_list]
             else:
-                psi_val_list: np.ndarray = self.psi_val_list
+                psi_val_list: np.ndarray = arr_list
             cp.savez_compressed(g, psi_val_list=psi_val_list)
 
     def use_summary(self, summary_name: Optional[str] = None) -> Tuple[SchroedingerMixtureSummary,
@@ -587,16 +604,23 @@ class SchroedingerMixture(Schroedinger):
 
         return E
 
-    def get_density_list(self, jit: bool = True) -> List[cp.ndarray]:
+    def get_density_list(self, jit: bool = True, cupy_used: bool = False) -> List[cp.ndarray]:
         density_list: List[np.ndarray] = []
         for psi_val, N in zip(self.psi_val_list, self.N_list):
             if jit:
-                density_list.append(N * numbas.get_density_jit(psi_val, p=2.0))
+                density_N: np.ndarray = N * numbas.get_density_jit(psi_val, p=2.0)
             else:
                 try:
-                    density_list.append(N * self.get_density(psi_val, jit=jit))
+                    density_N = N * self.get_density(psi_val, jit=jit)
                 except Exception:
-                    density_list.append(N * self.get_density(psi_val, jit=jit).get())
+                    try:
+                        density_N: np.ndarray = N * self.get_density(psi_val, jit=jit).get()
+                    except Exception:
+                        density_N: np.ndarray = N * self.get_density(psi_val, jit=jit)
+                if cupy_used:
+                    density_N: cp.ndarray = cp.asarray(density_N)
+
+            density_list.append(density_N)
 
         return density_list
 
@@ -816,6 +840,33 @@ class SchroedingerMixture(Schroedinger):
 
         return bec_contrast_list
 
+    def get_polarization(self, input_path: Path, filename_steps: str,
+                         steps_format: str, numerator_cut_off: float, divisor_cut_off: float,
+                         frame: int):
+        """
+        Calculates the polarization of a two component mixture: P = density2/density1.
+
+        :param divisor_cut_off: Cutoff for density1 to prohibit division by 0.
+
+        :param frame: Frame number of the npz to save to.
+
+        """
+        density_list = self.get_density_list()
+        val2 = np.where(density_list[1] > numerator_cut_off, density_list[1], 0.0) 
+        val1 = np.where(density_list[0] > divisor_cut_off, density_list[0], 0.0) 
+        polarization = np.divide(val2, val1, out=np.zeros_like(val1), where=val1!=0)
+        print(f"Saving Polarization into System.psi_val_list with shape {np.shape(polarization)} "
+              + f"in: {input_path}")
+        self.save_psi_val(input_path, filename_steps, steps_format, frame,
+                          arr_list=[polarization,
+                                    np.zeros(shape=np.shape(polarization))
+                                    ]
+                          )
+        polarization_max_index = ndimage.maximum_position(polarization)
+        polarization_max = polarization[polarization_max_index]
+
+        return polarization_max
+
     def sum_along(self, func_val: cp.ndarray, axis: int, l_0: Optional[float] = None) -> cp.ndarray:
         if l_0 is None:
             # x harmonic oscillator length
@@ -835,7 +886,18 @@ class SchroedingerMixture(Schroedinger):
 
     def get_U_dd_list(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
         U_dd_list: List[cp.ndarray] = []
+        print(f"get_U_dd"
+              + f"V_k_val type: {type(self.V_k_val)}\n"
+              + f"denisty_list type: {type(density_list)}\n"
+              + f"denisty_list[0] type: {type(density_list[0])}"
+              + f"denisty_list[1] type: {type(density_list[1])}"
+              + f"len type: {len(density_list)}"
+              )
         for density in density_list:
+            a = cp.fft.fftn(density)
+            b = self.V_k_val * cp.fft.fftn(density)
+            c = cp.fft.ifftn(b)
+            U_dd_list.append(c)
             U_dd_list.append(cp.fft.ifftn(self.V_k_val * cp.fft.fftn(density)))
 
         return U_dd_list
@@ -856,12 +918,34 @@ class SchroedingerMixture(Schroedinger):
                 )
 
     def split_operator_pot(self, split_step: float = 0.5,
-                           jit: bool = True) -> Tuple[List[cp.ndarray], List[cp.ndarray]]:
-        density_list: List[np.ndarray] = self.get_density_list(jit=jit)
-        density_tensor_vec: cp.ndarray = cp.stack(density_list, axis=0)
+            jit: bool = True, cupy_used: bool = False) -> Tuple[List[cp.ndarray], List[cp.ndarray]]:
+        if cupy_used:
+            jit = False
+        density_list: List[cp.ndarray] = self.get_density_list(jit=jit, cupy_used=cupy_used)
+        print(f"denisty_list type: {type(density_list)}\n"
+              + f"denisty_list[0] type: {type(density_list[0])}"
+              + f"denisty_list[1] type: {type(density_list[1])}"
+              + f"len type: {len(density_list)}"
+              )
+        try:
+            # density_tensor_vec: cp.ndarray = cp.stack(density_list, axis=0)
+            density_tensor_vec: cp.ndarray = cp.array(density_list)
+        except Exception:
+            density_list_np = []
+            for density in density_list:
+                density_list_np.append(density.get())
+            density_tensor_vec: np.ndarray = np.stack(density_list_np, axis=0)
 
-        U_dd_list: List[np.ndarray] = self.get_U_dd_list(density_list)
-        U_dd_tensor_vec: cp.ndarray = cp.stack(U_dd_list, axis=0)
+        U_dd_list: List[cp.ndarray] = self.get_U_dd_list(density_list)
+        try:
+            # U_dd_tensor_vec: cp.ndarray = cp.stack(U_dd_list, axis=0)
+            U_dd_tensor_vec: cp.ndarray = cp.array(U_dd_list)
+        except Exception:
+            U_dd_list_np = []
+            for U_dd in U_dd_list:
+                U_dd_list_np.append(U_dd.get())
+            U_dd_tensor_vec: np.ndarray = np.stack(U_dd_list_np, axis=0)
+
 
         # update H_pot before use
         contact_interaction_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
@@ -931,9 +1015,9 @@ class SchroedingerMixture(Schroedinger):
         """
         # adjust dt, to get the time accuracy when needed
         # self.dt = self.dt_func(self.t, self.dt)
-        self.split_operator_pot(split_step=0.5, jit=numba_used)
+        self.split_operator_pot(split_step=0.5, jit=numba_used, cupy_used=cupy_used)
         self.split_operator_kin()
-        self.split_operator_pot(split_step=0.5, jit=numba_used)
+        self.split_operator_pot(split_step=0.5, jit=numba_used, cupy_used=cupy_used)
 
         self.t = self.t + self.dt
 

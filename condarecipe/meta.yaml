@@ -23,6 +23,7 @@ requirements:
     - ffmpeg-python
     - matplotlib
     - mayavi
+    - moviepy
     - numpy {{ numpy }}
     - pip
     - psutil
@@ -38,6 +39,7 @@ requirements:
     - ffmpeg-python
     - matplotlib
     - mayavi
+    - moviepy
     - numpy {{ numpy }}
     - psutil
     - pyqt {{ pyqt }}

@@ -50,15 +50,22 @@ def check_cupy_used(np):
         cupy_used = False
         cuda_used = False
     else:
-        if cp.cuda.is_available():
-            cupy_used = True
-            cuda_used = True
-        else:
-            print("No cuda available! numba used instead.") 
+        try:
+            if cp.cuda.is_available():
+                cupy_used = True
+                cuda_used = True
+            else:
+                print("No cuda available! numba used instead.") 
+                cupy_used = False
+                cuda_used = False
+                cp = np
+        except Exception as e:
+            print(f"ERROR: {e}! No cupy and cuda turned off! numba used instead.") 
             cupy_used = False
             cuda_used = False
             cp = np
-            
+        
+                
     return cp, cupy_used, cuda_used
 
 def check_cp_nb(np):

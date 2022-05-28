@@ -2,6 +2,8 @@
 from pathlib import Path
 from typing import List
 
+from moviepy.editor import VideoFileClip, clips_array
+
 import numpy as np
 from PIL import Image
 
@@ -28,6 +30,17 @@ def paste_together(path_in_list: List[Path], path_out: Path, nrow: int, ncol: in
 
     cvs.save(path_out, format='png')
 
+def paste_together_videos(path_mesh, path_out_video: Path,
+                          margin: int = 10, width: int = 1920, height: int = 1200, fps=5):
+    shape = np.shape(path_mesh)
+    video_list = [VideoFileClip(str(path)).margin(margin) for path in path_mesh.ravel()]
+    video_array = np.reshape(np.asarray(video_list), shape)
+    # clip1 = VideoFileClip("merged.mp4").margin(10) # add 10px contour
+    # path_mesh_videos_borders = map(lambda obj: obj.margin(margin), video_mesh)
+    video_array2 = list(video_array)
+    final_clip = clips_array(video_array2)
+    final_clip.resize(width=width).write_videofile(str(path_out_video), fps=fps)
+ 
 
 def get_first_im_size(path_in_list, ratio):
     for i, path_in in enumerate(path_in_list):

@@ -12,8 +12,9 @@ Functions for Potential and initial wave function :math:`\psi_0`
 import sys
 from pathlib import Path
 import zipfile
-from typing import Optional, List
+from typing import List, Optional, Tuple
 
+from copy import deepcopy
 import dill
 import numpy as np
 from ffmpeg import input
@@ -23,7 +24,7 @@ from functools import partial
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
-from supersolids.helper import functions, constants, get_path
+from supersolids.helper import functions, constants, get_path, cut_1d
 from supersolids.helper.get_version import check_cp_nb, get_version
 cp, cupy_used, cuda_used, numba_used = check_cp_nb(np)
 if numba_used:
@@ -151,7 +152,8 @@ class MayaviAnimation(Animation.Animation):
     def create_movie(self,
                      dir_path: Path = None,
                      input_data_file_pattern: str = "*.png",
-                     delete_input: bool = True) -> Path:
+                     delete_input: bool = True,
+                     filename: str = "") -> Path:
         """
         Creates movie filename with all matching pictures from
         input_data_file_pattern.
@@ -172,7 +174,10 @@ class MayaviAnimation(Animation.Animation):
             input_path, _, _, _ = get_path.get_path(dir_path)
 
         input_data = Path(input_path, input_data_file_pattern)
-        output_path = Path(input_path, self.filename)
+        if filename:
+            output_path = Path(input_path, filename)
+        else:
+            output_path = Path(input_path, self.filename)
         print(f"input_data: {input_data}")
 
         # requires either mencoder or ffmpeg to be installed on your system
@@ -195,10 +200,17 @@ class MayaviAnimation(Animation.Animation):
 
     def prepare(self, System: Schroedinger, mixture_slice_index: int = 0):
         if cupy_used:
-            x_mesh: np.ndarray = System.x_mesh.get()
-            y_mesh: np.ndarray = System.y_mesh.get()
-            z_mesh: np.ndarray = System.z_mesh.get()
-            V_val: np.ndarray = System.V_val.get()
+            try:
+                x_mesh: np.ndarray = System.x_mesh.get()
+                y_mesh: np.ndarray = System.y_mesh.get()
+                z_mesh: np.ndarray = System.z_mesh.get()
+                V_val: np.ndarray = System.V_val.get()
+            except Exception:
+                # cupy is installed, but data was saved as numpy array
+                x_mesh: np.ndarray = System.x_mesh
+                y_mesh: np.ndarray = System.y_mesh
+                z_mesh: np.ndarray = System.z_mesh
+                V_val: np.ndarray = System.V_val
 
         else:
             x_mesh: np.ndarray = System.x_mesh
@@ -216,12 +228,20 @@ class MayaviAnimation(Animation.Animation):
                 if i == mixture_slice_index:
                     colormap = "cool"
                     if cupy_used:
-                        prob1_3d: np.ndarray = (cp.abs(psi_val) ** 2.0).get()
+                        try:
+                            prob1_3d: np.ndarray = (cp.abs(psi_val) ** 2.0).get()
+                        except Exception:
+                            # cupy is installed, but data was saved as numpy array
+                            prob1_3d: np.ndarray = np.abs(psi_val) ** 2.0
                     else:
                         prob1_3d: np.ndarray = np.abs(psi_val) ** 2.0
 
                 if cupy_used:
-                    prob: np.ndarray = (cp.abs(psi_val) ** 2.0).get()
+                    try:
+                        prob: np.ndarray = (cp.abs(psi_val) ** 2.0).get()
+                    except Exception:
+                        # cupy is installed, but data was saved as numpy array
+                        prob: np.ndarray = np.abs(psi_val) ** 2.0
                 else:
                     prob: np.ndarray = np.abs(psi_val) ** 2.0
 
@@ -236,7 +256,11 @@ class MayaviAnimation(Animation.Animation):
                                   )
         else:
             if cupy_used:
-                prob1_3d = (cp.abs(System.psi_val) ** 2.0).get()
+                try:
+                    prob1_3d = (cp.abs(System.psi_val) ** 2.0).get()
+                except Exception:
+                    # cupy is installed, but data was saved as numpy array
+                    prob1_3d = np.abs(System.psi_val) ** 2.0
             else:
                 prob1_3d = np.abs(System.psi_val) ** 2.0
 
@@ -294,7 +318,11 @@ class MayaviAnimation(Animation.Animation):
         else:
             if System.psi_sol_val is not None:
                 if cupy_used:
-                    psi_sol_val: np.ndarray = System.psi_sol_val.get()
+                    try:
+                        psi_sol_val: np.ndarray = System.psi_sol_val.get()
+                    except Exception:
+                        # cupy is installed, but data was saved as numpy array
+                        psi_sol_val: np.ndarray = System.psi_sol_val
                 else:
                     psi_sol_val: np.ndarray = System.psi_sol_val
 
@@ -317,18 +345,21 @@ class MayaviAnimation(Animation.Animation):
                     dir_path: Path = None,
                     dir_name: str = None,
                     filename_schroedinger: str = f"schroedinger.pkl",
-                    filename_steps: str = f"step_",
+                    filename_steps_list: str = [f"step_"],
                     steps_format: str = "%06d",
                     steps_per_npz: int = 10,
                     frame_start: int = 0,
+                    frame_end: Optional[int] = None,
                     arg_slices: bool = False,
                     azimuth: float = 0.0,
                     elevation: float = 0.0,
                     distance: float = 60.0,
                     sum_along: Optional[float] = None,
                     summary_name: Optional[str] = None,
-                    mixture_slice_index: int = 0,
+                    mixture_slice_index_list: List[int] = [0],
                     no_legend: bool = False,
+                    cut1d_y_lim: Tuple[float, float] = (0.0, 1.0),
+                    cut1d_plot_val_list: bool = [False],
                     ):
         """
         Animates solving of the Schroedinger equations of System with mayavi in 3D.
@@ -356,7 +387,7 @@ class MayaviAnimation(Animation.Animation):
         self.dir_path = input_path
         self.fig.scene.movie_maker.directory = self.dir_path
         _, last_index, _, _ = get_path.get_path(self.dir_path,
-                                                search_prefix=filename_steps,
+                                                search_prefix=filename_steps_list[0],
                                                 file_pattern=".npz"
                                                 )
 
@@ -366,30 +397,40 @@ class MayaviAnimation(Animation.Animation):
             System: Schroedinger = dill.load(file=f)
 
         (prob_plots, slice_x_plot, slice_y_plot, slice_z_plot,
-         V_plot, psi_sol_plot) = self.prepare(System, mixture_slice_index=mixture_slice_index)
+         V_plot, psi_sol_plot) = self.prepare(System,
+                                              mixture_slice_index=mixture_slice_index_list[0])
 
         yield
+
+        System_list: List[Schroedinger] = []
+        for i in range(0, len(filename_steps_list)):
+            # create copies of the System in a list (to fill them later with different psi_val)
+            System_list.append(deepcopy(System))
 
         # read new frames until Exception (last frame read)
         frame = frame_start
         while True:
             print(f"frame={frame}")
             try:
-                # get the psi_val of Schroedinger at other timesteps (t!=0)
-                psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
-                if isinstance(System, SchroedingerMixture):
-                    with open(psi_val_path, "rb") as f:
-                        System.psi_val_list = np.load(file=f)["psi_val_list"]
-                else:
-                    with open(psi_val_path, "rb") as f:
-                        System.psi_val = np.load(file=f)["psi_val"]
+                for i, filename_steps in enumerate(filename_steps_list):
+                    # get the psi_val of Schroedinger at other timesteps (t!=0)
+                    psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
+                    if isinstance(System_list[i], SchroedingerMixture):
+                        with open(psi_val_path, "rb") as f:
+                            System_list[i].psi_val_list = np.load(file=f)["psi_val_list"]
+                    else:
+                        with open(psi_val_path, "rb") as f:
+                            System_list[i].psi_val = np.load(file=f)["psi_val"]
 
-                if not (summary_name is None):
-                    try:
-                        System = System.load_summary(input_path, steps_format, frame,
-                                                     summary_name=summary_name)
-                    except Exception:
-                        print(f"Could not load {summary_name}!")
+                    if not (summary_name is None):
+                        try:
+                            System_list[i] = System_list[i].load_summary(input_path,
+                                                                         steps_format, frame,
+                                                                         summary_name=summary_name)
+                        except Exception:
+                            print(f"Could not load {summary_name}!")
+
+                System = System_list[0]
 
                 if not no_legend:
                     text = get_legend(System, frame, frame_start, supersolids_version)
@@ -415,9 +456,10 @@ class MayaviAnimation(Animation.Animation):
                 if isinstance(System, SchroedingerMixture):
                     densities: List[np.ndarray] = []
                     for i, psi_val in enumerate(System.psi_val_list):
-                        densities.append(System.get_density(func_val=psi_val, p=2.0,
-                                                            jit=numba_used))
-                        if i == mixture_slice_index:
+                        densities.append(psi_val)
+                        # densities.append(System.get_density(func_val=psi_val, p=2.0,
+                        #                                     jit=numba_used))
+                        if i == mixture_slice_index_list[0]:
                             if sum_along is None:
                                 psi_val1 = psi_val
                                 density1 = densities[i]
@@ -470,7 +512,32 @@ class MayaviAnimation(Animation.Animation):
                 yield None
                 break
 
+            try:
+                output_path, _, _, _ = get_path.get_path(self.dir_path)
+                cut_1d.cut_1d(System_list,
+                              slice_indices=[self.slice_indices[0],
+                                             self.slice_indices[1],
+                                             self.slice_indices[2]],
+                              psi_sol_3d_cut_x=None,
+                              psi_sol_3d_cut_y=None,
+                              psi_sol_3d_cut_z=None,
+                              # dir_path=self.dir_path,
+                              dir_path=output_path,
+                              y_lim=cut1d_y_lim,
+                              plot_val_list=cut1d_plot_val_list,
+                              frame=frame,
+                              steps_format=steps_format,
+                              mixture_slice_index_list=mixture_slice_index_list,
+                              filename_steps_list=filename_steps_list,
+                              )
+            except Exception as e:
+                print(f"cut1d did not work!\n{e}")
+
             frame = frame + steps_per_npz
+
+            if frame_end:
+               last_index = frame_end 
+
             if frame == last_index + steps_per_npz:
                 yield None
                 break
@@ -483,7 +550,7 @@ class MayaviAnimation(Animation.Animation):
     @mlab.animate(delay=10, ui=True)
     def animate(self, System: Schroedinger, accuracy: float = 10 ** -6,
                 interactive: bool = True,
-                mixture_slice_index: int = 0,
+                mixture_slice_index_list: List[int] = [0],
                 no_legend: bool = False):
         """
         Animates solving of the Schroedinger equations of System with mayavi in 3D.
@@ -507,11 +574,13 @@ class MayaviAnimation(Animation.Animation):
 
         :param no_legend: Option to add legend as text to every frame.
 
-        :param mixture_slice_index: Index of component of which the slices are taken.
+        :param mixture_slice_index: List of indeces of the mixtures in filename_steps_list of the
+            components of which the slices are taken.
 
         """
         (prob_plots, slice_x_plot, slice_y_plot, slice_z_plot,
-         V_plot, psi_sol_plot) = self.prepare(System, mixture_slice_index=0)
+         V_plot, psi_sol_plot) = self.prepare(System,
+                                              mixture_slice_index=mixture_slice_index_list[0])
 
         supersolids_version = get_version()
 
@@ -581,7 +650,7 @@ class MayaviAnimation(Animation.Animation):
             if isinstance(System, SchroedingerMixture):
                 for i, psi_val in enumerate(System.psi_val_list):
                     densities.append(System.get_density(func_val=psi_val, p=2.0, jit=numba_used))
-                    if i == mixture_slice_index:
+                    if i == mixture_slice_index_list[0]:
                         psi_val1 = psi_val
                         density1 = densities[i]
 

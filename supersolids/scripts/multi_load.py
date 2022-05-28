@@ -20,63 +20,72 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/test/")
-    # path_anchor_input = Path("/run/media/dsche/scr2/begin_mixture/")
-    # path_anchor_input = Path("/home/dsche/supersolids/results/begin_mixture/")
     # path_anchor_input = Path("/run/media/dsche/scr2/begin_mixture_13/")
     # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/grid/from_step_1150000/steps120k/")
     # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/grid/from_step_1270000/steps40k/")
     # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/cos/from_step_637000/")
     # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/sin/from_step_999000/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture_15/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/joseph_injunction2/no_kick/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/sin_hold/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/sin_shift/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/frenkel/sin_shift01/")
-    # path_anchor_input = Path("/home/dsche/supersolids/results/")
-    # path_anchor_input = Path("/home/dsche/supersolids/results/begin_schroedinger/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_schroedinger/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture_13/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6125/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture_15/")
-    # path_anchor_input = Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6375/")
-    path_anchor_input = Path("/run/media/dsche/scr2/begin_mixture_15_6375/")
-    # path_anchor_input = Path("/run/media/dsche/scr2/begin_mixture_a12/")
+    # path_anchor_input = Path("/bigwork/dscheier/results/begin_gpu_big/")
+    path_anchor_input = Path("/bigwork/dscheier/results/begin_mixture_a12_grid/")
+    # path_anchor_input = Path("/bigwork/dscheier/results/begin_mixture_a12_small_grid/")
 
     # mixture = False
     mixture = True
-    no_legend = True
-    # no_legend = False
+    # no_legend = True
+    no_legend = False
 
     take_last = 3
     # take_last = np.inf
+    # frame_end = 2000
+    # frame_end = 100000
+    frame_end = None
 
+    # steps_per_npz = 10000
     steps_per_npz = 1000
+    # steps_per_npz = 10
+    # steps_per_npz = 1
 
     movie_string = "movie"
     counting_format = "%03d"
     movie_start = 1
-    movie_end = 114
+    movie_end = 50
+    # movie_end = 10
+    # movie_end = 1
 
     slice_indices = {"x": 127, "y": 63, "z": 15}
+    # slice_indices = {"x": 127, "y": 31, "z": 15}
+    # slice_indices = {"x": 127, "y": 31, "z": 31}
 
     if mixture:
-        mixture_slice_index = 0
-        filename_steps = "mixture_step_"
+        # mixture_slice_index = 1
+        mixture_slice_index_list = [0, 1, 0]
+        # filename_steps = "mixture_step_"
+        # filename_steps = "mixture_mixture_step_pol_"
+        # filename_steps_list = ["mixture_step_"]
+        # filename_steps_list = ["mixture_mixture_step_pol_"]
+        filename_steps_list = ["mixture_step_", "mixture_step_", "mixture_mixture_step_pol_"]
         alpha_psi_list = [0.0, 0.0]
         alpha_psi_sol_list = [0.0, 0.0]
     else:
         filename_steps = "step_"
         alpha_psi_list = [0.0]
         alpha_psi_sol_list = [0.0]
+        
+    cut1d = True
+    if cut1d:
+        cut1d_y_lim = [0.0, 1.0]
+        # cut1d_plot_val_list = [False]
+        # cut1d_plot_val_list = [False, True]
+        cut1d_plot_val_list = [False, False, True]
 
     steps_format = "%07d"
     filename_pattern = ".npz"
 
     azimuth = 0.0
     elevation = 0.0
-    distance = 29.0
+    # distance = 25.0
+    distance = 30.0
+    # distance = 60.0
 
     alpha_V = 0.0
 
@@ -85,10 +94,11 @@ if __name__ == "__main__":
     arg_slices = False
     plot_V = False
     ui = False
+    # ui = True
 
     for i in range(movie_start, movie_end + 1):
         path_in = Path(path_anchor_input, movie_string + f"{counting_format % i}")
-        files = sorted([x for x in path_in.glob(filename_steps + "*" + filename_pattern) if x.is_file()])
+        files = sorted([x for x in path_in.glob(filename_steps_list[0] + "*" + filename_pattern) if x.is_file()])
         if len(files) > take_last:
             files_last = files[-take_last]
         else:
@@ -96,19 +106,18 @@ if __name__ == "__main__":
                 files_last = files[0]
             except IndexError:
                 # no files in dir
-                print(f'{str(Path(path_in, filename_steps + "*" + filename_pattern))} '
+                print(f'{str(Path(path_in, filename_steps_list[0] + "*" + filename_pattern))} '
                       f'not found. Skipping.')
                 continue
 
         frame_start = get_step_index(files_last,
-                                     filename_prefix=filename_steps,
+                                     filename_prefix=filename_steps_list[0],
                                      file_pattern=filename_pattern)
 
         command = ["python", "-m", "supersolids.tools.load_npz"]
         flags_given = [f"-dir_path={path_anchor_input}",
                        f"-dir_name={movie_string}{counting_format % i}",
                        f"-frame_start={frame_start}",
-                       f"-filename_steps={filename_steps}",
                        f"-steps_per_npz={steps_per_npz}",
                        f"-steps_format={steps_format}",
                        f"-slice_indices={dic2str(slice_indices, single_quote_wrapped=False)}",
@@ -122,9 +131,30 @@ if __name__ == "__main__":
         flags_given.append(f"--alpha_psi_list")
         flags_given += alpha_args_parsed
 
-        alpha_args_parsed = list(map(str, alpha_psi_sol_list))
+        alpha_sol_args_parsed = list(map(str, alpha_psi_sol_list))
         flags_given.append(f"--alpha_psi_sol_list")
-        flags_given += alpha_args_parsed
+        flags_given += alpha_sol_args_parsed
+
+        if filename_steps_list:
+            filename_steps_parsed = list(map(str, filename_steps_list))
+            flags_given.append(f"--filename_steps_list")
+            flags_given += filename_steps_parsed
+
+        if mixture:
+            slice_index_parsed = list(map(str, mixture_slice_index_list))
+            flags_given.append(f"--mixture_slice_index_list")
+            flags_given += slice_index_parsed
+
+        if cut1d_plot_val_list:
+            cut1d_plot_val_parsed = list(map(str, cut1d_plot_val_list))
+            flags_given.append("--cut1d_plot_val_list")
+            flags_given += cut1d_plot_val_parsed
+
+        if cut1d:
+            # flags_given.append(f"-cut1d_y_lim={cut1d_y_lim}")
+            cut1_y_lim_args_parsed = list(map(str, cut1d_y_lim))
+            flags_given.append(f"--cut1d_y_lim")
+            flags_given += cut1_y_lim_args_parsed
 
         if no_legend:
             flags_given.append("--no_legend")
@@ -134,10 +164,10 @@ if __name__ == "__main__":
             flags_given.append("--plot_V")
         if ui:
             flags_given.append("--ui")
-        if mixture:
-            flags_given.append(f"-mixture_slice_index={mixture_slice_index}")
         if sum_along:
             flags_given.append(f"-sum_along={sum_along}")
+        if frame_end:
+            flags_given.append(f"-frame_end={frame_end}")
 
         flags_parsed = " ".join(flags_given)
 
