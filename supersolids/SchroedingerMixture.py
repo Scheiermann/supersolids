@@ -515,10 +515,9 @@ class SchroedingerMixture(Schroedinger):
             # load SchroedingerSummary
             with open(system_summary_path, "rb") as f:
                 SystemSummary: SchroedingerMixtureSummary = dill.load(file=f)
+                SystemSummary.copy_to(self)
         except Exception:
             print(f"{system_summary_path} not found.")
-        finally:
-            SystemSummary.copy_to(self)
 
         return self
 
@@ -866,23 +865,6 @@ class SchroedingerMixture(Schroedinger):
         polarization_max = polarization[polarization_max_index]
 
         return polarization_max
-
-    def sum_along(self, func_val: cp.ndarray, axis: int, l_0: Optional[float] = None) -> cp.ndarray:
-        if l_0 is None:
-            # x harmonic oscillator length
-            l_0 = cp.sqrt(constants.hbar / (self.m_list[0] * self.w_x))
-
-        if axis == 0:
-            psi_axis_sum: float = cp.sum(func_val, axis) * self.dx * (1 / l_0 ** 2.0)
-        elif axis == 1:
-            psi_axis_sum: float = cp.sum(func_val, axis) * self.dy * (1 / l_0 ** 2.0)
-        elif axis == 2:
-            psi_axis_sum: float = cp.sum(func_val, axis) * self.dz * (1 / l_0 ** 2.0)
-
-        psi_axis_sum_3d = cp.empty(cp.shape(func_val))
-        psi_axis_sum_3d[...] = psi_axis_sum[..., None]
-
-        return psi_axis_sum_3d
 
     def get_U_dd_list(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
         U_dd_list: List[cp.ndarray] = []

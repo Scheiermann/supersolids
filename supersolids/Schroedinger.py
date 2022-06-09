@@ -432,6 +432,23 @@ class Schroedinger:
 
         return r
 
+    def sum_along(self, func_val: cp.ndarray, axis: int, l_0: Optional[float] = None) -> cp.ndarray:
+        if l_0 is None:
+            # x harmonic oscillator length
+            l_0 = cp.sqrt(constants.hbar / (self.m_list[0] * self.w_x))
+
+        if axis == 0:
+            psi_axis_sum: float = cp.sum(func_val, axis) * self.dx * (1 / l_0 ** 2.0)
+        elif axis == 1:
+            psi_axis_sum: float = cp.sum(func_val, axis) * self.dy * (1 / l_0 ** 2.0)
+        elif axis == 2:
+            psi_axis_sum: float = cp.sum(func_val, axis) * self.dz * (1 / l_0 ** 2.0)
+
+        psi_axis_sum_3d = cp.empty(cp.shape(func_val))
+        psi_axis_sum_3d[...] = psi_axis_sum[..., None]
+
+        return psi_axis_sum_3d
+
     def get_peaks_along(self, axis: int = 0, height: float = 0.05) -> Tuple[List[float],
                                                                             List[float]]:
         prob: cp.ndarray = cp.abs(self.psi_val) ** 2.0
