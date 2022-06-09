@@ -411,6 +411,7 @@ class MayaviAnimation(Animation.Animation):
         frame = frame_start
         while True:
             print(f"frame={frame}")
+            # self.fig.scene.movie_maker._count = frame
             try:
                 for i, filename_steps in enumerate(filename_steps_list):
                     # get the psi_val of Schroedinger at other timesteps (t!=0)
@@ -456,9 +457,11 @@ class MayaviAnimation(Animation.Animation):
                 if isinstance(System, SchroedingerMixture):
                     densities: List[np.ndarray] = []
                     for i, psi_val in enumerate(System.psi_val_list):
-                        densities.append(psi_val)
-                        # densities.append(System.get_density(func_val=psi_val, p=2.0,
-                        #                                     jit=numba_used))
+                        if cut1d_plot_val_list[0]:
+                            densities.append(psi_val)
+                        else:
+                            densities.append(System.get_density(func_val=psi_val, p=2.0,
+                                                                jit=numba_used))
                         if i == mixture_slice_index_list[0]:
                             if sum_along is None:
                                 psi_val1 = psi_val
@@ -478,12 +481,20 @@ class MayaviAnimation(Animation.Animation):
                         slice_z_plot.mlab_source.trait_set(scalars=density1)
                 else:
                     # Update plot functions
-                    if sum_along is None:
-                        density1: np.ndarray = System.get_density(func_val=System.psi_val, p=2.0,
-                                                                  jit=numba_used)
+                    if cut1d_plot_val_list[0]:
+                        if sum_along is None:
+                            density1: np.ndarray = System.psi_val
+                        else:
+                            density1 = System.sum_along(func_val=System.psi_val, axis=sum_along,
+                                                        l_0=None)
                     else:
-                        density1 = System.sum_along(func_val=System.psi_val, axis=sum_along,
-                                                    l_0=None)
+                        density: np.ndarray = System.get_density(func_val=System.psi_val,
+                                                                  p=2.0, jit=numba_used)
+                        if sum_along is None:
+                            density1: np.ndarray = density
+                        else:
+                            density1 = System.sum_along(func_val=density, axis=sum_along,
+                                                        l_0=None)
 
                     densities = [density1]
                     if arg_slices:
