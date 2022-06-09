@@ -142,6 +142,9 @@ def flags(args_array):
 
     flag_args = parser.parse_args(args_array)
     print(f"args: {flag_args}")
+    # convert list of bool strings to list of bool
+    flag_args.cut1d_plot_val_list = [bool_str == "True"
+                                     for bool_str in flag_args.cut1d_plot_val_list]
 
     return flag_args
 
