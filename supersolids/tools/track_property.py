@@ -88,62 +88,66 @@ def track_property(input_path,
                    ):
     last_index = get_last_index(input_path, filename_steps)
     print("Load schroedinger")
-    with open(Path(input_path, filename_schroedinger), "rb") as f:
-        # WARNING: this is just the input Schroedinger at t=0
-        System_loaded = dill.load(file=f)
+    try:
+        path_schroedinger = Path(input_path, filename_schroedinger)
+        with open(path_schroedinger, "rb") as f:
+            # WARNING: this is just the input Schroedinger at t=0
+            System_loaded = dill.load(file=f)
 
-    # read new frames until Exception (last frame read)
-    frame = frame_start
-    while True:
-        print(f"frame={frame}")
-        try:
-            # if property is attribute, loading of psi_val is not needed as it is saved in Summary
-            if property_func:
-                # get the psi_val of Schroedinger at other timesteps (t!=0)
-                psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
-                if isinstance(System_loaded, SchroedingerMixture):
-                    with open(psi_val_path, "rb") as f:
-                        psi_val_pkl = np.load(file=f)["psi_val_list"]
-                        System_loaded.psi_val_list = psi_val_pkl
-                else:
-                    with open(psi_val_path, "rb") as f:
-                        psi_val_pkl = np.load(file=f)["psi_val"]
-                        System_loaded.psi_val = psi_val_pkl
+        # read new frames until Exception (last frame read)
+        frame = frame_start
+        while True:
+            print(f"frame={frame}")
+            try:
+                # if property is attribute, loading of psi_val is not needed as it is saved in Summary
+                if property_func:
+                    # get the psi_val of Schroedinger at other timesteps (t!=0)
+                    psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
+                    if isinstance(System_loaded, SchroedingerMixture):
+                        with open(psi_val_path, "rb") as f:
+                            psi_val_pkl = np.load(file=f)["psi_val_list"]
+                            System_loaded.psi_val_list = psi_val_pkl
+                    else:
+                        with open(psi_val_path, "rb") as f:
+                            psi_val_pkl = np.load(file=f)["psi_val"]
+                            System_loaded.psi_val = psi_val_pkl
 
-            System_loaded = System_loaded.load_summary(input_path, steps_format, frame,
-                                                       summary_name=None)
+                System_loaded = System_loaded.load_summary(input_path, steps_format, frame,
+                                                           summary_name=None)
 
-        except zipfile.BadZipFile:
-            print(
-                f"Zipfile with frame {frame} can't be read. Maybe the simulation "
-                "was stopped before file was successfully created."
-                "Animation is built until, but without that frame.")
-            break
+            except zipfile.BadZipFile:
+                print(
+                    f"Zipfile with frame {frame} can't be read. Maybe the simulation "
+                    "was stopped before file was successfully created."
+                    "Animation is built until, but without that frame.")
+                break
 
-        except FileNotFoundError:
-            break
+            except FileNotFoundError:
+                break
 
-        frame = frame + steps_per_npz
+            frame = frame + steps_per_npz
 
-        if property_args_frame:
-            # add fram as extra argument
-            yield property_check(get_property(System_loaded, property_name),
-                                 property_name,
-                                 property_func,
-                                 property_args_str + property_args + [frame])
-        else:
-            yield property_check(get_property(System_loaded, property_name),
-                                 property_name,
-                                 property_func,
-                                 property_args_str + property_args)
+            if property_args_frame:
+                # add fram as extra argument
+                yield property_check(get_property(System_loaded, property_name),
+                                     property_name,
+                                     property_func,
+                                     property_args_str + property_args + [frame])
+            else:
+                yield property_check(get_property(System_loaded, property_name),
+                                     property_name,
+                                     property_func,
+                                     property_args_str + property_args)
 
-        if frame_end:
-            last_index = frame_end
+            if frame_end:
+                last_index = frame_end
 
-        if frame == last_index + steps_per_npz:
-            break
-        elif frame > last_index:
-            frame = last_index
+            if frame == last_index + steps_per_npz:
+                break
+            elif frame > last_index:
+                frame = last_index
+    except FileNotFoundError:
+        print(f"{path_schroedinger} not found. Skipping!")
 
 def property_to_array(property_tuple, list_of_arrays: bool=False):
     property_all = np.empty(shape=(1, 1))
@@ -183,6 +187,8 @@ def plot_property(args, func=functions.identity):
 
     input_path = get_input_path(dir_path, args.dir_name)
     print(input_path)
+    if not input_path.is_dir():
+        return
     if args.frame_start is None:
         _, last_index, _, _ = get_path.get_path(input_path,
                                                 search_prefix=args.filename_steps,
@@ -230,8 +236,9 @@ def plot_property(args, func=functions.identity):
 
     if cupy_used:
         try:
-
             property_all = property_all.get() 
+        except AttributeError as e:
+            pass
         except Exception as e:
             print(f"ERROR: {e}")
 
