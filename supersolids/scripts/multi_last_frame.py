@@ -59,8 +59,18 @@ if __name__ == "__main__":
 
     experiment_suffix = "mixture_a12_grid"
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    var1_list.append(np.arange(0.6, 0.81, 0.05))
+    var1_list.append(np.arange(60.0, 81.0, 5.0))
     var2_list.append(np.arange(0.05, 0.51, 0.05))
+    movie_start_list = [1]
+    movie_end_list = [50]
+    # suffix_list = ["_map_xyz_p-9"]
+    # cut_names: List[str] = ["cut_x", "cut_y", "cut_z"]
+    suffix_list = ["_map_x"]
+    cut_names: List[str] = ["cut_x"]
+    normed_plots = True
+    # normed_plots = False
+    if normed_plots:
+        suffix_list[0] += "_normed"
 
     # experiment_suffix = "mixture_a12_small_grid"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
@@ -84,20 +94,33 @@ if __name__ == "__main__":
     # var1_list.append(np.arange(0.6, 0.91, 0.05))
     # var2_list.append(np.arange(0.05, 0.51, 0.05))
 
+    # experiment_suffix = "a11_95"
     # # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6125/"))
-    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6125/"))
-    # var1_list.append(np.arange(0.6125, 0.91, 0.05))
+    # # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6125/"))
+    # path_anchor_input_list.append(Path("/bigwork/dscheier/results/begin_mixture_15_6125/"))
+    # var1_list.append(np.arange(61.25, 91.0, 5.0))
     # var2_list.append(np.arange(0.05, 0.51, 0.05))
 
-    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15/"))
-    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15/"))
-    # var1_list.append(np.arange(0.625, 0.91, 0.05))
+    # # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15/"))
+    # # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15/"))
+    # path_anchor_input_list.append(Path("/bigwork/dscheier/results/begin_mixture_15/"))
+    # var1_list.append(np.arange(62.5, 91.0, 5.0))
     # var2_list.append(np.arange(0.05, 0.51, 0.05))
 
     # # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6375/"))
-    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6375/"))
-    # var1_list.append(np.arange(0.6375, 0.91, 0.05))
+    # # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6375/"))
+    # path_anchor_input_list.append(Path("/bigwork/dscheier/results/begin_mixture_15_6375/"))
+    # var1_list.append(np.arange(63.75, 91.0, 5.0))
     # var2_list.append(np.arange(0.05, 0.51, 0.05))
+    # movie_start_list = [1, 1, 1]
+    # movie_end_list = [60, 60, 60]
+    # # suffix_list = ["_xyz_p-9"]
+    # # cut_names: List[str] = ["cut_x", "cut_y", "cut_z"]
+    # suffix_list = ["_x"]
+    # cut_names: List[str] = ["cut_x"]
+    # normed_plots = True
+    # if normed_plots:
+    #     suffix_list[0] += "_normed"
 
     nrow_components = 1
     ncol_components = 1
@@ -115,7 +138,6 @@ if __name__ == "__main__":
         frames = np.array([False])
 
     movie_take_last_list: int = [1]
-    suffix_list = ["_pol_0.01_map"]
     # suffix_list = [""]
     # movie_take_last_list: int = [2, 1]
     # suffix_list = ["_0", "_1"]
@@ -126,20 +148,13 @@ if __name__ == "__main__":
     merge_suffix = suffix_list[0]
 
     movie_skip = None
-    movie_start_list = [1]
-    movie_end_list = [50]
-    # movie_end_list = [45]
-    # movie_start_list = [61]
-    # movie_end_list = [90]
-    # movie_start_list = [1, 1]
-    # movie_end_list = [70, 60]
-    # movie_start_list = [1, 1, 1, 1]
-    # movie_end_list = [70, 60, 60, 60]
 
     # if simulation for movie_number was continued in dir with name movie_number + number_of_movies
     # check_further_list = [1, 1, 1, 1]
     # check_further_list = [2, 2]
-    check_further_list = [2]
+    # check_further_list = [2]
+    # check_further_list = [2]
+    check_further_list = [2, 2, 2]
 
     dir_name = "movie"
     counting_format = "%03d"
@@ -152,10 +167,11 @@ if __name__ == "__main__":
     frame_format = "%07d"
     # filename_pattern: str = "1d_cut_"
 
-    mesh_remap_index_list: List[int] = [1]
-    y_lim: Tuple[int] = (0, 1)
-    cut_names: List[str] = ["cut_x", "cut_y", "cut_z"]
+    y_lim: Tuple[int] = (0, 1.2)
+    # mixture_slice_index_list: List[int] = [0, 0, 0]
+    # mesh_remap_index_list: List[int] = [1]
     mixture_slice_index_list: List[int] = [0, 1, 0]
+    mesh_remap_index_list: List[int] = []
     filename_steps_list: List[str] = ["mixture_step_", "mixture_step_", "mixture_mixture_step_pol_"]
 
     video = False
@@ -229,6 +245,7 @@ if __name__ == "__main__":
                        cut_names=cut_names,
                        mixture_slice_index_list=mixture_slice_index_list,
                        filename_steps_list=filename_steps_list,
+                       normed_plots=normed_plots,
                        )
     else:
         frame = None
@@ -269,4 +286,5 @@ if __name__ == "__main__":
                    cut_names=cut_names,
                    mixture_slice_index_list=mixture_slice_index_list,
                    filename_steps_list=filename_steps_list,
+                   normed_plots=normed_plots,
                    )

@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 from PIL import Image
+from supersolids.helper import cut_1d
 from supersolids.helper.cut_1d import plot_cuts_tuples, zip_meshes
 
 from supersolids.helper.get_path import get_last_png_in_last_anim, get_path, get_step_index
@@ -58,11 +59,13 @@ def last_frame(frame: Optional[int],
                cut_names: List[str] = ["cut_x"],
                mixture_slice_index_list: List[int] = [0],
                filename_steps_list: List[str] = ["mixture_step_"],
+               normed_plots: bool = True,
                ):
     path_graphs = Path(path_anchor_input_list[0].parent, "graphs")
     number_of_movies_list = ((np.array(movie_end_list) + 1) - np.array(movie_start_list)).tolist()
 
-    labels_list = [[filename + name for name in cut_names] for filename in filename_steps_list]
+    labels_list = [[filename + f"{slice_index}_" + name for name in cut_names]
+                    for slice_index, filename in zip(mixture_slice_index_list, filename_steps_list)]
 
     # construct list of all paths (path_mesh_list)
     path_mesh_list = []
@@ -196,24 +199,58 @@ def last_frame(frame: Optional[int],
             for mesh_remap_index in mesh_remap_index_list:
                 path_mesh_cuts[mesh_remap_index] = path_mesh_remap(path_mesh_cuts[mesh_remap_index])
         path_out_mesh_cuts = path_mesh_cuts[0].copy()
+        probs_cuts_max = path_mesh_cuts[0].copy()
+        probs_cuts_middle = path_mesh_cuts[0].copy()
         for j, (ix, iy) in enumerate(np.ndindex(path_mesh_cuts[0].shape)):
             dir_paths = [path_mesh_cuts[i][ix, iy] for i in range(len(path_mesh_cuts))]
             if frame:
                 frame_formatted = f"{frame_format % frame}"
             else:
                 frame_formatted = f"{frame_format % frame_last_list[j]}"
+            # cut_1d.cut_1d(System_list,
+                          # slice_indices=[self.slice_indices[0],
+                                         # self.slice_indices[1],
+                                         # self.slice_indices[2]],
+                          # psi_sol_3d_cut_x=None,
+                          # psi_sol_3d_cut_y=None,
+                          # psi_sol_3d_cut_z=None,
+                          # # dir_path=self.dir_path,
+                          # dir_path=path_output_frame,
+                          # y_lim=cut1d_y_lim,
+                          # plot_val_list=cut1d_plot_val_list,
+                          # frame=frame,
+                          # steps_format=frame_format,
+                          # mixture_slice_index_list=mixture_slice_index_list,
+                          # filename_steps_list=filename_steps_list,
+                          # )
 
-            path_out_mesh_cuts[ix, iy] = plot_cuts_tuples(dir_paths, path_output_frame,
-                                                          frame_formatted,
-                                                          y_lim=y_lim,
-                                                          labels_list=labels_list,
-                                                          )
+            (path_out_mesh_cuts[ix, iy], probs_cuts_middle[ix, iy],
+             probs_cuts_max[ix, iy]) = plot_cuts_tuples(dir_paths,
+                                                        path_output_frame,
+                                                        frame_formatted,
+                                                        y_lim=y_lim,
+                                                        labels_list=labels_list,
+                                                        normed=normed_plots,
+                                                        )
 
         path_out_periodic_list.append(path_out_periodic)
         nrow, ncol = path_mesh_new.shape
         # flip needed as appending pictures start from left top corner,
         # but enumeration of movies from left bottom corner
+        np.set_printoptions(linewidth=500)
         path_mesh_mirrored: List[Path] = np.flip(path_mesh_new, axis=0)
+        probs_cuts_mirrored_list: List = [np.flip(probs_cuts_middle, axis=0),
+                                          np.flip(probs_cuts_max, axis=0)]
+        probs_cuts_filenames = ["probs_cuts_middle", "probs_cuts_max"]
+        if frame:
+            probs_cuts_filenames = [name + f"_{filename_format % frame}"
+                                    for name in probs_cuts_filenames]
+
+        for probs_cuts_filename, probs_cuts_mirrored in zip(probs_cuts_filenames,
+                                                            probs_cuts_mirrored_list):
+            with open(Path(path_anchor_output, probs_cuts_filename + ".npz"), "wb") as g:
+                np.savez_compressed(g, probs_cuts_mesh=probs_cuts_mirrored)
+
         if video:
             if frame:
                 path_out_video: Path = Path(path_anchor_output,

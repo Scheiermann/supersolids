@@ -72,7 +72,6 @@ def cut_1d(System_list: List[Schroedinger],
     names = []
     # markers = [".-", "x-", "o-"]
     markers = [m + "-" for m in Line2D.markers.keys() if m not in ([",", None] + list(range(12)))]
-    print("markers are ok!")
     for i, (System, m, plot_val, mixture_slice_index) in enumerate(zip(System_list,
                                                                        markers,
                                                                        plot_val_list,
@@ -147,8 +146,8 @@ def cut_1d(System_list: List[Schroedinger],
 
     for i, filename_steps in enumerate(filename_steps_list):
         for name, cut, prob in zip(names[i], cuts[i], probs[i]):
-            with open(Path(dir_path, filename_steps + name + "_"
-                                     + frame_formatted + ".npz"), "wb") as g:
+            path_npz = Path(dir_path, filename_steps + name + "_" + frame_formatted + ".npz")
+            with open(path_npz, "wb") as g:
                 np.savez_compressed(g, cut=cut, prob=prob)
 
 def plot_cuts_tuples(dir_paths_list: List[List[Path]],
@@ -156,6 +155,7 @@ def plot_cuts_tuples(dir_paths_list: List[List[Path]],
                      frame_formatted: str,
                      y_lim: Tuple[float, float] = (0.0, 1.0),
                      labels_list: List[List[str]] = [["cut_x", "cut_y", "cut_z"]],
+                     normed: bool = True,
                      ):
     cuts_list, probs_list = [], []
     for dir_paths in dir_paths_list:
@@ -170,23 +170,34 @@ def plot_cuts_tuples(dir_paths_list: List[List[Path]],
     # plt.cla()
 
     ax.set_ylim(y_lim)
-    ax.set_yticks(ticks=np.linspace(0.0, 1.0, num=11),
-               labels=np.round_(np.linspace(0.0, 1.0, num=11), decimals=4))
+    y_range = np.linspace(y_lim[0], y_lim[1], num=11)
+    ax.set_yticks(ticks=y_range, labels=np.round_(y_range, decimals=4))
 
-    markers = [str(m) + "-" for m in Line2D.markers.keys() if m not in [","]]
+    markers = [str(m) + "-" for m in Line2D.markers.keys() if m not in [",", "o", "v", "<", ">"]]
     # markers = [".-", "x-", "o-"]
+    middle = lambda x: int((len(x) / 2) - 1)
     for j, (labels, marker, cut_xyz, probs_xyz) in enumerate(zip(labels_list, markers, cuts_list, probs_list)):
         for i, (label, cut, prob) in enumerate(zip(labels, cut_xyz, probs_xyz)):
-            # ax.plot(cut, prob, marker, color=plt.get_cmap("tab20c").colors[4 * i + j], label=label)
-            ax.plot(cut, prob, marker, color=plt.get_cmap("tab20c").colors[4 * i], label=label)
+            if normed:
+                middle_index = middle(prob)
+                prob = prob / prob[middle_index]
+            if len(labels_list[0]) == 1:
+                # just one cut, so different colors can be used for probs_list
+                ax.plot(cut, prob, marker, color=plt.get_cmap("tab20c").colors[4 * j], label=label)
+            else:
+                ax.plot(cut, prob, marker, color=plt.get_cmap("tab20c").colors[4 * i], label=label)
     ax.legend()
     ax.grid()
 
     movie_str = dir_paths[0].parent.parent.stem
     path_png = Path(output_path, f"1d_cut_{movie_str}_{frame_formatted}.png")
     fig.savefig(path_png, bbox_inches='tight')
+    plt.close()
 
-    return path_png
+    probs_max = [[np.max(prob) for prob in probs_xyz] for probs_xyz in probs_list]
+    probs_middle = [[prob[middle(prob)] for prob in prob_xyz] for prob_xyz in probs_list]
+
+    return path_png, probs_middle, probs_max
 
 
 def read_cuts_paths(dir_paths: List[Path]):
