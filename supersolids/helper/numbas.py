@@ -70,7 +70,7 @@ def f_lam(A: cp.ndarray, lam: float,
 
 @njit(cache=True)
 def f_lam(A: cp.ndarray, lam: float,
-              eta_aa: float, eta_bb: float, eta_ab: float) -> cp.ndarray:
+              eta_aa: float, eta_bb: float, eta_ab: float) -> np.ndarray:
     return (eta_aa * A
             + eta_bb * (1.0 - A)
             + lam * np.sqrt((eta_aa * A - eta_bb * (1.0 - A)) ** 2.0
@@ -79,7 +79,7 @@ def f_lam(A: cp.ndarray, lam: float,
 
 @njit('f8[:](f8[:], f8, f8, f8, f8)')
 def eta_dVdna_jit(A: cp.ndarray, lam: float,
-                  eta_aa: float, eta_bb: float, eta_ab: float) -> cp.ndarray:
+                  eta_aa: float, eta_bb: float, eta_ab: float) -> np.ndarray:
     term = ((eta_aa * (eta_aa * A - eta_bb * (1 - A)) + 2 * eta_ab ** 2 * (1 - A))
              / np.sqrt((eta_aa * A - eta_bb * (1 - A)) ** 2 + 4 * eta_ab ** 2 * A * (1 - A))
             )
@@ -90,7 +90,7 @@ def eta_dVdna_jit(A: cp.ndarray, lam: float,
 
 @njit(cache=True)
 def eta_dVdna_jit(A: cp.ndarray, lam: float,
-                  eta_aa: float, eta_bb: float, eta_ab: float) -> cp.ndarray:
+                  eta_aa: float, eta_bb: float, eta_ab: float) -> np.ndarray:
     term = ((eta_aa * (eta_aa * A - eta_bb * (1 - A)) + 2 * eta_ab ** 2 * (1 - A))
              / np.sqrt((eta_aa * A - eta_bb * (1 - A)) ** 2 + 4 * eta_ab ** 2 * A * (1 - A))
             )
