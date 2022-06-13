@@ -616,7 +616,7 @@ class MayaviAnimation(Animation.Animation):
             # also a timestep is needed for mu_rel
             if frame > 0:
                 mu_old = System.mu_arr
-                System.time_step()
+                System.time_step(numba_used, cupy_used)
 
                 mu_rel = np.abs((System.mu_arr - mu_old) / System.mu_arr)
 
