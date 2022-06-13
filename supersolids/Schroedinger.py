@@ -275,7 +275,14 @@ class Schroedinger:
                 if (p == 2.0) and jit:
                     psi_density: cp.ndarray = numbas.get_density_jit(self.psi_val, p=2.0)
                 else:
-                    psi_density: cp.ndarray = cp.abs(self.psi_val) ** p
+                    try:
+                        psi_density: cp.ndarray = cp.abs(self.psi_val) ** p
+                        try:
+                            psi_density: cp.ndarray = cp.abs(self.psi_val) ** p
+                        except:
+                            psi_density: cp.ndarray = cp.abs(cp.array(self.psi_val)) ** p
+                    except:
+                        psi_density: np.ndarray = np.abs(self.psi_val) ** p
             else:
                 if (p == 2.0) and jit:
                     psi_density: cp.ndarray = numbas.get_density_jit(func_val, p=2.0)
