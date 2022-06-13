@@ -52,16 +52,16 @@ def flags(args_array):
                         help="Number of particles in box per mixture")
     parser.add_argument("--m_list", metavar="m",  type=float, nargs="+", default=[164.0],
                         help="Mass of a particles in atomic mass unit (u) per mixture")
-    parser.add_argument("--dipol_list", metavar="mu",  type=float, nargs="+", default=None,
-                        help="Use a_dd_list or this flag (not both), as it is used to construct "
-                             "a_dd_list. Dipol moment of particles per mixture component. "
-                             "E.g. for Dy: dipol_list = [9.5 * 10 ** (-23), 9.5 * 10 ** (-23)]")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--dipol_list", metavar="mu",  type=float, nargs="+", default=None,
+                       help="Use a_dd_list or this flag (not both), as it is used to construct "
+                            "a_dd_list. Dipol moment of particles per mixture component. "
+                            "E.g. for Dy: dipol_list = [9.5 * 10 ** (-23), 9.5 * 10 ** (-23)]")
+    group.add_argument("--a_dd_list", metavar="a_dd",  type=float, nargs="+", default=[130.8],
+                       help="a_dd in a0 per mixture-mixture interaction in a upper triangle "
+                            "matrix e.g. for 2 mixtures, the index combinations are [11, 12, 22].")
     parser.add_argument("--a_s_list", metavar="a_s", type=float, nargs="+", default=[85.0],
                         help="a_s in a0 per mixture-mixture interaction in a upper triangle "
-                             "matrix e.g. for 2 mixtures, the index combinations are [11, 12, 22].")
-    parser.add_argument("--a_dd_list", metavar="a_dd",  type=float, nargs="+",
-                        default=[130.8],
-                        help="a_dd in a0 per mixture-mixture interaction in a upper triangle "
                              "matrix e.g. for 2 mixtures, the index combinations are [11, 12, 22].")
     parser.add_argument("-w_x", metavar="w_x", type=float, default=2.0 * np.pi * 33.0,
                         help="Frequency of harmonic trap in x direction")
