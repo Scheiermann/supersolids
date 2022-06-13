@@ -486,8 +486,8 @@ class SchroedingerMixture(Schroedinger):
                      steps_format: str, frame: int, arr_list = None) -> None:
         if arr_list is None:
             arr_list: List[cp.ndarray] = self.psi_val_list
-        with open(Path(input_path, "mixture_" + filename_steps + steps_format % frame + ".npz"),
-                  "wb") as g:
+        path_output = Path(input_path, filename_steps + f"{steps_format % frame}" + ".npz")
+        with open(path_output, "wb") as g:
             if cupy_used:
                 try:
                     psi_val_list: np.ndarray = [psi_val.get() for psi_val in arr_list]
@@ -868,19 +868,17 @@ class SchroedingerMixture(Schroedinger):
 
     def get_U_dd_list(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
         U_dd_list: List[cp.ndarray] = []
-        print(f"get_U_dd"
-              + f"V_k_val type: {type(self.V_k_val)}\n"
-              + f"denisty_list type: {type(density_list)}\n"
-              + f"denisty_list[0] type: {type(density_list[0])}"
-              + f"denisty_list[1] type: {type(density_list[1])}"
-              + f"len type: {len(density_list)}"
-              )
         for density in density_list:
-            a = cp.fft.fftn(density)
-            b = self.V_k_val * cp.fft.fftn(density)
-            c = cp.fft.ifftn(b)
-            U_dd_list.append(c)
-            U_dd_list.append(cp.fft.ifftn(self.V_k_val * cp.fft.fftn(density)))
+            try:
+                U_dd_list.append(cp.fft.ifftn(self.V_k_val * cp.fft.fftn(density)))
+            except Exception as e:
+                print({e})
+                U_dd_list.append(np.fft.ifftn(self.V_k_val.get() * np.fft.fftn(density.get())))
+                try:
+                    U_dd_list.append(np.fft.ifftn(self.V_k_val * np.fft.fftn(density)))
+                except Exception as e:
+                    print({e})
+
 
         return U_dd_list
 
@@ -904,11 +902,6 @@ class SchroedingerMixture(Schroedinger):
         if cupy_used:
             jit = False
         density_list: List[cp.ndarray] = self.get_density_list(jit=jit, cupy_used=cupy_used)
-        print(f"denisty_list type: {type(density_list)}\n"
-              + f"denisty_list[0] type: {type(density_list[0])}"
-              + f"denisty_list[1] type: {type(density_list[1])}"
-              + f"len type: {len(density_list)}"
-              )
         try:
             # density_tensor_vec: cp.ndarray = cp.stack(density_list, axis=0)
             density_tensor_vec: cp.ndarray = cp.array(density_list)
