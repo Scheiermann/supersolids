@@ -87,7 +87,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_grid_helper" title="supersolids.helper.functions.get_grid_helper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_grid_helper</span></code></a>(Res, MyBox, index)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_grid" title="supersolids.helper.functions.get_grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_grid</span></code></a>(Res, MyBox)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.get_grid" title="supersolids.helper.functions.get_grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_grid</span></code></a>(Res, MyBox, cupy_try = True)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.BoxResAssert" title="supersolids.helper.functions.BoxResAssert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxResAssert</span></code></a>(Res, Box)</p></td>
@@ -306,7 +306,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.camera_3d_trajectory" title="supersolids.helper.functions.camera_3d_trajectory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_3d_trajectory</span></code></a>(frame, r_func = None, phi_func = None, z_func = None, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0)</p></td>
 <td><p>Computes r, phi, z as the components of the camera position</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.noise_mesh" title="supersolids.helper.functions.noise_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">noise_mesh</span></code></a>(min = 0.8, max = 1.2, shape = (64, 64, 64))</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.functions.noise_mesh" title="supersolids.helper.functions.noise_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">noise_mesh</span></code></a>(val_min = 0.8, val_max = 1.2, shape = (64, 64, 64))</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.functions.dt_adaptive" title="supersolids.helper.functions.dt_adaptive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dt_adaptive</span></code></a>(t, dt)</p></td>
@@ -357,12 +357,13 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.get_grid">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MyBox</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_grid" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">get_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MyBox</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cupy_try</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#get_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.get_grid" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>Res</strong> (<a class="reference internal" href="../Resolution/index.html#supersolids.helper.Resolution.Resolution" title="supersolids.helper.Resolution.Resolution"><em>supersolids.helper.Resolution.Resolution</em></a>) – </p></li>
 <li><p><strong>MyBox</strong> (<a class="reference internal" href="../Box/index.html#supersolids.helper.Box.Box" title="supersolids.helper.Box.Box"><em>supersolids.helper.Box.Box</em></a>) – </p></li>
+<li><p><strong>cupy_try</strong> (<em>bool</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -1234,12 +1235,12 @@ in the animation for the given frame.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.functions.noise_mesh">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">noise_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(64,</span> <span class="pre">64,</span> <span class="pre">64)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#noise_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.noise_mesh" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.functions.</span></span><span class="sig-name descname"><span class="pre">noise_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(64,</span> <span class="pre">64,</span> <span class="pre">64)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/functions.html#noise_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.functions.noise_mesh" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>min</strong> (<em>float</em>) – </p></li>
-<li><p><strong>max</strong> (<em>float</em>) – </p></li>
+<li><p><strong>val_min</strong> (<em>float</em>) – </p></li>
+<li><p><strong>val_max</strong> (<em>float</em>) – </p></li>
 <li><p><strong>shape</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – </p></li>
 </ul>
 </dd>

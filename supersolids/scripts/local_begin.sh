@@ -15,8 +15,8 @@ dir_name_result=$movie_string$movie_number_formatted
 # dir_path_after="/run/media/dsche/ITP Transfer/test/"
 dir_path_after=$dir_path
 
-# python -m supersolids \
-python -m supersolids \
+#/bigwork/dscheier/miniconda3/envs/solids/bin/python -m supersolids \
+ python -m supersolids \
 -Res='{"x":128, "y":64, "z":32}' \
 -Box='{"x0":-10, "x1":10, "y0":-5, "y1":5, "z0":-4, "z1":4}' \
 -max_timesteps=1000 \
@@ -37,7 +37,9 @@ python -m supersolids \
 --a_s_list  88.0 0.0 0.0 \
 --V_interaction \
 --offscreen \
---mixture
+ --mixture
+# --dipol_list 10.0 9.0 \
+# --a_s_list 0.00000004656759455 \
 
 # -w_y=518.36
 # -w_y=518.36 # w_y = 2 * np.pi * 82.50 # alpha_t=0.4 # get some 1D and all 2D, while bigger N
