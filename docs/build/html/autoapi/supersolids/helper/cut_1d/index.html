@@ -82,8 +82,20 @@ time-dependent Schrodinger equation.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.cut_1d.cut_1d" title="supersolids.helper.cut_1d.cut_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cut_1d</span></code></a>(System, slice_indices = [0, 0, 0], psi_sol_3d_cut_x = None, psi_sol_3d_cut_y = None, psi_sol_3d_cut_z = None, dir_path = Path(__file__).parent.parent.joinpath('results'), y_lim = (0.0, 1.0))</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.cut_1d.cut_1d" title="supersolids.helper.cut_1d.cut_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cut_1d</span></code></a>(System_list, slice_indices = [0, 0, 0], psi_sol_3d_cut_x = None, psi_sol_3d_cut_y = None, psi_sol_3d_cut_z = None, dir_path = Path(__file__).parent.parent.joinpath('results'), y_lim = (0.0, 1.0), plot_val_list = [False], frame = None, steps_format = None, mixture_slice_index_list = [0], cut_names = ['cut_x', 'cut_y', 'cut_z'], filename_steps_list = ['step_'])</p></td>
 <td><p>Creates 1D plots of the probability function of the System <span class="math notranslate nohighlight">\(|\psi|^2\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.cut_1d.plot_cuts_tuples" title="supersolids.helper.cut_1d.plot_cuts_tuples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cuts_tuples</span></code></a>(dir_paths_list, output_path, frame_formatted, y_lim = (0.0, 1.0), labels_list = [['cut_x', 'cut_y', 'cut_z']], normed = True)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.cut_1d.read_cuts_paths" title="supersolids.helper.cut_1d.read_cuts_paths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_cuts_paths</span></code></a>(dir_paths)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.cut_1d.read_cuts" title="supersolids.helper.cut_1d.read_cuts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_cuts</span></code></a>(dir_path, frame_formatted, cut_names = ['cut_x', 'cut_y', 'cut_z'])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.cut_1d.zip_meshes" title="supersolids.helper.cut_1d.zip_meshes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zip_meshes</span></code></a>(path_mesh1, path_mesh2)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.cut_1d.prepare_cuts" title="supersolids.helper.cut_1d.prepare_cuts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_cuts</span></code></a>(func, N, alpha_z, e_dd, a_s_l_ho_ratio)</p></td>
 <td><p>Helper function to get <span class="math notranslate nohighlight">\(R_r\)</span> and <span class="math notranslate nohighlight">\(R_z\)</span> and set it for the given func.</p></td>
@@ -92,13 +104,13 @@ time-dependent Schrodinger equation.</p>
 </table>
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.cut_1d.cut_1d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.cut_1d.</span></span><span class="sig-name descname"><span class="pre">cut_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_sol_3d_cut_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_sol_3d_cut_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_sol_3d_cut_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Path(__file__).parent.parent.joinpath('results')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_lim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">1.0)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/cut_1d.html#cut_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.cut_1d.cut_1d" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.cut_1d.</span></span><span class="sig-name descname"><span class="pre">cut_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">System_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_sol_3d_cut_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_sol_3d_cut_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_sol_3d_cut_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Path(__file__).parent.parent.joinpath('results')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_lim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">1.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_val_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[False]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixture_slice_index_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['cut_x',</span> <span class="pre">'cut_y',</span> <span class="pre">'cut_z']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_steps_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['step_']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/cut_1d.html#cut_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.cut_1d.cut_1d" title="Permalink to this definition"></a></dt>
 <dd><p>Creates 1D plots of the probability function of the System <span class="math notranslate nohighlight">\(|\psi|^2\)</span>
 and if given of the solution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>System</strong> (<a class="reference internal" href="../../Schroedinger/index.html#supersolids.Schroedinger.Schroedinger" title="supersolids.Schroedinger.Schroedinger"><em>supersolids.Schroedinger.Schroedinger</em></a>) – Schrödinger equations for the specified system</p></li>
+<li><p><strong>System</strong> – Schrödinger equations for the specified system</p></li>
 <li><p><strong>slice_indices</strong> (<em>numpy.ndarray</em>) – Numpy array with indices of grid points
 in the directions x, y, z (in terms of System.x, System.y, System.z)
 to produce a slice/plane in mayavi,
@@ -109,6 +121,13 @@ Max values is for e.g. System.Res.x - 1.</p></li>
 <li><p><strong>psi_sol_3d_cut_z</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>]</em>) – 1D function after cut in z direction.</p></li>
 <li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – Path where to save 1d cut plots</p></li>
 <li><p><strong>y_lim</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>) – Limit of y for plotting the 1D cut</p></li>
+<li><p><strong>System_list</strong> (<em>List</em><em>[</em><a class="reference internal" href="../../Schroedinger/index.html#supersolids.Schroedinger.Schroedinger" title="supersolids.Schroedinger.Schroedinger"><em>supersolids.Schroedinger.Schroedinger</em></a><em>]</em>) – </p></li>
+<li><p><strong>plot_val_list</strong> (<em>List</em><em>[</em><em>bool</em><em>]</em>) – </p></li>
+<li><p><strong>frame</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>steps_format</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p></li>
+<li><p><strong>mixture_slice_index_list</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>cut_names</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – </p></li>
+<li><p><strong>filename_steps_list</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -116,6 +135,52 @@ Max values is for e.g. System.Res.x - 1.</p></li>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.cut_1d.plot_cuts_tuples">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.cut_1d.</span></span><span class="sig-name descname"><span class="pre">plot_cuts_tuples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_paths_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_formatted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_lim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">1.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[['cut_x',</span> <span class="pre">'cut_y',</span> <span class="pre">'cut_z']]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#supersolids.helper.cut_1d.plot_cuts_tuples" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir_paths_list</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>pathlib.Path</em><em>]</em><em>]</em>) – </p></li>
+<li><p><strong>output_path</strong> (<em>pathlib.Path</em>) – </p></li>
+<li><p><strong>frame_formatted</strong> (<em>str</em>) – </p></li>
+<li><p><strong>y_lim</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>) – </p></li>
+<li><p><strong>labels_list</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) – </p></li>
+<li><p><strong>normed</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.cut_1d.read_cuts_paths">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.cut_1d.</span></span><span class="sig-name descname"><span class="pre">read_cuts_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#supersolids.helper.cut_1d.read_cuts_paths" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dir_paths</strong> (<em>List</em><em>[</em><em>pathlib.Path</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.cut_1d.read_cuts">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.cut_1d.</span></span><span class="sig-name descname"><span class="pre">read_cuts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_formatted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['cut_x',</span> <span class="pre">'cut_y',</span> <span class="pre">'cut_z']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#supersolids.helper.cut_1d.read_cuts" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir_path</strong> (<em>pathlib.Path</em>) – </p></li>
+<li><p><strong>frame_formatted</strong> (<em>str</em>) – </p></li>
+<li><p><strong>cut_names</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.cut_1d.zip_meshes">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.cut_1d.</span></span><span class="sig-name descname"><span class="pre">zip_meshes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_mesh1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_mesh2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#supersolids.helper.cut_1d.zip_meshes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.cut_1d.prepare_cuts">

@@ -84,10 +84,22 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#id0" title="supersolids.helper.numbas.get_H_pot_exponent_terms_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_H_pot_exponent_terms_jit</span></code></a>(V_val, a_dd_factor, a_s_factor, dipol_term, contact_interaction, mu_lhy)</p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#id0" title="supersolids.helper.numbas.get_H_pot_exponent_terms_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_H_pot_exponent_terms_jit</span></code></a>(V_val, a_dd_factor, a_s_factor, dipol_term, contact_interaction, mu_lhy)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id1" title="supersolids.helper.numbas.get_H_pot_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_H_pot_jit</span></code></a>(U, dt, terms, split_step = 0.5)</p></td>
+<td><p></p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#id1" title="supersolids.helper.numbas.get_H_pot_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_H_pot_jit</span></code></a>(U, dt, terms, split_step = 0.5)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#id2" title="supersolids.helper.numbas.f_lam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f_lam</span></code></a>(A, lam, eta_aa, eta_bb, eta_ab)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#id2" title="supersolids.helper.numbas.f_lam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f_lam</span></code></a>(A, lam, eta_aa, eta_bb, eta_ab)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id3" title="supersolids.helper.numbas.eta_dVdna_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta_dVdna_jit</span></code></a>(A, lam, eta_aa, eta_bb, eta_ab)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#id3" title="supersolids.helper.numbas.eta_dVdna_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta_dVdna_jit</span></code></a>(A, lam, eta_aa, eta_bb, eta_ab)</p></td>
@@ -96,29 +108,40 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#id4" title="supersolids.helper.numbas.eta_dVdnb_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta_dVdnb_jit</span></code></a>(A, lam, eta_aa, eta_bb, eta_ab)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.numbas.get_density_jit" title="supersolids.helper.numbas.get_density_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_density_jit</span></code></a>(func_val, p)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#id4" title="supersolids.helper.numbas.eta_dVdnb_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta_dVdnb_jit</span></code></a>(A, lam, eta_aa, eta_bb, eta_ab)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id5" title="supersolids.helper.numbas.get_density_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_density_jit</span></code></a>(func_val, p)</p></td>
 <td><p>Calculates <span class="math notranslate nohighlight">\(|\psi|^2\)</span> for 1D, 2D or 3D (depending on self.dim).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#id0" title="supersolids.helper.numbas.get_H_pot_exponent_terms_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_H_pot_exponent_terms_jit</span></code></a>(V_val, a_dd_factor, a_s_factor, dipol_term, contact_interaction, mu_lhy)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#id1" title="supersolids.helper.numbas.get_H_pot_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_H_pot_jit</span></code></a>(U, dt, terms, split_step = 0.5)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#id2" title="supersolids.helper.numbas.f_lam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f_lam</span></code></a>(A, lam, eta_aa, eta_bb, eta_ab)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#id3" title="supersolids.helper.numbas.eta_dVdna_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta_dVdna_jit</span></code></a>(A, lam, eta_aa, eta_bb, eta_ab)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#id4" title="supersolids.helper.numbas.eta_dVdnb_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eta_dVdnb_jit</span></code></a>(A, lam, eta_aa, eta_bb, eta_ab)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#id5" title="supersolids.helper.numbas.get_density_jit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_density_jit</span></code></a>(func_val, p)</p></td>
+<td><p>Calculates <span class="math notranslate nohighlight">\(|\psi|^2\)</span> for 1D, 2D or 3D (depending on self.dim).</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.numbas.get_H_pot_exponent_terms_jit">
 <span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">get_H_pot_exponent_terms_jit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dipol_term</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_interaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_lhy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#get_H_pot_exponent_terms_jit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.numbas.get_H_pot_exponent_terms_jit" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>V_val</strong> (<em>cp</em>) – </p></li>
+<li><p><strong>a_dd_factor</strong> (<em>float</em>) – </p></li>
+<li><p><strong>a_s_factor</strong> (<em>float</em>) – </p></li>
+<li><p><strong>dipol_term</strong> (<em>cp</em>) – </p></li>
+<li><p><strong>contact_interaction</strong> (<em>cp</em>) – </p></li>
+<li><p><strong>mu_lhy</strong> (<em>cp</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>cp</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">get_H_pot_exponent_terms_jit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dipol_term</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_interaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_lhy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#get_H_pot_exponent_terms_jit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -155,6 +178,24 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">get_H_pot_jit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#get_H_pot_jit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>U</strong> (<em>cp</em>) – </p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – </p></li>
+<li><p><strong>terms</strong> (<em>cp</em>) – </p></li>
+<li><p><strong>split_step</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>cp</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.numbas.f_lam">
 <span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">f_lam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_aa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_bb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_ab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#f_lam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.numbas.f_lam" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
@@ -168,7 +209,26 @@
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>cp</p>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">f_lam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_aa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_bb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_ab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#f_lam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>cp</em>) – </p></li>
+<li><p><strong>lam</strong> (<em>float</em>) – </p></li>
+<li><p><strong>eta_aa</strong> (<em>float</em>) – </p></li>
+<li><p><strong>eta_bb</strong> (<em>float</em>) – </p></li>
+<li><p><strong>eta_ab</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -187,7 +247,26 @@
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>cp</p>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">eta_dVdna_jit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_aa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_bb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_ab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#eta_dVdna_jit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>cp</em>) – </p></li>
+<li><p><strong>lam</strong> (<em>float</em>) – </p></li>
+<li><p><strong>eta_aa</strong> (<em>float</em>) – </p></li>
+<li><p><strong>eta_bb</strong> (<em>float</em>) – </p></li>
+<li><p><strong>eta_ab</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -195,6 +274,25 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.numbas.eta_dVdnb_jit">
 <span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">eta_dVdnb_jit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_aa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_bb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_ab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#eta_dVdnb_jit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.numbas.eta_dVdnb_jit" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>cp</em>) – </p></li>
+<li><p><strong>lam</strong> (<em>float</em>) – </p></li>
+<li><p><strong>eta_aa</strong> (<em>float</em>) – </p></li>
+<li><p><strong>eta_bb</strong> (<em>float</em>) – </p></li>
+<li><p><strong>eta_ab</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>cp</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">eta_dVdnb_jit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_aa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_bb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_ab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#eta_dVdnb_jit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -232,96 +330,21 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">get_H_pot_exponent_terms_jit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dd_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_s_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dipol_term</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_interaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_lhy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#get_H_pot_exponent_terms_jit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">get_density_jit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#get_density_jit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates <span class="math notranslate nohighlight">\(|\psi|^2\)</span> for 1D, 2D or 3D (depending on self.dim).</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>V_val</strong> (<em>cp</em>) – </p></li>
-<li><p><strong>a_dd_factor</strong> (<em>float</em>) – </p></li>
-<li><p><strong>a_s_factor</strong> (<em>float</em>) – </p></li>
-<li><p><strong>dipol_term</strong> (<em>cp</em>) – </p></li>
-<li><p><strong>contact_interaction</strong> (<em>cp</em>) – </p></li>
-<li><p><strong>mu_lhy</strong> (<em>cp</em>) – </p></li>
+<li><p><strong>func_val</strong> (<em>cp</em>) – Array of function values to get p-norm for.</p></li>
+<li><p><strong>p</strong> (<em>float</em>) – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>cp</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(|\psi|^2\)</span></p>
 </dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">get_H_pot_jit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#get_H_pot_jit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>U</strong> (<em>cp</em>) – </p></li>
-<li><p><strong>dt</strong> (<em>float</em>) – </p></li>
-<li><p><strong>terms</strong> (<em>cp</em>) – </p></li>
-<li><p><strong>split_step</strong> (<em>float</em>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>cp</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="id2">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">f_lam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_aa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_bb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_ab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#f_lam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<em>cp</em>) – </p></li>
-<li><p><strong>lam</strong> (<em>float</em>) – </p></li>
-<li><p><strong>eta_aa</strong> (<em>float</em>) – </p></li>
-<li><p><strong>eta_bb</strong> (<em>float</em>) – </p></li>
-<li><p><strong>eta_ab</strong> (<em>float</em>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>cp</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="id3">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">eta_dVdna_jit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_aa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_bb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_ab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#eta_dVdna_jit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<em>cp</em>) – </p></li>
-<li><p><strong>lam</strong> (<em>float</em>) – </p></li>
-<li><p><strong>eta_aa</strong> (<em>float</em>) – </p></li>
-<li><p><strong>eta_bb</strong> (<em>float</em>) – </p></li>
-<li><p><strong>eta_ab</strong> (<em>float</em>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>cp</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="id4">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.numbas.</span></span><span class="sig-name descname"><span class="pre">eta_dVdnb_jit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_aa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_bb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_ab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/numbas.html#eta_dVdnb_jit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<em>cp</em>) – </p></li>
-<li><p><strong>lam</strong> (<em>float</em>) – </p></li>
-<li><p><strong>eta_aa</strong> (<em>float</em>) – </p></li>
-<li><p><strong>eta_bb</strong> (<em>float</em>) – </p></li>
-<li><p><strong>eta_ab</strong> (<em>float</em>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>cp</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>cp</p>
 </dd>
 </dl>
 </dd></dl>
