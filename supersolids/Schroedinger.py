@@ -236,6 +236,9 @@ class Schroedinger:
 
             if cupy_used:
                 kx, ky, kz = cp.asarray(self.kx), cp.asarray(self.ky), cp.asarray(self.kz)
+            else:
+                kx, ky, kz = self.kx, self.ky, self.kz
+
             kx_mesh, ky_mesh, kz_mesh = cp.meshgrid(kx, ky, kz, indexing="ij")
             self.k_squared = kx_mesh ** 2.0 + ky_mesh ** 2.0 + kz_mesh ** 2.0
 

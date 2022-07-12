@@ -15,8 +15,10 @@ import argparse
 import functools
 import json
 import sys
+from contextlib import nullcontext
 from pathlib import Path
 from typing import Callable, Optional, List
+
 
 import numpy as np
 from supersolids.helper import constants, functions, get_version
@@ -84,6 +86,8 @@ def flags(args_array):
     parser.add_argument("-dir_name_result", type=str, default="",
                         help="Name of directory where to save the results at. "
                              "For example the standard naming convention is movie002")
+    parser.add_argument("-tilt", metavar="tilt", type=float, default=0.0, nargs="?",
+                        help="Term for +tilt * psi1 and -tilt * psi2 in the eGPE")
     parser.add_argument("-V", type=functions.lambda_parsed,
                         help="Potential as lambda function. For example: "
                              "-V='lambda x,y,z: 10 * x * y'")
@@ -336,6 +340,7 @@ if __name__ == "__main__":
             w_y=args.w_y,
             w_z=args.w_z,
             imag_time=(not args.real_time),
+            tilt=args.tilt,
             mu_arr=None,
             E=1.0,
             V=V,
@@ -397,27 +402,33 @@ if __name__ == "__main__":
 
     # TODO: get mayavi lim to work
     # 3D works in single core mode
-    with run_time(name="simulate_case"):
-        SystemResult: Schroedinger = simulate_case(
-            SchroedingerInput,
-            Anim,
-            accuracy=args.accuracy,
-            delete_input=False,
-            dir_path=dir_path,
-            dir_name_result=args.dir_name_result,
-            filename_steps=args.filename_steps,
-            steps_format=args.steps_format,
-            steps_per_npz=args.steps_per_npz,
-            frame_start=0,
-            script_name=args.script_name,
-            script_args=args,
-            script_number_regex=args.script_number_regex,
-            script_extensions=args.script_extensions,
-            script_extensions_index=args.script_extensions_index,
-            slice_indices=slice_indices,  # from here just mayavi
-            offscreen=args.offscreen,
-            x_lim=x_lim,  # from here just matplotlib
-            y_lim=y_lim,
-            )
+    if cupy_used:
+        from cupyx.profiler import profile
+        cm = profile()
+    else:
+        cm = nullcontext()
+    with cm:
+        with run_time(name="simulate_case"):
+            SystemResult: Schroedinger = simulate_case(
+                SchroedingerInput,
+                Anim,
+                accuracy=args.accuracy,
+                delete_input=False,
+                dir_path=dir_path,
+                dir_name_result=args.dir_name_result,
+                filename_steps=args.filename_steps,
+                steps_format=args.steps_format,
+                steps_per_npz=args.steps_per_npz,
+                frame_start=0,
+                script_name=args.script_name,
+                script_args=args,
+                script_number_regex=args.script_number_regex,
+                script_extensions=args.script_extensions,
+                script_extensions_index=args.script_extensions_index,
+                slice_indices=slice_indices,  # from here just mayavi
+                offscreen=args.offscreen,
+                x_lim=x_lim,  # from here just matplotlib
+                y_lim=y_lim,
+                )
 
     print("Single core done")

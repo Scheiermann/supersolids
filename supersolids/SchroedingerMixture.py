@@ -143,6 +143,7 @@ class SchroedingerMixture(Schroedinger):
                  w_y: float = 2.0 * np.pi * 80.0,
                  w_z: float = 2.0 * np.pi * 167.0,
                  imag_time: bool = True,
+                 tilt: float = 0.0,
                  mu_arr: Optional[np.ndarray] = None,
                  E: float = 1.0,
                  V: Optional[Callable] = functions.v_harmonic_3d,
@@ -178,6 +179,8 @@ class SchroedingerMixture(Schroedinger):
         self.w_x: float = w_x
         self.w_y: float = w_y
         self.w_z: float = w_z
+        
+        self.tilt = tilt
 
         self.E: float = E
 
@@ -954,9 +957,9 @@ class SchroedingerMixture(Schroedinger):
                 H_pot: cp.ndarray = self.get_H_pot(term, split_step)
 
             if cupy_used:
-                self.psi_val_list[i] = (cp.asarray(H_pot) * cp.asarray(self.psi_val_list[i]))
+                self.psi_val_list[i] = (cp.asarray(H_pot) * (-1) ** i * self.tilt * cp.asarray(self.psi_val_list[i]))
             else:
-                self.psi_val_list[i] = H_pot * self.psi_val_list[i]
+                self.psi_val_list[i] = H_pot * (-1) ** i * self.tilt * self.psi_val_list[i]
 
         return density_list, U_dd_list
 
