@@ -340,7 +340,10 @@ class SchroedingerMixture(Schroedinger):
 
             kx_mesh, ky_mesh, kz_mesh = np.meshgrid(self.kx, self.ky, self.kz, indexing="ij")
             self.k_squared: cp.ndarray = np.power(kx_mesh, 2) + np.power(ky_mesh, 2) + np.power(kz_mesh, 2)
-            self.kz_mesh = kz_mesh
+            if cupy_used:
+                self.kz_mesh = cp.asarray(kz_mesh)
+            else:
+                self.kz_mesh = kz_mesh
 
             if V is None:
                 self.V_val = 0.0
@@ -875,8 +878,8 @@ class SchroedingerMixture(Schroedinger):
     def get_U_dd_list(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
         U_dd_list: List[cp.ndarray] = []
         for i, density in enumerate(density_list):
-            stack_shift_op = cp.exp((-1) ** i * 1.0j * self.kz_mesh * self.stack_shift)
             try:
+                stack_shift_op = cp.exp((-1) ** i * 1.0j * self.kz_mesh * self.stack_shift)
                 U_dd_list.append(cp.fft.ifftn(self.V_k_val * cp.fft.fftn(density) * stack_shift_op))
             except Exception as e:
                 print({e})
