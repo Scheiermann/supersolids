@@ -9,11 +9,11 @@ from supersolids.helper.dict2str import dic2str
 
 slurm = True
 mem_in_GB = 4
-xvfb_display = 800
+xvfb_display = 900
 supersolids_version = "0.1.35"
 # dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_schroedinger/")
 # dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_small_grid/")
-dir_path = Path("/bigwork/dscheier/results/begin_stacked/")
+dir_path = Path("/bigwork/dscheier/results/begin_ramp/")
 # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
 dir_path_log = Path(dir_path, "log")
@@ -29,9 +29,7 @@ a11 = 100.0
 
 m_list = [163.9, 163.9]
 a_dd = 130.8
-# dipol = 9.0
-dipol = 10.0
-a_dd_list = [a_dd, (dipol/10.0) * a_dd, (dipol/10.0) ** 2.0 * a_dd]
+a_dd_list = [a_dd, (9.0/10.0) * a_dd, (9.0/10.0) ** 2.0 * a_dd]
 
 Box = {"x0": -15, "x1": 15, "y0": -7, "y1": 7, "z0": -6, "z1": 6}
 # Res = {"x": 256, "y": 128, "z": 32}
@@ -53,7 +51,7 @@ w_z = 2.0 * np.pi * w_z_freq
 # for mixtures
 a = {"a_x": 4.0, "a_y": 0.8, "a_z": 1.8}
 
-max_timesteps = 250001
+max_timesteps = 50001
 dt = 0.0002
 steps_per_npz = 10000
 # steps_per_npz = 1
@@ -66,21 +64,15 @@ accuracy = 0.0
 
 N2_part = 0.5
 
-h_start = 2.0
+epsilon_start = -1.5
 # N_end = 0.06
-h_end = 4.1
-h_step = 0.5
+epsilon_end = 0.6
+epsilon_step = 0.5
 
-# d_start = -30.0
-# d_end = -2.1
-d_start = 0.0
-d_end = 0.1
-d_step = 1.0
+a12_start = 0.65
+a12_end = 0.72
+a12_step = 0.0125
 
-a12 = 0.0
-
-# gauss bump in z direction
-# v_string = 0.1
 
 func_filename = "distort.txt"
 
@@ -93,23 +85,23 @@ movie_list = []
 func_list = []
 func_path_list = []
 dir_path_func_list = []
-for h in np.arange(h_start, h_end, h_step):
-    for d in np.arange(d_start, d_end, d_step):
+for epsilon in np.arange(epsilon_start, epsilon_end, epsilon_step):
+    for a12 in np.arange(a12_start, a12_end, a12_step):
         skip_counter += 1
         if skip_counter < skip:
             continue
         if skip_counter == end:
             break
         func_list.append([])
-        d_exp = 10 ** d
-        d_string = round(d_exp, ndigits=5)
-        h_string = round(h, ndigits=5)
+        tilt = 10 ** epsilon
+        epsilon_string = round(epsilon, ndigits=5)
+        a12_string = round(a12, ndigits=5)
         N2 = int(N * N2_part)
         N_list = [N - N2, N2]
 
         # a_s_list in triu (triangle upper matrix) form: a11, a12, a22
-        a_s_list = [a11, a12 * a11, a11]
 
+        a_s_list = [a11, a12 * a11, a11]
         # w_y = 2.0 * np.pi * (w_x_freq / a12)
 
         # d_string = 0.0001 * 10.0 ** round(d, ndigits=5)
@@ -117,7 +109,7 @@ for h in np.arange(h_start, h_end, h_step):
         # V = f"lambda x, y, z: {v_string} * np.sin(np.pi*x/{d_string}) ** 2"
         # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi/4.0) + (np.pi*x/{d_string}) )"
         # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi*x/{d_string}) )"
-        # V = f"lambda x, y, z: {d_string} * np.exp(-((z ** 2.0) /{v_string} ** 2.0) )"
+        # V = f"lambda x, y, z: {v_string} * np.exp(-((x ** 2.0) /{d_string} ** 2.0) )"
         # func_list[j_counter].append(f"-V='{V}' ")
 
         movie_number_after = movie_number + j_counter
@@ -129,7 +121,7 @@ for h in np.arange(h_start, h_end, h_step):
         func_path = Path(dir_path_func, func_filename)
         func_path_list.append(func_path)
 
-        jobname = f"{supersolids_version}_d{d_string}h_{h_string}_m{movie_number_after}"
+        jobname = f"{supersolids_version}_e{epsilon_string}a12_{a12_string}_m{movie_number_after}"
 
         if slurm:
             cluster_flags = f"""#==================================================
@@ -143,7 +135,7 @@ for h in np.arange(h_start, h_end, h_step):
 #SBATCH -n 1
 #SBATCH -t 1-00:00:00
 #SBATCH --mem={mem_in_GB}G
-##SBATCH -p gpu
+#SBATCH -p gpu
 ##SBATCH -w atlas
 ##SBATCH -w altair,atlas,berti,gemini,mirzam,niobe,pegasus,phad,pollux,rana,sargas,weywot
 """
@@ -224,7 +216,7 @@ echo $HOME
 --a_s_list {' '.join(map(str, a_s_list))} \
 --V_interaction \
 --offscreen \
--stack_shift={h} \
+-tilt={tilt} \
 --mixture
 
 """])

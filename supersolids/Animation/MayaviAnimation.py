@@ -302,6 +302,7 @@ class MayaviAnimation(Animation.Animation):
                                          )
 
         if self.plot_V:
+            V_val = cp.asnumpy(V_val)
             V_plot = mlab.contour3d(x_mesh,
                                     y_mesh,
                                     z_mesh,

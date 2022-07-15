@@ -88,6 +88,8 @@ def flags(args_array):
                              "For example the standard naming convention is movie002")
     parser.add_argument("-tilt", metavar="tilt", type=float, default=0.0, nargs="?",
                         help="Term for +tilt * psi1 and -tilt * psi2 in the eGPE")
+    parser.add_argument("-stack_shift", metavar="s", type=float, default=0.0, nargs="?",
+                        help="Term for potential act as components are seperated by distance s in z direction.")
     parser.add_argument("-V", type=functions.lambda_parsed,
                         help="Potential as lambda function. For example: "
                              "-V='lambda x,y,z: 10 * x * y'")
@@ -341,6 +343,7 @@ if __name__ == "__main__":
             w_z=args.w_z,
             imag_time=(not args.real_time),
             tilt=args.tilt,
+            stack_shift=args.stack_shift,
             mu_arr=None,
             E=1.0,
             V=V,

@@ -144,6 +144,7 @@ class SchroedingerMixture(Schroedinger):
                  w_z: float = 2.0 * np.pi * 167.0,
                  imag_time: bool = True,
                  tilt: float = 0.0,
+                 stack_shift: float = 0.0,
                  mu_arr: Optional[np.ndarray] = None,
                  E: float = 1.0,
                  V: Optional[Callable] = functions.v_harmonic_3d,
@@ -181,6 +182,7 @@ class SchroedingerMixture(Schroedinger):
         self.w_z: float = w_z
         
         self.tilt = tilt
+        self.stack_shift = stack_shift
 
         self.E: float = E
 
@@ -338,6 +340,7 @@ class SchroedingerMixture(Schroedinger):
 
             kx_mesh, ky_mesh, kz_mesh = np.meshgrid(self.kx, self.ky, self.kz, indexing="ij")
             self.k_squared: cp.ndarray = np.power(kx_mesh, 2) + np.power(ky_mesh, 2) + np.power(kz_mesh, 2)
+            self.kz_mesh = kz_mesh
 
             if V is None:
                 self.V_val = 0.0
@@ -871,14 +874,17 @@ class SchroedingerMixture(Schroedinger):
 
     def get_U_dd_list(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
         U_dd_list: List[cp.ndarray] = []
-        for density in density_list:
+        for i, density in enumerate(density_list):
+            stack_shift_op = cp.exp((-1) ** i * 1.0j * self.kz_mesh * self.stack_shift)
             try:
-                U_dd_list.append(cp.fft.ifftn(self.V_k_val * cp.fft.fftn(density)))
+                U_dd_list.append(cp.fft.ifftn(self.V_k_val * cp.fft.fftn(density) * stack_shift_op))
             except Exception as e:
                 print({e})
-                U_dd_list.append(np.fft.ifftn(self.V_k_val.get() * np.fft.fftn(density.get())))
+                stack_shift_op = np.exp((-1) ** i * 1.0j * cp.asnumpy(self.kz_mesh) * self.stack_shift)
+                U_dd_list.append(np.fft.ifftn(self.V_k_val.get() * np.fft.fftn(density.get()) * stack_shift_op))
                 try:
-                    U_dd_list.append(np.fft.ifftn(self.V_k_val * np.fft.fftn(density)))
+                    stack_shift_op = np.exp((-1) ** i * 1.0j * cp.asnumpy(self.kz_mesh) * self.stack_shift)
+                    U_dd_list.append(np.fft.ifftn(self.V_k_val * np.fft.fftn(density) * stack_shift_op))
                 except Exception as e:
                     print({e})
 
@@ -940,6 +946,11 @@ class SchroedingerMixture(Schroedinger):
                 list(contact_interaction_vec),
                 list(dipol_term_vec),
                 mu_lhy_list)):
+            if cupy_used:
+                tilt_term = (-1) ** i * self.tilt * cp.array(self.x_mesh)
+            else:
+                tilt_term = (-1) ** i * self.tilt * self.x_mesh
+ 
             if jit: 
                 term: cp.ndarray = numbas.get_H_pot_exponent_terms_jit(self.V_val,
                                                                        self.a_dd_factor,
@@ -948,18 +959,18 @@ class SchroedingerMixture(Schroedinger):
                                                                        contact_interaction,
                                                                        mu_lhy
                                                                        )
-                H_pot: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt, term, split_step)
+                H_pot: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt, term + tilt_term, split_step)
             else:
                 term: cp.ndarray = self.get_H_pot_exponent_terms(dipol_term,
                                                                  contact_interaction,
                                                                  mu_lhy
                                                                  )
-                H_pot: cp.ndarray = self.get_H_pot(term, split_step)
+                H_pot: cp.ndarray = self.get_H_pot(term + tilt_term, split_step)
 
             if cupy_used:
-                self.psi_val_list[i] = (cp.asarray(H_pot) * (-1) ** i * self.tilt * cp.asarray(self.psi_val_list[i]))
+                self.psi_val_list[i] = (cp.asarray(H_pot) * cp.asarray(self.psi_val_list[i]))
             else:
-                self.psi_val_list[i] = H_pot * (-1) ** i * self.tilt * self.psi_val_list[i]
+                self.psi_val_list[i] = H_pot * self.psi_val_list[i]
 
         return density_list, U_dd_list
 
