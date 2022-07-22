@@ -9,9 +9,12 @@ from supersolids.helper.dict2str import dic2str
 
 slurm = True
 mem_in_GB = 4
-xvfb_display = 800
+xvfb_display = 700
 supersolids_version = "0.1.35"
-dir_path = Path("/bigwork/dscheier/results/begin_stacked_a11/")
+# dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_schroedinger/")
+# dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_small_grid/")
+dir_path = Path("/bigwork/dscheier/results/begin_pretilt/")
+# dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
 dir_path_log = Path(dir_path, "log")
 dir_path_log.mkdir(parents=True, exist_ok=True)
@@ -58,51 +61,40 @@ accuracy = 0.0
 
 N2_part = 0.5
 
-h_start = 2.0
-h_end = 4.1
-h_step = 0.5
+a11_start = 85.0
+a11_end = 100.1
+a11_step = 2.5
 
-a11_start = 90.0
-a11_end = 110.1
-a11_step = 5.0
-
-a12 = 0.0
+a12_start = 85.0
+a12_end = 100.1
+a12_step = 2.50
 
 func_filename = "distort.txt"
 
 skip = 0
 skip_counter = 0
-j_counter = skip
+j_counter = 0
+# j_counter = skip - 1
 end = 0
 
 movie_list = []
 func_list = []
 func_path_list = []
 dir_path_func_list = []
-for h in np.arange(h_start, h_end, h_step):
-    for a11 in np.arange(a11_start, a11_end, a11_step):
+for a11 in np.arange(a11_start, a11_end, a11_step):
+    for a12 in np.arange(a12_start, a12_end, a12_step):
         skip_counter += 1
         if skip_counter < skip:
             continue
         if skip_counter == end:
             break
         func_list.append([])
-        h_string = round(h, ndigits=5)
+        a12_string = round(a12, ndigits=5)
         N2 = int(N * N2_part)
         N_list = [N - N2, N2]
 
         # a_s_list in triu (triangle upper matrix) form: a11, a12, a22
-        a_s_list = [a11, a12 * a11, a11]
-
-        # w_y = 2.0 * np.pi * (w_x_freq / a12)
-
-        # d_string = 0.0001 * 10.0 ** round(d, ndigits=5)
-
-        # V = f"lambda x, y, z: {v_string} * np.sin(np.pi*x/{d_string}) ** 2"
-        # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi/4.0) + (np.pi*x/{d_string}) )"
-        # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi*x/{d_string}) )"
-        # V = f"lambda x, y, z: {d_string} * np.exp(-((z ** 2.0) /{v_string} ** 2.0) )"
-        # func_list[j_counter].append(f"-V='{V}' ")
+        a_s_list = [a11, a12, a11]
 
         movie_number_after = movie_number + j_counter
         movie_after = f"{movie_string}{counting_format % movie_number_after}"
@@ -113,7 +105,7 @@ for h in np.arange(h_start, h_end, h_step):
         func_path = Path(dir_path_func, func_filename)
         func_path_list.append(func_path)
 
-        jobname = f"{supersolids_version}_a11_{a11}h_{h_string}_m{movie_number_after}"
+        jobname = f"{supersolids_version}_a11_{a11}a12_{a12_string}_m{movie_number_after}"
 
         if slurm:
             cluster_flags = f"""#==================================================
@@ -208,7 +200,6 @@ echo $HOME
 --a_s_list {' '.join(map(str, a_s_list))} \
 --V_interaction \
 --offscreen \
--stack_shift={h} \
 --mixture
 
 """])

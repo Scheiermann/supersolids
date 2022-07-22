@@ -10,11 +10,8 @@ from supersolids.helper.dict2str import dic2str
 slurm = True
 mem_in_GB = 4
 xvfb_display = 900
-supersolids_version = "0.1.34rc34"
-# dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_schroedinger/")
-# dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_small_grid/")
+supersolids_version = "0.1.35"
 dir_path = Path("/bigwork/dscheier/results/begin_paper_a11_100/")
-# dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
 dir_path_log = Path(dir_path, "log")
 dir_path_log.mkdir(parents=True, exist_ok=True)
@@ -134,7 +131,7 @@ for N2_part in np.arange(N_start, N_end, N_step):
 #SBATCH -e error-%j.out
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH -t 7-00:00:00
+#SBATCH -t 1-00:00:00
 #SBATCH --mem={mem_in_GB}G
 #SBATCH -p gpu
 ##SBATCH -w atlas

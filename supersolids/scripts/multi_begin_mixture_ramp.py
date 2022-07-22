@@ -9,12 +9,9 @@ from supersolids.helper.dict2str import dic2str
 
 slurm = True
 mem_in_GB = 4
-xvfb_display = 900
+xvfb_display = 600
 supersolids_version = "0.1.35"
-# dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_schroedinger/")
-# dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_small_grid/")
 dir_path = Path("/bigwork/dscheier/results/begin_ramp/")
-# dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
 dir_path_log = Path(dir_path, "log")
 dir_path_log.mkdir(parents=True, exist_ok=True)
@@ -29,7 +26,9 @@ a11 = 100.0
 
 m_list = [163.9, 163.9]
 a_dd = 130.8
-a_dd_list = [a_dd, (9.0/10.0) * a_dd, (9.0/10.0) ** 2.0 * a_dd]
+# dipol = 9.0
+dipol = 10.0
+a_dd_list = [a_dd, (dipol/10.0) * a_dd, (dipol/10.0) ** 2.0 * a_dd]
 
 Box = {"x0": -15, "x1": 15, "y0": -7, "y1": 7, "z0": -6, "z1": 6}
 # Res = {"x": 256, "y": 128, "z": 32}
@@ -58,27 +57,22 @@ steps_per_npz = 10000
 steps_format = "%07d"
 accuracy = 0.0
 
-# N_start = 0.01
-# N_end = 0.051
-# N_step = 0.005
-
 N2_part = 0.5
 
-epsilon_start = -1.5
-# N_end = 0.06
-epsilon_end = 0.6
+epsilon_start = 0.0
+epsilon_end = 3.6
 epsilon_step = 0.5
 
-a12_start = 0.65
-a12_end = 0.72
-a12_step = 0.0125
-
+a12_start = 65.0
+a12_end = 72.0
+a12_step = 1.25
 
 func_filename = "distort.txt"
 
-j_counter = 0
-skip_counter = 0
 skip = 0
+skip_counter = 0
+j_counter = 0
+# j_counter = skip - 1
 end = 0
 
 movie_list = []
@@ -93,24 +87,13 @@ for epsilon in np.arange(epsilon_start, epsilon_end, epsilon_step):
         if skip_counter == end:
             break
         func_list.append([])
-        tilt = 10 ** epsilon
         epsilon_string = round(epsilon, ndigits=5)
         a12_string = round(a12, ndigits=5)
         N2 = int(N * N2_part)
         N_list = [N - N2, N2]
 
         # a_s_list in triu (triangle upper matrix) form: a11, a12, a22
-
-        a_s_list = [a11, a12 * a11, a11]
-        # w_y = 2.0 * np.pi * (w_x_freq / a12)
-
-        # d_string = 0.0001 * 10.0 ** round(d, ndigits=5)
-
-        # V = f"lambda x, y, z: {v_string} * np.sin(np.pi*x/{d_string}) ** 2"
-        # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi/4.0) + (np.pi*x/{d_string}) )"
-        # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi*x/{d_string}) )"
-        # V = f"lambda x, y, z: {v_string} * np.exp(-((x ** 2.0) /{d_string} ** 2.0) )"
-        # func_list[j_counter].append(f"-V='{V}' ")
+        a_s_list = [a11, a12, a11]
 
         movie_number_after = movie_number + j_counter
         movie_after = f"{movie_string}{counting_format % movie_number_after}"
@@ -121,7 +104,7 @@ for epsilon in np.arange(epsilon_start, epsilon_end, epsilon_step):
         func_path = Path(dir_path_func, func_filename)
         func_path_list.append(func_path)
 
-        jobname = f"{supersolids_version}_e{epsilon_string}a12_{a12_string}_m{movie_number_after}"
+        jobname = f"{supersolids_version}_e_{epsilon_string}a12_{a12_string}_m{movie_number_after}"
 
         if slurm:
             cluster_flags = f"""#==================================================
@@ -195,6 +178,9 @@ echo $HOME
 # /bigwork/dscheier/miniconda/bin/pip install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
 # /bigwork/dscheier/miniconda/bin/pip install -i https://pypi.org/simple/supersolids=={supersolids_version}
 
+cd /bigwork/dscheier/supersolids
+conda develop .
+
 /bigwork/dscheier/miniconda/envs/solids/bin/python3.10 -m supersolids \
 -Box={dic2str(Box)} \
 -Res={dic2str(Res)} \
@@ -216,7 +202,7 @@ echo $HOME
 --a_s_list {' '.join(map(str, a_s_list))} \
 --V_interaction \
 --offscreen \
--tilt={tilt} \
+-tilt={epsilon} \
 --mixture
 
 """])

@@ -57,20 +57,50 @@ if __name__ == "__main__":
     # var1_list.append(np.arange(0.005, 0.05, 0.005))
     # var2_list.append(np.arange(0.6, 0.66, 0.05))
 
-    experiment_suffix = "mixture_a12_grid"
+#     experiment_suffix = "mixture_a12_grid"
+#     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+#     var1_list.append(np.arange(60.0, 81.0, 5.0))
+#     var2_list.append(np.arange(0.05, 0.51, 0.05))
+#     movie_start_list = [1]
+#     movie_end_list = [50]
+#     # suffix_list = ["_map_xyz_p-9"]
+#     # cut_names: List[str] = ["cut_x", "cut_y", "cut_z"]
+#     # suffix_list = ["_map_rolled_x"]
+#     # suffix_list = ["_map_x"]
+#     movie_take_last_list: int = [3, 1]
+#     suffix_list = ["_map_x_0", "_map_x_1"]
+#     cut_names: List[str] = ["cut_x"]
+#     normed_plots = True
+#     # normed_plots = False
+#     if normed_plots:
+#         suffix_list[0] += "_normed"
+
+    # experiment_suffix = "pancake"
+    # experiment_suffix = "stacked"
+    # experiment_suffix = "ramp"
+    # experiment_suffix = "ramp0"
+    experiment_suffix = "ramp01"
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    var1_list.append(np.arange(60.0, 81.0, 5.0))
-    var2_list.append(np.arange(0.05, 0.51, 0.05))
+    var1_list.append(np.arange(65.0, 71.0, 1.25))
+    # var1_list.append(np.arange(65.0, 72.0, 1.25))
+    # var2_list.append(np.arange(-1.5, 0.6, 0.5))
+    var2_list.append(np.arange(0.0, 0.1, 0.5))
+    # var2_list.append(np.arange(-2.0, -0.1, 1.0))
     movie_start_list = [1]
-    movie_end_list = [50]
+    # movie_end_list = [30]
+    movie_end_list = [6]
     # suffix_list = ["_map_xyz_p-9"]
     # cut_names: List[str] = ["cut_x", "cut_y", "cut_z"]
-    suffix_list = ["_map_x"]
+    # suffix_list = ["_map_rolled_x"]
+    # suffix_list = ["_map_x"]
+    movie_take_last_list: int = [2, 1]
+    suffix_list = ["_map_x_0", "_map_x_1"]
     cut_names: List[str] = ["cut_x"]
-    normed_plots = True
-    # normed_plots = False
+    # normed_plots = True
+    normed_plots = False
     if normed_plots:
         suffix_list[0] += "_normed"
+
 
     # experiment_suffix = "mixture_a12_small_grid"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
@@ -116,15 +146,20 @@ if __name__ == "__main__":
     # movie_end_list = [60, 60, 60]
     # # suffix_list = ["_xyz_p-9"]
     # # cut_names: List[str] = ["cut_x", "cut_y", "cut_z"]
-    # suffix_list = ["_x"]
+    # # suffix_list = ["_rolled_x"]
+    # # movie_take_last_list: int = [1]
+    # # suffix_list = ["_x"]
+    # movie_take_last_list: int = [3, 1]
+    # suffix_list = ["_x_0", "_x_1"]
     # cut_names: List[str] = ["cut_x"]
     # normed_plots = True
     # if normed_plots:
-    #     suffix_list[0] += "_normed"
+    #     suffix_list = [suffix + "_normed" for suffix in suffix_list]
 
-    nrow_components = 1
-    ncol_components = 1
+    # nrow_components = 1
     # ncol_components = 2
+    nrow_components = 2
+    ncol_components = 1
     
     frames = False
     # frames = True
@@ -137,10 +172,6 @@ if __name__ == "__main__":
     else:
         frames = np.array([False])
 
-    movie_take_last_list: int = [1]
-    # suffix_list = [""]
-    # movie_take_last_list: int = [2, 1]
-    # suffix_list = ["_0", "_1"]
     dir_suffix_list = [f"last_frame_{experiment_suffix}" + suf for suf in suffix_list]
     filename_out_list = [f"last_frame_{experiment_suffix}" + suf for suf in suffix_list]
     file_suffix = ""
@@ -170,9 +201,12 @@ if __name__ == "__main__":
     y_lim: Tuple[int] = (0, 1.2)
     # mixture_slice_index_list: List[int] = [0, 0, 0]
     # mesh_remap_index_list: List[int] = [1]
-    mixture_slice_index_list: List[int] = [0, 1, 0]
     mesh_remap_index_list: List[int] = []
-    filename_steps_list: List[str] = ["mixture_step_", "mixture_step_", "mixture_mixture_step_pol_"]
+    # filename_steps_list: List[str] = ["mixture_step_", "mixture_step_", "mixture_mixture_step_pol_"]
+    # mixture_slice_index_list: List[int] = [0, 1, 0]
+    # filename_steps_list: List[str] = ["step_", "step_", "pol_"]
+    mixture_slice_index_list: List[int] = [0, 1]
+    filename_steps_list: List[str] = ["step_", "step_"]
 
     video = False
     if video:
