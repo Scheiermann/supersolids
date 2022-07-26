@@ -13,6 +13,7 @@ Functions for Potential and initial wave function :math:`\psi_0`
 import functools
 import itertools
 import sys
+from typing import Tuple, Callable, List
 
 import numpy as np
 from scipy.integrate import quad
@@ -20,13 +21,8 @@ from scipy.ndimage.filters import maximum_filter
 from scipy.ndimage.morphology import generate_binary_structure, binary_erosion
 from scipy.special import jv
 from scipy import stats, ndimage
-from typing import Tuple, Callable, Optional, List
 
-from supersolids.helper import constants, get_version
-cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np)
-if numba_used:
-    import supersolids.helper.numbas as numbas
-
+from supersolids.helper import constants
 from supersolids.helper.run_time import run_time
 from supersolids.helper.Box import Box
 from supersolids.helper.Resolution import Resolution
@@ -64,7 +60,7 @@ def get_grid_helper(Res: Resolution, MyBox: Box, index: int):
     return x, dx, kx, dkx
 
 
-def get_grid(Res: Resolution, MyBox: Box, cupy_try: bool = True):
+def get_grid(Res: Resolution, MyBox: Box):
     x0, x1 = MyBox.get_bounds_by_index(0)
     res_x = Res.get_bounds_by_index(0)
     y0, y1 = MyBox.get_bounds_by_index(1)
@@ -113,18 +109,18 @@ def identity(*args):
 
 
 def tensor_grid_mult(tensor, tensor_vec):
-    tensor_vec_result = cp.einsum("ij..., j...->i...", tensor, tensor_vec)
+    tensor_vec_result = np.einsum("ij..., j...->i...", tensor, tensor_vec)
 
     return tensor_vec_result
 
 
-def array_to_tensor_grid(arr: cp.ndarray, res_x: int, res_y: int, res_z: int):
+def array_to_tensor_grid(arr: np.ndarray, res_x: int, res_y: int, res_z: int):
     number_of_mixtures: int = arr.shape[0]
 
-    arr_grid: List[cp.ndarray] = []
-    for elem in cp.nditer(arr):
-        arr_grid.append(cp.full((res_x, res_y, res_z), elem))
-    tensor_grid_1d = cp.array(arr_grid)
+    arr_grid: List[np.ndarray] = []
+    for elem in np.nditer(arr):
+        arr_grid.append(np.full((res_x, res_y, res_z), elem))
+    tensor_grid_1d = np.array(arr_grid)
     tensor_grid_2d = tensor_grid_1d.reshape(
         (number_of_mixtures, number_of_mixtures, res_x, res_y, res_z))
 
@@ -142,8 +138,8 @@ def fft_plot(t, property_all):
     T = t[-1]
     N = len(t)
     sample_rate = N / T
-    freq = cp.fft.rfftfreq(len(t), 1.0 / sample_rate)
-    property_fft = cp.abs(cp.fft.rfft(property_all))
+    freq = np.fft.rfftfreq(len(t), 1.0 / sample_rate)
+    property_fft = np.abs(np.fft.rfft(property_all))
 
     return freq, property_fft
 
@@ -158,7 +154,7 @@ def get_droplet_edges(prob_droplets, peaks_index_3d, cut_axis):
     else:
         sys.exit("Not implemented. Choose distance_axis 0, 1, 2.")
 
-    zeros = cp.ndarray.flatten(cp.argwhere(a == 0))
+    zeros = np.ndarray.flatten(np.argwhere(a == 0))
     zeros_left = zeros[zeros < peaks_index_3d[cut_axis]]
     zeros_right = zeros[zeros > peaks_index_3d[cut_axis]]
     edge_left = max(zeros_left)
@@ -180,7 +176,7 @@ def extract_droplet(prob_droplets, peaks_index_3d):
 def peaks_sort(peaks_indices, peaks_height, number_of_peaks):
     # sort peaks by height
     zipped_sorted_by_height = zip(*sorted(zip(peaks_indices, peaks_height), key=lambda t: t[1]))
-    a, b = map(cp.array, zipped_sorted_by_height)
+    a, b = map(np.array, zipped_sorted_by_height)
 
     # get the highest peaks (the n biggest, where n is number_of_peaks)
     peaks_sorted_indices = a[-number_of_peaks:]
@@ -231,7 +227,7 @@ def get_peaks(prob):
     peaks_mask = local_max ^ eroded_background
 
     peaks_height = prob[peaks_mask]
-    peaks_indices = cp.argwhere(peaks_mask)
+    peaks_indices = np.argwhere(peaks_mask)
 
     return peaks_indices, peaks_height
 
@@ -255,8 +251,8 @@ def fill_holes(region, structure_vertical, structure_horizontal):
 
 
 def get_meshgrid(x, y):
-    x_mesh, y_mesh = cp.meshgrid(x, y)
-    pos = cp.empty(x_mesh.shape + (2,))
+    x_mesh, y_mesh = np.meshgrid(x, y)
+    pos = np.empty(x_mesh.shape + (2,))
     pos[:, :, 0] = x_mesh
     pos[:, :, 1] = y_mesh
 
@@ -264,10 +260,10 @@ def get_meshgrid(x, y):
 
 
 def get_meshgrid_3d(x, y, z):
-    # WARNING: cp.meshgrid and mgrid have different structure,
+    # WARNING: np.meshgrid and mgrid have different structure,
     # resulting in fact x and y NEED to be swapped here (it is NOT a typo)
-    x_mesh, y_mesh, z_mesh = cp.meshgrid(y, x, z)
-    pos = cp.empty(x_mesh.shape + (3,))
+    x_mesh, y_mesh, z_mesh = np.meshgrid(y, x, z)
+    pos = np.empty(x_mesh.shape + (3,))
     pos[:, :, :, 0] = x_mesh
     pos[:, :, :, 1] = y_mesh
     pos[:, :, :, 2] = z_mesh
@@ -324,10 +320,7 @@ def get_parameters_mixture(l_0: float,
 
 
 def dimensionless(arr, l_0):
-    if cupy_used:
-        return cp.asnumpy(arr) / cp.asnumpy(l_0)
-    else:
-        return arr / l_0
+    return arr / l_0
 
 
 def combinations2array(number_of_mixtures: int,
@@ -480,7 +473,7 @@ def psi_gauss_2d(x, y,
 
     return (
             (a_x * a_y * np.pi) ** -0.5
-            * cp.exp(-0.5 * (
+            * np.exp(-0.5 * (
             ((x - x_0) / a_x) ** 2.0
             + ((y - y_0) / a_y) ** 2.0
     )
@@ -540,7 +533,7 @@ def psi_gauss_1d(x, a: float = 1.0, x_0: float = 0.0, k_0: float = 0.0):
     """
 
     return ((a * np.sqrt(np.pi)) ** (-0.5)
-            * cp.exp(-0.5 * ((x - x_0) * 1. / a) ** 2 + 1j * x * k_0))
+            * np.exp(-0.5 * ((x - x_0) * 1. / a) ** 2 + 1j * x * k_0))
 
 
 def psi_pdf(x, loc: float = 0.0, scale: float = 1.0):
@@ -572,7 +565,7 @@ def psi_rect(x, x_min: float = -0.5, x_max: float = 0.5, a: float = 1.0):
 
     """
 
-    pulse = cp.select([x < x_min, x < x_max, x_max < x], [0, a, 0])
+    pulse = np.select([x < x_min, x < x_max, x_max < x], [0, a, 0])
     assert pulse.any(), ("Pulse is completely 0. Resolution is too small. "
                          "Resolution needs to be set, "
                          "as fft is used onto the pulse.")
@@ -588,7 +581,7 @@ def psi_gauss_solution(x):
 
     """
 
-    return cp.exp(-x ** 2) / np.sqrt(np.pi)
+    return np.exp(-x ** 2) / np.sqrt(np.pi)
 
 
 def thomas_fermi_1d(x, g: float = 0.0):
@@ -716,7 +709,7 @@ def v_harmonic_3d(x, y, z, alpha_y: float = 1.0, alpha_z: float = 1.0, lH0: floa
     return 0.5 * (x ** 2 + (alpha_y * y) ** 2 + (alpha_z * z) ** 2) / (lH0 ** 4.0)
 
 
-def get_r_cut(k_mesh: cp.ndarray, r_cut: float = 1.0):
+def get_r_cut(k_mesh: np.ndarray, r_cut: float = 1.0):
     kr_singular = k_mesh * r_cut
 
     # remove known singularity at [0, 0, 0], for calculation
@@ -743,9 +736,9 @@ def dipol_dipol(u):
     return dipol
 
 
-def dipol_dipol_interaction(kx_mesh: cp.ndarray,
-                            ky_mesh: cp.ndarray,
-                            kz_mesh: cp.ndarray,
+def dipol_dipol_interaction(kx_mesh: np.ndarray,
+                            ky_mesh: np.ndarray,
+                            kz_mesh: np.ndarray,
                             r_cut: float = 1.0,
                             use_cut_off: bool = False):
     k_squared: np.ndarray = np.power(kx_mesh, 2) + np.power(ky_mesh, 2) + np.power(kz_mesh, 2)
@@ -769,8 +762,8 @@ def dipol_dipol_interaction(kx_mesh: cp.ndarray,
 
 
 def get_V_k_val_ddi(kx_mesh, ky_mesh, kz_mesh,
-                    rho_lin: cp.ndarray,
-                    z_lin: cp.ndarray,
+                    rho_lin: np.ndarray,
+                    z_lin: np.ndarray,
                     ):
     """
     Explicit calculation of the Fourier transform with the cylindrical cut-off
@@ -779,18 +772,18 @@ def get_V_k_val_ddi(kx_mesh, ky_mesh, kz_mesh,
     z_cut = z_lin[-1]
 
     k_rho2_mesh = kx_mesh ** 2.0 + ky_mesh ** 2.0
-    k_rho_mesh = cp.sqrt(k_rho2_mesh)
+    k_rho_mesh = np.sqrt(k_rho2_mesh)
     k_r2_mesh = k_rho2_mesh + kz_mesh ** 2.0
 
     # remove artifical singularity
-    k_r2_singular_free = cp.where(k_r2_mesh == 0.0, 1.0, k_r2_mesh)
+    k_r2_singular_free = np.where(k_r2_mesh == 0.0, 1.0, k_r2_mesh)
     cos2a = kz_mesh ** 2.0 / k_r2_singular_free
 
     sin2a = 1 - cos2a
-    sinacosa = cp.sqrt(sin2a * cos2a)
+    sinacosa = np.sqrt(sin2a * cos2a)
     term1 = cos2a - 1.0 / 3.0
-    term2 = cp.exp(-z_cut * k_rho_mesh) * (sin2a * cp.cos(z_cut * kz_mesh)
-                                           - sinacosa * cp.sin(z_cut * kz_mesh)
+    term2 = np.exp(-z_cut * k_rho_mesh) * (sin2a * np.cos(z_cut * kz_mesh)
+                                           - sinacosa * np.sin(z_cut * kz_mesh)
                                            )
     term3_slow = get_rho_integral_slow(k_rho_mesh, kz_mesh, rho_lin, z_lin)
     term3 = get_rho_integral(k_rho_mesh, kz_mesh, rho_lin, z_lin, compare=term3_slow)
@@ -798,30 +791,30 @@ def get_V_k_val_ddi(kx_mesh, ky_mesh, kz_mesh,
     return 4.0 * np.pi * (term1 + term2 + term3)
 
 
-def get_rho_integral_slow(k_rho_mesh: cp.ndarray,
-                          kz_mesh: cp.ndarray,
-                          rho_lin: cp.ndarray,
-                          z_lin: cp.ndarray,
+def get_rho_integral_slow(k_rho_mesh: np.ndarray,
+                          kz_mesh: np.ndarray,
+                          rho_lin: np.ndarray,
+                          z_lin: np.ndarray,
                           ):
     drho = rho_lin[1] - rho_lin[0]
     dz = z_lin[1] - z_lin[0]
 
     with run_time(name="get_rho_integral_slow"):
-        it = cp.nditer([k_rho_mesh, kz_mesh], flags=['external_loop'])
-        shape = cp.shape(kz_mesh)
+        it = np.nditer([k_rho_mesh, kz_mesh], flags=['external_loop'])
+        shape = np.shape(kz_mesh)
         out = []
-        # it = cp.nditer([k_rho_mesh, kz_mesh, None], flags=['external_loop'])
-        # out = cp.zeros(shape=shape)
+        # it = np.nditer([k_rho_mesh, kz_mesh, None], flags=['external_loop'])
+        # out = np.zeros(shape=shape)
         with it:
-            iter = cp.ndindex(shape)
+            iter = np.ndindex(shape)
             for k_rho1, kz1 in it:
                 for k_rho, kz in zip(k_rho1, kz1):
                     index = next(iter)
-                    integrand_rho_z = bessel_func(rho_lin[:, cp.newaxis], z_lin, k_rho, kz)
-                    out.append(cp.sum(cp.sum(integrand_rho_z)) * drho * dz)
-                    # out[index] = cp.sum(cp.sum(integrand_rho_z)) * drho * dz
+                    integrand_rho_z = bessel_func(rho_lin[:, np.newaxis], z_lin, k_rho, kz)
+                    out.append(np.sum(np.sum(integrand_rho_z)) * drho * dz)
+                    # out[index] = np.sum(np.sum(integrand_rho_z)) * drho * dz
 
-        out = cp.array(out).reshape(shape)
+        out = np.array(out).reshape(shape)
 
     return out
 
@@ -833,10 +826,10 @@ def triu_list2array(triu_list, triu_ind, shape):
     return triu
 
 
-def get_rho_integral(k_rho_mesh: cp.ndarray,
-                     kz_mesh: cp.ndarray,
-                     rho_lin: cp.ndarray,
-                     z_lin: cp.ndarray,
+def get_rho_integral(k_rho_mesh: np.ndarray,
+                     kz_mesh: np.ndarray,
+                     rho_lin: np.ndarray,
+                     z_lin: np.ndarray,
                      compare,
                      ):
     drho = rho_lin[1] - rho_lin[0]
@@ -848,7 +841,7 @@ def get_rho_integral(k_rho_mesh: cp.ndarray,
         y_len = int((y_size / 2.0) + 1.0)
         k_rho_mesh_halved = k_rho_mesh[0:x_len, 0:y_len, :]
         kz_mesh_halved = kz_mesh[0:x_len, 0:y_len, :]
-        z_len = cp.shape(kz_mesh_halved)[2]
+        z_len = np.shape(kz_mesh_halved)[2]
 
         triu_ind = np.triu_indices(n=x_len, m=y_len, k=-1)
         g = [k_rho_mesh_halved[:, :, i][triu_ind] for i in range(0, z_len)]
@@ -857,36 +850,36 @@ def get_rho_integral(k_rho_mesh: cp.ndarray,
         for k_rho_rank, kz_rank in zip(g, h):
             inner = []
             for k_rho, kz in zip(k_rho_rank, kz_rank):
-                integrand_rho_z = bessel_func(rho_lin[:, cp.newaxis], z_lin, k_rho, kz)
-                inner.append(cp.sum(cp.sum(integrand_rho_z)) * drho * dz)
+                integrand_rho_z = bessel_func(rho_lin[:, np.newaxis], z_lin, k_rho, kz)
+                inner.append(np.sum(np.sum(integrand_rho_z)) * drho * dz)
             out.append(inner)
 
         trius = [triu_list2array(inner, triu_ind, (x_len, y_len)) for inner in out]
-        out = cp.stack(trius, axis=2)
+        out = np.stack(trius, axis=2)
 
     out_n_n = out[1:int(x_len - 1), :, :]
-    a1 = cp.apply_over_axes(symmetric_mat, out_n_n, axes=2)
-    z_len = cp.shape(a1)[2]
+    a1 = np.apply_over_axes(symmetric_mat, out_n_n, axes=2)
+    z_len = np.shape(a1)[2]
     result = []
     for i in range(0, z_len):
-        b = cp.rot90(a1[:, :, i], 1, axes=(0, 1)).T
-        c = cp.rot90(b, 2, axes=(0, 1)).T
-        d = cp.rot90(c, 3, axes=(0, 1)).T
-        e = cp.vstack((a1[:, :, i], b))
-        f = cp.vstack((d, c))
-        g = cp.hstack((e, f))
-        first = cp.hstack((out[0, :, i], out[0, :, i][::-1]))
-        h = cp.insert(g, 0, first, axis=0)
-        middle = cp.hstack((out[int(x_len - 1), :, i], out[int(x_len - 1), :, i][::-1]))
-        j = cp.insert(h, x_len, middle, axis=0)
-        j_size_y = cp.size(j)[1]
+        b = np.rot90(a1[:, :, i], 1, axes=(0, 1)).T
+        c = np.rot90(b, 2, axes=(0, 1)).T
+        d = np.rot90(c, 3, axes=(0, 1)).T
+        e = np.vstack((a1[:, :, i], b))
+        f = np.vstack((d, c))
+        g = np.hstack((e, f))
+        first = np.hstack((out[0, :, i], out[0, :, i][::-1]))
+        h = np.insert(g, 0, first, axis=0)
+        middle = np.hstack((out[int(x_len - 1), :, i], out[int(x_len - 1), :, i][::-1]))
+        j = np.insert(h, x_len, middle, axis=0)
+        j_size_y = np.size(j)[1]
         y_too_much = y_size - j_size_y
         for counter in range(0, y_too_much):
-            k = cp.delete(j, int(y_size + 1), axis=1)
-        # m = cp.hstack((out[i, :, :], k))
+            k = np.delete(j, int(y_size + 1), axis=1)
+        # m = np.hstack((out[i, :, :], k))
         result.append(k)
 
-    result = cp.reshape(result, cp.shape(k_rho_mesh))
+    result = np.reshape(result, np.shape(k_rho_mesh))
 
     return result
 
@@ -898,16 +891,16 @@ def get_rho_integral_quad(kx_mesh: float,
                           rho_cut: float = 1.0,
                           z_cut: float = 1.0):
     shape = kx_mesh.shape
-    k_rho_mesh = cp.sqrt(kx_mesh ** 2.0 + ky_mesh ** 2.0)
+    k_rho_mesh = np.sqrt(kx_mesh ** 2.0 + ky_mesh ** 2.0)
 
     result = []
     with run_time(name="get_rho_integral_quad"):
-        it = cp.nditer([z_mesh, kz_mesh, k_rho_mesh], flags=['multi_index'])
+        it = np.nditer([z_mesh, kz_mesh, k_rho_mesh], flags=['multi_index'])
         for z, kz, k_rho in it:
             # print(f"triple: {z}, {kz}, {k_rho}")
             print(it.multi_index)
             result.append(quad(bessel_func(z, k_rho, kz), rho_cut, np.inf)[0])
-        result = cp.array(result).reshape(kz_mesh.shape)
+        result = np.array(result).reshape(kz_mesh.shape)
 
     return result
 
@@ -919,16 +912,16 @@ def get_V_k_val_ddi_fft_where(x_mesh: float,
                               z_cut: float = 1.0):
     with run_time(name="fft V_ddi"):
         rho2_mesh = x_mesh ** 2.0 + y_mesh ** 2.0
-        rho_mesh = cp.sqrt(rho2_mesh)
-        r_mesh = cp.sqrt(rho2_mesh + z_mesh ** 2.0)
+        rho_mesh = np.sqrt(rho2_mesh)
+        r_mesh = np.sqrt(rho2_mesh + z_mesh ** 2.0)
         cos_theta = z_mesh / r_mesh
 
         ddi = (1.0 - cos_theta ** 2.0) / (r_mesh ** 3.0)
-        zeros = cp.zeros(shape=ddi.shape)
-        cond_cylinder = cp.logical_and(cp.abs(z_mesh) < z_cut, rho_mesh < rho_cut)
-        ddi_cut = cp.where(cond_cylinder, ddi, zeros)
+        zeros = np.zeros(shape=ddi.shape)
+        cond_cylinder = np.logical_and(np.abs(z_mesh) < z_cut, rho_mesh < rho_cut)
+        ddi_cut = np.where(cond_cylinder, ddi, zeros)
 
-        V_k_val = cp.fft.fftn(ddi_cut)
+        V_k_val = np.fft.fftn(ddi_cut)
 
         V_k_val_real = V_k_val.real
 
@@ -942,20 +935,20 @@ def get_V_k_val_ddi_fft(x_mesh: float,
                         y_cut: List[float],
                         z_cut: List[float]):
     with run_time(name="fft V_ddi xyz cut"):
-        r_mesh = cp.sqrt(x_mesh ** 2.0 + y_mesh ** 2.0 + z_mesh ** 2.0)
+        r_mesh = np.sqrt(x_mesh ** 2.0 + y_mesh ** 2.0 + z_mesh ** 2.0)
 
-        r_mesh_singular_free = cp.where(r_mesh == 0.0, 1.0, r_mesh)
+        r_mesh_singular_free = np.where(r_mesh == 0.0, 1.0, r_mesh)
         cos_theta = z_mesh / r_mesh_singular_free
 
         ddi = (1.0 - 3.0 * cos_theta ** 2.0) / (r_mesh ** 3.0)
-        zeros = cp.zeros(shape=ddi.shape)
+        zeros = np.zeros(shape=ddi.shape)
         cond_x = (x_cut[0] < x_mesh) & (x_mesh < x_cut[1])
         cond_y = (y_cut[0] < y_mesh) & (y_mesh < y_cut[1])
         cond_z = (z_cut[0] < z_mesh) & (z_mesh < z_cut[1])
         cond_xyz_cut = cond_x & cond_y & cond_z
-        ddi_cut = cp.where(cond_xyz_cut, ddi, zeros)
+        ddi_cut = np.where(cond_xyz_cut, ddi, zeros)
 
-        V_k_val = cp.fft.fftn(ddi_cut)
+        V_k_val = np.fft.fftn(ddi_cut)
 
         V_k_val_real = V_k_val.real
 
@@ -963,7 +956,7 @@ def get_V_k_val_ddi_fft(x_mesh: float,
 
 
 def bessel_func(rho, z, k_rho, kz):
-    bessel = (- cp.cos(kz * z) * rho
+    bessel = (- np.cos(kz * z) * rho
               * (rho ** 2.0 - 2.0 * z ** 2.0) / ((rho ** 2.0 + z ** 2.0) ** 2.5)
               * jv(0, rho * k_rho)
               )
@@ -979,14 +972,14 @@ def f_kappa(kappa: np.ndarray, epsilon: float = 10 ** -10) -> float:
     return result
 
 
-@cp.vectorize
+@np.vectorize
 def atan_special(x):
     if x > 0:
-        result = cp.arctan(cp.sqrt(x)) / cp.sqrt(x)
+        result = np.arctan(np.sqrt(x)) / np.sqrt(x)
     elif x == 0:
         result = 0.0
     else:
-        result = cp.arctanh(cp.sqrt(-x)) / cp.sqrt(-x)
+        result = np.arctanh(np.sqrt(-x)) / np.sqrt(-x)
 
     return result
 
@@ -1015,7 +1008,7 @@ def get_R_rz(kappa: float, e_dd: float, N: int, a_s_l_ho_ratio: float):
 
 def get_kappa(alpha_z: float, e_dd: float,
               x_min: float = 3.0, x_max: float = 5.0, res: int = 1000):
-    kappa_array: cp.ndarray = cp.linspace(x_min, x_max, res,
+    kappa_array: np.ndarray = np.linspace(x_min, x_max, res,
                                           endpoint=False)
     y = func_125(kappa_array, alpha_z, e_dd)
     if y[-1] > 0:
@@ -1028,11 +1021,11 @@ def get_kappa(alpha_z: float, e_dd: float,
 
 def density_in_trap(x: float, y: float, z: float,
                     R_r: float, R_z: float, g: float = 0.0):
-    r = cp.sqrt(x ** 2.0 + y ** 2.0)
+    r = np.sqrt(x ** 2.0 + y ** 2.0)
     n_0 = 15.0 / (8.0 * np.pi * R_z * R_r ** 2.0)
     a = (r / R_r) ** 2.0 + (z / R_z) ** 2.0
 
-    n_r = cp.where(a > 1, 0.0, n_0 * (1.0 - a))
+    n_r = np.where(a > 1, 0.0, n_0 * (1.0 - a))
 
     return n_r
 
@@ -1120,7 +1113,7 @@ def camera_3d_trajectory(frame: int,
 
 def noise_mesh(val_min: float = 0.8,
                val_max: float = 1.2,
-               shape: Tuple[int, int, int] = (64, 64, 64)) -> cp.ndarray:
+               shape: Tuple[int, int, int] = (64, 64, 64)) -> np.ndarray:
     noise = val_min + (val_max - val_min) * np.random.rand(*shape)
 
     return noise
@@ -1166,6 +1159,6 @@ if __name__ == '__main__':
 
     # testing for 2d plot
     L = 10
-    x = cp.linspace(-L, L, resolution, endpoint=False)
-    y = cp.linspace(-L, L, resolution, endpoint=False)
+    x = np.linspace(-L, L, resolution, endpoint=False)
+    y = np.linspace(-L, L, resolution, endpoint=False)
     x_mesh, y_mesh, pos = get_meshgrid(x, y)
