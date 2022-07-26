@@ -10,21 +10,25 @@ Numerical solver for non-linear time-dependent Schrodinger equation (eGPE) for d
 
 
 """
-import dill
 import functools
-import numpy as np
+import os
 import pickle
 import sys
 
+import dill
+import numpy as np
 from pathlib import Path
+from typing import Optional, Callable, Union, List, Tuple
+
 from scipy import ndimage
 from scipy.interpolate import interpolate
 from scipy.integrate import quad_vec
 from scipy.ndimage import distance_transform_edt
-from typing import Optional, Callable, Union, List, Tuple
 
 from supersolids.helper import constants, functions, get_path, get_version
-cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np)
+
+__GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False))
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__)
 import supersolids.helper.numbas as numbas
 
 from supersolids.Schroedinger import Schroedinger
@@ -962,18 +966,22 @@ class SchroedingerMixture(Schroedinger):
                                                                        contact_interaction,
                                                                        mu_lhy
                                                                        )
-                H_pot: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt, term + tilt_term, split_step)
+                term_and_tilt = term + tilt_term
+                H_pot_propagator: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt, term_and_tilt, split_step)
+                H_pot_propagator: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt, term, split_step)
             else:
                 term: cp.ndarray = self.get_H_pot_exponent_terms(dipol_term,
                                                                  contact_interaction,
                                                                  mu_lhy
                                                                  )
-                H_pot: cp.ndarray = self.get_H_pot(term + tilt_term, split_step)
+                term_and_tilt = term + tilt_term
+                H_pot_propagator: cp.ndarray = self.get_H_pot(term_and_tilt, split_step)
+                H_pot_propagator: cp.ndarray = self.get_H_pot(term, split_step)
 
             if cupy_used:
-                self.psi_val_list[i] = (cp.asarray(H_pot) * cp.asarray(self.psi_val_list[i]))
+                self.psi_val_list[i] = (cp.asarray(H_pot_propagator) * cp.asarray(self.psi_val_list[i]))
             else:
-                self.psi_val_list[i] = H_pot * self.psi_val_list[i]
+                self.psi_val_list[i] = H_pot_propagator * self.psi_val_list[i]
 
         return density_list, U_dd_list
 

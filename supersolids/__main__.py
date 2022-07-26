@@ -12,26 +12,20 @@ time-dependent Schrodinger equation for 1D, 2D and 3D.
 """
 
 import argparse
+from contextlib import nullcontext
 import functools
 import json
-import sys
-from contextlib import nullcontext
+import os
 from pathlib import Path
+import sys
 from typing import Callable, Optional, List
 
 
 import numpy as np
 from supersolids.helper import constants, functions, get_version
-cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np)
-if numba_used:
-    import supersolids.helper.numbas as numbas
 
 from supersolids.Animation.Animation import Animation
-from supersolids.Schroedinger import Schroedinger
-from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper.run_time import run_time
-from supersolids.helper.simulate_case import simulate_case
-from supersolids.helper.cut_1d import prepare_cuts
 from supersolids.helper.Resolution import Resolution, ResAssert
 from supersolids.helper.Box import Box, BoxResAssert
 
@@ -142,6 +136,8 @@ def flags(args_array):
                         help="If flag is not used, interactive animation is "
                              "shown and saved as mp4, else Schroedinger is "
                              "saved as pkl and allows offscreen usage.")
+    parser.add_argument("--gpu_off", default=False, action="store_true",
+                        help="Use flag to turn off gpu eventhouh it might be usable")
 
     flag_args = parser.parse_args(args_array)
     print(f"args: {flag_args}")
@@ -152,6 +148,14 @@ def flags(args_array):
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     args = flags(sys.argv[1:])
+
+    os.environ["SUPERSOLIDS_GPU_OFF"] = str(args.gpu_off)
+    __GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False))
+    cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__)
+    from supersolids.Schroedinger import Schroedinger
+    from supersolids.SchroedingerMixture import SchroedingerMixture
+    from supersolids.helper.simulate_case import simulate_case
+    from supersolids.helper.cut_1d import prepare_cuts
 
     # apply units to input
     m_list = [m * constants.u_in_kg for m in args.m_list]

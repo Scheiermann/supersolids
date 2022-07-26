@@ -68,9 +68,16 @@ def check_cupy_used(np):
                 
     return cp, cupy_used, cuda_used
 
-def check_cp_nb(np):
+def check_cp_nb(np, gpu_off = False):
     numba_used = check_numba_used()
     cp, cupy_used, cuda_used = check_cupy_used(np)
+    
+    # use flag to turn off gpu eventhouh it might be usable
+    if gpu_off:
+        cp = np
+        cupy_used = False
+        cuda_used = False
+
     if cupy_used:
         numba_used = False
 

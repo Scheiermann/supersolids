@@ -11,16 +11,18 @@ Numerical solver for non-linear time-dependent Schrodinger equation.
 """
 
 import functools
+import os
+from pathlib import Path
 import sys
 from typing import Callable, Union, Optional, List, Tuple
-from pathlib import Path
 
 import dill
 import numpy as np
 import scipy.signal
 
 from supersolids.helper import constants, functions, get_path, get_version
-cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np)
+__GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False))
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__)
 if numba_used:
     import supersolids.helper.numbas as numbas
 
@@ -66,10 +68,10 @@ class Schroedinger:
                  a_s: float = 85.0 * constants.a_0,
                  e_dd: float = 1.0,
                  imag_time: bool = True,
-                 mu_arr: cp.ndarray = cp.array([1.1]),
+                 mu_arr: np.ndarray = np.array([1.1]),
                  E: float = 1.0,
                  psi_0: Callable = functions.psi_gauss_3d,
-                 psi_0_noise: cp.ndarray = functions.noise_mesh,
+                 psi_0_noise: np.ndarray = functions.noise_mesh,
                  V: Optional[Callable] = functions.v_harmonic_3d,
                  V_interaction: Optional[Callable] = None,
                  psi_sol: Optional[Callable] = functions.thomas_fermi_3d,

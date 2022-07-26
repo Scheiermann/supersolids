@@ -9,16 +9,17 @@
 Functions for Potential and initial wave function :math:`\psi_0`
 
 """
-import sys
-from pathlib import Path
-import zipfile
-from typing import List, Optional, Tuple
-
 from copy import deepcopy
+import os
+from pathlib import Path
+import sys
+from typing import List, Optional, Tuple
+import zipfile
+
 import dill
-import numpy as np
 from ffmpeg import input
 from mayavi import mlab
+import numpy as np
 from functools import partial
 
 from supersolids.Animation import Animation
@@ -26,9 +27,8 @@ from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper import functions, constants, get_path, cut_1d
 from supersolids.helper.get_version import check_cp_nb, get_version
-cp, cupy_used, cuda_used, numba_used = check_cp_nb(np)
-if numba_used:
-    import supersolids.helper.numbas as numbas
+__GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False))
+cp, cupy_used, cuda_used, numba_used = check_cp_nb(np, gpu_off=__GPU_OFF_ENV__)
 
 
 def get_legend(System, frame, frame_start, supersolids_version, mu_rel=None):
@@ -125,7 +125,6 @@ class MayaviAnimation(Animation.Animation):
                          camera_z_func=Anim.camera_z_func,
                          filename=Anim.filename,
                          )
-
         if not dir_path.is_dir():
             dir_path.mkdir(parents=True)
 
