@@ -564,12 +564,23 @@ class SchroedingerMixture(Schroedinger):
         density_U_dd = np.einsum("i...,j...->ij...", U_dd_array, density_array)
         density_density = np.einsum("i...,j...->ij...", density_array, density_array)
 
-        # a = self.array_to_tensor_grid(self.U_dd_factor_array) * density_U_dd
-        a = np.einsum("...ij, kl...->kl...", self.a_dd_array, density_U_dd)
-        b = np.einsum("...ij, kl...->kl...", self.a_s_array, density_density)
-        en_mf = 0.5 * np.sum(a + b).real
+        # density_density and density_U_dd are (2, 2, res_x, res_y, res_z)
+        # the (2,2) part needs to be summed after multiplication with (2, 2) matrices
+        # formally, as we sum in real space dV is just a constant multiplication, so summation
+        # over all 5 dimensions is fine
+        
+        # there are 3 ways when to sum (verison 3 is the fastest):
+        # 1. getting a (2, 2, res_x, res_y, res_z) matrix
+        # 2. getting a (res_x, res_y, res_z) matrix, where (2,2) gird part is already summed
+        # 3. getting a (2, 2) matrix, where the (res_x, res_y, res_z) is already summed
 
-        return self.sum_dV(en_mf, dV=dV)
+        # f1 = np.einsum("ij..., ijklm->ijklm", self.a_s_array, density_density)
+        # f1 = np.einsum("ij..., ijklm->klm", self.a_s_array, density_density)
+        f1 = np.einsum("ij..., ijklm->ij", self.a_s_array, density_density)
+        f2 = np.einsum("ij..., ijklm->ij", self.a_dd_array, density_U_dd)
+        E_dd = 0.5 * np.sum(f1 + f2).real * dV
+
+        return E_dd
 
     def get_E(self) -> None:
         # update for energy calculation
@@ -982,8 +993,6 @@ class SchroedingerMixture(Schroedinger):
                 self.psi_val_list[i] = (cp.asarray(H_pot_propagator) * cp.asarray(self.psi_val_list[i]))
             else:
                 self.psi_val_list[i] = H_pot_propagator * self.psi_val_list[i]
-
-        return density_list, U_dd_list
 
     def split_operator_kin(self) -> None:
         # apply H_kin in k-space (transform back and forth)
