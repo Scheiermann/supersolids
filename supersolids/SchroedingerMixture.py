@@ -554,45 +554,51 @@ class SchroedingerMixture(Schroedinger):
 
         return lhy_energy
 
-    def energy_density_interaction(self,
-                                   density_list: List[np.ndarray],
-                                   U_dd_list: List[np.ndarray]) -> float:
+    def energy_density_interaction(self, density_list: List[np.ndarray]) -> float:
         dV = self.volume_element(fourier_space=False)
-        U_dd_array = np.stack(U_dd_list, axis=0)
-        density_array = np.stack(density_list, axis=0)
+        density_array = cp.stack(density_list, axis=0)
 
-        density_U_dd = np.einsum("i...,j...->ij...", U_dd_array, density_array)
-        density_density = np.einsum("i...,j...->ij...", density_array, density_array)
+        density_density = cp.einsum("i...,j...->ij...", density_array, density_array)
 
         # density_density and density_U_dd are (2, 2, res_x, res_y, res_z)
-        # the (2,2) part needs to be summed after multiplication with (2, 2) matrices
+        # the (2,2) part needs to be summed after one-by-one multiplication
+        # [[a11 * b11, a12 * a12], [a21 * b21, a22 * b22]] with (2, 2) matrices
         # formally, as we sum in real space dV is just a constant multiplication, so summation
         # over all 5 dimensions is fine
         
-        # there are 3 ways when to sum (verison 3 is the fastest):
-        # 1. getting a (2, 2, res_x, res_y, res_z) matrix
-        # 2. getting a (res_x, res_y, res_z) matrix, where (2,2) gird part is already summed
-        # 3. getting a (2, 2) matrix, where the (res_x, res_y, res_z) is already summed
+        # there are 3 ways when to sum (verison c is the fastest):
+        # a. getting a (2, 2, res_x, res_y, res_z) matrix
+        # b. getting a (res_x, res_y, res_z) matrix, where (2,2) grid part is already summed
+        # c. getting a (2, 2) matrix, where the (res_x, res_y, res_z) is already summed
 
-        # f1 = np.einsum("ij..., ijklm->ijklm", self.a_s_array, density_density)
-        # f1 = np.einsum("ij..., ijklm->klm", self.a_s_array, density_density)
-        f1 = np.einsum("ij..., ijklm->ij", self.a_s_array, density_density)
-        f2 = np.einsum("ij..., ijklm->ij", self.a_dd_array, density_U_dd)
-        E_dd = 0.5 * np.sum(f1 + f2).real * dV
+        # energy_dipol_dipol_a = np.einsum("ij..., ijklm->ijklm", self.a_s_array, density_density)
+        # energy_dipol_dipol_b = np.einsum("ij..., ijklm->klm", self.a_s_array, density_density)
+        energy_scattering = cp.einsum("ij..., ijklm->ij", self.a_s_array, density_density)
+
+        # if stack_shift is used U_dd has higher dimensionality, but resulting density_U_dd the same
+        if self.stack_shift != 0.0:
+            U_dd = self.get_U_dd(density_list)
+            density_U_dd = cp.einsum("ijklm, jklm->ijklm", U_dd, density_array)
+        else:
+            U_dd_list = self.get_U_dd_list(density_list)
+            U_dd_array = cp.stack(U_dd_list, axis=0)
+            density_U_dd = cp.einsum("i...,j...->ij...", U_dd_array, density_array)
+
+        energy_dipol_dipol = cp.einsum("ij..., ijklm->ij", self.a_dd_array, density_U_dd)
+
+        E_dd = 0.5 * np.sum(energy_scattering + energy_dipol_dipol).real * dV
 
         return E_dd
 
     def get_E(self) -> None:
         # update for energy calculation
         density_list = self.get_density_list(jit=numba_used)
-        U_dd_list = self.get_U_dd_list(density_list)
         mu_lhy_list: List[np.ndarray] = self.get_mu_lhy_list(density_list)
 
         # use normalized inputs for energy
-        self.E = self.energy(density_list, U_dd_list, mu_lhy_list)
+        self.E = self.energy(density_list, mu_lhy_list)
 
-    def energy(self, density_list: List[cp.ndarray], U_dd_list: List[cp.ndarray],
-               mu_lhy_list: List[cp.ndarray]) -> float:
+    def energy(self, density_list: List[cp.ndarray], mu_lhy_list: List[cp.ndarray]) -> float:
         """
         Input psi_1, psi_2 need to be normalized.
         density1 and density2 need to be build by the normalized psi_1, psi_2.
@@ -605,7 +611,7 @@ class SchroedingerMixture(Schroedinger):
             mu_lhy_part_list.append(self.sum_dV(mu_lhy * density, dV=dV))
         mu_lhy_part = cp.sum(cp.array(mu_lhy_part_list))
 
-        p_int = self.energy_density_interaction(density_list, U_dd_list)
+        p_int = self.energy_density_interaction(density_list)
 
         E_lhy = self.sum_dV(self.get_energy_lhy(density_list), dV=dV)
 
@@ -890,6 +896,27 @@ class SchroedingerMixture(Schroedinger):
 
         return polarization_max
 
+    def get_U_dd(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
+        """
+        Calculates :math:`U_{dd, ij} = \\mathcal{F}^{-1}(\\mathcal{F}(S_{ij} |\psi_{j}|^{2}) V_{k})`
+        with :math: `V_{k} = epsilon_{dd} g (3 (k_z / k)^2 - 1)`,
+        :math: `S_{ij} = exp{-ikM}` and
+        :math: `M_{ij} = stack_shift * \sigma_{x}` with :math: `\sigma_{x}` is the x-Pauli matrix
+
+        """
+        pauli_x = cp.array([[0, 1], [1, 0]])
+        stack_mat = self.stack_shift * pauli_x
+        stack_exponent_mat = cp.einsum("ij..., klm->ijklm", stack_mat, self.kz_mesh)
+        stack_shift_op_mat = cp.exp((-1) * 1.0j * stack_exponent_mat)
+
+        density_fft_V_k = self.V_k_val * cp.array([cp.fft.fftn(density_list[0]),
+                                                   cp.fft.fftn(density_list[1])])
+        shifted = cp.einsum("ijklm, jklm->ijklm", stack_shift_op_mat, density_fft_V_k)
+        U_dd = cp.array([[cp.fft.ifftn(shifted[0, 0]), cp.fft.ifftn(shifted[0, 1])],
+                         [cp.fft.ifftn(shifted[1, 0]), cp.fft.ifftn(shifted[1, 1])]])
+        
+        return U_dd
+
     def get_U_dd_list(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
         U_dd_list: List[cp.ndarray] = []
         for i, density in enumerate(density_list):
@@ -938,24 +965,31 @@ class SchroedingerMixture(Schroedinger):
                 density_list_np.append(density.get())
             density_tensor_vec: np.ndarray = np.stack(density_list_np, axis=0)
 
-        U_dd_list: List[cp.ndarray] = self.get_U_dd_list(density_list)
-        try:
-            # U_dd_tensor_vec: cp.ndarray = cp.stack(U_dd_list, axis=0)
-            U_dd_tensor_vec: cp.ndarray = cp.array(U_dd_list)
-        except Exception:
-            U_dd_list_np = []
-            for U_dd in U_dd_list:
-                U_dd_list_np.append(U_dd.get())
-            U_dd_tensor_vec: np.ndarray = np.stack(U_dd_list_np, axis=0)
+        if self.stack_shift != 0.0:
+            U_dd = self.get_U_dd(density_list)
+            dipol_term_vec: cp.ndarray = cp.einsum("ij..., ij...->i...",
+                                                   self.a_dd_array,
+                                                   U_dd)
+        else:
+            U_dd_list: List[cp.ndarray] = self.get_U_dd_list(density_list)
+            try:
+                # U_dd_tensor_vec: cp.ndarray = cp.stack(U_dd_list, axis=0)
+                U_dd_tensor_vec: cp.ndarray = cp.array(U_dd_list)
+            except Exception:
+                U_dd_list_np = []
+                for U_dd in U_dd_list:
+                    U_dd_list_np.append(U_dd.get())
+                U_dd_tensor_vec: np.ndarray = np.stack(U_dd_list_np, axis=0)
+            dipol_term_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
+                                                   self.a_dd_array,
+                                                   U_dd_tensor_vec)
 
 
         # update H_pot before use
         contact_interaction_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
                                                         self.a_s_array,
                                                         density_tensor_vec)
-        dipol_term_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
-                                               self.a_dd_array,
-                                               U_dd_tensor_vec)
+
         # contact_interaction_vec = self.arr_tensor_mult(self.a_s_array, density_tensor_vec)
         # dipol_term_vec = self.arr_tensor_mult(self.a_dd_array, U_dd_tensor_vec)
 
