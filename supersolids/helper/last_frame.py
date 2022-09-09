@@ -60,6 +60,7 @@ def last_frame(frame: Optional[int],
                mixture_slice_index_list: List[int] = [0],
                filename_steps_list: List[str] = ["mixture_step_"],
                normed_plots: bool = True,
+               property_filename_list: List[str] = [],
                ):
     path_graphs = Path(path_anchor_input_list[0].parent, "graphs")
     number_of_movies_list = ((np.array(movie_end_list) + 1) - np.array(movie_start_list)).tolist()
@@ -114,9 +115,13 @@ def last_frame(frame: Optional[int],
             path_output_frame: Path = Path(path_anchor_output, f"frame_{filename_format % frame}")
         else:
             path_output_frame: Path = Path(path_anchor_output, f"frame_last")
+        
+        path_anchor_scripts: Path = Path(path_anchor_output, f"scripts")
 
         if not path_output_frame.is_dir():
             path_output_frame.mkdir(parents=True)
+        if not path_anchor_scripts.is_dir():
+            path_anchor_scripts.mkdir(parents=True)
 
         # use path_mesh to get last png of every animation
         path_mesh_new = path_mesh.copy()
@@ -186,6 +191,14 @@ def last_frame(frame: Optional[int],
                 if path_currently_new is not None:
                     shutil.copy(path_mesh_new[ix, iy], path_out)
 
+            script_filename = "script"
+            script_extension = ".txt"
+            path_out_script: Path = Path(path_anchor_scripts,
+                                         f"{script_filename}"
+                                         + f"_{path_currently_old.stem}{script_extension}")
+            path_in_script: Path = Path(path_currently_old, f"{script_filename}{script_extension}")
+            shutil.copy(path_in_script, path_out_script)
+
         print(f"frame: {frame}, movie_take_last: {movie_take_last}")
         if frame:
             path_out_periodic: Path = Path(path_anchor_output,
@@ -238,7 +251,7 @@ def last_frame(frame: Optional[int],
         # flip needed as appending pictures start from left top corner,
         # but enumeration of movies from left bottom corner
         np.set_printoptions(linewidth=500)
-        path_mesh_mirrored: List[Path] = np.flip(path_mesh_new, axis=0)
+        path_mesh_new_mirrored: List[Path] = np.flip(path_mesh_new, axis=0)
         probs_cuts_mirrored_list: List = [np.flip(probs_cuts_middle, axis=0),
                                           np.flip(probs_cuts_max, axis=0)]
         probs_cuts_filenames = ["probs_cuts_middle", "probs_cuts_max"]
@@ -261,10 +274,10 @@ def last_frame(frame: Optional[int],
                                             f"periodic_video_{suffix}_{experiment_suffix}"
                                             + ".mp4")
 
-            paste_together_videos(path_mesh_mirrored, path_out_video, margin, width, height, fps)
+            paste_together_videos(path_mesh_new_mirrored, path_out_video, margin, width, height, fps)
 
         else:
-            paste_together(path_mesh_mirrored.ravel(), path_out_periodic, nrow, ncol, ratio=dpi_ratio)
+            paste_together(path_mesh_new_mirrored.ravel(), path_out_periodic, nrow, ncol, ratio=dpi_ratio)
 
     if not video:
         if frame:
@@ -285,15 +298,33 @@ def last_frame(frame: Optional[int],
                                            f"cuts_all_{experiment_suffix}"
                                            + f"{merge_suffix}.png")
 
-        # merge
+        # mayavi view in periodic table
         # turn off decompression bomb checker
         Image.MAX_IMAGE_PIXELS = number_of_movies * Image.MAX_IMAGE_PIXELS
         paste_together(path_in_list=path_out_periodic_list, path_out=path_out_periodic_all,
                        nrow=nrow_components, ncol=ncol_components, ratio=dpi_ratio_all)
         
+        # cuts in periodic table
         path_out_mesh_cuts_mirrored: List[Path] = np.flip(path_out_mesh_cuts, axis=0)
-        # cuts
         # turn off decompression bomb checker
         Image.MAX_IMAGE_PIXELS = number_of_movies * Image.MAX_IMAGE_PIXELS
         paste_together(path_in_list=path_out_mesh_cuts_mirrored.ravel(), path_out=path_out_cuts_all,
                        nrow=nrow, ncol=ncol, ratio=dpi_ratio_all) 
+        
+        # properties in periodic tables
+        for property_filename in property_filename_list:
+            path_mesh_mirrored: List[Path] = np.flip(path_mesh, axis=0)
+            path_mesh_property = path_mesh_mirrored.copy()
+            for ix, iy in np.ndindex(path_mesh_mirrored.shape):
+                path_mesh_property[ix, iy]: Path = Path(path_mesh_mirrored[ix, iy], f"{property_filename}")
+
+            path_out_property_all: Path = Path(path_anchor_output,
+                                               f"property_all_{experiment_suffix}"
+                                               + f"{merge_suffix}"
+                                               + f"_{property_filename}")
+
+            # turn off decompression bomb checker
+            Image.MAX_IMAGE_PIXELS = number_of_movies * Image.MAX_IMAGE_PIXELS
+            paste_together(path_in_list=path_mesh_property.ravel(), path_out=path_out_property_all,
+                           nrow=nrow, ncol=ncol, ratio=dpi_ratio_all) 
+             
