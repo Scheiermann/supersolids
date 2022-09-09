@@ -153,24 +153,13 @@ def property_to_array(property_tuple, list_of_arrays: bool=False):
     property_all = np.empty(shape=(1, 1))
     # initialize with first value
     for property_components_all in property_tuple:
-        if list_of_arrays:
-            # take first property of every mixture component and create a list of arrays
-            property_all = []
-            for property_mixture_component in property_components_all:
-                property_all.append(np.array(property_components_all))
-
-        else:
-            property_all = property_components_all
+        property_all = property_components_all
         break
-
-    # load all other values
+    # load all other values (first value already consumed from generator)
     for i, property_components_all in enumerate(property_tuple):
         try:
             if list_of_arrays:
-                number_of_components = len(property_all)
-                for j in range(0, number_of_components):
-                    for property_mixture_component in property_components_all:
-                        property_all[j] = np.vstack((property_all[j], property_mixture_component))
+                property_all = np.dstack((property_all, property_components_all))
             else:
                 property_all = np.vstack((property_all, property_components_all))
         except ValueError:
@@ -245,22 +234,25 @@ def plot_property(args, func=functions.identity):
     try:
         if args.list_of_arrays:
             property_length = np.shape(property_all[0])[0]
-            dim = property_all[0].shape[1]
+            dim = property_length
         else:
             property_length = np.shape(property_all)[0]
             dim = property_all.shape[1]
     except Exception:
         dim = 1
 
+    path_output = Path(input_path, f"{args.property_name + args.property_filename_suffix}")
     if dim == 1:
-        plt.plot(t, property_all, "x-")
+        property_all = property_all.ravel()
+        x_range, y_range = func(t, property_all)
+
+        plt.plot(x_range, y_range, "x-")
         plt.xlabel(rf"t with dt={args.dt}")
         plt.ylabel(f"{args.property_name}")
         plt.grid()
         plt.title(f"with property_args: {args.property_args}")
         # plt.legend()
-        if args.property_name:
-            plt.savefig(Path(input_path, f"{args.property_name + args.property_filename_suffix}"))
+
     else:
         labels = []
         if args.subplots:
@@ -270,8 +262,9 @@ def plot_property(args, func=functions.identity):
                     number_of_components = len(property_all)
                     for j in range(0, number_of_components):
                         labels.append(f"component {j} axis {i}")
-                        x_range, y_range = func(t, property_all[j].T[i])
+                        x_range, y_range = func(t, property_all[j, i, :])
                         ax.plot(x_range, y_range, "x-", label=labels[-1])
+
                 else:
                     labels.append(str(i))
                     x_range, y_range = func(t, property_all.T[i])
@@ -285,8 +278,6 @@ def plot_property(args, func=functions.identity):
             plt.suptitle(f"{args.property_name}({', '.join(map(str, args.property_args))})")
             plt.subplots_adjust(left=0.15, bottom=0.2)
 
-            if args.property_name:
-                fig.savefig(Path(input_path, f"{args.property_name + args.property_filename_suffix}"))
         else:
             for i in range(0, dim):
                 labels.append(str(i))
@@ -299,8 +290,12 @@ def plot_property(args, func=functions.identity):
             plt.grid()
             plt.title(f"with property_args: {args.property_args}")
             plt.legend()
-            if args.property_name:
-                plt.savefig(Path(input_path, f"{args.property_name + args.property_filename_suffix}"))
+
+    # save plot as png and values as npz
+    if args.property_name:
+        plt.savefig(path_output)
+    with open(path_output.with_suffix(".npz"), "wb") as g:
+        np.savez_compressed(g, t=t, property_all=property_all)
 
 
 def flags(args_array):
