@@ -674,26 +674,45 @@ class SchroedingerMixture(Schroedinger):
         return com_list
 
     def get_parity(self,
-                   axis: int = 2,
+                   axis: Optional[int] = None,
                    Mx0: Optional[int] = None, Mx1: Optional[int] = None,
                    My0: Optional[int] = None, My1: Optional[int] = None,
                    Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> List[float]:
         x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
+        if axis is None:
+            axis_list = range(self.dim)
+        else:
+            axis_list = [axis]
         parity_list: List[float] = []
         for psi_val in self.psi_val_list:
-            psi_under0, psi_over0 = cp.split(psi_val, 2, axis=axis)
+            parity_axis_list = []
+            for axis in axis_list:
+                psi_under0, psi_over0 = np.split(psi_val, 2, axis=axis)
 
-            if axis in [0, 1, 2]:
-                psi_over0_reversed = psi_over0[::-1]
-            else:
-                sys.exit(f"No such axis ({axis}). Choose 0, 1 or 2 for axis x, y or z.")
+                if axis in [0, 1, 2]:
+                    psi_over0_reversed = psi_over0[::-1]
+                else:
+                    sys.exit(f"No such axis ({axis}). Choose 0, 1 or 2 for axis x, y or z.")
 
-            parity = self.trapez_integral(cp.abs(
-                psi_under0[x0:x1, y0:y1, z0:z1] - psi_over0_reversed[x0:x1, y0:y1, z0:z1]) ** 2.0)
-
-            parity_list.append(parity)
+                parity = self.trapez_integral(np.abs(
+                    psi_under0[x0:x1, y0:y1, z0:z1] - psi_over0_reversed[x0:x1, y0:y1, z0:z1]) ** 2.0)
+                parity_axis_list.append(parity)
+            parity_list.append(parity_axis_list)
 
         return parity_list
+
+    def check_N(self) -> List[float]:
+        """
+        Calculates :math:`N_i = \int \\mathcal{d}\vec{r} |\psi_{i}(r)|^2`
+        Returns [N_1, N_2, N]
+        """
+        N_list_check: List[float] = []
+        for i, (psi_val, N) in enumerate(zip(self.psi_val_list, self.N_list)):
+            N_list_check.append(N * self.get_norm(func_val=psi_val))
+        N_list_check.append(sum(N_list_check))
+
+        return N_list_check
+
 
     def distmat(self, a: cp.ndarray, index: List[float]):
         mask = cp.ones(a.shape, dtype=bool)
@@ -919,17 +938,14 @@ class SchroedingerMixture(Schroedinger):
 
     def get_U_dd_list(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
         U_dd_list: List[cp.ndarray] = []
-        for i, density in enumerate(density_list):
+        for density in density_list:
             try:
-                stack_shift_op = cp.exp((-1) ** i * 1.0j * self.kz_mesh * self.stack_shift)
-                U_dd_list.append(cp.fft.ifftn(self.V_k_val * cp.fft.fftn(density) * stack_shift_op))
+                U_dd_list.append(cp.fft.ifftn(self.V_k_val * cp.fft.fftn(density)))
             except Exception as e:
                 print({e})
-                stack_shift_op = np.exp((-1) ** i * 1.0j * cp.asnumpy(self.kz_mesh) * self.stack_shift)
-                U_dd_list.append(np.fft.ifftn(self.V_k_val.get() * np.fft.fftn(density.get()) * stack_shift_op))
+                U_dd_list.append(np.fft.ifftn(self.V_k_val.get() * np.fft.fftn(density.get())))
                 try:
-                    stack_shift_op = np.exp((-1) ** i * 1.0j * cp.asnumpy(self.kz_mesh) * self.stack_shift)
-                    U_dd_list.append(np.fft.ifftn(self.V_k_val * np.fft.fftn(density) * stack_shift_op))
+                    U_dd_list.append(np.fft.ifftn(self.V_k_val * np.fft.fftn(density)))
                 except Exception as e:
                     print({e})
 
@@ -965,6 +981,8 @@ class SchroedingerMixture(Schroedinger):
                 density_list_np.append(density.get())
             density_tensor_vec: np.ndarray = np.stack(density_list_np, axis=0)
 
+        # if stack_shift is used U_dd has higher dimensionality (get_U_dd),
+        # but resulting dipol_term_vec the same (else use get_U_dd_list)
         if self.stack_shift != 0.0:
             U_dd = self.get_U_dd(density_list)
             dipol_term_vec: cp.ndarray = cp.einsum("ij..., ij...->i...",
@@ -1013,7 +1031,6 @@ class SchroedingerMixture(Schroedinger):
                                                                        )
                 term_and_tilt = term + tilt_term
                 H_pot_propagator: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt, term_and_tilt, split_step)
-                H_pot_propagator: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt, term, split_step)
             else:
                 term: cp.ndarray = self.get_H_pot_exponent_terms(dipol_term,
                                                                  contact_interaction,
@@ -1021,7 +1038,6 @@ class SchroedingerMixture(Schroedinger):
                                                                  )
                 term_and_tilt = term + tilt_term
                 H_pot_propagator: cp.ndarray = self.get_H_pot(term_and_tilt, split_step)
-                H_pot_propagator: cp.ndarray = self.get_H_pot(term, split_step)
 
             if cupy_used:
                 self.psi_val_list[i] = (cp.asarray(H_pot_propagator) * cp.asarray(self.psi_val_list[i]))
