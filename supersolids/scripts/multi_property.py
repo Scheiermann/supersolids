@@ -12,7 +12,9 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    experiment_suffix = "ramp_05_09"
+    # experiment_suffix = "ramp_05_09"
+    # experiment_suffix = "ramp_09_09_10**eps"
+    experiment_suffix = "ramp_13_09_10**eps"
     path_anchor_input = Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/")
 
     mixture = True
@@ -37,7 +39,10 @@ if __name__ == "__main__":
         frame_end = None
 
     movie_start = 1
-    movie_end = 32
+    # movie_end = 32
+    movie_end = 6
+    # movie_start = 7
+    # movie_end = 7
 
     dt = 0.0002
 
@@ -64,18 +69,23 @@ if __name__ == "__main__":
     # property_names = ["E", "mu_arr"]
     # list_of_arrays = False
 
-    # subplots = False
-    subplots = True
-    # property_func = False
-    property_func = True
-    list_of_arrays = True
-    property_names = ["get_center_of_mass"]
+    subplots_list = [True, False, False, True, False]
+    property_func_list = [True, False, False, True, True]
+    list_of_arrays_list = [True, False, False, True, False]
+    property_names_list = ["get_center_of_mass", "E", "mu_arr", "get_parity", "check_N"]
+    property_args_list = [[], [], [], [], []]
+    property_args_frame_list = [False, False, False, False, False]
+
+    # subplots_list = [False]
+    # property_func_list = [True]
+    # list_of_arrays_list = [False]
+    # property_names_list = ["check_N"]
+    # property_args_list = [[]]
+    # property_args_frame_list = [False]
     # property_names = ["get_parity"]
     # property_name = ["get_peak_distances_along"]
     # property_name = ["get_peak_positions"]
     # property_args = [0]
-    property_args = []
-    property_args_frame = False
 
     # property_name = "get_polarization"
     # property_args = [10.0 ** -9, 10.0 ** -9]
@@ -111,7 +121,10 @@ if __name__ == "__main__":
     # move2graphs = True
     move2graphs = False
 
-    for property_name in property_names:
+    for (property_func, property_name,
+         property_args, property_args_frame, subplots, list_of_arrays) in zip(
+            property_func_list, property_names_list, property_args_list, property_args_frame_list,
+            subplots_list, list_of_arrays_list):
         for i, movie_number in enumerate(range(movie_start, movie_end + 1)):
             property_args_str = False
             # property_args_str = [Path(path_anchor_input, f"{dir_name}{counting_format % movie_number}"),

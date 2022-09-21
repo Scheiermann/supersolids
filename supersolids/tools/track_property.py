@@ -29,6 +29,20 @@ from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper import get_path, functions
 
 
+def get_dim(list_of_arrays, property_all):
+    try:
+        if list_of_arrays:
+            property_length = np.shape(property_all[0])[0]
+            dim = property_length
+        else:
+            property_length = np.shape(property_all)[0]
+            dim = property_all.shape[1]
+    except Exception:
+        dim = 1
+        
+    return dim
+
+
 def get_input_path(dir_path, dir_name):
     if dir_name is not None:
         input_path = Path(dir_path, dir_name)
@@ -231,15 +245,7 @@ def plot_property(args, func=functions.identity):
         except Exception as e:
             print(f"ERROR: {e}")
 
-    try:
-        if args.list_of_arrays:
-            property_length = np.shape(property_all[0])[0]
-            dim = property_length
-        else:
-            property_length = np.shape(property_all)[0]
-            dim = property_all.shape[1]
-    except Exception:
-        dim = 1
+    dim = get_dim(args.list_of_arrays, property_all)
 
     path_output = Path(input_path, f"{args.property_name + args.property_filename_suffix}")
     if dim == 1:

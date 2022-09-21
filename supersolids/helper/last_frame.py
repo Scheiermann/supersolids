@@ -4,16 +4,18 @@ import dill
 import numpy as np
 import shutil
 
+from matplotlib import pyplot as plt
 from pathlib import Path
+from PIL import Image
 from typing import List, Optional, Tuple
 
-from PIL import Image
 from supersolids.helper import cut_1d
 from supersolids.helper.cut_1d import plot_cuts_tuples, zip_meshes
-
+from supersolids.helper.property_load_npz import property_load_npz
 from supersolids.helper.get_path import get_last_png_in_last_anim, get_path, get_step_index
 from supersolids.helper.merge_meshes import check_if_further, merge_meshes
 from supersolids.helper.periodic_system import paste_together, paste_together_videos
+from supersolids.tools.track_property import get_dim
 
 
 def path_mesh_remap(path_mesh: np.ndarray):
@@ -61,6 +63,7 @@ def last_frame(frame: Optional[int],
                filename_steps_list: List[str] = ["mixture_step_"],
                normed_plots: bool = True,
                property_filename_list: List[str] = [],
+               list_of_arrays_list: List[bool] = [],
                ):
     path_graphs = Path(path_anchor_input_list[0].parent, "graphs")
     number_of_movies_list = ((np.array(movie_end_list) + 1) - np.array(movie_start_list)).tolist()
@@ -220,22 +223,6 @@ def last_frame(frame: Optional[int],
                 frame_formatted = f"{frame_format % frame}"
             else:
                 frame_formatted = f"{frame_format % frame_last_list[j]}"
-            # cut_1d.cut_1d(System_list,
-                          # slice_indices=[self.slice_indices[0],
-                                         # self.slice_indices[1],
-                                         # self.slice_indices[2]],
-                          # psi_sol_3d_cut_x=None,
-                          # psi_sol_3d_cut_y=None,
-                          # psi_sol_3d_cut_z=None,
-                          # # dir_path=self.dir_path,
-                          # dir_path=path_output_frame,
-                          # y_lim=cut1d_y_lim,
-                          # plot_val_list=cut1d_plot_val_list,
-                          # frame=frame,
-                          # steps_format=frame_format,
-                          # mixture_slice_index_list=mixture_slice_index_list,
-                          # filename_steps_list=filename_steps_list,
-                          # )
 
             (path_out_mesh_cuts[ix, iy], probs_cuts_middle[ix, iy],
              probs_cuts_max[ix, iy]) = plot_cuts_tuples(dir_paths,
@@ -311,20 +298,109 @@ def last_frame(frame: Optional[int],
         paste_together(path_in_list=path_out_mesh_cuts_mirrored.ravel(), path_out=path_out_cuts_all,
                        nrow=nrow, ncol=ncol, ratio=dpi_ratio_all) 
         
-        # properties in periodic tables
-        for property_filename in property_filename_list:
-            path_mesh_mirrored: List[Path] = np.flip(path_mesh, axis=0)
-            path_mesh_property = path_mesh_mirrored.copy()
-            for ix, iy in np.ndindex(path_mesh_mirrored.shape):
-                path_mesh_property[ix, iy]: Path = Path(path_mesh_mirrored[ix, iy], f"{property_filename}")
+        # plot property of last frame along var2 for every var1
+        for k, _ in enumerate(path_anchor_input_list):
+            # properties in periodic tables
+            for property_filename, list_of_arrays in zip(property_filename_list, list_of_arrays_list):
+                path_mesh_mirrored: List[Path] = np.flip(path_mesh, axis=0)
+                path_mesh_property = path_mesh_mirrored.copy()
+                for ix, iy in np.ndindex(path_mesh_mirrored.shape):
+                    path_mesh_property[ix, iy]: Path = Path(path_mesh_mirrored[ix, iy], f"{property_filename}")
+                    path_property_npz = path_mesh_property[ix, iy].with_suffix('.npz')
+                    if ix == iy == 0:
+                        # create 3d array in shape of path_mesh (2D) + property 
+                        try:
+                            property_00_1 = property_load_npz(path_property_npz)[1]
+                            if list_of_arrays:
+                                number_of_components = property_00_1.shape[0]
+                                property_length = property_00_1.shape[-1]
+                            else:
+                                property_length = property_00_1.shape[0]
+                            property_dim = get_dim(list_of_arrays, property_00_1)
 
-            path_out_property_all: Path = Path(path_anchor_output,
-                                               f"property_all_{experiment_suffix}"
-                                               + f"{merge_suffix}"
-                                               + f"_{property_filename}")
+                        except Exception as e:
+                            print("Error: property_length not found. "
+                                  "Make sure that property_length is the same for all movies. {e}")
+                        mesh_t = np.zeros((path_mesh_property.shape[0],
+                                           path_mesh_property.shape[1],
+                                           property_length))
+                        if property_dim == 1:
+                            mesh_property_all = np.zeros((path_mesh_property.shape[0],
+                                                          path_mesh_property.shape[1],
+                                                          property_length))
+                        else:
+                            if list_of_arrays:
+                                mesh_property_all = np.zeros((path_mesh_property.shape[0],
+                                                              path_mesh_property.shape[1],
+                                                              number_of_components,
+                                                              property_dim,
+                                                              property_length,
+                                                              ))
+                            else:
+                                mesh_property_all = np.zeros((path_mesh_property.shape[0],
+                                                              path_mesh_property.shape[1],
+                                                              property_length,
+                                                              property_dim))
+                    mesh_t[ix, iy], mesh_property_all[ix, iy] = property_load_npz(path_property_npz) 
 
-            # turn off decompression bomb checker
-            Image.MAX_IMAGE_PIXELS = number_of_movies * Image.MAX_IMAGE_PIXELS
-            paste_together(path_in_list=path_mesh_property.ravel(), path_out=path_out_property_all,
-                           nrow=nrow, ncol=ncol, ratio=dpi_ratio_all) 
-             
+                path_out_property_all: Path = Path(path_anchor_output,
+                                                   f"property_all_{experiment_suffix}"
+                                                   + f"{merge_suffix}"
+                                                   + f"_{property_filename}")
+                
+                path_mesh_all = path_out_property_all.with_suffix('.npz')
+                with open(path_mesh_all, "wb") as g:
+                    np.savez_compressed(g, x=mesh_t, y=mesh_property_all, z=path_mesh_mirrored)
+
+                # turn off decompression bomb checker
+                Image.MAX_IMAGE_PIXELS = number_of_movies * Image.MAX_IMAGE_PIXELS
+                paste_together(path_in_list=path_mesh_property.ravel(), path_out=path_out_property_all,
+                               nrow=nrow, ncol=ncol, ratio=dpi_ratio_all) 
+
+                rows = path_mesh_mirrored.shape[1]
+                if list_of_arrays:
+                    cols = property_dim
+                else:
+                    cols = 1
+                fig, axes = plt.subplots(nrows=rows, ncols=cols, squeeze=False,
+                                         sharex='col', figsize=(16,9))
+                fig.suptitle(f"{Path(property_filename).stem}")
+
+                # give titles to rows and columns
+                for i, ax in enumerate(axes[0, :]):
+                    ax.set_title(f"axis {i}")
+
+                title_rows = list(map(str, var1_list[k][::-1]))
+                for ax, title_row in zip(axes[:,0], title_rows):
+                    pad = 5
+                    ax.annotate(title_row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
+                                xycoords=ax.yaxis.label, textcoords='offset points',
+                                size='large', ha='right', va='center')
+                    # ax.set_ylabel(title_row, rotation=0, size='large')
+
+                # for iy, ax in enumerate(plt.gcf().get_axes()):
+                for iy in range(rows):
+                    # fixed a11
+                    lambda_frame = -1
+                    labels = []
+                    for i in range(property_dim):
+                        if list_of_arrays:
+                            for j in range(number_of_components):
+                                x_range, y_range = var2_list[k], mesh_property_all[:, iy, j, i, lambda_frame]
+                                axes[iy, i].plot(x_range, y_range, "x-")
+                        else:
+                            x_range, y_range = var2_list[k], mesh_property_all[:, iy, lambda_frame]
+                            axes[iy, 0].plot(x_range, y_range, "x-")
+                for ax in axes.flatten():
+                    ax.grid()
+                if list_of_arrays:
+                    labels = [f"component {j}" for j in range(number_of_components)]
+                    fig.legend(labels, loc='center right')
+
+                path_out_property_ix: Path = Path(path_anchor_output,
+                                                      f"property_all_{experiment_suffix}"
+                                                      + f"{merge_suffix}"
+                                                      + f"_ix_{property_filename}")
+                print(f"Save to: {path_out_property_ix}")
+                fig.savefig(path_out_property_ix)
+                

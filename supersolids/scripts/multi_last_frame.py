@@ -16,148 +16,25 @@ if __name__ == "__main__":
 
     use_edited = False
 
-    # experiment_suffix = "x"
-    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    # var1_list.append(np.arange(2.0, 31.0, 2.0))
-    # var2_list.append(np.arange(80000, 81000, 10000))
-
-    # experiment_suffix = "gpu"
-    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    # var1_list.append(np.arange(12.0, 17.0, 2.0))
-    # var2_list.append(np.arange(50.0, 96.0, 5.0))
-
-    # experiment_suffix = "gpu"
-    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    # var2_list.append(np.arange(12.0, 17.0, 2.0))
-    # var1_list.append(np.arange(50.0, 96.0, 5.0))
-
-    # experiment_suffix = "y_N15k"
-    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    # var1_list.append(np.arange(80.0, 97.0, 2.0))
-    # var2_list.append(np.arange(150000, 151000, 10000))
-
-    # experiment_suffix = "yN"
-    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    # var1_list.append(np.arange(50.0, 96.0, 5.0))
-
-    # var2_list.append(np.arange(80000, 81000, 10000))
-    # experiment_suffix = "xN"
-    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    # var1_list.append(np.arange(12.0, 17.0, 2.0))
-    # var2_list.append(np.arange(50000, 151000, 10000))
-
-    # var1_list.append(np.arange(2.0, 31.0, 2.0))
-    # var2_list.append(np.arange(80000, 81000, 5000))
-
-    # experiment_suffix = "droplet"
-    # var1_list.append(np.arange(92.0, 101.0, 2.0))
-    # var2_list.append(np.arange(55000, 81000, 5000))
-
-    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_19/"))
-    # var1_list.append(np.arange(0.005, 0.05, 0.005))
-    # var2_list.append(np.arange(0.6, 0.66, 0.05))
-
-#     experiment_suffix = "mixture_a12_grid"
-#     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-#     var1_list.append(np.arange(60.0, 81.0, 5.0))
-#     var2_list.append(np.arange(0.05, 0.51, 0.05))
-#     movie_start_list = [1]
-#     movie_end_list = [50]
-#     # suffix_list = ["_map_xyz_p-9"]
-#     # cut_names: List[str] = ["cut_x", "cut_y", "cut_z"]
-#     # suffix_list = ["_map_rolled_x"]
-#     # suffix_list = ["_map_x"]
-#     movie_take_last_list: int = [3, 1]
-#     suffix_list = ["_map_x_0", "_map_x_1"]
-#     cut_names: List[str] = ["cut_x"]
-#     normed_plots = True
-#     # normed_plots = False
-#     if normed_plots:
-#         suffix_list[0] += "_normed"
-
-    # experiment_suffix = "pancake"
-    # experiment_suffix = "stacked"
-    # experiment_suffix = "ramp"
-    # experiment_suffix = "ramp0"
-    experiment_suffix = "ramp01"
+    experiment_suffix = "ramp_13_09_10**eps"
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    var1_list.append(np.arange(65.0, 71.0, 1.25))
-    # var1_list.append(np.arange(65.0, 72.0, 1.25))
-    # var2_list.append(np.arange(-1.5, 0.6, 0.5))
-    var2_list.append(np.arange(0.0, 0.1, 0.5))
-    # var2_list.append(np.arange(-2.0, -0.1, 1.0))
+    var1_list.append(np.arange(70.0, 70.1, 5.0)) # a11
+    var2_list.append(np.arange(3.0, 8.1, 1.0)) # tilt
     movie_start_list = [1]
-    # movie_end_list = [30]
     movie_end_list = [6]
-    # suffix_list = ["_map_xyz_p-9"]
-    # cut_names: List[str] = ["cut_x", "cut_y", "cut_z"]
-    # suffix_list = ["_map_rolled_x"]
-    # suffix_list = ["_map_x"]
-    movie_take_last_list: int = [2, 1]
-    suffix_list = ["_map_x_0", "_map_x_1"]
-    cut_names: List[str] = ["cut_x"]
-    # normed_plots = True
+    # movie_take_last_list: int = [2, 1]
+    # suffix_list = [f"_map_z_0", f"_map_z_1"]
+    movie_take_last_list: int = [4, 3]
+    suffix_list = [f"_map_x_0", f"_map_x_1"]
+    property_filename_list = ["E_paper_framestart_0.png", "mu_arr_paper_framestart_0.png",
+                              "get_center_of_mass_paper_framestart_0.png",
+                              "get_parity_paper_framestart_0.png", "check_N_paper_framestart_0.png"]
+    list_of_arrays_list = [False, False, True, True, False]
+    cut_names: List[str] = ["cut_x", "cut_y", "cut_z"]
     normed_plots = False
     if normed_plots:
         suffix_list[0] += "_normed"
 
-
-    # experiment_suffix = "mixture_a12_small_grid"
-    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    # var1_list.append(np.arange(0.6, 0.81, 0.05))
-    # var2_list.append(np.arange(0.01, 0.051, 0.005))
-
-    # path_anchor_input_list.append(Path(f"/run/media/dsche/ITP Transfer/begin_mixture_{experiment_suffix}/"))
-    # var1_list.append(np.arange(0.60, 0.726, 0.025))
-    # var2_list.append(np.arange(0.01, 0.041, 0.01))
-    # var1_list.append(np.arange(0.50, 0.751, 0.025))
-    # var2_list.append(np.arange(0.05, 0.51, 0.05))
-
-    # var1_list.append(np.arange(0.76, 0.81, 0.02))
-    # var2_list.append(np.arange(0.50, 0.51, 0.05))
-
-    # var1_list.append(np.arange(0.75, 0.80, 0.001))
-    # var2_list.append(np.arange(0.50, 0.51, 0.05))
-
-    # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_13/"))
-    # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_13/"))
-    # var1_list.append(np.arange(0.6, 0.91, 0.05))
-    # var2_list.append(np.arange(0.05, 0.51, 0.05))
-
-    # experiment_suffix = "a11_95"
-    # # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6125/"))
-    # # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6125/"))
-    # path_anchor_input_list.append(Path("/bigwork/dscheier/results/begin_mixture_15_6125/"))
-    # var1_list.append(np.arange(61.25, 91.0, 5.0))
-    # var2_list.append(np.arange(0.05, 0.51, 0.05))
-
-    # # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15/"))
-    # # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15/"))
-    # path_anchor_input_list.append(Path("/bigwork/dscheier/results/begin_mixture_15/"))
-    # var1_list.append(np.arange(62.5, 91.0, 5.0))
-    # var2_list.append(np.arange(0.05, 0.51, 0.05))
-
-    # # path_anchor_input_list.append(Path("/run/media/dsche/ITP Transfer/begin_mixture_15_6375/"))
-    # # path_anchor_input_list.append(Path("/run/media/dsche/scr2/begin_mixture_15_6375/"))
-    # path_anchor_input_list.append(Path("/bigwork/dscheier/results/begin_mixture_15_6375/"))
-    # var1_list.append(np.arange(63.75, 91.0, 5.0))
-    # var2_list.append(np.arange(0.05, 0.51, 0.05))
-    # movie_start_list = [1, 1, 1]
-    # movie_end_list = [60, 60, 60]
-    # # suffix_list = ["_xyz_p-9"]
-    # # cut_names: List[str] = ["cut_x", "cut_y", "cut_z"]
-    # # suffix_list = ["_rolled_x"]
-    # # movie_take_last_list: int = [1]
-    # # suffix_list = ["_x"]
-    # movie_take_last_list: int = [3, 1]
-    # suffix_list = ["_x_0", "_x_1"]
-    # cut_names: List[str] = ["cut_x"]
-    # normed_plots = True
-    # if normed_plots:
-    #     suffix_list = [suffix + "_normed" for suffix in suffix_list]
-
-    # nrow_components = 1
-    # ncol_components = 2
     nrow_components = 2
     ncol_components = 1
     
@@ -181,10 +58,6 @@ if __name__ == "__main__":
     movie_skip = None
 
     # if simulation for movie_number was continued in dir with name movie_number + number_of_movies
-    # check_further_list = [1, 1, 1, 1]
-    # check_further_list = [2, 2]
-    # check_further_list = [2]
-    # check_further_list = [2]
     check_further_list = [2, 2, 2]
 
     dir_name = "movie"
@@ -280,6 +153,8 @@ if __name__ == "__main__":
                        mixture_slice_index_list=mixture_slice_index_list,
                        filename_steps_list=filename_steps_list,
                        normed_plots=normed_plots,
+                       property_filename_list=property_filename_list,
+                       list_of_arrays_list=list_of_arrays_list,
                        )
     else:
         frame = None
@@ -321,4 +196,6 @@ if __name__ == "__main__":
                    mixture_slice_index_list=mixture_slice_index_list,
                    filename_steps_list=filename_steps_list,
                    normed_plots=normed_plots,
+                   property_filename_list=property_filename_list,
+                   list_of_arrays_list=list_of_arrays_list,
                    )

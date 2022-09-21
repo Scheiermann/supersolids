@@ -21,7 +21,13 @@ def string_float(s):
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
     path_anchor_input_list = []
-    path_anchor_input_list.append(Path("/bigwork/dscheier/results/begin_ramp/"))
+    # experiment_suffix = "ramp_05_09"
+    # experiment_suffix = "ramp_09_09_10**eps"
+    # experiment_suffix = "ramp_13_09_10**eps"
+    # experiment_suffix = "ramp_19_09_a12=0"
+    # experiment_suffix = "ramp_21_09_a12=0"
+    experiment_suffix = "ramp_21_09_a12=70"
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     
     # mixture = False
     mixture = True
@@ -30,30 +36,33 @@ if __name__ == "__main__":
 
     # take_last = 3
     take_last = np.inf
-    # frame_end = 100000
+    # frame_end = 1000
     frame_end = None
 
-    steps_per_npz = 10000
-    # steps_per_npz = 1
+    # steps_per_npz = 10000
+    # steps_per_npz = 1000
+    steps_per_npz = 100
 
     movie_string = "movie"
     counting_format = "%03d"
-    movie_start = 1
-    movie_end = 50
+    # movie_end_list = [32]
+    # movie_start_list = [11]
+    # movie_end_list = [13]
+    movie_start_list = [21]
+    movie_end_list = [22]
+    # movie_start_list = [1, 11, 21]
+    # movie_end_list = [1, 13, 22]
+    slice_indices = {"x": 63, "y": 31, "z": 31}
 
-    slice_indices = {"x": 63, "y": 31, "z": 15}
-    # slice_indices = {"x": 127, "y": 63, "z": 15}
-    # slice_indices = {"x": 127, "y": 31, "z": 15}
-    # slice_indices = {"x": 127, "y": 31, "z": 31}
-
+    mixture_slice_index_list_list = []
     if mixture:
         # mixture_slice_index_list = [1]
         # mixture_slice_index_list = [0]
         # filename_steps_list = ["step_"]
         # filename_steps_list = ["mixture_step_"]
         # filename_steps_list = ["mixture_mixture_step_pol_"]
-        # mixture_slice_index_list = [1, 0]
-        mixture_slice_index_list = [0, 1]
+        mixture_slice_index_list_list.append([0, 1])
+        mixture_slice_index_list_list.append([1, 0])
         filename_steps_list = ["step_", "step_"]
         # filename_steps_list = ["mixture_step_", "mixture_step_", "mixture_mixture_step_pol_"]
         # filename_steps_list = ["step_", "step_", "pol_"]
@@ -74,11 +83,24 @@ if __name__ == "__main__":
     steps_format = "%07d"
     filename_pattern = ".npz"
 
-    azimuth = 0.0
-    elevation = 0.0
-    # distance = 25.0
-    distance = 30.0
-    # distance = 60.0
+    azimuth_list = []
+    elevation_list = []
+    distance_list = []
+
+    ## xy
+    # azimuth_list.append(0.0)
+    # elevation_list.append(0.0)
+    # distance_list.append(20.0)
+
+    ## xz
+    # azimuth_list.append(270.0)
+    # elevation_list.append(90.0)
+    # distance_list.append(20.0)
+
+    ## diagonal
+    azimuth_list.append(45.0)
+    elevation_list.append(45.0)
+    distance_list.append(40.0)
 
     alpha_V = 0.0
 
@@ -89,83 +111,85 @@ if __name__ == "__main__":
     ui = False
     # ui = True
 
-    for path_anchor_input in path_anchor_input_list:
-        for i in range(movie_start, movie_end + 1):
-            path_in = Path(path_anchor_input, movie_string + f"{counting_format % i}")
-            files = sorted([x for x in path_in.glob(filename_steps_list[0]
-                            + "*" + filename_pattern) if x.is_file()])
-            if len(files) > take_last:
-                files_last = files[-take_last]
-            else:
-                try:
-                    files_last = files[0]
-                except IndexError:
-                    # no files in dir
-                    print(f'{str(Path(path_in, filename_steps_list[0] + "*" + filename_pattern))} '
-                          f'not found. Skipping.')
-                    continue
+    for azimuth, elevation, distance in zip(azimuth_list, elevation_list, distance_list):
+        for mixture_slice_index_list in mixture_slice_index_list_list:
+            for path_anchor_input, movie_start, movie_end in zip(path_anchor_input_list, movie_start_list, movie_end_list):
+                for i in range(movie_start, movie_end + 1):
+                    path_in = Path(path_anchor_input, movie_string + f"{counting_format % i}")
+                    files = sorted([x for x in path_in.glob(filename_steps_list[0]
+                                    + "*" + filename_pattern) if x.is_file()])
+                    if len(files) > take_last:
+                        files_last = files[-take_last]
+                    else:
+                        try:
+                            files_last = files[0]
+                        except IndexError:
+                            # no files in dir
+                            print(f'{str(Path(path_in, filename_steps_list[0] + "*" + filename_pattern))} '
+                                  f'not found. Skipping.')
+                            continue
 
-            frame_start = get_step_index(files_last,
-                                         filename_prefix=filename_steps_list[0],
-                                         file_pattern=filename_pattern)
+                    frame_start = get_step_index(files_last,
+                                                 filename_prefix=filename_steps_list[0],
+                                                 file_pattern=filename_pattern)
 
-            command = ["python", "-m", "supersolids.tools.load_npz"]
-            flags_given = [f"-dir_path={path_anchor_input}",
-                           f"-dir_name={movie_string}{counting_format % i}",
-                           f"-frame_start={frame_start}",
-                           f"-steps_per_npz={steps_per_npz}",
-                           f"-steps_format={steps_format}",
-                           f"-slice_indices={dic2str(slice_indices, single_quote_wrapped=False)}",
-                           f"-azimuth={azimuth}",
-                           f"-elevation={elevation}",
-                           f"-distance={distance}",
-                           f"--alpha_V={alpha_V}",
-                           ]
+                    command = ["python", "-m", "supersolids.tools.load_npz"]
+                    flags_given = [f"-dir_path={path_anchor_input}",
+                                   f"-dir_name={movie_string}{counting_format % i}",
+                                   f"-frame_start={frame_start}",
+                                   f"-steps_per_npz={steps_per_npz}",
+                                   f"-steps_format={steps_format}",
+                                   f"-slice_indices={dic2str(slice_indices, single_quote_wrapped=False)}",
+                                   f"-azimuth={azimuth}",
+                                   f"-elevation={elevation}",
+                                   f"-distance={distance}",
+                                   f"--alpha_V={alpha_V}",
+                                   ]
 
-            alpha_args_parsed = list(map(str, alpha_psi_list))
-            flags_given.append(f"--alpha_psi_list")
-            flags_given += alpha_args_parsed
+                    alpha_args_parsed = list(map(str, alpha_psi_list))
+                    flags_given.append(f"--alpha_psi_list")
+                    flags_given += alpha_args_parsed
 
-            alpha_sol_args_parsed = list(map(str, alpha_psi_sol_list))
-            flags_given.append(f"--alpha_psi_sol_list")
-            flags_given += alpha_sol_args_parsed
+                    alpha_sol_args_parsed = list(map(str, alpha_psi_sol_list))
+                    flags_given.append(f"--alpha_psi_sol_list")
+                    flags_given += alpha_sol_args_parsed
 
-            if filename_steps_list:
-                filename_steps_parsed = list(map(str, filename_steps_list))
-                flags_given.append(f"--filename_steps_list")
-                flags_given += filename_steps_parsed
+                    if filename_steps_list:
+                        filename_steps_parsed = list(map(str, filename_steps_list))
+                        flags_given.append(f"--filename_steps_list")
+                        flags_given += filename_steps_parsed
 
-            if mixture:
-                slice_index_parsed = list(map(str, mixture_slice_index_list))
-                flags_given.append(f"--mixture_slice_index_list")
-                flags_given += slice_index_parsed
+                    if mixture:
+                        slice_index_parsed = list(map(str, mixture_slice_index_list))
+                        flags_given.append(f"--mixture_slice_index_list")
+                        flags_given += slice_index_parsed
 
-            if cut1d_plot_val_list:
-                cut1d_plot_val_parsed = list(map(str, cut1d_plot_val_list))
-                flags_given.append("--cut1d_plot_val_list")
-                flags_given += cut1d_plot_val_parsed
+                    if cut1d_plot_val_list:
+                        cut1d_plot_val_parsed = list(map(str, cut1d_plot_val_list))
+                        flags_given.append("--cut1d_plot_val_list")
+                        flags_given += cut1d_plot_val_parsed
 
-            if cut1d:
-                # flags_given.append(f"-cut1d_y_lim={cut1d_y_lim}")
-                cut1_y_lim_args_parsed = list(map(str, cut1d_y_lim))
-                flags_given.append(f"--cut1d_y_lim")
-                flags_given += cut1_y_lim_args_parsed
+                    if cut1d:
+                        # flags_given.append(f"-cut1d_y_lim={cut1d_y_lim}")
+                        cut1_y_lim_args_parsed = list(map(str, cut1d_y_lim))
+                        flags_given.append(f"--cut1d_y_lim")
+                        flags_given += cut1_y_lim_args_parsed
 
-            if no_legend:
-                flags_given.append("--no_legend")
-            if arg_slices:
-                flags_given.append("--arg_slices")
-            if plot_V:
-                flags_given.append("--plot_V")
-            if ui:
-                flags_given.append("--ui")
-            if sum_along:
-                flags_given.append(f"-sum_along={sum_along}")
-            if frame_end:
-                flags_given.append(f"-frame_end={frame_end}")
+                    if no_legend:
+                        flags_given.append("--no_legend")
+                    if arg_slices:
+                        flags_given.append("--arg_slices")
+                    if plot_V:
+                        flags_given.append("--plot_V")
+                    if ui:
+                        flags_given.append("--ui")
+                    if sum_along:
+                        flags_given.append(f"-sum_along={sum_along}")
+                    if frame_end:
+                        flags_given.append(f"-frame_end={frame_end}")
 
-            flags_parsed = " ".join(flags_given)
+                    flags_parsed = " ".join(flags_given)
 
-            print(flags_given)
-            args = flags(flags_given)
-            load_npz(args)
+                    print(flags_given)
+                    args = flags(flags_given)
+                    load_npz(args)
