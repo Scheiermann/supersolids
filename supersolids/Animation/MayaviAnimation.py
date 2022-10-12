@@ -12,6 +12,7 @@ Functions for Potential and initial wave function :math:`\psi_0`
 from copy import deepcopy
 import os
 from pathlib import Path
+import shutil
 import sys
 from typing import List, Optional, Tuple
 import zipfile
@@ -21,6 +22,7 @@ from ffmpeg import input
 from mayavi import mlab
 import numpy as np
 from functools import partial
+import paramiko
 
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
@@ -29,6 +31,44 @@ from supersolids.helper import functions, constants, get_path, cut_1d
 from supersolids.helper.get_version import check_cp_nb, get_version
 __GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False))
 cp, cupy_used, cuda_used, numba_used = check_cp_nb(np, gpu_off=__GPU_OFF_ENV__)
+        
+
+def load_System(path_schroedinger, host=None):
+    print("Load schroedinger")
+    if host:
+        sftp = host.sftp()
+        with sftp.file(str(path_schroedinger), "rb") as f:
+            # WARNING: this is just the input Schroedinger at t=0
+            System: Schroedinger = dill.load(file=f)
+    else:
+        with open(path_schroedinger, "rb") as f:
+            # WARNING: this is just the input Schroedinger at t=0
+            System: Schroedinger = dill.load(file=f)
+    
+    return System
+
+
+def load_System_list(System_list, filename_steps_list, input_path, steps_format, frame,
+                     summary_name):
+    for i, filename_steps in enumerate(filename_steps_list):
+        # get the psi_val of Schroedinger at other timesteps (t!=0)
+        psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
+        if isinstance(System_list[i], SchroedingerMixture):
+            with open(psi_val_path, "rb") as f:
+                System_list[i].psi_val_list = np.load(file=f)["psi_val_list"]
+        else:
+            with open(psi_val_path, "rb") as f:
+                System_list[i].psi_val = np.load(file=f)["psi_val"]
+
+        if not (summary_name is None):
+            try:
+                System_list[i] = System_list[i].load_summary(input_path,
+                                                             steps_format, frame,
+                                                             summary_name=summary_name)
+            except Exception:
+                print(f"Could not load {summary_name}!")
+    
+    return System_list
 
 
 def get_legend(System, frame, frame_start, supersolids_version, mu_rel=None):
@@ -99,6 +139,7 @@ class MayaviAnimation(Animation.Animation):
                  slice_indices: np.ndarray = [0, 0, 0],
                  dir_path: Path = Path.home().joinpath("supersolids", "results"),
                  offscreen: bool = False,
+                 host=None,
                  ):
         """
         Creates an Animation with mayavi for a Schroedinger equation
@@ -125,8 +166,19 @@ class MayaviAnimation(Animation.Animation):
                          camera_z_func=Anim.camera_z_func,
                          filename=Anim.filename,
                          )
-        if not dir_path.is_dir():
-            dir_path.mkdir(parents=True)
+        if host is None:
+            if not dir_path.is_dir():
+                dir_path.mkdir(parents=True)
+        else:
+            sftp = host.sftp()
+            try:
+                # Test if remote_path exists
+                sftp.chdir(str(dir_path))
+            except IOError:
+                # Create remote_path
+                sftp.mkdir(str(dir_path))
+                sftp.chdir(str(dir_path))
+            
 
         MayaviAnimation.mayavi_counter += 1
         self.slice_indices = slice_indices
@@ -152,7 +204,8 @@ class MayaviAnimation(Animation.Animation):
                      dir_path: Path = None,
                      input_data_file_pattern: str = "*.png",
                      delete_input: bool = True,
-                     filename: str = "") -> Path:
+                     filename: str = "",
+                     host=None) -> Path:
         """
         Creates movie filename with all matching pictures from
         input_data_file_pattern.
@@ -178,6 +231,9 @@ class MayaviAnimation(Animation.Animation):
         else:
             output_path = Path(input_path, self.filename)
         print(f"input_data: {input_data}")
+        if host:
+           output_path = Path("/bigwork/dscheier/results/begin_ramp_21_09_a12_70_big/movie013/")
+           input_path, _, _, _ = get_path.get_path(output_path)
 
         # requires either mencoder or ffmpeg to be installed on your system
         # from command line:
@@ -360,6 +416,7 @@ class MayaviAnimation(Animation.Animation):
                     no_legend: bool = False,
                     cut1d_y_lim: Tuple[float, float] = (0.0, 1.0),
                     cut1d_plot_val_list: bool = [False],
+                    host=None,
                     ):
         """
         Animates solving of the Schroedinger equations of System with mayavi in 3D.
@@ -385,16 +442,22 @@ class MayaviAnimation(Animation.Animation):
                 input_path, _, _, _ = get_path.get_path(dir_path)
 
         self.dir_path = input_path
-        self.fig.scene.movie_maker.directory = self.dir_path
+        if host:
+            local_dir_path = Path("/bigwork/dscheier/results/begin_ramp_21_09_a12_70_big/movie013/")
+            if not local_dir_path.is_dir():
+                local_dir_path.mkdir(parents=True)
+            self.fig.scene.movie_maker.directory = local_dir_path
+            # self.dir_path
+        else:
+            self.fig.scene.movie_maker.directory = self.dir_path
+
         _, last_index, _, _ = get_path.get_path(self.dir_path,
                                                 search_prefix=filename_steps_list[0],
                                                 file_pattern=".npz"
                                                 )
 
-        print("Load schroedinger")
-        with open(Path(input_path, filename_schroedinger), "rb") as f:
-            # WARNING: this is just the input Schroedinger at t=0
-            System: Schroedinger = dill.load(file=f)
+        path_schroedinger: Path = Path(input_path, filename_schroedinger)
+        System = load_System(path_schroedinger, host=host)
 
         (prob_plots, slice_x_plot, slice_y_plot, slice_z_plot,
          V_plot, psi_sol_plot) = self.prepare(System,
@@ -413,24 +476,8 @@ class MayaviAnimation(Animation.Animation):
             print(f"frame={frame}")
             # self.fig.scene.movie_maker._count = frame
             try:
-                for i, filename_steps in enumerate(filename_steps_list):
-                    # get the psi_val of Schroedinger at other timesteps (t!=0)
-                    psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
-                    if isinstance(System_list[i], SchroedingerMixture):
-                        with open(psi_val_path, "rb") as f:
-                            System_list[i].psi_val_list = np.load(file=f)["psi_val_list"]
-                    else:
-                        with open(psi_val_path, "rb") as f:
-                            System_list[i].psi_val = np.load(file=f)["psi_val"]
-
-                    if not (summary_name is None):
-                        try:
-                            System_list[i] = System_list[i].load_summary(input_path,
-                                                                         steps_format, frame,
-                                                                         summary_name=summary_name)
-                        except Exception:
-                            print(f"Could not load {summary_name}!")
-
+                System_list = load_System_list(System_list, filename_steps_list, input_path,
+                                               steps_format, frame, summary_name)
                 System = System_list[0]
 
                 if not no_legend:
@@ -544,6 +591,13 @@ class MayaviAnimation(Animation.Animation):
             except Exception as e:
                 print(f"cut1d did not work!\n{e}")
 
+            anim_name = "anim"
+            anim_extension = ".png"
+            path_anim = Path(output_path, anim_name + "%05d" % int(frame / steps_per_npz) + anim_extension)
+            path_anim_new = Path(output_path, anim_name + steps_format % frame + anim_extension)
+            shutil.move(path_anim, path_anim_new)
+            print(f"from: {path_anim}, to: {path_anim_new}")
+
             frame = frame + steps_per_npz
 
             if frame_end:
@@ -557,6 +611,7 @@ class MayaviAnimation(Animation.Animation):
 
         # Finally close
         mlab.close(all=True)
+        
 
     @mlab.animate(delay=10, ui=True)
     def animate(self, System: Schroedinger, accuracy: float = 10 ** -6,

@@ -79,9 +79,9 @@ if __name__ == "__main__":
     password = None
 
     path_anchor_input = Path("/bigwork/nhbbsche/results/begin_gpu_big/")
-    # path_anchor_output = Path("/bigwork/dscheier/results/begin_gpu/")
+    path_anchor_output = Path("/bigwork/dscheier/results/begin_gpu_big/")
     # path_anchor_output = Path("/run/media/dsche/scr2/begin_gpu/")
-    path_anchor_output = Path("/run/media/dsche/scr2/begin_gpu_big/")
+    # path_anchor_output = Path("/run/media/dsche/scr2/begin_gpu_big/")
 
 
     # take_last = 3
@@ -89,12 +89,10 @@ if __name__ == "__main__":
 
     movie_string = "movie"
     counting_format = "%03d"
-    movie_start = 11
-    # movie_end = 110
-    # movie_end = 24
-    movie_end = 40
+    movie_start = 1
+    movie_end = 6
 
-    mixture = False
+    mixture = True
 
     if mixture:
         filename_steps_list = ["script_", "schroedinger_",

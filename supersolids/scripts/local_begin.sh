@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-dir_path="/bigwork/dscheier/results/begin_gpu"
+dir_path="/bigwork/dscheier/results/begin_ramp03"
 # dir_path="/run/media/dsche/ITP Transfer/test/"
 steps_per_npz=1000
 steps_format="%07d"
 
 frame_start=0
-movie_number_result=6
+movie_number_result=1
 movie_string="movie"
 movie_format="%03d"
 printf -v movie_number_formatted ${movie_format} ${movie_number_result}
@@ -37,7 +37,8 @@ dir_path_after=$dir_path
 --a_s_list  88.0 0.0 0.0 \
 --V_interaction \
 --offscreen \
- --mixture
+--mixture \
+-tilt=0.0
 # --dipol_list 10.0 9.0 \
 # --a_s_list 0.00000004656759455 \
 

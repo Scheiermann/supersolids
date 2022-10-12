@@ -1133,6 +1133,12 @@ def dt_adaptive(t, dt) -> float:
     return dt_adapted
 
 
+def convert_m_to_dimensionless(steps_in_m, res, l_0):
+    return dimensionless((steps_in_m * res) / 2.0, l_0)
+
+def get_l_0(m , w_x):
+    return np.sqrt(constants.hbar / (m * w_x))
+
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == '__main__':
     # due to fft of the points the res needs to be 2 **

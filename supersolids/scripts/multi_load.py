@@ -5,6 +5,8 @@
 # license: MIT
 # Please feel free to use and modify this, but keep the above information.
 
+from fabric import Connection
+import fnmatch
 from pathlib import Path
 import numpy as np
 
@@ -20,13 +22,20 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
+    ssh_hostname = None
+    # ssh_hostname = "transfer"
+    password = None
+
     path_anchor_input_list = []
-    # experiment_suffix = "ramp_05_09"
-    # experiment_suffix = "ramp_09_09_10**eps"
-    # experiment_suffix = "ramp_13_09_10**eps"
-    # experiment_suffix = "ramp_19_09_a12=0"
-    # experiment_suffix = "ramp_21_09_a12=0"
-    experiment_suffix = "ramp_21_09_a12=70"
+    # experiment_suffix = "ramp_21_09_a12=70"
+    # experiment_suffix = "ramp_21_09_a12_70_big"
+    # experiment_suffix = "ramp_test00"
+    # experiment_suffix = "ramp_05_10"
+    # experiment_suffix = "ramp_05_10_a12=70"
+    # experiment_suffix = "stacked_05_10_a11"
+    # experiment_suffix = "ramp_10_10"
+    experiment_suffix = "ramp_10_10_small"
+    # path_anchor_input_list.append(Path(f"/bigwork/nhbbsche/results/begin_{experiment_suffix}/"))
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     
     # mixture = False
@@ -39,20 +48,21 @@ if __name__ == "__main__":
     # frame_end = 1000
     frame_end = None
 
-    # steps_per_npz = 10000
+    steps_per_npz = 10000
     # steps_per_npz = 1000
-    steps_per_npz = 100
+    # steps_per_npz = 100
+    # steps_per_npz = 1
 
     movie_string = "movie"
     counting_format = "%03d"
-    # movie_end_list = [32]
-    # movie_start_list = [11]
-    # movie_end_list = [13]
-    movie_start_list = [21]
-    movie_end_list = [22]
-    # movie_start_list = [1, 11, 21]
-    # movie_end_list = [1, 13, 22]
-    slice_indices = {"x": 63, "y": 31, "z": 31}
+    # movie_start_list = [1, 11, 21, 31]
+    # movie_end_list = [2, 12, 22, 32]
+    movie_start_list = [1]
+    # movie_end_list = [30]
+    movie_end_list = [6]
+    slice_indices = {"x": 127, "y": 31, "z": 31}
+    # slice_indices = {"x": 63, "y": 31, "z": 31}
+    # slice_indices = {"x": 31, "y": 15, "z": 15}
 
     mixture_slice_index_list_list = []
     if mixture:
@@ -88,19 +98,19 @@ if __name__ == "__main__":
     distance_list = []
 
     ## xy
-    # azimuth_list.append(0.0)
-    # elevation_list.append(0.0)
-    # distance_list.append(20.0)
+    azimuth_list.append(0.0)
+    elevation_list.append(0.0)
+    distance_list.append(20.0)
 
     ## xz
-    # azimuth_list.append(270.0)
-    # elevation_list.append(90.0)
-    # distance_list.append(20.0)
+    azimuth_list.append(270.0)
+    elevation_list.append(90.0)
+    distance_list.append(20.0)
 
     ## diagonal
-    azimuth_list.append(45.0)
-    elevation_list.append(45.0)
-    distance_list.append(40.0)
+    # azimuth_list.append(45.0)
+    # elevation_list.append(45.0)
+    # distance_list.append(40.0)
 
     alpha_V = 0.0
 
@@ -116,8 +126,16 @@ if __name__ == "__main__":
             for path_anchor_input, movie_start, movie_end in zip(path_anchor_input_list, movie_start_list, movie_end_list):
                 for i in range(movie_start, movie_end + 1):
                     path_in = Path(path_anchor_input, movie_string + f"{counting_format % i}")
-                    files = sorted([x for x in path_in.glob(filename_steps_list[0]
-                                    + "*" + filename_pattern) if x.is_file()])
+                    if ssh_hostname:
+                        with Connection(ssh_hostname) as host:
+                            files = sorted(fnmatch.filter(host.sftp().listdir(path=str(path_in)),
+                                                          filename_steps_list[0]
+                                                          + "*"
+                                                          + filename_pattern))
+                    else:
+                        files = sorted([x for x in path_in.glob(filename_steps_list[0]
+                                        + "*" + filename_pattern) if x.is_file()])
+
                     if len(files) > take_last:
                         files_last = files[-take_last]
                     else:
@@ -192,4 +210,13 @@ if __name__ == "__main__":
 
                     print(flags_given)
                     args = flags(flags_given)
-                    load_npz(args)
+                    if password is None:
+                        if ssh_hostname:
+                            with Connection(ssh_hostname) as host:
+                                load_npz(args, host=host)
+                        else:
+                            load_npz(args)
+                    else:
+                        with Connection(ssh_hostname,
+                                        connect_kwargs={'password': f"{password}"}) as host:
+                            load_npz(args, host=host)

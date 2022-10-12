@@ -10,6 +10,7 @@ Numerical solver for non-linear time-dependent Schrodinger equation (eGPE) for d
 
 
 """
+from copy import deepcopy
 import functools
 import os
 import pickle
@@ -79,14 +80,34 @@ def smaller_slice(val0, val1):
     return changed, val0, val1
 
 def get_A_density_total(density_list: List[cp.ndarray]) -> Tuple[cp.ndarray, cp.ndarray]:
-    density_total: np.ndarray = np.copy(density_list[0])
+    if cupy_used:
+        try:
+            density_list[0].get() 
+            density_total: cp.ndarray = cp.copy(density_list[0])
+        except:
+            try:
+                for i, density in enumerate(density_list):
+                    density_list[i] = cp.asarray(density)
+                density_total: cp.ndarray = cp.copy(density_list[0])
+            except:
+                density_total: np.ndarray = np.copy(density_list[0])
+    else:
+        density_total: np.ndarray = np.copy(density_list[0])
+
     for density in density_list[1:]:
         density_total += density
 
     # A = n1/(n1+n2)
     density_A = density_list[0] / density_total
     # remove nan, because of possible 0/0 
-    density_A = cp.where(density_A == cp.nan, density_A, 0.0)
+    try:
+        density_A = cp.where(density_A != cp.nan, density_A, 0.0)
+    except:
+        try:
+            density_A = np.where(density_A != cp.nan, density_A, 0.0)
+        except:
+            density_A = np.where(density_A != np.nan, density_A, 0.0)
+
 
     return density_A, density_total
 
@@ -381,10 +402,25 @@ class SchroedingerMixture(Schroedinger):
 
         eta_dVdna = functools.partial(numbas.eta_dVdna_jit, A=self.A)
         eta_dVdnb = functools.partial(numbas.eta_dVdnb_jit, A=self.A)
+ 
         mu_lhy_integrand_a = functools.partial(self.mu_lhy_integrand, eta_dVdn=eta_dVdna)
         mu_lhy_integrand_b = functools.partial(self.mu_lhy_integrand, eta_dVdn=eta_dVdnb)
-        # mu_lhy_integrand_a = functools.partial(self.mu_lhy_integrand, eta_dVdn=self.eta_dVdna)
-        # mu_lhy_integrand_b = functools.partial(self.mu_lhy_integrand, eta_dVdn=self.eta_dVdnb)
+        
+        ######## testing
+        eta_array: np.ndarray = (self.a_s_factor * self.a_s_array
+                                 + self.a_dd_factor * self.a_dd_array * quad_vec(functions.dipol_dipol, 0.0, 1.0)[0]
+                                 )
+        eta_aa = eta_array[0, 0]
+        eta_ab = eta_array[0, 1]
+        eta_bb = eta_array[1, 1]
+        c_t1 = eta_dVdna(lam=1, eta_aa=eta_aa, eta_bb=eta_bb, eta_ab=eta_ab)
+        c_t2 = eta_dVdna(lam=-1, eta_aa=eta_aa, eta_bb=eta_bb, eta_ab=eta_ab)
+        d_t1 = eta_dVdnb(lam=1, eta_aa=eta_aa, eta_bb=eta_bb, eta_ab=eta_ab)
+        d_t2 = eta_dVdnb(lam=-1, eta_aa=eta_aa, eta_bb=eta_bb, eta_ab=eta_ab)
+        b_t = quad_vec(mu_lhy_integrand_b, 0.0, 1.0)[0]
+        a_t = quad_vec(mu_lhy_integrand_a, 0.0, 1.0)[0]
+        ######## testing
+
         mu_lhy_integrated_list = get_mu_lhy_integrated_list(func_list=[mu_lhy_integrand_a,
                                                                        mu_lhy_integrand_b])
 
@@ -554,6 +590,40 @@ class SchroedingerMixture(Schroedinger):
 
         return lhy_energy
 
+    def energy_density_interaction_explicit(self, density_list: List[np.ndarray]) -> float:
+        dV = self.volume_element(fourier_space=False)
+        density_array = cp.stack(density_list, axis=0)
+
+        density_density = cp.einsum("i...,j...->ij...", density_array, density_array)
+
+        # density_density and density_U_dd are (2, 2, res_x, res_y, res_z)
+        # the (2,2) part needs to be summed after one-by-one multiplication
+        # [[a11 * b11, a12 * a12], [a21 * b21, a22 * b22]] with (2, 2) matrices
+        # formally, as we sum in real space dV is just a constant multiplication, so summation
+        # over all 5 dimensions is fine
+        energy_scattering = cp.einsum("ij..., ijklm->ij", self.a_s_array, density_density)
+
+        # if stack_shift is used U_dd has higher dimensionality, but resulting density_U_dd the same
+        if self.stack_shift != 0.0:
+            U_dd = self.get_U_dd(density_list)
+            density_U_dd = cp.einsum("ijklm, jklm->ijklm", U_dd, density_array)
+        else:
+            U_dd_list = self.get_U_dd_list(density_list)
+            U_dd_array = cp.stack(U_dd_list, axis=0)
+            density_U_dd = cp.einsum("i...,j...->ij...", U_dd_array, density_array)
+
+        energy_dipol_dipol = cp.einsum("ij..., ijklm->ij", self.a_dd_array, density_U_dd)
+
+        # E_scatter = 0.5 * np.sum(energy_scattering).real * dV
+        # E_dd = np.sum(energy_dipol_dipol).real * dV
+        E_scatter = 0.5 * np.sum(energy_scattering) * dV
+        E_dd = 0.5 * np.sum(energy_dipol_dipol).real * dV
+        if cupy_used:
+            E_scatter = cp.asnumpy(E_scatter)
+            E_dd = cp.asnumpy(E_dd)
+
+        return E_dd, E_scatter
+
     def energy_density_interaction(self, density_list: List[np.ndarray]) -> float:
         dV = self.volume_element(fourier_space=False)
         density_array = cp.stack(density_list, axis=0)
@@ -597,6 +667,72 @@ class SchroedingerMixture(Schroedinger):
 
         # use normalized inputs for energy
         self.E = self.energy(density_list, mu_lhy_list)
+
+
+    def get_E_pot(self, density_list: List[cp.ndarray], dV: float = None) -> None:
+        E_pot_ext_list: List[float] = []
+        for density in density_list:
+            if cupy_used:
+                E_pot_ext_list.append(self.sum_dV(cp.asarray(density) * cp.asarray(self.V_val), dV=dV))
+            else:
+                try:
+                    E_pot_ext_list.append(self.sum_dV(density * self.V_val, dV=dV))
+                except:
+                    E_pot_ext_list.append(self.sum_dV(density.get() * self.V_val, dV=dV))
+
+        try:
+            E_pot_arr = cp.array(E_pot_ext_list).get()
+        except:
+            E_pot_arr = np.array(E_pot_ext_list)
+        # add all components
+        E_pot = np.sum(E_pot_arr)
+        
+        return E_pot
+
+
+    def get_E_kin(self, dV: float = None) -> None:
+        psi_val_array = np.array(self.psi_val_list)
+        fft_dim = range(1, psi_val_array.ndim)
+        psi_val_array_k = np.fft.fftn(psi_val_array, axes=fft_dim)
+        H_kin_array = np.array(self.H_kin_list)
+        E_kin_grid_helper = np.einsum("i...,i...->i...", H_kin_array, psi_val_array_k)
+        E_kin_grid_helper_fft = np.fft.ifftn(E_kin_grid_helper, axes=fft_dim)
+        E_kin_grid = np.einsum("i...,i...->i...", np.conjugate(psi_val_array), E_kin_grid_helper_fft)
+        E_kin_arr = np.fromiter(map(functools.partial(self.sum_dV, dV=dV), E_kin_grid.real),
+                                 dtype=float) * np.array(self.N_list)
+        E_kin = np.sum(E_kin_arr)
+
+        return E_kin
+
+    def get_mu_explicit(self, psi_previous_list) -> None:
+        mu_list = []
+        for (psi_val, psi_previous) in zip(self.psi_val_list, psi_previous_list):
+            integrand = np.conjugate(psi_previous) * (psi_val - psi_previous)
+            mu_list.append((1 / self.dt) * self.sum_dV(integrand))
+        
+        return mu_list
+
+    def get_E_explicit(self) -> None:
+        dV = self.volume_element(fourier_space=False)
+
+        # update for energy calculation
+        density_list = self.get_density_list(jit=numba_used)
+        # density_list_per_particle = []
+        # for density, N in zip(density_list, self.N_list):
+        #     # norm
+            # density_list_per_particle.append((1.0 / N) * density)
+
+        E_lhy = self.sum_dV(self.get_energy_lhy(density_list), dV=dV)
+        E_dd, E_scatter = self.energy_density_interaction_explicit(density_list)
+        E_pot = self.get_E_pot(density_list, dV=dV)
+        E_kin = self.get_E_kin(dV=dV)
+
+        # use normalized inputs for energy
+        N = np.sum(self.N_list)
+        E = (E_kin + E_pot + E_lhy + E_dd + E_scatter) / N
+        print(f"Check E: {E}")
+        
+        return E
 
     def energy(self, density_list: List[cp.ndarray], mu_lhy_list: List[cp.ndarray]) -> float:
         """
@@ -940,14 +1076,17 @@ class SchroedingerMixture(Schroedinger):
         U_dd_list: List[cp.ndarray] = []
         for density in density_list:
             try:
-                U_dd_list.append(cp.fft.ifftn(self.V_k_val * cp.fft.fftn(density)))
+                U_dd_list.append(cp.fft.ifftn(cp.asarray(self.V_k_val) * cp.fft.fftn(density)))
             except Exception as e:
                 print({e})
-                U_dd_list.append(np.fft.ifftn(self.V_k_val.get() * np.fft.fftn(density.get())))
                 try:
-                    U_dd_list.append(np.fft.ifftn(self.V_k_val * np.fft.fftn(density)))
+                    U_dd_list.append(np.fft.ifftn(self.V_k_val.get() * np.fft.fftn(density.get())))
                 except Exception as e:
                     print({e})
+                    try:
+                        U_dd_list.append(np.fft.ifftn(self.V_k_val * np.fft.fftn(density.get())))
+                    except Exception as e:
+                        print({e})
 
 
         return U_dd_list
@@ -1072,6 +1211,11 @@ class SchroedingerMixture(Schroedinger):
         split operator method with the Trotter-Suzuki approximation.
 
         """
+        # psi_previous_list = []
+        # for previous in self.psi_val_list:
+        #     psi_previous_list.append(deepcopy(previous))
+        # self.get_E_explicit()
+
         # adjust dt, to get the time accuracy when needed
         # self.dt = self.dt_func(self.t, self.dt)
         self.split_operator_pot(split_step=0.5, jit=numba_used, cupy_used=cupy_used)
@@ -1079,6 +1223,8 @@ class SchroedingerMixture(Schroedinger):
         self.split_operator_pot(split_step=0.5, jit=numba_used, cupy_used=cupy_used)
 
         self.t = self.t + self.dt
+        # self.get_mu_explicit(psi_previous_list)
+        # self.get_E_explicit()
 
         # for self.imag_time=False, renormalization should be preserved,
         # but we play safe here (regardless of speedup)

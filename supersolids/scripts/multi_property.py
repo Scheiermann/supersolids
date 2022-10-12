@@ -12,9 +12,13 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    # experiment_suffix = "ramp_05_09"
-    # experiment_suffix = "ramp_09_09_10**eps"
-    experiment_suffix = "ramp_13_09_10**eps"
+    # experiment_suffix = "ramp_13_09_10**eps"
+    # experiment_suffix = "ramp_21_09_a12=70"
+    # experiment_suffix = "ramp_test00"
+    # experiment_suffix = "ramp_05_10"
+    # experiment_suffix = "ramp_05_10_a12=70"
+    experiment_suffix = "ramp_10_10"
+    # experiment_suffix = "ramp_10_10_small"
     path_anchor_input = Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/")
 
     mixture = True
@@ -27,6 +31,8 @@ if __name__ == "__main__":
         filename_steps = "step_"
 
     steps_per_npz = 10000
+    # steps_per_npz = 1000
+    # steps_per_npz = 1
 
     # frame_start = None
     frame_start = 0
@@ -39,10 +45,7 @@ if __name__ == "__main__":
         frame_end = None
 
     movie_start = 1
-    # movie_end = 32
-    movie_end = 6
-    # movie_start = 7
-    # movie_end = 7
+    movie_end = 30
 
     dt = 0.0002
 
@@ -69,19 +72,28 @@ if __name__ == "__main__":
     # property_names = ["E", "mu_arr"]
     # list_of_arrays = False
 
+    # subplots_list = [True, False, False, True, False]
+    # property_func_list = [True, False, False, True, True]
+    # list_of_arrays_list = [True, False, False, True, False]
+    # property_names_list = ["get_center_of_mass", "E", "mu_arr", "get_parity", "check_N"]
+    # property_args_list = [[], [], [], [], []]
+    # property_args_frame_list = [False, False, False, False, False]
+
     subplots_list = [True, False, False, True, False]
     property_func_list = [True, False, False, True, True]
     list_of_arrays_list = [True, False, False, True, False]
-    property_names_list = ["get_center_of_mass", "E", "mu_arr", "get_parity", "check_N"]
+    property_names_list = ["get_center_of_mass", "E", "mu_arr", "get_parity", "get_E_explicit"]
     property_args_list = [[], [], [], [], []]
     property_args_frame_list = [False, False, False, False, False]
 
     # subplots_list = [False]
     # property_func_list = [True]
     # list_of_arrays_list = [False]
-    # property_names_list = ["check_N"]
+    # property_names_list = ["get_E_explicit"]
     # property_args_list = [[]]
     # property_args_frame_list = [False]
+
+
     # property_names = ["get_parity"]
     # property_name = ["get_peak_distances_along"]
     # property_name = ["get_peak_positions"]

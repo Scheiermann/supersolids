@@ -7,10 +7,12 @@ import numpy as np
 
 def check_if_further(path_anchor_input, dir_name, counting_format, movie_number,
                      experiment_step, check_further=1):
+    # check from most furthest to nearest
     check_range = (np.arange(0, check_further + 1) * experiment_step).tolist()[::-1]
     for movie_number_add in check_range:
         movie_number_check = movie_number + movie_number_add
         path_movie = Path(path_anchor_input, f"{dir_name}{counting_format % movie_number_check}")
+        # accpet if created path has files
         try:
             files = sorted([x for x in path_movie.glob("*") if x.is_file()])
             if len(files) > 0:

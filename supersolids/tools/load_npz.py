@@ -14,15 +14,18 @@ time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 import argparse
 import json
 import sys
+from copy import deepcopy
 from pathlib import Path
 
 from mayavi import mlab
 
 from supersolids.Animation.Animation import Animation
 from supersolids.Animation import MayaviAnimation
+from supersolids.Animation.MayaviAnimation import load_System, load_System_list
+from supersolids.helper import get_path
 
 
-def load_npz(flag_args):
+def load_npz(flag_args, host=None):
     slice_x = flag_args.slice_indices["x"]
     slice_y = flag_args.slice_indices["y"]
     slice_z = flag_args.slice_indices["z"]
@@ -31,6 +34,33 @@ def load_npz(flag_args):
         dir_path = Path(flag_args.dir_path).expanduser()
     except Exception:
         dir_path = flag_args.dir_path
+
+    # System_list = []
+    # input_path = Path(dir_path, flag_args.dir_name)
+    # path_schroedinger = Path(input_path, flag_args.filename_schroedinger)
+    # System = load_System(path_schroedinger, host=host)
+    # for i in range(0, len(flag_args.filename_steps_list)):
+    #     # create copies of the System in a list (to fill them later with different psi_val)
+    #     System_list.append(deepcopy(System))
+
+    # _, last_index, _, _ = get_path.get_path(dir_path,
+    #                                         search_prefix=flag_args.filename_steps_list[0],
+    #                                         file_pattern=".npz"
+    #                                         )
+
+    # frame = flag_args.frame_start
+    # while True:
+    #      System_list = load_System_list(System_list, flag_args.filename_steps_list, input_path,
+    #                                     flag_args.steps_format, frame, flag_args.summary_name)
+    #      frame = frame + flag_args.steps_per_npz
+
+    #      if flag_args.frame_end:
+    #         last_index = flag_args.frame_end 
+
+    #      if frame == last_index + flag_args.steps_per_npz:
+    #          break
+    #      elif frame > last_index:
+    #          frame = last_index
 
     Anim: Animation = Animation(plot_V=flag_args.plot_V,
                                 alpha_psi_list=flag_args.alpha_psi_list,
@@ -43,6 +73,7 @@ def load_npz(flag_args):
     MayAnim = MayaviAnimation.MayaviAnimation(Anim,
                                               dir_path=dir_path,
                                               slice_indices=[slice_x, slice_y, slice_z],
+                                              host=host,
                                               )
 
     animate_wrapper = mlab.animate(MayAnim.animate_npz, delay=10, ui=flag_args.ui)
@@ -64,17 +95,20 @@ def load_npz(flag_args):
                                   no_legend=flag_args.no_legend,
                                   cut1d_y_lim=flag_args.cut1d_y_lim,
                                   cut1d_plot_val_list=flag_args.cut1d_plot_val_list,
+                                  host=host,
                                   )
     mlab.show()
 
     result_path_anim = MayAnim.create_movie(dir_path=MayAnim.dir_path,
+    # result_path_anim = MayAnim.create_movie(dir_path=Path("/bigwork/dscheier/results/begin_ramp_21_09_a12_70_big/movie013/"),
                                             input_data_file_pattern="anim*.png",
                                             delete_input=flag_args.delete_input)
     result_path_cut1d = MayAnim.create_movie(dir_path=MayAnim.dir_path,
+    # result_path_cut1d = MayAnim.create_movie(dir_path=Path("/bigwork/dscheier/results/begin_ramp_21_09_a12_70_big/movie013/"),
                                              input_data_file_pattern="1d_cut_*.png",
                                              delete_input=flag_args.delete_input,
-                                             filename="1d_cut.mp4")
-
+                                             filename="1d_cut.mp4",
+                                             host=host)
 
 def flags(args_array):
     parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "

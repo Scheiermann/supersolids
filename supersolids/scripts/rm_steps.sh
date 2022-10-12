@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
-path_anchor_input="/bigwork/dscheier/supersolids/supersolids/results/begin_alpha/"
+path_anchor_input="/bigwork/dscheier/results/begin_pretilt0.05_a11_60to100/"
 
 # next_new allows to point to different movies of one batched simulation
 next_new=0
 
 # number of movies in batched simulation
-number=$((40 - next_new))
+# number=$((25 - next_new))
+number=$((1 - next_new))
 
 # starting number to numerate the output directories
 start=$((1 + next_new))
@@ -16,6 +17,8 @@ rm_start=$start
 rm_dir_name="movie"
 
 regex="step_*[1-9]000.npz"
+# regex="SchroedingerMixtureSummary_*[1-9]000.npz"
+
 
 for ((j = ${start}; j < $((start + number)); j++))
 do

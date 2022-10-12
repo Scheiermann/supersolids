@@ -64,6 +64,11 @@ def last_frame(frame: Optional[int],
                normed_plots: bool = True,
                property_filename_list: List[str] = [],
                list_of_arrays_list: List[bool] = [],
+               dir_all: str = "all",
+               dir_cuts: str = "cuts",
+               dir_frames: str = "frames",
+               dir_scripts: str = "scripts",
+               dir_videos: str = "videos",
                ):
     path_graphs = Path(path_anchor_input_list[0].parent, "graphs")
     number_of_movies_list = ((np.array(movie_end_list) + 1) - np.array(movie_start_list)).tolist()
@@ -114,17 +119,29 @@ def last_frame(frame: Optional[int],
                                                                          path_anchor_output_list,
                                                                          suffix_list,
                                                                          filename_out_list):
+        dir_pics = f"{counting_format_png % movie_take_last}"
+        path_anchor_all: Path = Path(path_anchor_output, dir_all)
+        path_anchor_cuts: Path = Path(path_anchor_output, dir_cuts)
+        path_anchor_frames: Path = Path(path_anchor_output, dir_frames)
+        path_anchor_pics: Path = Path(path_anchor_output, dir_pics)
+        path_anchor_scripts: Path = Path(path_anchor_output, dir_scripts)
+        path_anchor_videos: Path = Path(path_anchor_output, dir_videos)
+        path_anchor_dir_list = [path_anchor_all, path_anchor_cuts, path_anchor_frames,
+                                path_anchor_pics, path_anchor_scripts, path_anchor_videos]
+
         if frame:
-            path_output_frame: Path = Path(path_anchor_output, f"frame_{filename_format % frame}")
+            path_output_frame: Path = Path(path_anchor_frames,
+                                           f"frame_{frame_format % frame}")
         else:
-            path_output_frame: Path = Path(path_anchor_output, f"frame_last")
+            path_output_frame: Path = Path(path_anchor_frames, f"frame_last")
         
-        path_anchor_scripts: Path = Path(path_anchor_output, f"scripts")
 
         if not path_output_frame.is_dir():
             path_output_frame.mkdir(parents=True)
-        if not path_anchor_scripts.is_dir():
-            path_anchor_scripts.mkdir(parents=True)
+        
+        for path_anchor_dir in path_anchor_dir_list:
+            if not path_anchor_dir.is_dir():
+                path_anchor_dir.mkdir(parents=True)
 
         # use path_mesh to get last png of every animation
         path_mesh_new = path_mesh.copy()
@@ -135,8 +152,10 @@ def last_frame(frame: Optional[int],
                 path_mesh_new[ix, iy] = get_last_png_in_last_anim(path_mesh[ix, iy],
                                                                   dir_name_png, counting_format_png,
                                                                   movie_take_last,
-                                                                  filename_pattern, filename_format,
-                                                                  filename_extension)
+                                                                  filename_pattern,
+                                                                  filename_format,
+                                                                  filename_extension,
+                                                                  frame_format)
                 for i, (filename_step, mixture_slice_index) in enumerate(zip(filename_steps_list,
                                                                              mixture_slice_index_list)):
                     path_mesh_cuts[i][ix, iy] = []
@@ -162,8 +181,19 @@ def last_frame(frame: Optional[int],
                     )
 
                 path_mesh_new[ix, iy] = Path(path_last_movie_png,
-                                             filename_pattern + f"{filename_format % frame}"
+                                             filename_pattern + f"{frame_format % frame}"
                                              + filename_extension)
+
+                for i, (filename_step, mixture_slice_index) in enumerate(zip(filename_steps_list,
+                                                                             mixture_slice_index_list)):
+                    path_mesh_cuts[i][ix, iy] = []
+                    for cut_name in cut_names:
+                        path_mesh_cuts[i][ix, iy].append(
+                            Path(path_last_movie_png, filename_step + str(mixture_slice_index)
+                                 + "_" + cut_name + "_" + frame_format % frame + ".npz"
+                                )
+                            )
+
 
             path_currently_old: Path = path_mesh[ix, iy]
             if frame: 
@@ -178,7 +208,7 @@ def last_frame(frame: Optional[int],
                 path_out: Path = Path(path_output_frame,
                                       f"{filename_out}"
                                       + f"_{path_currently_old.stem}"
-                                      + f"_frame_{frame_last}{filename_extension}"
+                                      + f"_frame_{frame_format % frame_last}{filename_extension}"
                                       )
 
             # else:
@@ -192,7 +222,10 @@ def last_frame(frame: Optional[int],
             else:
                 path_currently_new: Path = path_mesh_new[ix, iy]
                 if path_currently_new is not None:
-                    shutil.copy(path_mesh_new[ix, iy], path_out)
+                    try:
+                        shutil.copy(path_mesh_new[ix, iy], path_out)
+                    except Exception as e: 
+                        print(f"Copying failed: {e}")
 
             script_filename = "script"
             script_extension = ".txt"
@@ -204,11 +237,11 @@ def last_frame(frame: Optional[int],
 
         print(f"frame: {frame}, movie_take_last: {movie_take_last}")
         if frame:
-            path_out_periodic: Path = Path(path_anchor_output,
+            path_out_periodic: Path = Path(path_anchor_output, dir_pics,
                                            f"periodic_system_merge{suffix}_{experiment_suffix}"
-                                           + f"_{filename_format % frame}" + ".png")
+                                           + f"_{frame_format % frame}" + ".png")
         else:
-            path_out_periodic: Path = Path(path_anchor_output,
+            path_out_periodic: Path = Path(path_anchor_output, dir_pics,
                                            f"periodic_system_merge{suffix}_{experiment_suffix}.png")
 
         if mesh_remap_index_list:
@@ -243,21 +276,21 @@ def last_frame(frame: Optional[int],
                                           np.flip(probs_cuts_max, axis=0)]
         probs_cuts_filenames = ["probs_cuts_middle", "probs_cuts_max"]
         if frame:
-            probs_cuts_filenames = [name + f"_{filename_format % frame}"
+            probs_cuts_filenames = [name + f"_{frame_format % frame}"
                                     for name in probs_cuts_filenames]
 
         for probs_cuts_filename, probs_cuts_mirrored in zip(probs_cuts_filenames,
                                                             probs_cuts_mirrored_list):
-            with open(Path(path_anchor_output, probs_cuts_filename + ".npz"), "wb") as g:
+            with open(Path(path_anchor_cuts, probs_cuts_filename + ".npz"), "wb") as g:
                 np.savez_compressed(g, probs_cuts_mesh=probs_cuts_mirrored)
 
         if video:
             if frame:
-                path_out_video: Path = Path(path_anchor_output,
+                path_out_video: Path = Path(path_anchor_videos,
                                             f"periodic_video_{suffix}_{experiment_suffix}"
-                                            + f"_{filename_format % frame}" + ".mp4")
+                                            + f"_{frame_format % frame}" + ".mp4")
             else:
-                path_out_video: Path = Path(path_anchor_output,
+                path_out_video: Path = Path(path_anchor_videos,
                                             f"periodic_video_{suffix}_{experiment_suffix}"
                                             + ".mp4")
 
@@ -268,20 +301,20 @@ def last_frame(frame: Optional[int],
 
     if not video:
         if frame:
-            path_out_periodic_all: Path = Path(path_anchor_output,
+            path_out_periodic_all: Path = Path(path_anchor_all,
                                                f"periodic_system_merge_all_{experiment_suffix}"
                                                + f"{merge_suffix}"
-                                               + f"_{filename_format % frame}" + ".png")
-            path_out_cuts_all: Path = Path(path_anchor_output,
+                                               + f"_{frame_format % frame}" + ".png")
+            path_out_cuts_all: Path = Path(path_anchor_cuts,
                                            f"cuts_all_{experiment_suffix}"
                                            + f"{merge_suffix}"
-                                           + f"_{filename_format % frame}" + ".png")
+                                           + f"_{frame_format % frame}" + ".png")
 
         else:
-            path_out_periodic_all: Path = Path(path_anchor_output,
+            path_out_periodic_all: Path = Path(path_anchor_all,
                                                f"periodic_system_merge_all_{experiment_suffix}"
                                                + f"{merge_suffix}.png")
-            path_out_cuts_all: Path = Path(path_anchor_output,
+            path_out_cuts_all: Path = Path(path_anchor_cuts,
                                            f"cuts_all_{experiment_suffix}"
                                            + f"{merge_suffix}.png")
 
@@ -302,25 +335,48 @@ def last_frame(frame: Optional[int],
         for k, _ in enumerate(path_anchor_input_list):
             # properties in periodic tables
             for property_filename, list_of_arrays in zip(property_filename_list, list_of_arrays_list):
-                path_mesh_mirrored: List[Path] = np.flip(path_mesh, axis=0)
-                path_mesh_property = path_mesh_mirrored.copy()
-                for ix, iy in np.ndindex(path_mesh_mirrored.shape):
-                    path_mesh_property[ix, iy]: Path = Path(path_mesh_mirrored[ix, iy], f"{property_filename}")
+                # path_mesh_mirrored: List[Path] = np.flip(path_mesh, axis=0)
+                # path_mesh_property = path_mesh_mirrored.copy()
+                path_mesh_property = path_mesh.copy()
+                # for ix, iy in np.ndindex(path_mesh_mirrored.shape):
+                #     path_mesh_property[ix, iy]: Path = Path(path_mesh_mirrored[ix, iy], f"{property_filename}")
+                property_length_of_movie_list = []
+                property_dim_of_movie_list = []
+                for ix, iy in np.ndindex(path_mesh.shape):
+                    path_mesh_property[ix, iy]: Path = Path(path_mesh[ix, iy], f"{property_filename}")
                     path_property_npz = path_mesh_property[ix, iy].with_suffix('.npz')
-                    if ix == iy == 0:
-                        # create 3d array in shape of path_mesh (2D) + property 
-                        try:
-                            property_00_1 = property_load_npz(path_property_npz)[1]
-                            if list_of_arrays:
-                                number_of_components = property_00_1.shape[0]
-                                property_length = property_00_1.shape[-1]
-                            else:
-                                property_length = property_00_1.shape[0]
-                            property_dim = get_dim(list_of_arrays, property_00_1)
+                    # create 3d array in shape of path_mesh (2D) + property 
+                    try:
+                        property_00_1 = property_load_npz(path_property_npz)[1]
+                        if list_of_arrays:
+                            number_of_components = property_00_1.shape[0]
+                            property_length = property_00_1.shape[-1]
+                            property_length_of_movie_list.append(property_length)
+                        else:
+                            property_length = property_00_1.shape[0]
+                            property_length_of_movie_list.append(property_length)
+                        property_dim = get_dim(list_of_arrays, property_00_1)
+                        property_dim_of_movie_list.append(property_dim)
 
-                        except Exception as e:
-                            print("Error: property_length not found. "
-                                  "Make sure that property_length is the same for all movies. {e}")
+                    except Exception as e:
+                        print(f"Error: property_length not found. "
+                              f"Make sure that property_length is the same for all movies. {e}")
+        
+        property_length = max(property_length_of_movie_list)
+        property_dim = max(property_dim_of_movie_list)
+
+        # plot property of last frame along var2 for every var1
+        for k, _ in enumerate(path_anchor_input_list):
+            # properties in periodic tables
+            for property_filename, list_of_arrays in zip(property_filename_list, list_of_arrays_list):
+                # path_mesh_mirrored: List[Path] = np.flip(path_mesh, axis=0)
+                # path_mesh_property = path_mesh_mirrored.copy()
+                path_mesh_property = path_mesh.copy()
+                # for ix, iy in np.ndindex(path_mesh_mirrored.shape):
+                #     path_mesh_property[ix, iy]: Path = Path(path_mesh_mirrored[ix, iy], f"{property_filename}")
+                for ix, iy in np.ndindex(path_mesh.shape):
+                    # create arrays of right dimensions on first element
+                    if ix == iy == 0:
                         mesh_t = np.zeros((path_mesh_property.shape[0],
                                            path_mesh_property.shape[1],
                                            property_length))
@@ -341,6 +397,7 @@ def last_frame(frame: Optional[int],
                                                               path_mesh_property.shape[1],
                                                               property_length,
                                                               property_dim))
+
                     mesh_t[ix, iy], mesh_property_all[ix, iy] = property_load_npz(path_property_npz) 
 
                 path_out_property_all: Path = Path(path_anchor_output,
@@ -350,14 +407,18 @@ def last_frame(frame: Optional[int],
                 
                 path_mesh_all = path_out_property_all.with_suffix('.npz')
                 with open(path_mesh_all, "wb") as g:
-                    np.savez_compressed(g, x=mesh_t, y=mesh_property_all, z=path_mesh_mirrored)
+                    # np.savez_compressed(g, x=mesh_t, y=mesh_property_all, z=path_mesh_mirrored)
+                    np.savez_compressed(g, x=mesh_t, y=mesh_property_all, z=path_mesh)
 
                 # turn off decompression bomb checker
                 Image.MAX_IMAGE_PIXELS = number_of_movies * Image.MAX_IMAGE_PIXELS
-                paste_together(path_in_list=path_mesh_property.ravel(), path_out=path_out_property_all,
+                path_mesh_property_mirrored: List[Path] = np.flip(path_mesh_property, axis=0)
+                paste_together(path_in_list=path_mesh_property_mirrored.ravel(),
+                               path_out=path_out_property_all,
                                nrow=nrow, ncol=ncol, ratio=dpi_ratio_all) 
 
-                rows = path_mesh_mirrored.shape[1]
+                # rows = path_mesh_mirrored.shape[1]
+                rows = path_mesh.shape[1]
                 if list_of_arrays:
                     cols = property_dim
                 else:

@@ -16,34 +16,57 @@ if __name__ == "__main__":
 
     use_edited = False
 
-    experiment_suffix = "ramp_13_09_10**eps"
+    # experiment_suffix = "ramp_13_09_10**eps"
+    # experiment_suffix = "ramp_21_09_a12=70"
+    # experiment_suffix = "ramp_test00"
+    # experiment_suffix = "ramp_05_10"
+    # experiment_suffix = "ramp_05_10_a12=70"
+    # experiment_suffix = "ramp_10_10_small"
+    experiment_suffix = "ramp_10_10"
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    var1_list.append(np.arange(70.0, 70.1, 5.0)) # a11
-    var2_list.append(np.arange(3.0, 8.1, 1.0)) # tilt
+    # var1_list.append(np.arange(70.0, 75.1, 10.0)) # a11
+    var1_list.append(np.arange(72.5, 82.6, 2.5)) # a11
+    # var1_list.append(np.arange(75.0, 105.1, 10.0)) # a11
+    # var2_list.append(np.arange(0.0, 11.1, 2.0)) # tilt
+    var2_list.append(np.arange(0.0, 1.01, 0.2)) # tilt
+    # var2_list.append(np.array([0.0, 0.1, 1.0, 3.0, 3.0, 5.0, 5.0, 10.0])) # tilt
+    # var2_list.append(np.array([0.0])) # tilt
     movie_start_list = [1]
-    movie_end_list = [6]
+    # movie_end_list = [24]
+    movie_end_list = [30]
+    # movie_end_list = [6]
     # movie_take_last_list: int = [2, 1]
     # suffix_list = [f"_map_z_0", f"_map_z_1"]
     movie_take_last_list: int = [4, 3]
     suffix_list = [f"_map_x_0", f"_map_x_1"]
-    property_filename_list = ["E_paper_framestart_0.png", "mu_arr_paper_framestart_0.png",
+    # property_filename_list = []
+    # list_of_arrays_list = []
+    property_filename_list = ["get_E_explicit_paper_framestart_0.png", "E_paper_framestart_0.png",
+                              "mu_arr_paper_framestart_0.png",
                               "get_center_of_mass_paper_framestart_0.png",
-                              "get_parity_paper_framestart_0.png", "check_N_paper_framestart_0.png"]
-    list_of_arrays_list = [False, False, True, True, False]
+                              "get_parity_paper_framestart_0.png"]
+    list_of_arrays_list = [False, False, False, True, True]
     cut_names: List[str] = ["cut_x", "cut_y", "cut_z"]
     normed_plots = False
     if normed_plots:
         suffix_list[0] += "_normed"
 
+    # nrow_components = 1
+    # ncol_components = 2
     nrow_components = 2
     ncol_components = 1
     
     frames = False
     # frames = True
     if frames:
-        frame_start = 1000
-        frame_step = 1000
-        frame_end = 100001
+        frame_start = 0
+        # frame_step = 1
+        # frame_end = 101
+        frame_step = 10000
+        frame_end = 75001
+        # frame_start = 1000
+        # frame_step = 1000
+        # frame_end = 100001
         # frame_end = 20001
         frames = np.arange(frame_start, frame_end, frame_step)
     else:
@@ -58,7 +81,8 @@ if __name__ == "__main__":
     movie_skip = None
 
     # if simulation for movie_number was continued in dir with name movie_number + number_of_movies
-    check_further_list = [2, 2, 2]
+    # check_further_list = [2, 2, 2]
+    check_further_list = [0, 0, 0]
 
     dir_name = "movie"
     counting_format = "%03d"

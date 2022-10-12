@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import subprocess
 from pathlib import Path
 import numpy as np
@@ -8,45 +7,32 @@ import time
 from supersolids.helper.dict2str import dic2str
 
 slurm = True
-xvfb_display = 700
-# supersolids_version = "0.1.36rc4"
-supersolids_version = "0.1.37"
-dir_path = Path("/bigwork/dscheier/results/begin_ramp_11_10_775/")
-# dir_path = Path("/bigwork/dscheier/results/begin_ramp_test00/")
+mem_in_GB = 2
+# mem_in_GB = 8
+xvfb_display = 940
+supersolids_version = "0.1.34rc19"
+# dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_schroedinger/")
+dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_a11_100/")
+# dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_a11_100_mini/")
+# dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
-dir_path_log = Path(dir_path, "log")
-dir_path_log.mkdir(parents=True, exist_ok=True)
-
-
-wait_dir_creation = False
 movie_string = "movie"
 counting_format = "%03d"
+movie_number = 1
 
 N = 63000
 a11 = 100.0
 
 m_list = [163.9, 163.9]
 a_dd = 130.8
-# dipol = 9.0
-dipol = 10.0
-a_dd_list = [a_dd, (dipol/10.0) * a_dd, (dipol/10.0) ** 2.0 * a_dd]
-# a_dd_list = [a_dd, 0.0, (dipol/10.0) ** 2.0 * a_dd]
+a_dd_list = [a_dd, (9.0/10.0) * a_dd, (9.0/10.0) ** 2.0 * a_dd]
 
-movie_number = 1
-mem_in_MB = 750
-Box = {"x0": -12, "x1": 12, "y0": -3, "y1": 3, "z0": -5, "z1": 5}
-Res = {"x": 256, "y": 64, "z": 64}
-# Box = {"x0": -20, "x1": 20, "y0": -7, "y1": 7, "z0": -6, "z1": 6}
-# Res = {"x": 128, "y": 64, "z": 64} # 450MB
+# Box = {"x0": -15, "x1": 15, "y0": -7, "y1": 7, "z0": -6, "z1": 6}
 # Res = {"x": 256, "y": 128, "z": 32}
-# Res = {"x": 128, "y": 64, "z": 32}
-# Res = {"x": 256, "y": 128, "z": 128} # 1600MB
-# Res = {"x": 128, "y": 128, "z": 128} # 1000MB
-# Res = {"x": 128, "y": 128, "z": 64} # 600MB
-# Res = {"x": 128, "y": 64, "z": 64} # 400MB
+Box = {"x0": -10, "x1": 10, "y0": -7, "y1": 7, "z0": -5, "z1": 5}
+Res = {"x": 128, "y": 64, "z": 64}
 
-noise = [1.0, 1.0]
-# noise = [0.9, 1.1]
+noise = [0.9, 1.1]
 accuracy = 0.0
 
 w_x_freq = 33.0
@@ -62,62 +48,41 @@ w_z = 2.0 * np.pi * w_z_freq
 # for mixtures
 a = {"a_x": 4.0, "a_y": 0.8, "a_z": 1.8}
 
-# max_timesteps = 350001
-max_timesteps = 80001
-# max_timesteps = 35001
-# max_timesteps = 101
-# max_timesteps = 11
+# max_timesteps = 1500001
+max_timesteps = 100001
 dt = 0.0002
-steps_per_npz = 10000
-# steps_per_npz = 1000
-# steps_per_npz = 100
-# steps_per_npz = 1
+steps_per_npz = 1000
 steps_format = "%07d"
 accuracy = 0.0
 
-N2_part = 0.5
+N_start = 0.05
+N_end = 0.51
+N_step = 0.05
 
-epsilon_start = 1.0
-epsilon_end = 2.01
-# epsilon_end = 1.1
-# epsilon_start = 3.0
-# epsilon_end = 5.1
-# epsilon_step = 0.1
-epsilon_step = 0.2
+a12_start = 0.50
+a12_end = 0.751
+a12_step = 0.025
 
-# a12_start = 85.5
-# a12_end = 86.5
-a12_start = 77.5
-a12_end = 78.5
-# a12_end = 75.1
-# a12_start = 72.5
-# a12_end = 82.6
-# a12_start = 65.0
-# a12_start = 75.0
-# a12_end = 105.1
-# a12_start = 70.0
-# a12_end = 70.1
-# a12_start = 0.0
-# a12_end = 0.1
-# a12_start = 71.0
-# a12_end = 72.0
-# a12_step = 1.25
-a12_step = 2.5
-# a12_step = 10.0
+# N_start = 0.01
+# N_end = 0.041
+# N_step = 0.01
+
+# a12_start = 0.60
+# a12_end = 0.726
+# a12_step = 0.025
 
 func_filename = "distort.txt"
 
-skip = 0
-skip_counter = 0
 j_counter = 0
-# j_counter = skip - 1
-end = 0
+skip_counter = 0
+skip = 0
+end = 200
 
 movie_list = []
 func_list = []
 func_path_list = []
 dir_path_func_list = []
-for epsilon in np.arange(epsilon_start, epsilon_end, epsilon_step):
+for N2_part in np.arange(N_start, N_end, N_step):
     for a12 in np.arange(a12_start, a12_end, a12_step):
         skip_counter += 1
         if skip_counter < skip:
@@ -125,15 +90,23 @@ for epsilon in np.arange(epsilon_start, epsilon_end, epsilon_step):
         if skip_counter == end:
             break
         func_list.append([])
-        epsilon_string = round(epsilon, ndigits=5)
+        N2_part_string = round(N2_part, ndigits=5)
         a12_string = round(a12, ndigits=5)
         N2 = int(N * N2_part)
         N_list = [N - N2, N2]
-        # tilt = 10 ** epsilon
-        tilt = epsilon
 
         # a_s_list in triu (triangle upper matrix) form: a11, a12, a22
-        a_s_list = [a11, a12, a11]
+        a_s_list = [a11, a12 * a11, a11]
+
+        # w_y = 2.0 * np.pi * (w_x_freq / a12)
+
+        # d_string = 0.0001 * 10.0 ** round(d, ndigits=5)
+
+        # V = f"lambda x, y, z: {v_string} * np.sin(np.pi*x/{d_string}) ** 2"
+        # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi/4.0) + (np.pi*x/{d_string}) )"
+        # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi*x/{d_string}) )"
+        # V = f"lambda x, y, z: {v_string} * np.exp(-((x ** 2.0) /{d_string} ** 2.0) )"
+        # func_list[j_counter].append(f"-V='{V}' ")
 
         movie_number_after = movie_number + j_counter
         movie_after = f"{movie_string}{counting_format % movie_number_after}"
@@ -144,24 +117,20 @@ for epsilon in np.arange(epsilon_start, epsilon_end, epsilon_step):
         func_path = Path(dir_path_func, func_filename)
         func_path_list.append(func_path)
 
-        jobname = f"{supersolids_version}_{mem_in_MB}M_e_{epsilon_string}a12_{a12_string}_m{movie_number_after}"
+        jobname = f"{supersolids_version}_N2_{N2_part_string}_{a12_string}_m{movie_number_after}"
 
         if slurm:
             cluster_flags = f"""#==================================================
 #SBATCH --job-name {jobname}
-#SBATCH -D {dir_path_log}
+#SBATCH -D /bigwork/dscheier/supersolids/supersolids/results/log_a12_dense/
 #SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
 #SBATCH --mail-type=END,FAIL
 #SBATCH -o output-%j.out
 #SBATCH -e error-%j.out
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH -t 2-00:00:00
-##SBATCH -t 0-01:00:00
-#SBATCH --mem={mem_in_MB}M
-##SBATCH -p gpu_cuda
-#SBATCH --constraint="cuda&jammy"
-##SBATCH -w altair,atlas,berti,gemini,mirzam,niobe,pegasus,phad,pollux,rana,sargas,weywot
+#SBATCH -t 7-00:00:00
+#SBATCH --mem={mem_in_GB}G
 """
 
         else:
@@ -174,8 +143,8 @@ for epsilon in np.arange(epsilon_start, epsilon_end, epsilon_step):
 #PBS -o /bigwork/dscheier/supersolids/supersolids/results/log_s/output_$PBS_JOBID.txt
 #PBS -l nodes=1:ppn=1:ws
 #PBS -l walltime=200:00:00
-#PBS -l mem={mem_in_MB}MB
-#PBS -l vmem={mem_in_MB}MB
+#PBS -l mem={mem_in_GB}GB
+#PBS -l vmem={mem_in_GB}GB
 """
 
         heredoc = "\n".join(["#!/bin/bash",
@@ -183,7 +152,7 @@ for epsilon in np.arange(epsilon_start, epsilon_end, epsilon_step):
                             f""" 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/bigwork/dscheier/miniconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+__conda_setup="$('/bigwork/dscheier/miniconda/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
@@ -199,30 +168,21 @@ unset __conda_setup
 Xvfb :{xvfb_display - j_counter} &
 export DISPLAY=:{xvfb_display - j_counter}
 
-
 conda activate /bigwork/dscheier/miniconda/envs/solids
-
 echo $DISPLAY
 echo $CONDA_PREFIX
 echo $(which python3)
 echo $(which pip3)
-echo "supersolids={supersolids_version}"
 
-# CUPY_CACHE_DIR=/bigwork/dscheier/miniconda/envs/solids/.cupy/kernel_cache
-export HOME=$BIGWORK
-echo $HOME
 # conda install -c scheiermann/label/main supersolids={supersolids_version}
-# conda install -c scheiermann/label/testing supersolids={supersolids_version}
-# conda install numba
-# conda install cupy
+conda install -c scheiermann/label/testing supersolids={supersolids_version}
+conda install numba
+conda install cupy
 
 # /bigwork/dscheier/miniconda/bin/pip install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
 # /bigwork/dscheier/miniconda/bin/pip install -i https://pypi.org/simple/supersolids=={supersolids_version}
 
-cd /bigwork/dscheier/supersolids
-conda develop .
-
-/bigwork/dscheier/miniconda/envs/solids/bin/python3.10 -m supersolids \
+python -m supersolids \
 -Box={dic2str(Box)} \
 -Res={dic2str(Res)} \
 -max_timesteps={max_timesteps} \
@@ -241,17 +201,13 @@ conda develop .
 --m_list {' '.join(map(str, m_list))} \
 --a_dd_list {' '.join(map(str, a_dd_list))} \
 --a_s_list {' '.join(map(str, a_s_list))} \
--tilt={tilt} \
 --V_interaction \
 --offscreen \
---gpu_off \
 --mixture
 
 """])
 
         print(heredoc)
-        with open(Path(dir_path, f"sbatch_{dir_name_result}.sh"), "w") as f:
-            f.write(f"{heredoc}\n")
 
         if slurm:
             p = subprocess.Popen(["sbatch"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
@@ -265,29 +221,27 @@ conda develop .
 
         j_counter += 1
 
-        if wait_dir_creation:
+        existing_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
+        existing_dirnames = list(map(lambda path: path.name, existing_dirs))
+        print(f"{movie_after}")
+        while not movie_after in existing_dirnames:
+            print(f"Found dirnames: {existing_dirnames}")
+            print(f"Directory for {movie_after} not created yet. Waiting 20 seconds.")
+            time.sleep(20)
             existing_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
             existing_dirnames = list(map(lambda path: path.name, existing_dirs))
-            print(f"{movie_after}")
-            while not movie_after in existing_dirnames:
-                print(f"Found dirnames: {existing_dirnames}")
-                print(f"Directory for {movie_after} not created yet. Waiting 20 seconds.")
-                time.sleep(20)
-                existing_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
-                existing_dirnames = list(map(lambda path: path.name, existing_dirs))
-                if existing_dirs:
-                    print(f"First path: {existing_dirs[0]}")
+            if existing_dirs:
+                print(f"First path: {existing_dirs[0]}")
 
-if wait_dir_creation:
+movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
+movie_dirnames = list(map(lambda path: path.name, movie_dirs))
+while not all(item in movie_dirnames for item in movie_list):
+    print(f"{movie_list}")
+    print(f"{movie_dirnames}")
+    print(f"Not all directories for movies created.  Waiting 5 seconds.")
+    time.sleep(5)
     movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
     movie_dirnames = list(map(lambda path: path.name, movie_dirs))
-    while not all(item in movie_dirnames for item in movie_list):
-        print(f"{movie_list}")
-        print(f"{movie_dirnames}")
-        print(f"Not all directories for movies created.  Waiting 5 seconds.")
-        time.sleep(5)
-        movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
-        movie_dirnames = list(map(lambda path: path.name, movie_dirs))
 
 # j_counter = 0
 # # put distort.txt with the used V for every movie

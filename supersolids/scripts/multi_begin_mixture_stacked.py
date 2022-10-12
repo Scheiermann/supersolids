@@ -8,15 +8,17 @@ import time
 from supersolids.helper.dict2str import dic2str
 
 slurm = True
-mem_in_GB = 4
+mem_in_MB = 600
 xvfb_display = 800
-supersolids_version = "0.1.36rc4"
-dir_path = Path("/bigwork/dscheier/results/begin_stacked_a11_05_09_s0/")
+# supersolids_version = "0.1.36rc4"
+supersolids_version = "0.1.37"
+# dir_path = Path("/bigwork/dscheier/results/begin_stacked_a11_05_09_s0/")
+dir_path = Path("/bigwork/dscheier/results/begin_stacked_05_10_a11/")
 
 dir_path_log = Path(dir_path, "log")
 dir_path_log.mkdir(parents=True, exist_ok=True)
 
-
+wait_dir_creation = False
 movie_string = "movie"
 counting_format = "%03d"
 movie_number = 1
@@ -31,7 +33,8 @@ a_dd_list = [a_dd, (dipol/10.0) * a_dd, (dipol/10.0) ** 2.0 * a_dd]
 
 Box = {"x0": -15, "x1": 15, "y0": -7, "y1": 7, "z0": -6, "z1": 6}
 # Res = {"x": 256, "y": 128, "z": 32}
-Res = {"x": 128, "y": 64, "z": 32}
+# Res = {"x": 128, "y": 64, "z": 32}
+Res = {"x": 128, "y": 64, "z": 64}
 
 noise = [0.9, 1.1]
 accuracy = 0.0
@@ -49,10 +52,10 @@ w_z = 2.0 * np.pi * w_z_freq
 # for mixtures
 a = {"a_x": 4.0, "a_y": 0.8, "a_z": 1.8}
 
-# max_timesteps = 350001
-max_timesteps = 1001
+max_timesteps = 350001
+# max_timesteps = 1001
 dt = 0.0002
-# steps_per_npz = 10000
+steps_per_npz = 10000
 # steps_per_npz = 10
 # steps_per_npz = 1
 steps_format = "%07d"
@@ -60,15 +63,15 @@ accuracy = 0.0
 
 N2_part = 0.5
 
-h_start = 5.0
+h_start = 0.0
 h_end = 30.1
 h_step = 5.0
 # h_start = 2.0
 # h_end = 4.1
 # h_step = 0.5
 
-# a11_start = 80.0
-a11_start = 110.0
+a11_start = 80.0
+# a11_start = 110.0
 a11_end = 110.1
 a11_step = 10.0
 
@@ -76,12 +79,13 @@ a12 = 0.0
 
 func_filename = "distort.txt"
 
-# skip = 0
-skip = 4
+skip = 0
+# skip = 4
 skip_counter = 0
-j_counter = skip + 1
-# end = 0
-end = 4
+# j_counter = skip + 1
+j_counter = 0
+end = 0
+# end = 4
 
 movie_list = []
 func_list = []
@@ -111,7 +115,7 @@ for h in np.arange(h_start, h_end, h_step):
         func_path = Path(dir_path_func, func_filename)
         func_path_list.append(func_path)
 
-        jobname = f"{supersolids_version}_a11_{a11}h_{h_string}_m{movie_number_after}"
+        jobname = f"{supersolids_version}_{mem_in_MB}M_a11_{a11}h_{h_string}_m{movie_number_after}"
 
         if slurm:
             cluster_flags = f"""#==================================================
@@ -123,9 +127,10 @@ for h in np.arange(h_start, h_end, h_step):
 #SBATCH -e error-%j.out
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH -t 2-00:00:00
-#SBATCH --mem={mem_in_GB}G
-#SBATCH -p gpu_cuda
+#SBATCH -t 4-00:00:00
+#SBATCH --mem={mem_in_MB}M
+#SBATCH --constraint="cuda&jammy"
+##SBATCH -p gpu_cuda
 ##SBATCH -w alamak
 ##SBATCH -w gomeisa
 ##SBATCH -w altair,atlas,berti,gemini,mirzam,niobe,pegasus,phad,pollux,rana,sargas,weywot
@@ -141,7 +146,7 @@ for h in np.arange(h_start, h_end, h_step):
 #PBS -o /bigwork/dscheier/supersolids/supersolids/results/log_s/output_$PBS_JOBID.txt
 #PBS -l nodes=1:ppn=1:ws
 #PBS -l walltime=200:00:00
-#PBS -l mem={mem_in_GB}GB
+#PBS -l mem={mem_in_MB}MB
 #PBS -l vmem={mem_in_GB}GB
 """
 
@@ -226,27 +231,29 @@ echo $HOME
 
         j_counter += 1
 
-        existing_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
-        existing_dirnames = list(map(lambda path: path.name, existing_dirs))
-        print(f"{movie_after}")
-        while not movie_after in existing_dirnames:
-            print(f"Found dirnames: {existing_dirnames}")
-            print(f"Directory for {movie_after} not created yet. Waiting 20 seconds.")
-            time.sleep(20)
+        if wait_dir_creation:
             existing_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
             existing_dirnames = list(map(lambda path: path.name, existing_dirs))
-            if existing_dirs:
-                print(f"First path: {existing_dirs[0]}")
+            print(f"{movie_after}")
+            while not movie_after in existing_dirnames:
+                print(f"Found dirnames: {existing_dirnames}")
+                print(f"Directory for {movie_after} not created yet. Waiting 20 seconds.")
+                time.sleep(20)
+                existing_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
+                existing_dirnames = list(map(lambda path: path.name, existing_dirs))
+                if existing_dirs:
+                    print(f"First path: {existing_dirs[0]}")
 
-movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
-movie_dirnames = list(map(lambda path: path.name, movie_dirs))
-while not all(item in movie_dirnames for item in movie_list):
-    print(f"{movie_list}")
-    print(f"{movie_dirnames}")
-    print(f"Not all directories for movies created.  Waiting 5 seconds.")
-    time.sleep(5)
+if wait_dir_creation:
     movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
     movie_dirnames = list(map(lambda path: path.name, movie_dirs))
+    while not all(item in movie_dirnames for item in movie_list):
+        print(f"{movie_list}")
+        print(f"{movie_dirnames}")
+        print(f"Not all directories for movies created.  Waiting 5 seconds.")
+        time.sleep(5)
+        movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
+        movie_dirnames = list(map(lambda path: path.name, movie_dirs))
 
 # j_counter = 0
 # # put distort.txt with the used V for every movie

@@ -111,7 +111,8 @@ def get_step_index(dir_path: Path, filename_prefix: str = "step_",
 
 
 def get_last_png_in_last_anim(path_movie, dir_name_png, counting_format_png, movie_take_last,
-                              filename_pattern, filename_format, filename_extension):
+                              filename_pattern, filename_format, filename_extension,
+                              frame_format=None):
     # gets last movie with animations of each movie
     path_last_movie_png, _, _, _ = get_path(
         path_movie,
@@ -128,6 +129,16 @@ def get_last_png_in_last_anim(path_movie, dir_name_png, counting_format_png, mov
             counting_format=filename_format,
             file_pattern=filename_extension,
             )
+        # try other frame_format instead of filename_format
+        if not path_last_png.exists():
+            if frame_format:
+                path_last_png, _, _, _ = get_path(
+                    path_last_movie_png,
+                    search_prefix=filename_pattern,
+                    counting_format=frame_format,
+                    file_pattern=filename_extension,
+                    )
+        
     else:
         path_last_png = None
 
