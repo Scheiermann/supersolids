@@ -32,8 +32,10 @@ def load_npz(flag_args, host=None):
 
     try:
         dir_path = Path(flag_args.dir_path).expanduser()
+        dir_path_output = Path(flag_args.dir_path_output).expanduser()
     except Exception:
         dir_path = flag_args.dir_path
+        dir_path_output = flag_args.dir_path_output
 
     # System_list = []
     # input_path = Path(dir_path, flag_args.dir_name)
@@ -74,6 +76,7 @@ def load_npz(flag_args, host=None):
                                               dir_path=dir_path,
                                               slice_indices=[slice_x, slice_y, slice_z],
                                               host=host,
+                                              dir_path_output=dir_path_output,
                                               )
 
     animate_wrapper = mlab.animate(MayAnim.animate_npz, delay=10, ui=flag_args.ui)
@@ -100,11 +103,9 @@ def load_npz(flag_args, host=None):
     mlab.show()
 
     result_path_anim = MayAnim.create_movie(dir_path=MayAnim.dir_path,
-    # result_path_anim = MayAnim.create_movie(dir_path=Path("/bigwork/dscheier/results/begin_ramp_21_09_a12_70_big/movie013/"),
                                             input_data_file_pattern="anim*.png",
                                             delete_input=flag_args.delete_input)
     result_path_cut1d = MayAnim.create_movie(dir_path=MayAnim.dir_path,
-    # result_path_cut1d = MayAnim.create_movie(dir_path=Path("/bigwork/dscheier/results/begin_ramp_21_09_a12_70_big/movie013/"),
                                              input_data_file_pattern="1d_cut_*.png",
                                              delete_input=flag_args.delete_input,
                                              filename="1d_cut.mp4",
@@ -115,6 +116,8 @@ def flags(args_array):
                                                  "and create movie.")
     parser.add_argument("-dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to load data from")
+    parser.add_argument("-dir_path_output", type=str, default="~/supersolids/results",
+                        help="Absolute path to save data to")
     parser.add_argument("-dir_name", type=str, default="movie" + "%03d" % 1,
                         help="Name of directory where the files to load lie. "
                              "For example the standard naming convention is movie001")

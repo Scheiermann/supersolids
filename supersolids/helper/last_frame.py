@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
+import traceback
 import dill
 import numpy as np
 import shutil
+import sys
 
 from matplotlib import pyplot as plt
 from pathlib import Path
@@ -332,6 +334,8 @@ def last_frame(frame: Optional[int],
                        nrow=nrow, ncol=ncol, ratio=dpi_ratio_all) 
         
         # plot property of last frame along var2 for every var1
+        property_length_list = []
+        property_dim_list = []
         for k, _ in enumerate(path_anchor_input_list):
             # properties in periodic tables
             for property_filename, list_of_arrays in zip(property_filename_list, list_of_arrays_list):
@@ -362,19 +366,18 @@ def last_frame(frame: Optional[int],
                         print(f"Error: property_length not found. "
                               f"Make sure that property_length is the same for all movies. {e}")
         
-        property_length = max(property_length_of_movie_list)
-        property_dim = max(property_dim_of_movie_list)
+                property_length_list.append(max(property_length_of_movie_list))
+                property_dim_list.append(max(property_dim_of_movie_list))
 
         # plot property of last frame along var2 for every var1
         for k, _ in enumerate(path_anchor_input_list):
             # properties in periodic tables
-            for property_filename, list_of_arrays in zip(property_filename_list, list_of_arrays_list):
-                # path_mesh_mirrored: List[Path] = np.flip(path_mesh, axis=0)
-                # path_mesh_property = path_mesh_mirrored.copy()
-                path_mesh_property = path_mesh.copy()
-                # for ix, iy in np.ndindex(path_mesh_mirrored.shape):
-                #     path_mesh_property[ix, iy]: Path = Path(path_mesh_mirrored[ix, iy], f"{property_filename}")
+            for (property_filename, list_of_arrays,
+                 property_length, property_dim) in zip(property_filename_list, list_of_arrays_list,
+                                                       property_length_list, property_dim_list):
                 for ix, iy in np.ndindex(path_mesh.shape):
+                    path_mesh_property[ix, iy]: Path = Path(path_mesh[ix, iy], f"{property_filename}")
+                    path_property_npz = path_mesh_property[ix, iy].with_suffix('.npz')
                     # create arrays of right dimensions on first element
                     if ix == iy == 0:
                         mesh_t = np.zeros((path_mesh_property.shape[0],
@@ -398,7 +401,14 @@ def last_frame(frame: Optional[int],
                                                               property_length,
                                                               property_dim))
 
-                    mesh_t[ix, iy], mesh_property_all[ix, iy] = property_load_npz(path_property_npz) 
+                    try:
+                        mesh_t[ix, iy], mesh_property_all[ix, iy] = property_load_npz(path_property_npz) 
+                    except Exception as e:
+                        print(f"Problem with {path_property_npz}, "
+                              f"check out if list_of_arrays_list needs to be True.\n{e}")
+                        traceback.print_tb(e.__traceback__)
+                        sys.exit(1)
+
 
                 path_out_property_all: Path = Path(path_anchor_output,
                                                    f"property_all_{experiment_suffix}"

@@ -11,7 +11,9 @@ from pathlib import Path
 from fabric import Connection
 
 
-def download(host, path_in, path_out, filename_singles, download_steps, take_last):
+def download(host, path_in, path_out, filename_singles, download_steps, take_last,
+             filename_steps_list, steps_format_list,
+             filename_pattern_list, filename_number_regex_list):
     # Create a results dir, if there is none
     if not path_out.is_dir():
         path_out.mkdir(parents=True)
@@ -115,7 +117,11 @@ if __name__ == "__main__":
         print(f"\npath_in: {path_in}")
         if password is None:
             with Connection(ssh_hostname) as host:
-                download(host, path_in, path_out, filename_singles, download_steps, take_last)
+                download(host, path_in, path_out, filename_singles, download_steps, take_last,
+                         filename_steps_list, steps_format_list, filename_pattern_list,
+                         filename_number_regex_list)
         else:
             with Connection(ssh_hostname, connect_kwargs={'password': f"{password}"}) as host:
-                download(host, path_in, path_out, filename_singles, download_steps, take_last)
+                download(host, path_in, path_out, filename_singles, download_steps, take_last,
+                         filename_steps_list, steps_format_list, filename_pattern_list,
+                         filename_number_regex_list)

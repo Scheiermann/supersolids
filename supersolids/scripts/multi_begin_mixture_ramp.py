@@ -8,10 +8,10 @@ import time
 from supersolids.helper.dict2str import dic2str
 
 slurm = True
-xvfb_display = 700
+xvfb_display = 650
 # supersolids_version = "0.1.36rc4"
 supersolids_version = "0.1.37"
-dir_path = Path("/bigwork/dscheier/results/begin_ramp_11_10_775/")
+dir_path = Path("/bigwork/dscheier/results/begin_ramp_24_10_fix_movie015/")
 # dir_path = Path("/bigwork/dscheier/results/begin_ramp_test00/")
 
 dir_path_log = Path(dir_path, "log")
@@ -73,37 +73,29 @@ steps_per_npz = 10000
 # steps_per_npz = 100
 # steps_per_npz = 1
 steps_format = "%07d"
-accuracy = 0.0
 
 N2_part = 0.5
 
-epsilon_start = 1.0
-epsilon_end = 2.01
+# epsilon_start = 0.0
+# epsilon_end = 2.01
+# epsilon_start = 2.2
+# epsilon_start = 5.2
+# epsilon_end = 7.01
+epsilon_start = 2.8
+epsilon_end = 2.81
+# epsilon_end = 5.01
+# epsilon_end = 2.01
 # epsilon_end = 1.1
 # epsilon_start = 3.0
 # epsilon_end = 5.1
 # epsilon_step = 0.1
 epsilon_step = 0.2
 
-# a12_start = 85.5
-# a12_end = 86.5
 a12_start = 77.5
-a12_end = 78.5
-# a12_end = 75.1
-# a12_start = 72.5
-# a12_end = 82.6
-# a12_start = 65.0
-# a12_start = 75.0
-# a12_end = 105.1
-# a12_start = 70.0
-# a12_end = 70.1
-# a12_start = 0.0
-# a12_end = 0.1
-# a12_start = 71.0
-# a12_end = 72.0
-# a12_step = 1.25
+a12_end = 77.6
+# a12_start = 85.0
+# a12_end = 85.1
 a12_step = 2.5
-# a12_step = 10.0
 
 func_filename = "distort.txt"
 
@@ -202,6 +194,7 @@ export DISPLAY=:{xvfb_display - j_counter}
 
 conda activate /bigwork/dscheier/miniconda/envs/solids
 
+echo $(hostname -a)
 echo $DISPLAY
 echo $CONDA_PREFIX
 echo $(which python3)

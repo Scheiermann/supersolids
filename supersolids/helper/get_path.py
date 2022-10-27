@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 
+import fnmatch
+
 from pathlib import Path
 from typing import Tuple, List, Optional
+from stat import S_ISDIR, S_ISREG
 
 
 def get_path(dir_path: Path,
              search_prefix: str = "movie",
              counting_format: Optional[str] = "%03d",
              file_pattern: str = "",
-             take_last: int = 1) -> Tuple[Optional[Path], Optional[int], str, str]:
+             take_last: int = 1,
+             host=None) -> Tuple[Optional[Path], Optional[int], str, str]:
     """
     Looks up all directories with matching dir_name
     and counting format in dir_path.
@@ -37,7 +41,13 @@ def get_path(dir_path: Path,
     else:
         if file_pattern:
             # for files
-            existing = sorted([x for x in dir_path.glob(search_prefix + "*") if x.is_file()])
+            if host:
+                sftp = host.sftp()
+                files = [x.filename for x in sftp.listdir_attr(path=str(dir_path)) if S_ISREG(x.st_mode)]
+                existing = sorted(fnmatch.filter(files, search_prefix + "*"))
+                existing = [Path(dir_path, file) for file in existing]
+            else:
+                existing = sorted([x for x in dir_path.glob(search_prefix + "*") if x.is_file()])
             if take_last <= len(existing):
                 last_index = get_step_index(existing[-take_last],
                                             filename_prefix=search_prefix,
@@ -46,8 +56,13 @@ def get_path(dir_path: Path,
                 last_index = None
         else:
             # for dirs
-            existing = sorted([x for x in dir_path.glob(search_prefix + "*") if x.is_dir()])
-
+            if host:
+                sftp = host.sftp()
+                files = [x.filename for x in sftp.listdir_attr(path=str(dir_path)) if S_ISDIR(x.st_mode)]
+                existing = sorted(fnmatch.filter(files, search_prefix + "*"))
+                existing = [Path(dir_path, file) for file in existing]
+            else:
+                existing = sorted([x for x in dir_path.glob(search_prefix + "*") if x.is_dir()])
             try:
                 last_index = int(existing[-take_last].name.split(search_prefix)[1])
             except IndexError as e:

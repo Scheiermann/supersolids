@@ -22,13 +22,13 @@ from ffmpeg import input
 from mayavi import mlab
 import numpy as np
 from functools import partial
-import paramiko
 
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper import functions, constants, get_path, cut_1d
 from supersolids.helper.get_version import check_cp_nb, get_version
+from supersolids.scripts.download_last import download
 __GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False))
 cp, cupy_used, cuda_used, numba_used = check_cp_nb(np, gpu_off=__GPU_OFF_ENV__)
         
@@ -49,16 +49,26 @@ def load_System(path_schroedinger, host=None):
 
 
 def load_System_list(System_list, filename_steps_list, input_path, steps_format, frame,
-                     summary_name):
+                     summary_name, host=None):
     for i, filename_steps in enumerate(filename_steps_list):
         # get the psi_val of Schroedinger at other timesteps (t!=0)
         psi_val_path = Path(input_path, filename_steps + steps_format % frame + ".npz")
         if isinstance(System_list[i], SchroedingerMixture):
-            with open(psi_val_path, "rb") as f:
-                System_list[i].psi_val_list = np.load(file=f)["psi_val_list"]
+            if host:
+                sftp = host.sftp()
+                with sftp.file(str(psi_val_path), "rb") as f:
+                    System_list[i].psi_val_list = np.load(file=f)["psi_val_list"]
+            else:
+                with open(psi_val_path, "rb") as f:
+                    System_list[i].psi_val_list = np.load(file=f)["psi_val_list"]
         else:
-            with open(psi_val_path, "rb") as f:
-                System_list[i].psi_val = np.load(file=f)["psi_val"]
+            if host:
+                sftp = host.sftp()
+                with sftp.file(str(psi_val_path), "rb") as f:
+                    System_list[i].psi_val = np.load(file=f)["psi_val"]
+            else:
+                with open(psi_val_path, "rb") as f:
+                    System_list[i].psi_val = np.load(file=f)["psi_val"]
 
         if not (summary_name is None):
             try:
@@ -140,6 +150,7 @@ class MayaviAnimation(Animation.Animation):
                  dir_path: Path = Path.home().joinpath("supersolids", "results"),
                  offscreen: bool = False,
                  host=None,
+                 dir_path_output: Path = Path.home().joinpath("supersolids", "results"),
                  ):
         """
         Creates an Animation with mayavi for a Schroedinger equation
@@ -166,6 +177,15 @@ class MayaviAnimation(Animation.Animation):
                          camera_z_func=Anim.camera_z_func,
                          filename=Anim.filename,
                          )
+        # dir_path need to be saved to access it after the figure closed
+        self.dir_path = dir_path
+        if dir_path_output:
+           self.dir_path_output = dir_path_output
+           if not dir_path_output.is_dir():
+               dir_path_output.mkdir(parents=True)
+        else:
+            dir_path_output = dir_path
+
         if host is None:
             if not dir_path.is_dir():
                 dir_path.mkdir(parents=True)
@@ -179,12 +199,9 @@ class MayaviAnimation(Animation.Animation):
                 sftp.mkdir(str(dir_path))
                 sftp.chdir(str(dir_path))
             
-
         MayaviAnimation.mayavi_counter += 1
         self.slice_indices = slice_indices
         self.offscreen = offscreen
-        # dir_path need to be saved to access it after the figure closed
-        self.dir_path = dir_path
 
         if not self.offscreen:
             mlab.options.offscreen = self.offscreen
@@ -196,12 +213,13 @@ class MayaviAnimation(Animation.Animation):
             self.fig.scene.anti_aliasing_frames = 8
             self.fig.scene.movie_maker.record = True
             # set dir_path to save images to
-            self.fig.scene.movie_maker.directory = dir_path
+            self.fig.scene.movie_maker.directory = dir_path_output
 
             self.fig.scene.show_axes = True
 
     def create_movie(self,
                      dir_path: Path = None,
+                     dir_path_output: Path = None,
                      input_data_file_pattern: str = "*.png",
                      delete_input: bool = True,
                      filename: str = "",
@@ -220,20 +238,25 @@ class MayaviAnimation(Animation.Animation):
             after creation the creation of the animation as e.g. mp4
 
         """
-        if dir_path is None:
-            input_path, _, _, _ = get_path.get_path(self.dir_path)
-        else:
-            input_path, _, _, _ = get_path.get_path(dir_path)
+        if dir_path_output is None:
+            dir_path_output = self.dir_path_output
 
-        input_data = Path(input_path, input_data_file_pattern)
-        if filename:
-            output_path = Path(input_path, filename)
+        if dir_path is None:
+            input_path, _, _, _ = get_path.get_path(self.dir_path, host=host)
+            output_anchor, _, _, _ = get_path.get_path(self.dir_path_output)
         else:
-            output_path = Path(input_path, self.filename)
+            input_path, _, _, _ = get_path.get_path(dir_path, host=host)
+            output_anchor, _, _, _ = get_path.get_path(dir_path_output)
+
+        input_data = Path(output_anchor, input_data_file_pattern)
+        if filename:
+            output_path = Path(output_anchor, filename)
+        else:
+            output_path = Path(output_anchor, self.filename)
         print(f"input_data: {input_data}")
-        if host:
-           output_path = Path("/bigwork/dscheier/results/begin_ramp_21_09_a12_70_big/movie013/")
-           input_path, _, _, _ = get_path.get_path(output_path)
+        # if host:
+           # output_path = Path("/bigwork/dscheier/results/begin_ramp_21_09_a12_70_big/movie013/")
+           # input_path, _, _, _ = get_path.get_path(output_path)
 
         # requires either mencoder or ffmpeg to be installed on your system
         # from command line:
@@ -246,12 +269,12 @@ class MayaviAnimation(Animation.Animation):
             # remove all input files (pictures),
             # after animation is created and saved
             input_data_used = [x
-                               for x in input_path.glob(input_data_file_pattern)
+                               for x in output_path.glob(input_data_file_pattern)
                                if x.is_file()]
             for trash_file in input_data_used:
                 trash_file.unlink()
 
-        return input_path
+        return output_path
 
     def prepare(self, System: Schroedinger, mixture_slice_index: int = 0):
         if cupy_used:
@@ -427,34 +450,63 @@ class MayaviAnimation(Animation.Animation):
         :param mixture_slice_index: Index of component of which the slices are taken.
 
         """
+        filename_singles = ["script.txt"]
+        filename_steps_list = ["script_"]
+        steps_format_list = ["%04d"]
+        filename_pattern_list = [".pkl"]
+        filename_number_regex_list = ['*']
 
+        filename_singles_all = []
+        filename_steps_list_all = ["sbatch_movie"]
+        steps_format_list_all = ["%03d"]
+        filename_pattern_list_all = [".sh"]
+        filename_number_regex_list_all = ['*']
+        download_steps = True
+        take_last = None
         supersolids_version = get_version()
 
+        path_anchor_in = self.dir_path
+        path_anchor_out = self.dir_path_output
         if (dir_path is None) or (dir_path == Path("~/supersolids/results").expanduser()):
             if dir_name is not None:
                 input_path = Path(self.dir_path, dir_name)
+                output_path = Path(self.dir_path_output, dir_name)
             else:
                 input_path, _, _, _ = get_path.get_path(self.dir_path)
+                output_path, _, _, _ = get_path.get_path(self.dir_path_output)
         else:
             if dir_name is not None:
                 input_path = Path(self.dir_path, dir_name)
+                output_path = Path(self.dir_path_output, dir_name)
             else:
                 input_path, _, _, _ = get_path.get_path(dir_path)
 
         self.dir_path = input_path
+        self.dir_path_output = output_path
         if host:
-            local_dir_path = Path("/bigwork/dscheier/results/begin_ramp_21_09_a12_70_big/movie013/")
-            if not local_dir_path.is_dir():
-                local_dir_path.mkdir(parents=True)
-            self.fig.scene.movie_maker.directory = local_dir_path
-            # self.dir_path
+            print(f"input_path: {input_path}")
+            print(f"output_path: {output_path}")
+            if not output_path.is_dir():
+                print(f"mkdir: {output_path}")
+                output_path.mkdir(parents=True)
+            self.fig.scene.movie_maker.directory = self.dir_path_output
+            download(host, self.dir_path, self.dir_path_output, filename_singles,
+                     download_steps, take_last, filename_steps_list, steps_format_list,
+                     filename_pattern_list, filename_number_regex_list)
+            download(host, path_anchor_in, path_anchor_out, filename_singles_all,
+                     download_steps, take_last, filename_steps_list_all, steps_format_list_all,
+                     filename_pattern_list_all, filename_number_regex_list_all)
         else:
-            self.fig.scene.movie_maker.directory = self.dir_path
+            self.fig.scene.movie_maker.directory = self.dir_path_output
+
+
 
         _, last_index, _, _ = get_path.get_path(self.dir_path,
                                                 search_prefix=filename_steps_list[0],
-                                                file_pattern=".npz"
+                                                file_pattern=".npz",
+                                                host=host
                                                 )
+        print(f"{last_index}")
 
         path_schroedinger: Path = Path(input_path, filename_schroedinger)
         System = load_System(path_schroedinger, host=host)
@@ -477,7 +529,7 @@ class MayaviAnimation(Animation.Animation):
             # self.fig.scene.movie_maker._count = frame
             try:
                 System_list = load_System_list(System_list, filename_steps_list, input_path,
-                                               steps_format, frame, summary_name)
+                                               steps_format, frame, summary_name, host=host)
                 System = System_list[0]
 
                 if not no_legend:
@@ -487,7 +539,7 @@ class MayaviAnimation(Animation.Animation):
                     if not no_legend:
                         # create title for first frame
                         title = mlab.title(text=text,
-                                           height=0.95,
+                                           height=0.93,
                                            line_width=1.0,
                                            size=1.0,
                                            color=(0, 0, 0),
@@ -571,7 +623,9 @@ class MayaviAnimation(Animation.Animation):
                 break
 
             try:
-                output_path, _, _, _ = get_path.get_path(self.dir_path)
+                print(f"before last cut {self.dir_path_output}")
+                output_path, _, _, _ = get_path.get_path(self.dir_path_output)
+                print(f"after last cut {self.dir_path_output}")
                 cut_1d.cut_1d(System_list,
                               slice_indices=[self.slice_indices[0],
                                              self.slice_indices[1],
