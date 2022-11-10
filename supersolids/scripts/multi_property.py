@@ -39,9 +39,37 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # experiment_suffix = "ramp_11_10_85_long"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    experiment_suffix = "stacked_05_10_a11"
-    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "stacked_05_10_a11"
 
+    # experiment_suffix = "ramp_24_10_fix_movie008"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_24_10_fix_movie015"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_21_10_90"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_21_10_925"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_24_10_long_85"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_24_10_long"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_28_10_65_long"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_28_10_85_long"
+    # experiment_suffix = "ramp_11_01_65_long_wide"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_11_01_85_long_wide"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+
+    experiment_suffix = "ramp_11_04_675_long_wide"
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    experiment_suffix = "ramp_11_04_70_long_wide"
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    experiment_suffix = "ramp_11_04_725_long_wide"
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    experiment_suffix = "ramp_11_04_75_775_80_long_wide"
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+ 
 
     mixture = True
     filename_schroedinger: str = "schroedinger.pkl"
@@ -66,12 +94,10 @@ if __name__ == "__main__":
         # frame_end = 1000
         frame_end = None
 
-    # movie_start_list = [1, 1, 1, 1]
-    # movie_end_list = [6, 11, 6, 11]
-    # movie_start_list = [12]
-    # movie_end_list = [15]
-    movie_start_list = [1]
-    movie_end_list = [28]
+    # movie_start_list = [1]
+    # movie_end_list = [25]
+    movie_start_list = [1, 1, 1, 1]
+    movie_end_list = [25, 25, 25, 60]
 
     dt = 0.0002
 

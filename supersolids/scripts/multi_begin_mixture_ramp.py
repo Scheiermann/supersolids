@@ -11,8 +11,7 @@ slurm = True
 xvfb_display = 650
 # supersolids_version = "0.1.36rc4"
 supersolids_version = "0.1.37"
-dir_path = Path("/bigwork/dscheier/results/begin_ramp_24_10_fix_movie015/")
-# dir_path = Path("/bigwork/dscheier/results/begin_ramp_test00/")
+dir_path = Path("/bigwork/dscheier/results/begin_ramp_11_08_eq_65_70_75_80_85_90/")
 
 dir_path_log = Path(dir_path, "log")
 dir_path_log.mkdir(parents=True, exist_ok=True)
@@ -27,15 +26,18 @@ a11 = 100.0
 
 m_list = [163.9, 163.9]
 a_dd = 130.8
-# dipol = 9.0
-dipol = 10.0
-a_dd_list = [a_dd, (dipol/10.0) * a_dd, (dipol/10.0) ** 2.0 * a_dd]
+dipol = 9.0
+# dipol = 10.0
+dipol2 = 10.0
+a_dd_list = [a_dd, (dipol/dipol2) * a_dd, (dipol/dipol2) ** 2.0 * a_dd]
 # a_dd_list = [a_dd, 0.0, (dipol/10.0) ** 2.0 * a_dd]
 
 movie_number = 1
 mem_in_MB = 750
 Box = {"x0": -12, "x1": 12, "y0": -3, "y1": 3, "z0": -5, "z1": 5}
+# Box = {"x0": -20, "x1": 20, "y0": -3, "y1": 3, "z0": -5, "z1": 5}
 Res = {"x": 256, "y": 64, "z": 64}
+# Res = {"x": 256, "y": 64, "z": 64}
 # Box = {"x0": -20, "x1": 20, "y0": -7, "y1": 7, "z0": -6, "z1": 6}
 # Res = {"x": 128, "y": 64, "z": 64} # 450MB
 # Res = {"x": 256, "y": 128, "z": 32}
@@ -76,25 +78,12 @@ steps_format = "%07d"
 
 N2_part = 0.5
 
-# epsilon_start = 0.0
-# epsilon_end = 2.01
-# epsilon_start = 2.2
-# epsilon_start = 5.2
-# epsilon_end = 7.01
-epsilon_start = 2.8
-epsilon_end = 2.81
-# epsilon_end = 5.01
-# epsilon_end = 2.01
-# epsilon_end = 1.1
-# epsilon_start = 3.0
-# epsilon_end = 5.1
-# epsilon_step = 0.1
+epsilon_start = 0.0
+epsilon_end = 0.1
 epsilon_step = 0.2
 
-a12_start = 77.5
-a12_end = 77.6
-# a12_start = 85.0
-# a12_end = 85.1
+a12_start = 65.0
+a12_end = 95.1
 a12_step = 2.5
 
 func_filename = "distort.txt"

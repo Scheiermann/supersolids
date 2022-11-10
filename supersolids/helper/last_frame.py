@@ -402,13 +402,20 @@ def last_frame(frame: Optional[int],
                                                               property_dim))
 
                     try:
-                        mesh_t[ix, iy], mesh_property_all[ix, iy] = property_load_npz(path_property_npz) 
+                        a, b = property_load_npz(path_property_npz) 
+                        # mesh_t[ix, iy], mesh_property_all[ix, iy] = property_load_npz(path_property_npz) 
+                        mesh_t[ix, iy], mesh_property_all[ix, iy] = a, b
                     except Exception as e:
                         print(f"Problem with {path_property_npz}, "
                               f"check out if list_of_arrays_list needs to be True.\n{e}")
                         traceback.print_tb(e.__traceback__)
-                        sys.exit(1)
-
+                        try:
+                            mesh_t[ix, iy] = np.pad(a, (0, len(mesh_t[ix, iy]) - len(a)), 'constant')
+                            # mesh_property_all[ix, iy] = np.pad(a, (0, len(mesh_property_all[ix, iy]) - len(a)), 'constant')
+                            print("Padding with 0 worked!")
+                        except Exception as e:
+                            print("Padding did not work!")
+                            sys.exit(1)
 
                 path_out_property_all: Path = Path(path_anchor_output,
                                                    f"property_all_{experiment_suffix}"

@@ -22,34 +22,31 @@ def string_float(s):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    # ssh_hostname = None
-    ssh_hostname = "transfer"
+    ssh_hostname = None
+    # ssh_hostname = "transfer"
     password = None
 
     path_anchor_input_list = []
     path_anchor_output_list = []
-    # experiment_suffix = "ramp_21_09_a12=70"
-    # experiment_suffix = "ramp_21_09_a12_70_big"
-    # experiment_suffix = "ramp_test00"
-    # experiment_suffix = "ramp_05_10"
-    # experiment_suffix = "ramp_05_10_a12=70"
-    # experiment_suffix = "stacked_05_10_a11"
-    # experiment_suffix = "ramp_10_10"
-    # experiment_suffix = "ramp_10_10_small"
-    # experiment_suffix = "ramp_11_10_65"
-    # experiment_suffix = "ramp_11_10_775"
-    # experiment_suffix = "ramp_11_10_85"
-    # experiment_suffix = "ramp_21_10"
-    # experiment_suffix = "ramp_21_10_675"
-    # experiment_suffix = "ramp_21_10_725"
-    # experiment_suffix = "ramp_21_10_825"
-    # experiment_suffix = "ramp_11_10_85_long"
-    # experiment_suffix = "stacked_05_10_a11"
-    experiment_suffix = "ramp_21_09_a12_70_big"
-    path_anchor_input_list.append(Path(f"/bigwork/nhbbsche/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_11_01_65_long_wide"
+    # experiment_suffix = "ramp_11_01_85_long_wide"
+    # experiment_suffix = "ramp_28_10_85_m15_fix"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
 
-    experiment_suffix = "ramp_luis"
-    path_anchor_output_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    experiment_suffix = "ramp_11_04_675_long_wide"
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_11_04_70_long_wide"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_11_04_725_long_wide"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_11_04_75_775_80_long_wide"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+ 
+
+    # path_anchor_input_list.append(Path(f"/bigwork/nhbbsche/results/begin_{experiment_suffix}/"))
+    path_anchor_output_list = path_anchor_input_list
+    # experiment_suffix = "ramp_luis"
+    # path_anchor_output_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     
     # mixture = False
     mixture = True
@@ -61,21 +58,20 @@ if __name__ == "__main__":
     # frame_end = 1000
     frame_end = None
 
-    # steps_per_npz = 10000
+    steps_per_npz = 10000
     # steps_per_npz = 1000
-    steps_per_npz = 100
+    # steps_per_npz = 100
     # steps_per_npz = 1
 
     movie_string = "movie"
     counting_format = "%03d"
     # movie_start_list = [1, 11, 21, 31]
     # movie_end_list = [2, 12, 22, 32]
-    movie_start_list = [11]
-    # movie_end_list = [30]
-    movie_end_list = [11]
-    # slice_indices = {"x": 127, "y": 31, "z": 31}
+    movie_start_list = [1]
+    movie_end_list = [2]
+    slice_indices = {"x": 127, "y": 31, "z": 31}
     # slice_indices = {"x": 63, "y": 31, "z": 31}
-    slice_indices = {"x": 31, "y": 15, "z": 15}
+    # slice_indices = {"x": 31, "y": 15, "z": 15}
 
     mixture_slice_index_list_list = []
     alpha_psi_list_list = []
@@ -91,8 +87,10 @@ if __name__ == "__main__":
         filename_steps_list = ["step_", "step_"]
         # filename_steps_list = ["mixture_step_", "mixture_step_", "mixture_mixture_step_pol_"]
         # filename_steps_list = ["step_", "step_", "pol_"]
-        alpha_psi_list_list.append([0.0, 1.0])
-        alpha_psi_list_list.append([1.0, 0.0])
+        alpha_psi_list_list.append([0.0, 0.0])
+        alpha_psi_list_list.append([0.0, 0.0])
+        # alpha_psi_list_list.append([0.0, 1.0])
+        # alpha_psi_list_list.append([1.0, 0.0])
         # alpha_psi_list = [0.0, 0.0]
         alpha_psi_sol_list_list.append([0.0, 0.0])
         alpha_psi_sol_list_list.append([0.0, 0.0])
@@ -119,7 +117,9 @@ if __name__ == "__main__":
     azimuth_list.append(0.0)
     elevation_list.append(0.0)
     # distance_list.append(20.0)
-    distance_list.append(32.0)
+    # distance_list.append(24.0)
+    # distance_list.append(25.0)
+    distance_list.append(38.0)
 
     ## xz
     # azimuth_list.append(270.0)

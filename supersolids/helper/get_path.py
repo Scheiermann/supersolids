@@ -144,16 +144,19 @@ def get_last_png_in_last_anim(path_movie, dir_name_png, counting_format_png, mov
             counting_format=filename_format,
             file_pattern=filename_extension,
             )
-        # try other frame_format instead of filename_format
-        if not path_last_png.exists():
-            if frame_format:
-                path_last_png, _, _, _ = get_path(
-                    path_last_movie_png,
-                    search_prefix=filename_pattern,
-                    counting_format=frame_format,
-                    file_pattern=filename_extension,
-                    )
-        
+        if path_last_movie_png is not None:
+            # try other frame_format instead of filename_format
+            if not path_last_png.exists():
+                if frame_format:
+                    path_last_png, _, _, _ = get_path(
+                        path_last_movie_png,
+                        search_prefix=filename_pattern,
+                        counting_format=frame_format,
+                        file_pattern=filename_extension,
+                        )
+        else:
+            print(f"No last png in {path_last_movie_png} found.")
+            
     else:
         path_last_png = None
 

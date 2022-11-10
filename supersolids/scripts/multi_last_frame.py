@@ -61,6 +61,83 @@ if __name__ == "__main__":
     # var1_list.append(np.arange(82.5, 82.6, 5.0)) # a11 21_10_825
     # var2_list.append(np.arange(0.0, 2.01, 0.2)) # tilt 21_10
 
+    # experiment_suffix = "ramp_21_10_90"
+    # var1_list.append(np.arange(90.0, 90.1, 5.0)) # a11 24_10_90
+    # var2_list.append(np.arange(0.0, 2.01, 0.2)) # tilt 24_10_90
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # movie_start_list = [1]
+    # movie_end_list = [11]
+
+    # experiment_suffix = "ramp_21_10_925"
+    # var1_list.append(np.arange(92.5, 92.6, 5.0)) # a11 24_10_925
+    # var2_list.append(np.arange(0.0, 2.01, 0.2)) # tilt 24_10_925
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # movie_start_list = [1]
+    # movie_end_list = [11]
+
+    # experiment_suffix = "ramp_28_10_65_long"
+    # var1_list.append(np.arange(65.0, 65.1, 5.0)) # a11 24_10_65_long
+    # var2_list.append(np.arange(2.2, 7.01, 0.2)) # tilt 24_10_65_long
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # movie_start_list = [1]
+    # movie_end_list = [25]
+
+    # experiment_suffix = "ramp_28_10_85_long"
+    # var1_list.append(np.arange(85.0, 85.1, 5.0)) # a11 24_10_85_long
+    # var2_list.append(np.arange(2.2, 7.01, 0.2)) # tilt 24_10_85_long
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # movie_start_list = [1]
+    # movie_end_list = [25]
+
+    # experiment_suffix = "ramp_11_01_65_long_wide"
+    # var1_list.append(np.arange(85.0, 85.1, 5.0)) # a11 24_10_85_long
+    # var2_list.append(np.arange(2.2, 7.01, 0.2)) # tilt 24_10_85_long
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # movie_start_list = [1]
+    # movie_end_list = [25]
+
+    # experiment_suffix = "ramp_11_01_85_long_wide"
+    # var1_list.append(np.arange(85.0, 85.1, 5.0)) # a11 24_10_85_long
+    # var2_list.append(np.arange(2.2, 7.01, 0.2)) # tilt 24_10_85_long
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # movie_start_list = [1]
+    # movie_end_list = [25]
+
+    # experiment_suffix = "ramp_11_04_675_long_wide"
+    # var1_list.append(np.arange(67.5, 67.6, 5.0)) # a11 11_04_675_long_wide
+    # var2_list.append(np.arange(2.2, 7.01, 0.2)) # tilt 11_04_675_long_wide
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # movie_start_list = [1]
+    # movie_end_list = [25]
+
+    # experiment_suffix = "ramp_11_04_70_long_wide"
+    # var1_list.append(np.arange(70.0, 70.1, 5.0)) # a11 11_04_70_long_wide
+    # var2_list.append(np.arange(2.2, 7.01, 0.2)) # tilt 11_04_70_long_wide
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # movie_start_list = [1]
+    # movie_end_list = [25]
+
+    # experiment_suffix = "ramp_11_04_725_long_wide"
+    # var1_list.append(np.arange(72.5, 72.6, 5.0)) # a11 11_04_725_long_wide
+    # var2_list.append(np.arange(3.2, 7.01, 0.2)) # tilt 11_04_725_long_wide
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # movie_start_list = [6]
+    # movie_end_list = [25]
+
+    experiment_suffix = "ramp_11_04_75_775_80_long_wide"
+    var1_list.append(np.arange(75.0, 80.1, 2.5)) # a11 11_04_75_775_80_long_wide
+    var2_list.append(np.arange(3.2, 7.01, 0.2)) # tilt 11_04_75_775_80_long_wide
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    movie_start_list = [1]
+    movie_end_list = [60]
+
+    # experiment_suffix = "ramp_24_10_long"
+    # var1_list.append(np.arange(72.5, 80.1, 2.5)) # a11 24_10_long
+    # var2_list.append(np.arange(2.2, 7.01, 0.2)) # tilt 24_10_long
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # movie_start_list = [1]
+    # movie_end_list = [100]
+
     # experiment_suffix = "ramp_11_10_85_long"
     # var1_list.append(np.arange(85.0, 85.6, 5.0)) # a11 21_10_long
     # var2_list.append(np.arange(2.2, 5.01, 0.2)) # tilt 21_10
@@ -68,12 +145,12 @@ if __name__ == "__main__":
     # movie_start_list = [1]
     # movie_end_list = [15]
 
-    experiment_suffix = "stacked_05_10_a11"
-    var1_list.append(np.arange(80.0, 110.1, 10.0)) # a11 stack
-    var2_list.append(np.arange(0.0, 30.1, 5.0)) # stack
-    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    movie_start_list = [1]
-    movie_end_list = [28]
+    # experiment_suffix = "stacked_05_10_a11"
+    # var1_list.append(np.arange(80.0, 110.1, 10.0)) # a11 stack
+    # var2_list.append(np.arange(0.0, 30.1, 5.0)) # stack
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # movie_start_list = [1]
+    # movie_end_list = [28]
 
     # movie_start_list = [1, 1, 1, 1, 1]
     # movie_end_list = [11, 6, 11, 6, 30]
@@ -99,10 +176,10 @@ if __name__ == "__main__":
     if normed_plots:
         suffix_list[0] += "_normed"
 
-    # nrow_components = 1
-    # ncol_components = 2
-    nrow_components = 2
-    ncol_components = 1
+    nrow_components = 1
+    ncol_components = 2
+    # nrow_components = 2
+    # ncol_components = 1
     
     frames = False
     # frames = True

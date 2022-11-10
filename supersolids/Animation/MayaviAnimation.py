@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import shutil
 import sys
+import traceback
 from typing import List, Optional, Tuple
 import zipfile
 
@@ -23,10 +24,11 @@ from mayavi import mlab
 import numpy as np
 from functools import partial
 
+import supersolids.helper.db_helper
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
-from supersolids.helper import functions, constants, get_path, cut_1d
+from supersolids.helper import functions, constants, get_path, cut_1d, db_helper
 from supersolids.helper.get_version import check_cp_nb, get_version
 from supersolids.scripts.download_last import download
 __GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False))
@@ -91,11 +93,11 @@ def get_legend(System, frame, frame_start, supersolids_version, mu_rel=None):
                 f"Res={System.Res}, "
                 f"max_timesteps={System.max_timesteps:d}, "
                 f"dt={System.dt:.6f}, "
-                f"a_s={System.a_s_array}, "
-                f"a_dd={System.a_dd_array}, "
                 f"w_x/2pi={System.w_x / (2.0 * np.pi):05.02f}, "
                 f"w_y/2pi={System.w_y / (2.0 * np.pi):05.02f}, "
-                f"w_z/2pi={System.w_z / (2.0 * np.pi):05.02f}, "
+                f"w_z/2pi={System.w_z / (2.0 * np.pi):05.02f},\n"
+                f"a_s={System.a_s_array.tolist()}, "
+                f"a_dd={System.a_dd_array.tolist()},\n"
                 f"imag_time={System.imag_time}, "
                 f"t={System.t:07.05f}, "
                 f"processed={100 * (frame - frame_start) / System.max_timesteps:03.01f}%, "
@@ -450,19 +452,6 @@ class MayaviAnimation(Animation.Animation):
         :param mixture_slice_index: Index of component of which the slices are taken.
 
         """
-        filename_singles = ["script.txt"]
-        filename_steps_list = ["script_"]
-        steps_format_list = ["%04d"]
-        filename_pattern_list = [".pkl"]
-        filename_number_regex_list = ['*']
-
-        filename_singles_all = []
-        filename_steps_list_all = ["sbatch_movie"]
-        steps_format_list_all = ["%03d"]
-        filename_pattern_list_all = [".sh"]
-        filename_number_regex_list_all = ['*']
-        download_steps = True
-        take_last = None
         supersolids_version = get_version()
 
         path_anchor_in = self.dir_path
@@ -490,6 +479,19 @@ class MayaviAnimation(Animation.Animation):
                 print(f"mkdir: {output_path}")
                 output_path.mkdir(parents=True)
             self.fig.scene.movie_maker.directory = self.dir_path_output
+            filename_singles = ["script.txt"]
+            filename_steps_list = ["script_"]
+            steps_format_list = ["%04d"]
+            filename_pattern_list = [".pkl"]
+            filename_number_regex_list = ['*']
+
+            filename_singles_all = []
+            filename_steps_list_all = ["sbatch_movie"]
+            steps_format_list_all = ["%03d"]
+            filename_pattern_list_all = [".sh"]
+            filename_number_regex_list_all = ['*']
+            download_steps = True
+            take_last = None
             download(host, self.dir_path, self.dir_path_output, filename_singles,
                      download_steps, take_last, filename_steps_list, steps_format_list,
                      filename_pattern_list, filename_number_regex_list)
@@ -618,14 +620,14 @@ class MayaviAnimation(Animation.Animation):
                 yield None
                 break
 
-            except FileNotFoundError:
+            except FileNotFoundError as e:
                 yield None
+                print(f"{e}")
+                traceback.print_exc()
                 break
 
             try:
-                print(f"before last cut {self.dir_path_output}")
                 output_path, _, _, _ = get_path.get_path(self.dir_path_output)
-                print(f"after last cut {self.dir_path_output}")
                 cut_1d.cut_1d(System_list,
                               slice_indices=[self.slice_indices[0],
                                              self.slice_indices[1],
@@ -645,12 +647,20 @@ class MayaviAnimation(Animation.Animation):
             except Exception as e:
                 print(f"cut1d did not work!\n{e}")
 
+            anim_name_special = "anextra"
             anim_name = "anim"
             anim_extension = ".png"
             path_anim = Path(output_path, anim_name + "%05d" % int(frame / steps_per_npz) + anim_extension)
-            path_anim_new = Path(output_path, anim_name + steps_format % frame + anim_extension)
+            if frame == 0:
+                path_anim_new = Path(output_path, anim_name_special + "_init" + anim_extension)
+            else:
+                path_anim_new = Path(output_path, anim_name + steps_format % (frame - steps_per_npz) + anim_extension)
             shutil.move(path_anim, path_anim_new)
             print(f"from: {path_anim}, to: {path_anim_new}")
+
+            # add System to database
+            db_helper.db_commit(input_path, System, frame,
+                                path_anchor_database=input_path.parent, database_name="data.db")
 
             frame = frame + steps_per_npz
 
@@ -658,6 +668,11 @@ class MayaviAnimation(Animation.Animation):
                last_index = frame_end 
 
             if frame == last_index + steps_per_npz:
+                # path_anim_new = Path(output_path, anim_name + "_last" + anim_extension)
+                path_anim = Path(output_path, anim_name + "%05d" % int((frame) / steps_per_npz) + anim_extension)
+                path_anim_new = Path(output_path, anim_name + steps_format % (frame - steps_per_npz) + anim_extension)
+                shutil.move(path_anim, path_anim_new)
+                print(f"from: {path_anim}, to: {path_anim_new}")
                 yield None
                 break
             elif frame > last_index:
@@ -665,7 +680,13 @@ class MayaviAnimation(Animation.Animation):
 
         # Finally close
         mlab.close(all=True)
-        
+
+        # move last picture, as it is produced 2nd time, when closing the plot
+        path_anim = Path(output_path, anim_name + "%05d" % int(frame / steps_per_npz + 1) + anim_extension)
+        path_anim_new = Path(output_path, anim_name_special + "_last" + anim_extension)
+        print(f"from: {path_anim}, to: {path_anim_new}")
+        shutil.move(path_anim, path_anim_new)
+
 
     @mlab.animate(delay=10, ui=True)
     def animate(self, System: Schroedinger, accuracy: float = 10 ** -6,
