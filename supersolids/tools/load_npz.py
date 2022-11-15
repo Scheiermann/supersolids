@@ -23,6 +23,7 @@ from supersolids.Animation.Animation import Animation
 from supersolids.Animation import MayaviAnimation
 from supersolids.Animation.MayaviAnimation import load_System, load_System_list
 from supersolids.helper import get_path
+from supersolids.helper import db_helper
 
 
 def load_npz(flag_args, host=None):
@@ -79,6 +80,8 @@ def load_npz(flag_args, host=None):
                                               dir_path_output=dir_path_output,
                                               )
 
+    # db_helper.db_check()
+    # db_helper.db_query(dir_path.parent)
     animate_wrapper = mlab.animate(MayAnim.animate_npz, delay=10, ui=flag_args.ui)
     MayAnimator = animate_wrapper(dir_path=dir_path,
                                   dir_name=flag_args.dir_name,
@@ -99,6 +102,7 @@ def load_npz(flag_args, host=None):
                                   cut1d_y_lim=flag_args.cut1d_y_lim,
                                   cut1d_plot_val_list=flag_args.cut1d_plot_val_list,
                                   host=host,
+                                  experiment_name=flag_args.experiment_name,
                                   )
     mlab.show()
 
@@ -114,6 +118,8 @@ def load_npz(flag_args, host=None):
 def flags(args_array):
     parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
                                                  "and create movie.")
+    parser.add_argument("-experiment_name", type=str, default="start",
+                        help="Name of the experiment in the database")
     parser.add_argument("-dir_path", type=str, default="~/supersolids/results",
                         help="Absolute path to load data from")
     parser.add_argument("-dir_path_output", type=str, default="~/supersolids/results",

@@ -442,6 +442,7 @@ class MayaviAnimation(Animation.Animation):
                     cut1d_y_lim: Tuple[float, float] = (0.0, 1.0),
                     cut1d_plot_val_list: bool = [False],
                     host=None,
+                    experiment_name="start_real",
                     ):
         """
         Animates solving of the Schroedinger equations of System with mayavi in 3D.
@@ -659,8 +660,8 @@ class MayaviAnimation(Animation.Animation):
             print(f"from: {path_anim}, to: {path_anim_new}")
 
             # add System to database
-            db_helper.db_commit(input_path, System, frame,
-                                path_anchor_database=input_path.parent, database_name="data.db")
+            db_helper.db_commit(experiment_name, input_path, System, frame,
+                                path_anchor_database=input_path.parent.parent, database_name="data.db")
 
             frame = frame + steps_per_npz
 

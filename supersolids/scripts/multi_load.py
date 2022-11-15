@@ -25,6 +25,8 @@ if __name__ == "__main__":
     ssh_hostname = None
     # ssh_hostname = "transfer"
     password = None
+    experiment_name = "start_real"
+    # experiment_name = "test_db"
 
     path_anchor_input_list = []
     path_anchor_output_list = []
@@ -33,8 +35,10 @@ if __name__ == "__main__":
     # experiment_suffix = "ramp_28_10_85_m15_fix"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
 
-    experiment_suffix = "ramp_11_04_675_long_wide"
+    experiment_suffix = "ramp_11_08_eq_65_70_75_80_85_90"
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_11_04_675_long_wide"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # experiment_suffix = "ramp_11_04_70_long_wide"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # experiment_suffix = "ramp_11_04_725_long_wide"
@@ -67,8 +71,10 @@ if __name__ == "__main__":
     counting_format = "%03d"
     # movie_start_list = [1, 11, 21, 31]
     # movie_end_list = [2, 12, 22, 32]
+    # movie_start_list = [1, 1]
+    # movie_end_list = [2, 2]
     movie_start_list = [1]
-    movie_end_list = [2]
+    movie_end_list = [13]
     slice_indices = {"x": 127, "y": 31, "z": 31}
     # slice_indices = {"x": 63, "y": 31, "z": 31}
     # slice_indices = {"x": 31, "y": 15, "z": 15}
@@ -83,17 +89,15 @@ if __name__ == "__main__":
         # filename_steps_list = ["mixture_step_"]
         # filename_steps_list = ["mixture_mixture_step_pol_"]
         mixture_slice_index_list_list.append([0, 1])
-        mixture_slice_index_list_list.append([1, 0])
+        # mixture_slice_index_list_list.append([1, 0])
         filename_steps_list = ["step_", "step_"]
         # filename_steps_list = ["mixture_step_", "mixture_step_", "mixture_mixture_step_pol_"]
         # filename_steps_list = ["step_", "step_", "pol_"]
         alpha_psi_list_list.append([0.0, 0.0])
-        alpha_psi_list_list.append([0.0, 0.0])
-        # alpha_psi_list_list.append([0.0, 1.0])
-        # alpha_psi_list_list.append([1.0, 0.0])
+        # alpha_psi_list_list.append([0.0, 0.0])
         # alpha_psi_list = [0.0, 0.0]
         alpha_psi_sol_list_list.append([0.0, 0.0])
-        alpha_psi_sol_list_list.append([0.0, 0.0])
+        # alpha_psi_sol_list_list.append([0.0, 0.0])
     else:
         filename_steps = "step_"
         alpha_psi_list_list.append([0.0])
@@ -116,10 +120,11 @@ if __name__ == "__main__":
     ## xy
     azimuth_list.append(0.0)
     elevation_list.append(0.0)
-    # distance_list.append(20.0)
+    distance_list.append(20.0)
+    # distance_list.append(24.0)
     # distance_list.append(24.0)
     # distance_list.append(25.0)
-    distance_list.append(38.0)
+    # distance_list.append(38.0)
 
     ## xz
     # azimuth_list.append(270.0)
@@ -225,6 +230,8 @@ if __name__ == "__main__":
                         flags_given.append(f"-sum_along={sum_along}")
                     if frame_end:
                         flags_given.append(f"-frame_end={frame_end}")
+                    if experiment_name:
+                        flags_given.append(f"-experiment_name={experiment_name}")
 
                     flags_parsed = " ".join(flags_given)
 
