@@ -22,11 +22,11 @@ def check_numba_used():
     if numba_version:
         numpy_version = get_version("numpy")
         # numba needs numpy version under or equal 1.21
-        if parse_version(numpy_version) < parse_version("1.22"):
+        if parse_version(numpy_version) < parse_version("1.24"):
             numba_used = True
-            print("numba is used!")
+            print("numba is usable!")
         else:
-            print("WARNING: numba NOT used, as it needs numpy version under or equal 1.21!")
+            print("WARNING: numba NOT used, as it needs numpy version under or equal 1.24!")
             numba_used = False
     else:
         print("WARNING: numba NOT used, as it is not installed!")
@@ -38,13 +38,13 @@ def check_cupy_used(np):
     try:
         import cupy as cp
         cupy_used = True
-        print("cupy is used!")
+        print("cupy is usable!")
     except ImportError:
         print("ImportError: cupy. numba used instead.")
         cp = np
         cupy_used = False
         cuda_used = False
-    except ModuleNotFound:
+    except ModuleNotFoundError:
         print("ModuleNotFound: cupy. numba used instead.")
         cp = np
         cupy_used = False
@@ -72,7 +72,7 @@ def check_cp_nb(np, gpu_off = False):
     numba_used = check_numba_used()
     cp, cupy_used, cuda_used = check_cupy_used(np)
     
-    # use flag to turn off gpu eventhouh it might be usable
+    # use flag to turn off gpu even though it might be usable
     if gpu_off:
         cp = np
         cupy_used = False

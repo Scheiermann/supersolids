@@ -28,7 +28,8 @@ from scipy.ndimage import distance_transform_edt
 
 from supersolids.helper import constants, functions, get_path, get_version
 
-__GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False))
+# if env variable found, it will be a string "False" or "True": trick to convert to bool
+__GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False) in ["True", "true"])
 cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__)
 import supersolids.helper.numbas as numbas
 
