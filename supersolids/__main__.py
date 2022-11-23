@@ -139,6 +139,8 @@ def flags(args_array):
                              "saved as pkl and allows offscreen usage.")
     parser.add_argument("--gpu_off", default=False, action="store_true",
                         help="Use flag to turn off gpu eventhouh it might be usable")
+    parser.add_argument("-gpu_index", type=int, default=0,
+                        help="Use to set index of cuda device.")
 
     flag_args = parser.parse_args(args_array)
     print(f"args: {flag_args}")
@@ -150,10 +152,13 @@ def flags(args_array):
 if __name__ == "__main__":
     args = flags(sys.argv[1:])
 
+    os.environ["SUPERSOLIDS_GPU_INDEX"] = str(args.gpu_index)
     os.environ["SUPERSOLIDS_GPU_OFF"] = str(args.gpu_off)
     # if env variable found, it will be a string "False" or "True": trick to convert to bool
     __GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False) in ["True", "true"])
-    cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__)
+    gpu_index_str = int(os.environ.get("SUPERSOLIDS_GPU_INDEX", 0))
+    __GPU_INDEX__= int("0" if gpu_index_str=="" else gpu_index_str)
+    cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__, gpu_index=__GPU_INDEX__)
     from supersolids.Schroedinger import Schroedinger
     from supersolids.SchroedingerMixture import SchroedingerMixture
     from supersolids.helper.simulate_case import simulate_case
