@@ -28,12 +28,13 @@ import supersolids.helper.db_helper
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
-from supersolids.helper import functions, constants, get_path, cut_1d, db_helper
-from supersolids.helper.get_version import check_cp_nb, get_version
+from supersolids.helper import functions, constants, get_path, get_version, cut_1d, db_helper
 from supersolids.scripts.download_last import download
 # if env variable found, it will be a string "False" or "True": trick to convert to bool
 __GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False) in ["True", "true"])
-cp, cupy_used, cuda_used, numba_used = check_cp_nb(np, gpu_off=__GPU_OFF_ENV__)
+gpu_index_str = int(os.environ.get("SUPERSOLIDS_GPU_INDEX", 0))
+__GPU_INDEX__= int("0" if gpu_index_str=="" else gpu_index_str)
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__, gpu_index=__GPU_INDEX__)
         
 
 def load_System(path_schroedinger, host=None):

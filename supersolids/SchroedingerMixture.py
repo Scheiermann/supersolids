@@ -30,7 +30,9 @@ from supersolids.helper import constants, functions, get_path, get_version
 
 # if env variable found, it will be a string "False" or "True": trick to convert to bool
 __GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False) in ["True", "true"])
-cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__)
+gpu_index_str = int(os.environ.get("SUPERSOLIDS_GPU_INDEX",0))
+__GPU_INDEX__= int("0" if gpu_index_str=="" else gpu_index_str)
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__, gpu_index=__GPU_INDEX__)
 import supersolids.helper.numbas as numbas
 
 from supersolids.Schroedinger import Schroedinger

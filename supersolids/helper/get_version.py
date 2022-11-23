@@ -68,7 +68,7 @@ def check_cupy_used(np):
                 
     return cp, cupy_used, cuda_used
 
-def check_cp_nb(np, gpu_off = False):
+def check_cp_nb(np, gpu_off: bool = False, gpu_index: int = 1):
     numba_used = check_numba_used()
     cp, cupy_used, cuda_used = check_cupy_used(np)
     
@@ -80,6 +80,9 @@ def check_cp_nb(np, gpu_off = False):
 
     if cupy_used:
         numba_used = False
+        
+        print(f"GPU index: {gpu_index}")
+        cp.cuda.runtime.setDevice(gpu_index)
 
     return cp, cupy_used, cuda_used, numba_used
 
