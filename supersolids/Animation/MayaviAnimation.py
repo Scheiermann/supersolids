@@ -77,7 +77,8 @@ def load_System_list(System_list, filename_steps_list, input_path, steps_format,
             try:
                 System_list[i] = System_list[i].load_summary(input_path,
                                                              steps_format, frame,
-                                                             summary_name=summary_name)
+                                                             summary_name=summary_name,
+                                                             host=host)
             except Exception:
                 print(f"Could not load {summary_name}!")
     
@@ -302,8 +303,9 @@ class MayaviAnimation(Animation.Animation):
         if isinstance(System, SchroedingerMixture):
             prob_plots: List[cp.ndarray] = []
             if len(System.psi_val_list) != len(self.alpha_psi_list):
-                sys.exit(f"System.psi_val_list ({len(System.psi_val_list)}) and Anim.alpha_psi_list "
-                         f"({len(self.alpha_psi_list)}) need to have same length.")
+                sys.exit(f"System.psi_val_list ({len(System.psi_val_list)}) "
+                         + "and Anim.alpha_psi_list "
+                         + f"({len(self.alpha_psi_list)}) need to have same length.")
             for i, (psi_val, alpha_psi) in enumerate(zip(System.psi_val_list, self.alpha_psi_list)):
                 colormap: str = "spectral"
                 if i == mixture_slice_index:
@@ -481,11 +483,11 @@ class MayaviAnimation(Animation.Animation):
                 print(f"mkdir: {output_path}")
                 output_path.mkdir(parents=True)
             self.fig.scene.movie_maker.directory = self.dir_path_output
-            filename_singles = ["script.txt"]
-            filename_steps_list = ["script_"]
-            steps_format_list = ["%04d"]
-            filename_pattern_list = [".pkl"]
-            filename_number_regex_list = ['*']
+            script_singles = ["script.txt"]
+            script_list = ["script_"]
+            script_format_list = ["%04d"]
+            script_pattern_list = [".pkl"]
+            script_number_regex_list = ['*']
 
             filename_singles_all = []
             filename_steps_list_all = ["sbatch_movie"]
@@ -494,9 +496,9 @@ class MayaviAnimation(Animation.Animation):
             filename_number_regex_list_all = ['*']
             download_steps = True
             take_last = None
-            download(host, self.dir_path, self.dir_path_output, filename_singles,
-                     download_steps, take_last, filename_steps_list, steps_format_list,
-                     filename_pattern_list, filename_number_regex_list)
+            download(host, self.dir_path, self.dir_path_output, script_singles,
+                     download_steps, take_last, script_list, script_format_list,
+                     script_pattern_list, script_number_regex_list)
             download(host, path_anchor_in, path_anchor_out, filename_singles_all,
                      download_steps, take_last, filename_steps_list_all, steps_format_list_all,
                      filename_pattern_list_all, filename_number_regex_list_all)
@@ -510,7 +512,7 @@ class MayaviAnimation(Animation.Animation):
                                                 file_pattern=".npz",
                                                 host=host
                                                 )
-        print(f"{last_index}")
+        print(f"Last index: {last_index}")
 
         path_schroedinger: Path = Path(input_path, filename_schroedinger)
         System = load_System(path_schroedinger, host=host)
@@ -551,7 +553,8 @@ class MayaviAnimation(Animation.Animation):
                     mlab.view(azimuth=azimuth, elevation=elevation, distance=distance)
 
                     if arg_slices:
-                        cbar = mlab.colorbar(object=slice_x_plot, orientation='vertical', nb_labels=10)
+                        cbar = mlab.colorbar(object=slice_x_plot, orientation='vertical',
+                                             nb_labels=10)
                         cbar.use_default_range = False
                         cbar.data_range = np.array([0.0, 2.0 * np.pi])
 
@@ -652,17 +655,22 @@ class MayaviAnimation(Animation.Animation):
             anim_name_special = "anextra"
             anim_name = "anim"
             anim_extension = ".png"
-            path_anim = Path(output_path, anim_name + "%05d" % int(frame / steps_per_npz) + anim_extension)
+            path_anim = Path(output_path,
+                             anim_name + "%05d" % int(frame / steps_per_npz) + anim_extension)
             if frame == 0:
                 path_anim_new = Path(output_path, anim_name_special + "_init" + anim_extension)
             else:
-                path_anim_new = Path(output_path, anim_name + steps_format % (frame - steps_per_npz) + anim_extension)
+                path_anim_new = Path(output_path,
+                                     anim_name
+                                     + steps_format % (frame - steps_per_npz)
+                                     + anim_extension)
             shutil.move(path_anim, path_anim_new)
             print(f"from: {path_anim}, to: {path_anim_new}")
 
             # add System to database
             db_helper.db_commit(experiment_name, input_path, System, frame,
-                                path_anchor_database=input_path.parent.parent, database_name="data.db")
+                                path_anchor_database=output_path.parent.parent,
+                                database_name="data.db")
 
             frame = frame + steps_per_npz
 
@@ -671,8 +679,14 @@ class MayaviAnimation(Animation.Animation):
 
             if frame == last_index + steps_per_npz:
                 # path_anim_new = Path(output_path, anim_name + "_last" + anim_extension)
-                path_anim = Path(output_path, anim_name + "%05d" % int((frame) / steps_per_npz) + anim_extension)
-                path_anim_new = Path(output_path, anim_name + steps_format % (frame - steps_per_npz) + anim_extension)
+                path_anim = Path(output_path,
+                                 anim_name
+                                 + "%05d" % int((frame) / steps_per_npz)
+                                 + anim_extension)
+                path_anim_new = Path(output_path,
+                                     anim_name
+                                     + steps_format % (frame - steps_per_npz)
+                                     + anim_extension)
                 shutil.move(path_anim, path_anim_new)
                 print(f"from: {path_anim}, to: {path_anim_new}")
                 yield None
@@ -684,7 +698,10 @@ class MayaviAnimation(Animation.Animation):
         mlab.close(all=True)
 
         # move last picture, as it is produced 2nd time, when closing the plot
-        path_anim = Path(output_path, anim_name + "%05d" % int(frame / steps_per_npz + 1) + anim_extension)
+        path_anim = Path(output_path,
+                         anim_name
+                         + "%05d" % int(frame / steps_per_npz + 1)
+                         + anim_extension)
         path_anim_new = Path(output_path, anim_name_special + "_last" + anim_extension)
         print(f"from: {path_anim}, to: {path_anim_new}")
         shutil.move(path_anim, path_anim_new)

@@ -555,7 +555,8 @@ class SchroedingerMixture(Schroedinger):
         return Summary, summary_name
 
     def load_summary(self, input_path: Path, steps_format: str, frame: int,
-                     summary_name: Optional[str] = "SchroedingerMixtureSummary_"):
+                     summary_name: Optional[str] = "SchroedingerMixtureSummary_",
+                     host=None):
         if summary_name:
             system_summary_path = Path(input_path, summary_name + steps_format % frame + ".pkl")
         else:
@@ -563,11 +564,17 @@ class SchroedingerMixture(Schroedinger):
 
         try:
             # load SchroedingerSummary
-            with open(system_summary_path, "rb") as f:
-                SystemSummary: SchroedingerMixtureSummary = dill.load(file=f)
-                SystemSummary.copy_to(self)
-        except Exception:
-            print(f"{system_summary_path} not found.")
+            if host:
+                sftp = host.sftp()
+                with sftp.file(str(system_summary_path), "rb") as f:
+                    SystemSummary: SchroedingerMixtureSummary = dill.load(file=f)
+                    SystemSummary.copy_to(self)
+            else:
+                with open(system_summary_path, "rb") as f:
+                    SystemSummary: SchroedingerMixtureSummary = dill.load(file=f)
+                    SystemSummary.copy_to(self)
+        except Exception as e:
+            print(f"{system_summary_path} not found.\n {e}")
 
         return self
 
