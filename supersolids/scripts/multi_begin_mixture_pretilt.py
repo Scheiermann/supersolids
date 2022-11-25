@@ -8,12 +8,12 @@ import time
 from supersolids.helper.dict2str import dic2str
 
 slurm = True
-mem_in_GB = 4
-xvfb_display = 700
-supersolids_version = "0.1.35"
+xvfb_display = 960
+supersolids_version = "0.1.36rc4"
 # dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_schroedinger/")
 # dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_small_grid/")
-dir_path = Path("/bigwork/dscheier/results/begin_pretilt/")
+dir_path = Path("/bigwork/dscheier/results/begin_pretilt0.05_a11_70to120_Res4x/")
+# dir_path = Path("/bigwork/dscheier/results/begin_pretilt0.25to100/")
 # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
 dir_path_log = Path(dir_path, "log")
@@ -32,9 +32,25 @@ a_dd = 130.8
 dipol = 10.0
 a_dd_list = [a_dd, (dipol/10.0) * a_dd, (dipol/10.0) ** 2.0 * a_dd]
 
-Box = {"x0": -15, "x1": 15, "y0": -7, "y1": 7, "z0": -6, "z1": 6}
-# Res = {"x": 256, "y": 128, "z": 32}
-Res = {"x": 128, "y": 64, "z": 32}
+# Box = {"x0": -10, "x1": 10, "y0": -3, "y1": 3, "z0": -4, "z1": 4}
+# Res = {"x": 128, "y": 32, "z": 32}
+# mem_in_GB = 8
+
+Box = {"x0": -10, "x1": 10, "y0": -3, "y1": 3, "z0": -4, "z1": 4}
+Res = {"x": 128, "y": 64, "z": 64}
+mem_in_GB = 32
+
+# Box = {"x0": -8, "x1": 8, "y0": -1, "y1": 1, "z0": -4, "z1": 4}
+# Res = {"x": 128, "y": 16, "z": 32}
+# mem_in_GB = 4
+
+# Box = {"x0": -10, "x1": 10, "y0": -3, "y1": 3, "z0": -4, "z1": 4}
+# Res = {"x": 256, "y": 32, "z": 32}
+# mem_in_GB = 16
+
+# Box = {"x0": -15, "x1": 15, "y0": -7, "y1": 7, "z0": -6, "z1": 6}
+# Res = {"x": 128, "y": 64, "z": 32}
+# mem_in_GB = 16
 
 noise = [0.9, 1.1]
 accuracy = 0.0
@@ -52,22 +68,53 @@ w_z = 2.0 * np.pi * w_z_freq
 # for mixtures
 a = {"a_x": 4.0, "a_y": 0.8, "a_z": 1.8}
 
-max_timesteps = 100001
+# max_timesteps = 20001
+max_timesteps = 250001
 dt = 0.0002
 steps_per_npz = 10000
 # steps_per_npz = 1
 steps_format = "%07d"
 accuracy = 0.0
 
-N2_part = 0.5
+N2_part = 0.05
 
-a11_start = 85.0
+# a11_start = 85.0
+# a11_end = 100.1
+# a11_step = 2.50
+
+# a11_start = 50.0
+# a11_end = 80.1
+# a11_step = 5.0
+
+# a11_start = 80.0
+# a11_end = 80.1
+# # a11_end = 100.1
+# a11_step = 5.0
+
+a11_start = 80.0
 a11_end = 100.1
-a11_step = 2.5
+a11_step = 5.0
 
-a12_start = 85.0
-a12_end = 100.1
-a12_step = 2.50
+a12_start = 70.0
+a12_end = 120.1
+a12_step = 10.0
+
+# a12_start = 85.0
+# a12_end = 100.1
+# a12_step = 2.50
+
+# a12_start = 80.0
+# a12_end = 100.1
+# a12_step = 5.0
+
+# a12_start = 50.0
+# a12_end = 80.1
+# a12_step = 5.0
+
+# a12_start = 50.0
+# a12_end = 100.1
+# a12_step = 2.50
+# a12_step = 10.0
 
 func_filename = "distort.txt"
 
@@ -105,7 +152,7 @@ for a11 in np.arange(a11_start, a11_end, a11_step):
         func_path = Path(dir_path_func, func_filename)
         func_path_list.append(func_path)
 
-        jobname = f"{supersolids_version}_a11_{a11}a12_{a12_string}_m{movie_number_after}"
+        jobname = f"{supersolids_version}_a11_{a11}a12_{a12_string}_m{movie_number_after}_N2_{N2_part}"
 
         if slurm:
             cluster_flags = f"""#==================================================
@@ -117,10 +164,10 @@ for a11 in np.arange(a11_start, a11_end, a11_step):
 #SBATCH -e error-%j.out
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH -t 1-00:00:00
+#SBATCH -t 5-00:00:00
 #SBATCH --mem={mem_in_GB}G
-##SBATCH -p gpu
-##SBATCH -w atlas
+##SBATCH -p gpu_cuda
+##SBATCH --constraint="cuda&jammy"
 ##SBATCH -w altair,atlas,berti,gemini,mirzam,niobe,pegasus,phad,pollux,rana,sargas,weywot
 """
 
@@ -179,6 +226,9 @@ echo $HOME
 # /bigwork/dscheier/miniconda/bin/pip install -i https://test.pypi.org/simple/ supersolids=={supersolids_version}
 # /bigwork/dscheier/miniconda/bin/pip install -i https://pypi.org/simple/supersolids=={supersolids_version}
 
+cd /bigwork/dscheier/supersolids
+conda develop .
+
 /bigwork/dscheier/miniconda/envs/solids/bin/python3.10 -m supersolids \
 -Box={dic2str(Box)} \
 -Res={dic2str(Res)} \
@@ -200,7 +250,8 @@ echo $HOME
 --a_s_list {' '.join(map(str, a_s_list))} \
 --V_interaction \
 --offscreen \
---mixture
+--gpu_off \
+--mixture 
 
 """])
 

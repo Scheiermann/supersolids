@@ -5,7 +5,8 @@ import shutil
 
 
 def cp_plots(start, number, path_anchor_input, dir_name, filename_in,
-             path_anchor_output, filename_out, counting_format="%03d", filename_extension=".png"):
+             path_anchor_output, filename_out, counting_format="%03d",
+             filename_extension=".png", move: bool = False):
     for i in range(start, start + number):
         movie_number = f"{counting_format % i}"
         # Create a results dir, if there is none
@@ -13,10 +14,15 @@ def cp_plots(start, number, path_anchor_input, dir_name, filename_in,
             path_anchor_output.mkdir(parents=True)
 
         print(f"{movie_number}")
-        path_in: Path = Path(path_anchor_input, dir_name + movie_number, filename_in + filename_extension)
-        path_out: Path = Path(path_anchor_output, filename_out + "_" + movie_number + filename_extension)
+        path_in: Path = Path(path_anchor_input, dir_name + movie_number,
+                             filename_in + filename_extension)
+        path_out: Path = Path(path_anchor_output,
+                              filename_out + "_movie_" + movie_number + filename_extension)
         try:
-            shutil.copy(path_in, path_out)
+            if move:
+                shutil.move(path_in, path_out)
+            else:
+                shutil.copy(path_in, path_out)
         except Exception as e:
             print(f"ERROR: {e}. Skipping copying of file!")
 

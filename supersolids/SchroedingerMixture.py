@@ -554,34 +554,51 @@ class SchroedingerMixture(Schroedinger):
 
         return lhy_energy
 
-    def energy_density_interaction(self,
-                                   density_list: List[np.ndarray],
-                                   U_dd_list: List[np.ndarray]) -> float:
+    def energy_density_interaction(self, density_list: List[np.ndarray]) -> float:
         dV = self.volume_element(fourier_space=False)
-        U_dd_array = np.stack(U_dd_list, axis=0)
-        density_array = np.stack(density_list, axis=0)
+        density_array = cp.stack(density_list, axis=0)
 
-        density_U_dd = np.einsum("i...,j...->ij...", U_dd_array, density_array)
-        density_density = np.einsum("i...,j...->ij...", density_array, density_array)
+        density_density = cp.einsum("i...,j...->ij...", density_array, density_array)
 
-        # a = self.array_to_tensor_grid(self.U_dd_factor_array) * density_U_dd
-        a = np.einsum("...ij, kl...->kl...", self.a_dd_array, density_U_dd)
-        b = np.einsum("...ij, kl...->kl...", self.a_s_array, density_density)
-        en_mf = 0.5 * np.sum(a + b).real
+        # density_density and density_U_dd are (2, 2, res_x, res_y, res_z)
+        # the (2,2) part needs to be summed after one-by-one multiplication
+        # [[a11 * b11, a12 * a12], [a21 * b21, a22 * b22]] with (2, 2) matrices
+        # formally, as we sum in real space dV is just a constant multiplication, so summation
+        # over all 5 dimensions is fine
+        
+        # there are 3 ways when to sum (verison c is the fastest):
+        # a. getting a (2, 2, res_x, res_y, res_z) matrix
+        # b. getting a (res_x, res_y, res_z) matrix, where (2,2) grid part is already summed
+        # c. getting a (2, 2) matrix, where the (res_x, res_y, res_z) is already summed
 
-        return self.sum_dV(en_mf, dV=dV)
+        # energy_dipol_dipol_a = np.einsum("ij..., ijklm->ijklm", self.a_s_array, density_density)
+        # energy_dipol_dipol_b = np.einsum("ij..., ijklm->klm", self.a_s_array, density_density)
+        energy_scattering = cp.einsum("ij..., ijklm->ij", self.a_s_array, density_density)
+
+        # if stack_shift is used U_dd has higher dimensionality, but resulting density_U_dd the same
+        if self.stack_shift != 0.0:
+            U_dd = self.get_U_dd(density_list)
+            density_U_dd = cp.einsum("ijklm, jklm->ijklm", U_dd, density_array)
+        else:
+            U_dd_list = self.get_U_dd_list(density_list)
+            U_dd_array = cp.stack(U_dd_list, axis=0)
+            density_U_dd = cp.einsum("i...,j...->ij...", U_dd_array, density_array)
+
+        energy_dipol_dipol = cp.einsum("ij..., ijklm->ij", self.a_dd_array, density_U_dd)
+
+        E_dd = 0.5 * np.sum(energy_scattering + energy_dipol_dipol).real * dV
+
+        return E_dd
 
     def get_E(self) -> None:
         # update for energy calculation
         density_list = self.get_density_list(jit=numba_used)
-        U_dd_list = self.get_U_dd_list(density_list)
         mu_lhy_list: List[np.ndarray] = self.get_mu_lhy_list(density_list)
 
         # use normalized inputs for energy
-        self.E = self.energy(density_list, U_dd_list, mu_lhy_list)
+        self.E = self.energy(density_list, mu_lhy_list)
 
-    def energy(self, density_list: List[cp.ndarray], U_dd_list: List[cp.ndarray],
-               mu_lhy_list: List[cp.ndarray]) -> float:
+    def energy(self, density_list: List[cp.ndarray], mu_lhy_list: List[cp.ndarray]) -> float:
         """
         Input psi_1, psi_2 need to be normalized.
         density1 and density2 need to be build by the normalized psi_1, psi_2.
@@ -594,7 +611,7 @@ class SchroedingerMixture(Schroedinger):
             mu_lhy_part_list.append(self.sum_dV(mu_lhy * density, dV=dV))
         mu_lhy_part = cp.sum(cp.array(mu_lhy_part_list))
 
-        p_int = self.energy_density_interaction(density_list, U_dd_list)
+        p_int = self.energy_density_interaction(density_list)
 
         E_lhy = self.sum_dV(self.get_energy_lhy(density_list), dV=dV)
 
@@ -657,26 +674,45 @@ class SchroedingerMixture(Schroedinger):
         return com_list
 
     def get_parity(self,
-                   axis: int = 2,
+                   axis: Optional[int] = None,
                    Mx0: Optional[int] = None, Mx1: Optional[int] = None,
                    My0: Optional[int] = None, My1: Optional[int] = None,
                    Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> List[float]:
         x0, x1, y0, y1, z0, z1 = self.slice_default(Mx0, Mx1, My0, My1, Mz0, Mz1)
+        if axis is None:
+            axis_list = range(self.dim)
+        else:
+            axis_list = [axis]
         parity_list: List[float] = []
         for psi_val in self.psi_val_list:
-            psi_under0, psi_over0 = cp.split(psi_val, 2, axis=axis)
+            parity_axis_list = []
+            for axis in axis_list:
+                psi_under0, psi_over0 = np.split(psi_val, 2, axis=axis)
 
-            if axis in [0, 1, 2]:
-                psi_over0_reversed = psi_over0[::-1]
-            else:
-                sys.exit(f"No such axis ({axis}). Choose 0, 1 or 2 for axis x, y or z.")
+                if axis in [0, 1, 2]:
+                    psi_over0_reversed = psi_over0[::-1]
+                else:
+                    sys.exit(f"No such axis ({axis}). Choose 0, 1 or 2 for axis x, y or z.")
 
-            parity = self.trapez_integral(cp.abs(
-                psi_under0[x0:x1, y0:y1, z0:z1] - psi_over0_reversed[x0:x1, y0:y1, z0:z1]) ** 2.0)
-
-            parity_list.append(parity)
+                parity = self.trapez_integral(np.abs(
+                    psi_under0[x0:x1, y0:y1, z0:z1] - psi_over0_reversed[x0:x1, y0:y1, z0:z1]) ** 2.0)
+                parity_axis_list.append(parity)
+            parity_list.append(parity_axis_list)
 
         return parity_list
+
+    def check_N(self) -> List[float]:
+        """
+        Calculates :math:`N_i = \int \\mathcal{d}\vec{r} |\psi_{i}(r)|^2`
+        Returns [N_1, N_2, N]
+        """
+        N_list_check: List[float] = []
+        for i, (psi_val, N) in enumerate(zip(self.psi_val_list, self.N_list)):
+            N_list_check.append(N * self.get_norm(func_val=psi_val))
+        N_list_check.append(sum(N_list_check))
+
+        return N_list_check
+
 
     def distmat(self, a: cp.ndarray, index: List[float]):
         mask = cp.ones(a.shape, dtype=bool)
@@ -879,19 +915,37 @@ class SchroedingerMixture(Schroedinger):
 
         return polarization_max
 
+    def get_U_dd(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
+        """
+        Calculates :math:`U_{dd, ij} = \\mathcal{F}^{-1}(\\mathcal{F}(S_{ij} |\psi_{j}|^{2}) V_{k})`
+        with :math: `V_{k} = epsilon_{dd} g (3 (k_z / k)^2 - 1)`,
+        :math: `S_{ij} = exp{-ikM}` and
+        :math: `M_{ij} = stack_shift * \sigma_{x}` with :math: `\sigma_{x}` is the x-Pauli matrix
+
+        """
+        pauli_x = cp.array([[0, 1], [1, 0]])
+        stack_mat = self.stack_shift * pauli_x
+        stack_exponent_mat = cp.einsum("ij..., klm->ijklm", stack_mat, self.kz_mesh)
+        stack_shift_op_mat = cp.exp((-1) * 1.0j * stack_exponent_mat)
+
+        density_fft_V_k = self.V_k_val * cp.array([cp.fft.fftn(density_list[0]),
+                                                   cp.fft.fftn(density_list[1])])
+        shifted = cp.einsum("ijklm, jklm->ijklm", stack_shift_op_mat, density_fft_V_k)
+        U_dd = cp.array([[cp.fft.ifftn(shifted[0, 0]), cp.fft.ifftn(shifted[0, 1])],
+                         [cp.fft.ifftn(shifted[1, 0]), cp.fft.ifftn(shifted[1, 1])]])
+        
+        return U_dd
+
     def get_U_dd_list(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
         U_dd_list: List[cp.ndarray] = []
-        for i, density in enumerate(density_list):
+        for density in density_list:
             try:
-                stack_shift_op = cp.exp((-1) ** i * 1.0j * self.kz_mesh * self.stack_shift)
-                U_dd_list.append(cp.fft.ifftn(self.V_k_val * cp.fft.fftn(density) * stack_shift_op))
+                U_dd_list.append(cp.fft.ifftn(self.V_k_val * cp.fft.fftn(density)))
             except Exception as e:
                 print({e})
-                stack_shift_op = np.exp((-1) ** i * 1.0j * cp.asnumpy(self.kz_mesh) * self.stack_shift)
-                U_dd_list.append(np.fft.ifftn(self.V_k_val.get() * np.fft.fftn(density.get()) * stack_shift_op))
+                U_dd_list.append(np.fft.ifftn(self.V_k_val.get() * np.fft.fftn(density.get())))
                 try:
-                    stack_shift_op = np.exp((-1) ** i * 1.0j * cp.asnumpy(self.kz_mesh) * self.stack_shift)
-                    U_dd_list.append(np.fft.ifftn(self.V_k_val * np.fft.fftn(density) * stack_shift_op))
+                    U_dd_list.append(np.fft.ifftn(self.V_k_val * np.fft.fftn(density)))
                 except Exception as e:
                     print({e})
 
@@ -927,24 +981,33 @@ class SchroedingerMixture(Schroedinger):
                 density_list_np.append(density.get())
             density_tensor_vec: np.ndarray = np.stack(density_list_np, axis=0)
 
-        U_dd_list: List[cp.ndarray] = self.get_U_dd_list(density_list)
-        try:
-            # U_dd_tensor_vec: cp.ndarray = cp.stack(U_dd_list, axis=0)
-            U_dd_tensor_vec: cp.ndarray = cp.array(U_dd_list)
-        except Exception:
-            U_dd_list_np = []
-            for U_dd in U_dd_list:
-                U_dd_list_np.append(U_dd.get())
-            U_dd_tensor_vec: np.ndarray = np.stack(U_dd_list_np, axis=0)
+        # if stack_shift is used U_dd has higher dimensionality (get_U_dd),
+        # but resulting dipol_term_vec the same (else use get_U_dd_list)
+        if self.stack_shift != 0.0:
+            U_dd = self.get_U_dd(density_list)
+            dipol_term_vec: cp.ndarray = cp.einsum("ij..., ij...->i...",
+                                                   self.a_dd_array,
+                                                   U_dd)
+        else:
+            U_dd_list: List[cp.ndarray] = self.get_U_dd_list(density_list)
+            try:
+                # U_dd_tensor_vec: cp.ndarray = cp.stack(U_dd_list, axis=0)
+                U_dd_tensor_vec: cp.ndarray = cp.array(U_dd_list)
+            except Exception:
+                U_dd_list_np = []
+                for U_dd in U_dd_list:
+                    U_dd_list_np.append(U_dd.get())
+                U_dd_tensor_vec: np.ndarray = np.stack(U_dd_list_np, axis=0)
+            dipol_term_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
+                                                   self.a_dd_array,
+                                                   U_dd_tensor_vec)
 
 
         # update H_pot before use
         contact_interaction_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
                                                         self.a_s_array,
                                                         density_tensor_vec)
-        dipol_term_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
-                                               self.a_dd_array,
-                                               U_dd_tensor_vec)
+
         # contact_interaction_vec = self.arr_tensor_mult(self.a_s_array, density_tensor_vec)
         # dipol_term_vec = self.arr_tensor_mult(self.a_dd_array, U_dd_tensor_vec)
 
@@ -968,7 +1031,6 @@ class SchroedingerMixture(Schroedinger):
                                                                        )
                 term_and_tilt = term + tilt_term
                 H_pot_propagator: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt, term_and_tilt, split_step)
-                H_pot_propagator: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt, term, split_step)
             else:
                 term: cp.ndarray = self.get_H_pot_exponent_terms(dipol_term,
                                                                  contact_interaction,
@@ -976,14 +1038,11 @@ class SchroedingerMixture(Schroedinger):
                                                                  )
                 term_and_tilt = term + tilt_term
                 H_pot_propagator: cp.ndarray = self.get_H_pot(term_and_tilt, split_step)
-                H_pot_propagator: cp.ndarray = self.get_H_pot(term, split_step)
 
             if cupy_used:
                 self.psi_val_list[i] = (cp.asarray(H_pot_propagator) * cp.asarray(self.psi_val_list[i]))
             else:
                 self.psi_val_list[i] = H_pot_propagator * self.psi_val_list[i]
-
-        return density_list, U_dd_list
 
     def split_operator_kin(self) -> None:
         # apply H_kin in k-space (transform back and forth)

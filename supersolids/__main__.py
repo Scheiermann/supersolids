@@ -83,7 +83,8 @@ def flags(args_array):
     parser.add_argument("-tilt", metavar="tilt", type=float, default=0.0, nargs="?",
                         help="Term for +tilt * psi1 and -tilt * psi2 in the eGPE")
     parser.add_argument("-stack_shift", metavar="s", type=float, default=0.0, nargs="?",
-                        help="Term for potential act as components are seperated by distance s in z direction.")
+                        help="Term for potential act as components are seperated by distance s"
+                             " in z direction.")
     parser.add_argument("-V", type=functions.lambda_parsed,
                         help="Potential as lambda function. For example: "
                              "-V='lambda x,y,z: 10 * x * y'")

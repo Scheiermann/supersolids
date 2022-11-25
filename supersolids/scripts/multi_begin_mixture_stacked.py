@@ -10,8 +10,8 @@ from supersolids.helper.dict2str import dic2str
 slurm = True
 mem_in_GB = 4
 xvfb_display = 800
-supersolids_version = "0.1.35"
-dir_path = Path("/bigwork/dscheier/results/begin_stacked_a11/")
+supersolids_version = "0.1.36rc4"
+dir_path = Path("/bigwork/dscheier/results/begin_stacked_a11_05_09_s0/")
 
 dir_path_log = Path(dir_path, "log")
 dir_path_log.mkdir(parents=True, exist_ok=True)
@@ -49,31 +49,39 @@ w_z = 2.0 * np.pi * w_z_freq
 # for mixtures
 a = {"a_x": 4.0, "a_y": 0.8, "a_z": 1.8}
 
-max_timesteps = 100001
+# max_timesteps = 350001
+max_timesteps = 1001
 dt = 0.0002
-steps_per_npz = 10000
+# steps_per_npz = 10000
+# steps_per_npz = 10
 # steps_per_npz = 1
 steps_format = "%07d"
 accuracy = 0.0
 
 N2_part = 0.5
 
-h_start = 2.0
-h_end = 4.1
-h_step = 0.5
+h_start = 5.0
+h_end = 30.1
+h_step = 5.0
+# h_start = 2.0
+# h_end = 4.1
+# h_step = 0.5
 
-a11_start = 90.0
+# a11_start = 80.0
+a11_start = 110.0
 a11_end = 110.1
-a11_step = 5.0
+a11_step = 10.0
 
 a12 = 0.0
 
 func_filename = "distort.txt"
 
-skip = 0
+# skip = 0
+skip = 4
 skip_counter = 0
-j_counter = skip
-end = 0
+j_counter = skip + 1
+# end = 0
+end = 4
 
 movie_list = []
 func_list = []
@@ -92,17 +100,7 @@ for h in np.arange(h_start, h_end, h_step):
         N_list = [N - N2, N2]
 
         # a_s_list in triu (triangle upper matrix) form: a11, a12, a22
-        a_s_list = [a11, a12 * a11, a11]
-
-        # w_y = 2.0 * np.pi * (w_x_freq / a12)
-
-        # d_string = 0.0001 * 10.0 ** round(d, ndigits=5)
-
-        # V = f"lambda x, y, z: {v_string} * np.sin(np.pi*x/{d_string}) ** 2"
-        # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi/4.0) + (np.pi*x/{d_string}) )"
-        # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi*x/{d_string}) )"
-        # V = f"lambda x, y, z: {d_string} * np.exp(-((z ** 2.0) /{v_string} ** 2.0) )"
-        # func_list[j_counter].append(f"-V='{V}' ")
+        a_s_list = [a11, a12, a11]
 
         movie_number_after = movie_number + j_counter
         movie_after = f"{movie_string}{counting_format % movie_number_after}"
@@ -125,10 +123,11 @@ for h in np.arange(h_start, h_end, h_step):
 #SBATCH -e error-%j.out
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH -t 1-00:00:00
+#SBATCH -t 2-00:00:00
 #SBATCH --mem={mem_in_GB}G
-##SBATCH -p gpu
-##SBATCH -w atlas
+#SBATCH -p gpu_cuda
+##SBATCH -w alamak
+##SBATCH -w gomeisa
 ##SBATCH -w altair,atlas,berti,gemini,mirzam,niobe,pegasus,phad,pollux,rana,sargas,weywot
 """
 

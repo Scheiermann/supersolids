@@ -187,7 +187,8 @@ def simulate_npz(args):
             if args.dt is None:
                 dt = System_loaded.dt
             else:
-                dt: float = float(args.dt[0])
+                # dt: float = float(args.dt[0])
+                dt: float = float(args.dt)
 
             # check if changes of Box or Res, can be done
             x_step_old = (System_loaded.Box.lengths()[0] / System_loaded.Res.x)
@@ -343,7 +344,11 @@ def simulate_npz(args):
                 if cupy_used:
                     psi_val_list = []
                     for i, psi_val_loaded in enumerate(System_loaded.psi_val_list):
-                        psi_val_list.append(psi_val_loaded.get())
+                        try:
+                            psi_val_list.append(psi_val_loaded.get())
+                        except:
+                            psi_val_list.append(psi_val_loaded)
+
                 else:
                     psi_val_list = System_loaded.psi_val_list
 
@@ -523,12 +528,19 @@ def flags(args_array):
 def flags_script(args_array):
     parser = argparse.ArgumentParser(description="Load old simulations of Schrödinger system "
                                                  "and continue simulation from there.")
+    parser.add_argument("-max_timesteps", metavar="max_timesteps", type=int, default=0,
+                        help="Simulate until accuracy or maximum of steps of length dt is reached")
     parser.add_argument("-neighborhood", type=json.loads, action='store', nargs=2,
                         help="Arguments for function get_peak_neighborhood: "
                              "prob_min, number_of_peaks")
     parser.add_argument("-w", metavar="Trap frequency", type=json.loads, default=None,
                         help="Frequency of harmonic trap in x, y, z direction. If None, "
                              "frequency of the loaded System from the npz is taken.")
+    parser.add_argument("-tilt", metavar="tilt", type=float, default=0.0, nargs="?",
+                        help="Term for +tilt * psi1 and -tilt * psi2 in the eGPE")
+    parser.add_argument("-stack_shift", metavar="s", type=float, default=0.0, nargs="?",
+                        help="Term for potential act as components are seperated by distance s "
+                             " in z direction.")
     parser.add_argument("-noise", type=json.loads, default=None, action='store',
                         nargs=2, help="Min and max of gauss noise to apply on psi.")
     parser.add_argument("--noise_func", type=functions.lambda_parsed, nargs="+",
@@ -580,12 +592,18 @@ if __name__ == "__main__":
         args_loaded.dir_name_result = args_overwrite.dir_name_result
         args_loaded.filename_schroedinger = args_overwrite.filename_schroedinger
         args_loaded.filename_npz = args_overwrite.filename_npz
-        args_loaded.filename2_npz = args_overwrite.filename2_npz
+        # args_loaded.filename2_npz = args_overwrite.filename2_npz
         args_loaded.summary_name = args_overwrite.summary_name
         args_loaded.w = args_overwrite.w
         args_loaded.noise = args_overwrite.noise
         args_loaded.noise_func = args_overwrite.noise_func
         args_loaded.neighborhood = args_overwrite.neighborhood
+        args_loaded.stack_shift = args_overwrite.stack_shift
+        args_loaded.tilt = args_overwrite.tilt
+        if args_overwrite.max_timesteps != 0:
+            args_loaded.max_timesteps = args_overwrite.max_timesteps
+
         args = args_loaded
 
+    print(f"args finally: {args}")
     simulate_npz(args)

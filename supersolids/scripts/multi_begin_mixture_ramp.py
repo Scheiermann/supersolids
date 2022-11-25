@@ -8,10 +8,9 @@ import time
 from supersolids.helper.dict2str import dic2str
 
 slurm = True
-mem_in_GB = 4
-xvfb_display = 600
-supersolids_version = "0.1.35"
-dir_path = Path("/bigwork/dscheier/results/begin_ramp/")
+xvfb_display = 900
+supersolids_version = "0.1.36rc4"
+dir_path = Path("/bigwork/dscheier/results/begin_ramp_21_09_a12=70/")
 
 dir_path_log = Path(dir_path, "log")
 dir_path_log.mkdir(parents=True, exist_ok=True)
@@ -19,7 +18,6 @@ dir_path_log.mkdir(parents=True, exist_ok=True)
 
 movie_string = "movie"
 counting_format = "%03d"
-movie_number = 1
 
 N = 63000
 a11 = 100.0
@@ -29,10 +27,14 @@ a_dd = 130.8
 # dipol = 9.0
 dipol = 10.0
 a_dd_list = [a_dd, (dipol/10.0) * a_dd, (dipol/10.0) ** 2.0 * a_dd]
+# a_dd_list = [a_dd, 0.0, (dipol/10.0) ** 2.0 * a_dd]
 
+movie_number = 1
+mem_in_GB = 8
 Box = {"x0": -15, "x1": 15, "y0": -7, "y1": 7, "z0": -6, "z1": 6}
 # Res = {"x": 256, "y": 128, "z": 32}
-Res = {"x": 128, "y": 64, "z": 32}
+# Res = {"x": 128, "y": 64, "z": 32}
+Res = {"x": 128, "y": 64, "z": 64}
 
 noise = [0.9, 1.1]
 accuracy = 0.0
@@ -50,22 +52,33 @@ w_z = 2.0 * np.pi * w_z_freq
 # for mixtures
 a = {"a_x": 4.0, "a_y": 0.8, "a_z": 1.8}
 
-max_timesteps = 50001
+# max_timesteps = 350001
+max_timesteps = 35001
 dt = 0.0002
-steps_per_npz = 10000
-# steps_per_npz = 1
+# steps_per_npz = 10000
+# steps_per_npz = 1000
+steps_per_npz = 100
 steps_format = "%07d"
 accuracy = 0.0
 
 N2_part = 0.5
 
-epsilon_start = 0.0
-epsilon_end = 3.6
-epsilon_step = 0.5
+epsilon_start = 3.0
+epsilon_end = 5.1
+epsilon_step = 2.0
 
-a12_start = 65.0
-a12_end = 72.0
-a12_step = 1.25
+# a12_start = 65.0
+# a12_end = 66.0
+# a12_start = 65.0
+# a12_end = 100.1
+a12_start = 70.0
+a12_end = 70.1
+# a12_start = 0.0
+# a12_end = 0.1
+# a12_start = 71.0
+# a12_end = 72.0
+# a12_step = 1.25
+a12_step = 5.0
 
 func_filename = "distort.txt"
 
@@ -91,6 +104,8 @@ for epsilon in np.arange(epsilon_start, epsilon_end, epsilon_step):
         a12_string = round(a12, ndigits=5)
         N2 = int(N * N2_part)
         N_list = [N - N2, N2]
+        # tilt = 10 ** epsilon
+        tilt = epsilon
 
         # a_s_list in triu (triangle upper matrix) form: a11, a12, a22
         a_s_list = [a11, a12, a11]
@@ -116,10 +131,12 @@ for epsilon in np.arange(epsilon_start, epsilon_end, epsilon_step):
 #SBATCH -e error-%j.out
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH -t 1-00:00:00
+##SBATCH -t 4-00:00:00
+#SBATCH -t 0-01:00:00
 #SBATCH --mem={mem_in_GB}G
-#SBATCH -p gpu
-##SBATCH -w atlas
+#SBATCH -p gpu_cuda
+##SBATCH --constraint="cuda&jammy"
+##SBATCH -w izar
 ##SBATCH -w altair,atlas,berti,gemini,mirzam,niobe,pegasus,phad,pollux,rana,sargas,weywot
 """
 
@@ -200,9 +217,9 @@ conda develop .
 --m_list {' '.join(map(str, m_list))} \
 --a_dd_list {' '.join(map(str, a_dd_list))} \
 --a_s_list {' '.join(map(str, a_s_list))} \
+-tilt={tilt} \
 --V_interaction \
 --offscreen \
--tilt={epsilon} \
 --mixture
 
 """])
