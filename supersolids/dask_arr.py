@@ -19,10 +19,11 @@ import os
 from pathlib import Path
 import sys
 from typing import Callable, Optional, List
+from dask.distributed import Client, LocalCluster
+from dask import config
 
 
 import numpy as np
-from dask.distributed import Client
 from supersolids.helper import constants, functions, get_version
 
 from supersolids.Animation.Animation import Animation
@@ -84,8 +85,7 @@ def flags(args_array):
     parser.add_argument("-tilt", metavar="tilt", type=float, default=0.0, nargs="?",
                         help="Term for +tilt * psi1 and -tilt * psi2 in the eGPE")
     parser.add_argument("-stack_shift", metavar="s", type=float, default=0.0, nargs="?",
-                        help="Term for potential act as components are seperated by distance s"
-                             " in z direction.")
+                        help="Term for potential act as components are seperated by distance s in z direction.")
     parser.add_argument("-V", type=functions.lambda_parsed,
                         help="Potential as lambda function. For example: "
                              "-V='lambda x,y,z: 10 * x * y'")
@@ -149,14 +149,15 @@ def flags(args_array):
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    client = Client()  # start distributed scheduler locally.
+    cluster = LocalCluster(threads_per_worker=2)
+    client = Client(cluster)  # start distributed scheduler locally.
     args = flags(sys.argv[1:])
 
     os.environ["SUPERSOLIDS_GPU_OFF"] = str(args.gpu_off)
     __GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False))
     cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__)
     from supersolids.Schroedinger import Schroedinger
-    from supersolids.SchroedingerMixture import SchroedingerMixture
+    from supersolids.SchroedingerMixtureDaskArr import SchroedingerMixtureDaskArr
     from supersolids.helper.simulate_case import simulate_case
     from supersolids.helper.cut_1d import prepare_cuts
 
@@ -335,7 +336,7 @@ if __name__ == "__main__":
             V = V_trap
 
     if args.mixture:
-        SchroedingerInput: SchroedingerMixture = SchroedingerMixture(
+        SchroedingerInput: SchroedingerMixtureDaskArr = SchroedingerMixtureDaskArr(
             MyBox,
             Res,
             max_timesteps=args.max_timesteps,
@@ -417,6 +418,7 @@ if __name__ == "__main__":
         cm = profile()
     else:
         cm = nullcontext()
+        # cm = config.set(num_workers=8)
     with cm:
         with run_time(name="simulate_case"):
             SystemResult: Schroedinger = simulate_case(
