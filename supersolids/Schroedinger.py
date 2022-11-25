@@ -333,11 +333,12 @@ class Schroedinger:
 
         return dV
 
-    def sum_dV(self, func_val: cp.ndarray, fourier_space: bool = False, dV: float = None) -> float:
+    def sum_dV(self, func_val: cp.ndarray, fourier_space: bool = False, dV: float = None,
+               axis=None) -> float:
         if dV is None:
             dV = self.volume_element(fourier_space=fourier_space)
 
-        psi_norm: float = cp.sum(func_val) * dV
+        psi_norm: float = cp.sum(func_val, axis=axis) * dV
 
         return psi_norm
 

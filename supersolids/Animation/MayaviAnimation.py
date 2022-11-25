@@ -217,6 +217,10 @@ class MayaviAnimation(Animation.Animation):
             z_mesh: np.ndarray = System.z_mesh
             V_val: np.ndarray = System.V_val
 
+        if x_mesh is None:
+            x_mesh, y_mesh, z_mesh = functions.get_grid(System.Res, System.Box)
+
+
         if isinstance(System, SchroedingerMixture):
             prob_plots: List[cp.ndarray] = []
             if len(System.psi_val_list) != len(self.alpha_psi_list):
