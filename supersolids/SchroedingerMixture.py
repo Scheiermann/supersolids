@@ -17,6 +17,7 @@ import sys
 
 import dill
 import numpy as np
+from copy import deepcopy
 from pathlib import Path
 from typing import Optional, Callable, Union, List, Tuple
 
@@ -78,17 +79,6 @@ def smaller_slice(val0, val1):
 
     return changed, val0, val1
 
-def get_A_density_total(density_list: List[cp.ndarray]) -> Tuple[cp.ndarray, cp.ndarray]:
-    density_total: np.ndarray = np.copy(density_list[0])
-    for density in density_list[1:]:
-        density_total += density
-
-    # A = n1/(n1+n2)
-    density_A = density_list[0] / density_total
-    # remove nan, because of possible 0/0 
-    density_A = cp.where(density_A == cp.nan, density_A, 0.0)
-
-    return density_A, density_total
 
 
 def get_mu_lhy_integrated_list(func_list: List[Callable]) -> List[np.ndarray]:
@@ -412,6 +402,33 @@ class SchroedingerMixture(Schroedinger):
         for m in self.m_list:
             self.H_kin_list.append(self.H_kin)
 
+        # remove unused arrays
+        if self.tilt == 0.0:
+            self.x_mesh = None
+        else:
+            if cupy_used:
+                self.tilt_term = (-1) ** i * self.tilt * cp.array(self.x_mesh)
+            else:
+                self.tilt_term = (-1) ** i * self.tilt * self.x_mesh
+        if self.stack_shift == 0.0:
+            self.kz_mesh = None
+        else:
+            self.stack_shift_op = cp.exp((-1) ** i * 1.0j * self.kz_mesh * self.stack_shift)
+        self.y_mesh = None
+        self.z_mesh = None
+        self.H_kin = None
+
+    def get_A_density_total(self, density_list: List[cp.ndarray]) -> Tuple[cp.ndarray, cp.ndarray]:
+        density_total: np.ndarray = np.copy(density_list[0])
+        for density in density_list[1:]:
+            density_total += density
+
+        # A = n1/(n1+n2)
+        density_A = density_list[0] / density_total
+        # remove nan, because of possible 0/0
+        density_A = cp.where(density_A != cp.nan, density_A, 0.0)
+
+        return density_A, density_total
 
     def func_energy(self, u: float) -> np.ndarray:
         """
@@ -473,7 +490,7 @@ class SchroedingerMixture(Schroedinger):
         return numbas.eta_dVdnb_jit(self.A, lam, eta_aa, eta_bb, eta_ab)
 
     def get_mu_lhy_list(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
-        density_A, density_total = get_A_density_total(density_list)
+        density_A, density_total = self.get_A_density_total(density_list)
 
         mu_lhy_list: List[cp.ndarray] = []
         for mu_lhy_interpolation in self.mu_lhy_interpolation_list:
@@ -487,7 +504,7 @@ class SchroedingerMixture(Schroedinger):
         return mu_lhy_list
 
     def get_energy_lhy(self, density_list: List[cp.ndarray]) -> cp.ndarray:
-        density_A, density_total = get_A_density_total(density_list)
+        density_A, density_total = self.get_A_density_total(density_list)
         if cupy_used:
             energy_lhy = self.energy_helper_function(density_A.get()) * density_total.get() ** 2.5
         else:
@@ -565,7 +582,7 @@ class SchroedingerMixture(Schroedinger):
         # [[a11 * b11, a12 * a12], [a21 * b21, a22 * b22]] with (2, 2) matrices
         # formally, as we sum in real space dV is just a constant multiplication, so summation
         # over all 5 dimensions is fine
-        
+
         # there are 3 ways when to sum (verison c is the fastest):
         # a. getting a (2, 2, res_x, res_y, res_z) matrix
         # b. getting a (res_x, res_y, res_z) matrix, where (2,2) grid part is already summed
@@ -598,6 +615,14 @@ class SchroedingerMixture(Schroedinger):
         # use normalized inputs for energy
         self.E = self.energy(density_list, mu_lhy_list)
 
+    def get_mu_explicit(self, previous_list):
+        mu_list = []
+        for previous, psi_val in zip(previous_list, self.psi_val_list):
+            integrand = previous * (psi_val - previous)
+            mu_list.append((1/self.dt) * self.sum_dV(integrand))
+
+        return mu_list
+
     def energy(self, density_list: List[cp.ndarray], mu_lhy_list: List[cp.ndarray]) -> float:
         """
         Input psi_1, psi_2 need to be normalized.
@@ -614,17 +639,6 @@ class SchroedingerMixture(Schroedinger):
         p_int = self.energy_density_interaction(density_list)
 
         E_lhy = self.sum_dV(self.get_energy_lhy(density_list), dV=dV)
-
-        # p_ext_list: List[float] = []
-        # for density in density_list:
-        #     p_ext_list.append(self.sum_dV(density * self.V_val, dV=dV))
-        # p_ext = np.array(p_ext_list)
-
-        # psi_val_array = np.array(self.psi_val_list)
-        # H_kin_array = np.array(self.H_kin_list)
-        # E_kin_grid = np.einsum("i...,i...->i...", H_kin_array, psi_val_array)
-        # E_kin = np.fromiter(map(functools.partial(self.sum_dV, dV=dV), E_kin_grid.real),
-        #                     dtype=float)
 
         N_array = np.array(self.N_list)
         chem_pot_N = np.dot(self.mu_arr, N_array)
@@ -933,7 +947,7 @@ class SchroedingerMixture(Schroedinger):
         shifted = cp.einsum("ijklm, jklm->ijklm", stack_shift_op_mat, density_fft_V_k)
         U_dd = cp.array([[cp.fft.ifftn(shifted[0, 0]), cp.fft.ifftn(shifted[0, 1])],
                          [cp.fft.ifftn(shifted[1, 0]), cp.fft.ifftn(shifted[1, 1])]])
-        
+
         return U_dd
 
     def get_U_dd_list(self, density_list: List[cp.ndarray]) -> List[cp.ndarray]:
@@ -948,7 +962,6 @@ class SchroedingerMixture(Schroedinger):
                     U_dd_list.append(np.fft.ifftn(self.V_k_val * np.fft.fftn(density)))
                 except Exception as e:
                     print({e})
-
 
         return U_dd_list
 
