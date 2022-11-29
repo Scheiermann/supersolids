@@ -9,11 +9,15 @@
 Function speeded up with numba
 
 """
+
 import numba
 import numpy as np
 
 from supersolids.helper import get_version
-cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np)
+
+__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version(gpu_index_str)
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__, gpu_index=__GPU_INDEX__)
+
 
 from numba import njit, types, f8, c16
 from typing import Callable
@@ -145,3 +149,4 @@ def get_density_jit(func_val: cp.ndarray, p: float) -> cp.ndarray:
 
     """
     return func_val.real ** p + func_val.imag ** p
+
