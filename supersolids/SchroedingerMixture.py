@@ -802,7 +802,8 @@ class SchroedingerMixture(Schroedinger):
     def get_center_of_mass(self,
                            Mx0: Optional[int] = None, Mx1: Optional[int] = None,
                            My0: Optional[int] = None, My1: Optional[int] = None,
-                           Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> List[float]:
+                           Mz0: Optional[int] = None, Mz1: Optional[int] = None,
+                           p: float = 1.0) -> List[float]:
         """
         Calculates the center of mass of the System.
 
@@ -814,7 +815,7 @@ class SchroedingerMixture(Schroedinger):
         r = self.get_mesh_list(x0, x1, y0, y1, z0, z1)
         com_list = []
         for prob in prob_list:
-            center_of_mass_along_axis = [prob * r_i for r_i in r]
+            center_of_mass_along_axis = [prob * r_i ** p for r_i in r]
             com_list.append([self.trapez_integral(com_along_axis) / self.trapez_integral(prob)
                              for com_along_axis in center_of_mass_along_axis])
         return com_list

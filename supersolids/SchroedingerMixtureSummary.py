@@ -57,6 +57,7 @@ class SchroedingerMixtureSummary:
         self.psi_sol_list: List[Optional[Callable]] = SystemMixture.psi_sol_list
         self.mu_sol_list: List[Optional[Callable]] = SystemMixture.mu_sol_list
         self.input_path: Path = SystemMixture.input_path
+        self.monopolar: Optional[float] = None
 
     def copy_to(self, SystemMixture):
         SystemMixture.name: str = self.name
@@ -86,3 +87,4 @@ class SchroedingerMixtureSummary:
         SystemMixture.psi_sol_list: List[Optional[Callable]] = self.psi_sol_list
         SystemMixture.mu_sol_list: List[Optional[Callable]] = self.mu_sol_list
         SystemMixture.input_path: Path = self.input_path
+        SystemMixture.monopolar: Optional[float] = self.monopolar

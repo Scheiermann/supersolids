@@ -441,6 +441,7 @@ def simulate_npz(args):
                 filename_steps=args.filename_steps,
                 steps_format=args.steps_format,
                 steps_per_npz=args.steps_per_npz,
+                steps_property=args.steps_property,
                 frame_start=frame,
                 script_name=args.script_name,
                 script_args=args,
@@ -506,6 +507,8 @@ def flags(args_array):
                         help="Formatting string for the enumeration of steps.")
     parser.add_argument("-steps_per_npz", type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
+    parser.add_argument("-steps_property", type=int, default=10,
+                        help="Number of dt steps skipped between saved summary of properties.")
     parser.add_argument("--offscreen", default=False, action="store_true",
                         help="If not used, interactive animation is shown and saved as mp4."
                              "If used, Schroedinger is saved as pkl and allows offscreen usage.")

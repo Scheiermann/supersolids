@@ -68,7 +68,7 @@ def check_cupy_used(np):
                 
     return cp, cupy_used, cuda_used
 
-def check_cp_nb(np, gpu_off: bool = False, gpu_index: int = 1):
+def check_cp_nb(np, gpu_off: bool = False, gpu_index: int = 0):
     numba_used = check_numba_used()
     cp, cupy_used, cuda_used = check_cupy_used(np)
     

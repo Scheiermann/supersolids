@@ -24,7 +24,6 @@ from mayavi import mlab
 import numpy as np
 from functools import partial
 
-import supersolids.helper.db_helper
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
@@ -457,7 +456,7 @@ class MayaviAnimation(Animation.Animation):
         :param mixture_slice_index: Index of component of which the slices are taken.
 
         """
-        supersolids_version = get_version()
+        supersolids_version = get_version.get_version()
 
         path_anchor_in = self.dir_path
         path_anchor_out = self.dir_path_output
@@ -657,7 +656,8 @@ class MayaviAnimation(Animation.Animation):
             anim_name = "anim"
             anim_extension = ".png"
             path_anim = Path(output_path,
-                             anim_name + "%05d" % int(frame / steps_per_npz) + anim_extension)
+                             anim_name + "%05d" % int((frame - frame_start) / steps_per_npz)
+                             + anim_extension)
             if frame == 0:
                 path_anim_new = Path(output_path, anim_name_special + "_init" + anim_extension)
             else:
@@ -682,7 +682,7 @@ class MayaviAnimation(Animation.Animation):
                 # path_anim_new = Path(output_path, anim_name + "_last" + anim_extension)
                 path_anim = Path(output_path,
                                  anim_name
-                                 + "%05d" % int((frame) / steps_per_npz)
+                                 + "%05d" % int((frame - frame_start) / steps_per_npz)
                                  + anim_extension)
                 path_anim_new = Path(output_path,
                                      anim_name
@@ -701,7 +701,7 @@ class MayaviAnimation(Animation.Animation):
         # move last picture, as it is produced 2nd time, when closing the plot
         path_anim = Path(output_path,
                          anim_name
-                         + "%05d" % int(frame / steps_per_npz + 1)
+                         + "%05d" % int((frame - frame_start) / steps_per_npz + 1)
                          + anim_extension)
         path_anim_new = Path(output_path, anim_name_special + "_last" + anim_extension)
         print(f"from: {path_anim}, to: {path_anim_new}")

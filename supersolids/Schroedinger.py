@@ -899,6 +899,11 @@ class Schroedinger:
         with open(Path(input_path, filename_steps + steps_format % frame + ".npz"), "wb") as g:
             np.savez_compressed(g, psi_val=self.psi_val)
 
+    def save_summary(self, SystemSummary, input_path: Path, steps_format: str, frame: int) -> None:
+        with open(Path(input_path, self.name + steps_format % frame + ".pkl"), "wb") as f:
+            dill.dump(obj=SystemSummary, file=f)
+
+
     def simulate_raw(self,
                      accuracy: float = 10 ** -6,
                      dir_path: Path = Path.home().joinpath("supersolids", "results"),
@@ -908,6 +913,7 @@ class Schroedinger:
                      filename_steps: str = "step_",
                      steps_format: str = "%07d",
                      steps_per_npz: int = 10,
+                     steps_property: int = 10,
                      frame_start: int = 0,
                      script_name: str = "script",
                      script_args: str = "",
@@ -973,18 +979,19 @@ class Schroedinger:
         for frame in range(frame_start, frame_end):
             mu_old: np.ndarray = np.copy(self.mu_arr)
             self.time_step(numba_used, cupy_used)
-            if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
+            if ((frame % steps_property == 0) or (frame % steps_per_npz == 0)
+                 or (frame == frame_end - 1)):
                 # calculate energy just when saving, but before creating a summary
                 self.get_E()
 
             SystemSummary, summary_name = self.use_summary()
 
-            if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
-                with open(Path(input_path, self.name + steps_format % frame + ".pkl"),
-                          "wb") as f:
-                    # save SchroedingerSummary not Schroedinger to save disk space
-                    dill.dump(obj=SystemSummary, file=f)
+            if ((frame % steps_property) == 0) or (frame == frame_end - 1):
+                SystemSummary.monopolar = self.get_center_of_mass(p=2.0)
+                # save SchroedingerSummary not Schroedinger to save disk space
+                self.save_summary(SystemSummary, input_path, steps_format, frame)
 
+            if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
                 # save psi_val after steps_per_npz steps of dt (to save disk space)
                 self.save_psi_val(input_path, filename_steps, steps_format, frame)
 

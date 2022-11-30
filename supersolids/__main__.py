@@ -131,6 +131,8 @@ def flags(args_array):
     parser.add_argument("-steps_per_npz", metavar="steps_per_npz",
                         type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
+    parser.add_argument("-steps_property", type=int, default=10,
+                        help="Number of dt steps skipped between saved summary of properties.")
     parser.add_argument("--mixture", default=False, action="store_true",
                         help="Use to simulate a SchroedingerMixture.")
     parser.add_argument("--offscreen", default=False, action="store_true",
@@ -433,6 +435,7 @@ if __name__ == "__main__":
                 filename_steps=args.filename_steps,
                 steps_format=args.steps_format,
                 steps_per_npz=args.steps_per_npz,
+                steps_property=args.steps_property,
                 frame_start=0,
                 script_name=args.script_name,
                 script_args=args,
