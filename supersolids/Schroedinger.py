@@ -21,8 +21,10 @@ import scipy.signal
 
 from supersolids.helper import constants, functions, get_path, get_version
 
-__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version(gpu_index_str)
-cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__, gpu_index=__GPU_INDEX__)
+__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables()
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
+                                                               gpu_off=__GPU_OFF_ENV__,
+                                                               gpu_index=__GPU_INDEX_ENV__)
 if numba_used:
     import supersolids.helper.numbas as numbas
 

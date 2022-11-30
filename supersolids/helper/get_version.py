@@ -87,10 +87,10 @@ def check_cp_nb(np, gpu_off: bool = False, gpu_index: int = 1):
 
     return cp, cupy_used, cuda_used, numba_used
 
-def get_env_variables(gpu_index_str):
+def get_env_variables(gpu_index_str=""):
     # if env variable found, it will be a string "False" or "True": trick to convert to bool
     __GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False) in ["True", "true"])
     gpu_index_str = int(os.environ.get("SUPERSOLIDS_GPU_INDEX",0))
-    __GPU_INDEX__ = int("0" if gpu_index_str=="" else gpu_index_str)
+    __GPU_INDEX_ENV__ = int("0" if gpu_index_str=="" else gpu_index_str)
 
     return __GPU_OFF_ENV__, __GPU_INDEX_ENV__

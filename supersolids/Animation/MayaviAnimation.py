@@ -30,8 +30,10 @@ from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper import functions, constants, get_path, get_version, cut_1d, db_helper
 from supersolids.scripts.download_last import download
 
-__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version(gpu_index_str)
-cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__, gpu_index=__GPU_INDEX__)
+__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables()
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
+                                                               gpu_off=__GPU_OFF_ENV__,
+                                                               gpu_index=__GPU_INDEX_ENV__)
         
 
 def load_System(path_schroedinger, host=None):
