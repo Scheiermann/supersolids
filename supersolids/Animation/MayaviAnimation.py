@@ -10,7 +10,6 @@ Functions for Potential and initial wave function :math:`\psi_0`
 
 """
 from copy import deepcopy
-import os
 from pathlib import Path
 import shutil
 import sys
@@ -29,11 +28,11 @@ from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
 from supersolids.helper import functions, constants, get_path, get_version, cut_1d, db_helper
 from supersolids.scripts.download_last import download
-# if env variable found, it will be a string "False" or "True": trick to convert to bool
-__GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False) in ["True", "true"])
-gpu_index_str = int(os.environ.get("SUPERSOLIDS_GPU_INDEX", 0))
-__GPU_INDEX__= int("0" if gpu_index_str=="" else gpu_index_str)
-cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__, gpu_index=__GPU_INDEX__)
+
+__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables()
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
+                                                               gpu_off=__GPU_OFF_ENV__,
+                                                               gpu_index=__GPU_INDEX_ENV__)
         
 
 def load_System(path_schroedinger, host=None):
