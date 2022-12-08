@@ -173,9 +173,17 @@ def property_to_array(property_tuple, list_of_arrays: bool=False):
     for i, property_components_all in enumerate(property_tuple):
         try:
             if list_of_arrays:
-                property_all = np.dstack((property_all, property_components_all))
+                try:
+                    property_all = np.dstack((property_all, property_components_all))
+                except Exception as e:
+                    print(f"Conversion from np to cp needed:\n{e}")
+                    property_all = cp.dstack((property_all, property_components_all))
             else:
-                property_all = np.vstack((property_all, property_components_all))
+                try:
+                    property_all = np.vstack((property_all, property_components_all))
+                except Exception as e:
+                    print(f"Conversion from np to cp needed:\n{e}")
+                    property_all = cp.vstack((property_all, property_components_all))
         except ValueError:
             sys.exit(f"Failed at {i}: {property_components_all}. Not enough values. "
                      "Adjust provided arguments of property.")
