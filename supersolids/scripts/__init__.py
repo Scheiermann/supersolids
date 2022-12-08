@@ -7,4 +7,5 @@ __all__ = ["cp_plots",
            "multi_load",
            "multi_property",
            "multi_simulate",
+           "property_plot_npz",
            ]
