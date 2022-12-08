@@ -61,15 +61,17 @@ if __name__ == "__main__":
     # experiment_suffix = "ramp_11_01_85_long_wide"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
 
-    experiment_suffix = "ramp_11_04_675_long_wide"
+    # experiment_suffix = "ramp_11_04_675_long_wide"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_11_04_70_long_wide"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_11_04_725_long_wide"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "ramp_11_04_75_775_80_long_wide"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+
+    experiment_suffix = "gpu_11_18_real_w-1"
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    experiment_suffix = "ramp_11_04_70_long_wide"
-    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    experiment_suffix = "ramp_11_04_725_long_wide"
-    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    experiment_suffix = "ramp_11_04_75_775_80_long_wide"
-    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
- 
 
     mixture = True
     filename_schroedinger: str = "schroedinger.pkl"
@@ -80,12 +82,8 @@ if __name__ == "__main__":
     else:
         filename_steps = "step_"
 
-    steps_per_npz = 10000
-    # steps_per_npz = 1000
-    # steps_per_npz = 1
-
     # frame_start = None
-    frame_start = 0
+    frame_start = 350000
     if frame_start is None:
         take_last = 4
     else:
@@ -96,8 +94,8 @@ if __name__ == "__main__":
 
     # movie_start_list = [1]
     # movie_end_list = [25]
-    movie_start_list = [1, 1, 1, 1]
-    movie_end_list = [25, 25, 25, 60]
+    movie_start_list = [111]
+    movie_end_list = [125]
 
     dt = 0.0002
 
@@ -112,13 +110,6 @@ if __name__ == "__main__":
     else:
         dir_suffix = f"_paper_takelast_{take_last}"
 
-    # file_suffix = "_fft"
-    # inbuild_func = "fft_plot"
-    inbuild_func = ""
-    func = ""
-    # func = "lambda x, y: (x, y)"
-    # func = "lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))"
-
     # subplots = False
     # property_func = False
     # property_names = ["E", "mu_arr"]
@@ -131,12 +122,69 @@ if __name__ == "__main__":
     # property_args_list = [[], [], [], [], []]
     # property_args_frame_list = [False, False, False, False, False]
 
-    subplots_list = [False, False, False, True, True]
-    property_func_list = [False, True, False, True, True]
-    list_of_arrays_list = [False, False, False, True, True]
-    property_names_list = ["E", "get_E_explicit", "mu_arr", "get_center_of_mass", "get_parity"]
-    property_args_list = [[], [], [], [], []]
-    property_args_frame_list = [False, False, False, False, False]
+    # subplots_list = [False, False, False, True, True]
+    # property_func_list = [False, True, False, True, True]
+    # list_of_arrays_list = [False, False, False, True, True]
+    # property_names_list = ["E", "get_E_explicit", "mu_arr", "get_center_of_mass", "get_parity"]
+    # property_args_list = [[], [], [], [], []]
+    # property_args_frame_list = [False, False, False, False, False]
+
+    # func = "lambda x, y: (x, y)"
+    # func_mu = "lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))"
+    # file_suffix_list = ["", "", "", "mu_rel", "", "", "", "_fft"]
+    # inbuild_func_list = ["", "", "", "", "", "", "", "fft_plot"]
+    # func_list = ["", "", "", func_mu, "", "", "", ""]
+    # steps_per_npz_list = [100, 1000, 100, 100, 1000, 1000, 100, 100]
+    # subplots_list = [False, False, False, False, True, True, True, True]
+    # property_func_list = [False, True, False, False, True, True, False, False]
+    # list_of_arrays_list = [False, False, False, False, True, True, True, True]
+    # property_names_list = ["E", "get_E_explicit", "mu_arr", "mu_arr", "get_center_of_mass", "get_parity", "monopolar", "monopolar"]
+    # property_args_list = [[], [], [], [], [], [], [], []]
+    # property_args_frame_list = [False, False, False, False, False, False, False, False]
+
+    func_mu = "lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))"
+    file_suffix_list = ["", "mu_rel", "", ""]
+    inbuild_func_list = ["", "", "", ""]
+    func_list = ["", func_mu, "", ""]
+    steps_per_npz_list = [100, 100, 1000, 1000]
+    subplots_list = [False, False, True, True]
+    property_func_list = [False, False, True, True]
+    list_of_arrays_list = [False, False, True, True]
+    property_names_list = ["mu_arr", "mu_arr", "get_center_of_mass", "get_parity"]
+    property_args_list = [[], [], [], []]
+    property_args_frame_list = [False, False, False, False]
+
+
+    # func_mu = "lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))"
+    # file_suffix_list = ["", "_fft"]
+    # inbuild_func_list = ["", "fft_plot"]
+    # func_list = ["", ""]
+    # steps_per_npz_list = [100, 100]
+    # subplots_list = [True, True]
+    # property_func_list = [False, False]
+    # list_of_arrays_list = [True, True]
+    # property_names_list = ["monopolar", "monopolar"]
+    # property_args_list = [[], []]
+    # property_args_frame_list = [False, False]
+
+    # file_suffix_list = ["_fft"]
+    # inbuild_func_list = ["fft_plot"]
+    # func_list = [""]
+    # steps_per_npz_list = [100]
+    # subplots_list = [True]
+    # property_func_list = [False]
+    # list_of_arrays_list = [True]
+    # property_names_list = ["monopolar"]
+    # property_args_list = [[]]
+    # property_args_frame_list = [False]
+
+    # steps_per_npz_list = [100]
+    # subplots_list = [True]
+    # property_func_list = [False]
+    # list_of_arrays_list = [True]
+    # property_names_list = ["monopolar"]
+    # property_args_list = [[]]
+    # property_args_frame_list = [False]
 
     # subplots_list = [False]
     # property_func_list = [True]
@@ -178,21 +226,23 @@ if __name__ == "__main__":
     # we want 2S=D, so that the peaks distance equals the distance between max and min of sin
     # delta = s * 2.0
 
-    file_suffix = ""
-    # file_suffix = "-" + "-".join(map(str, property_args)) + ".png"
-    property_filename_suffix = dir_suffix + file_suffix
-
     # move2graphs = True
     move2graphs = False
 
     for path_anchor_input, movie_start, movie_end in zip(path_anchor_input_list, movie_start_list, movie_end_list):
         for (property_func, property_name,
-             property_args, property_args_frame, subplots, list_of_arrays) in zip(
-                property_func_list, property_names_list, property_args_list, property_args_frame_list,
-                subplots_list, list_of_arrays_list):
+             property_args, property_args_frame, subplots, list_of_arrays, steps_per_npz,
+             file_suffix, inbuild_func, func) in zip(
+                property_func_list, property_names_list, property_args_list,
+                property_args_frame_list, subplots_list, list_of_arrays_list, steps_per_npz_list,
+                file_suffix_list, inbuild_func_list, func_list):
             for i, movie_number in enumerate(range(movie_start, movie_end + 1)):
+                # file_suffix = ""
+                # file_suffix = "-" + "-".join(map(str, property_args)) + ".png"
+                property_filename_suffix = dir_suffix + file_suffix
                 property_args_str = False
-                # property_args_str = [Path(path_anchor_input, f"{dir_name}{counting_format % movie_number}"),
+                # property_args_str = [Path(path_anchor_input,
+                                     # f"{dir_name}{counting_format % movie_number}"),
                                      # "pol_", steps_format]
                                      # filename_steps + "pol_", steps_format]
                 # property_args = [0.00725, number_of_peaks[i]]
