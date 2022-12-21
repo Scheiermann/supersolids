@@ -449,6 +449,42 @@ class SchroedingerMixture(Schroedinger):
         for m in self.m_list:
             self.H_kin_list.append(self.H_kin)
 
+    def convert_all_to_numpy(self):
+        self.a_s_array: np.ndarray = cp.asnumpy(self.a_s_array)
+        self.a_dd_array: np.ndarray = cp.asnumpy(self.a_dd_array)
+
+        self.k_squared: np.ndarray = cp.asnumpy(self.k_squared)
+
+        self.V_k_val: np.ndarray = cp.asnumpy(self.V_k_val)
+        self.V_val: np.ndarray = cp.asnumpy(self.V_val)
+
+        self.A: np.ndarray = cp.asnumpy(self.A)
+
+        self.H_kin: np.ndarray = cp.asnumpy(self.H_kin)
+        self.H_kin_list: List[np.ndarray] = [cp.asnumpy(H_kin) for H_kin in self.H_kin_list]
+
+        self.psi_0_list: List[np.ndarray] = [cp.asnumpy(psi_0) for psi_0 in self.psi_0_list]
+
+    def copy_with_all_numpy(self):
+        System = deepcopy(self)
+
+        System.a_s_array: np.ndarray = cp.asnumpy(self.a_s_array)
+        System.a_dd_array: np.ndarray = cp.asnumpy(self.a_dd_array)
+
+        System.k_squared: np.ndarray = cp.asnumpy(self.k_squared)
+
+        System.V_k_val: np.ndarray = cp.asnumpy(self.V_k_val)
+        System.V_val: np.ndarray = cp.asnumpy(self.V_val)
+
+        System.A: np.ndarray = cp.asnumpy(self.A)
+
+        System.H_kin: np.ndarray = cp.asnumpy(self.H_kin)
+        System.H_kin_list: List[np.ndarray] = [cp.asnumpy(H_kin) for H_kin in self.H_kin_list]
+
+        System.psi_0_list: List[np.ndarray] = [cp.asnumpy(psi_0) for psi_0 in self.psi_0_list]
+        
+        return System
+
 
     def func_energy(self, u: float) -> np.ndarray:
         """
@@ -551,6 +587,7 @@ class SchroedingerMixture(Schroedinger):
     def use_summary(self, summary_name: Optional[str] = None) -> Tuple[SchroedingerMixtureSummary,
                                                                        Optional[str]]:
         Summary: SchroedingerMixtureSummary = SchroedingerMixtureSummary(self)
+        Summary.convert_all_to_numpy()
 
         return Summary, summary_name
 
@@ -699,16 +736,18 @@ class SchroedingerMixture(Schroedinger):
 
 
     def get_E_kin(self, dV: float = None) -> None:
-        psi_val_array = np.array(self.psi_val_list)
+        psi_val_array = cp.array(self.psi_val_list)
         fft_dim = range(1, psi_val_array.ndim)
-        psi_val_array_k = np.fft.fftn(psi_val_array, axes=fft_dim)
-        H_kin_array = np.array(self.H_kin_list)
-        E_kin_grid_helper = np.einsum("i...,i...->i...", H_kin_array, psi_val_array_k)
-        E_kin_grid_helper_fft = np.fft.ifftn(E_kin_grid_helper, axes=fft_dim)
-        E_kin_grid = np.einsum("i...,i...->i...", np.conjugate(psi_val_array), E_kin_grid_helper_fft)
-        E_kin_arr = np.fromiter(map(functools.partial(self.sum_dV, dV=dV), E_kin_grid.real),
-                                 dtype=float) * np.array(self.N_list)
-        E_kin = np.sum(E_kin_arr)
+        psi_val_array_k = cp.fft.fftn(psi_val_array, axes=fft_dim)
+        H_kin_array = cp.array(self.H_kin_list)
+        E_kin_grid_helper = cp.einsum("i...,i...->i...", H_kin_array, psi_val_array_k)
+        E_kin_grid_helper_fft = cp.fft.ifftn(E_kin_grid_helper, axes=fft_dim)
+        E_kin_grid = cp.einsum("i...,i...->i...", np.conjugate(psi_val_array), E_kin_grid_helper_fft)
+        E_kin_arr = cp.fromiter(map(functools.partial(self.sum_dV, dV=dV), E_kin_grid.real),
+                                 dtype=float) * cp.array(self.N_list)
+        E_kin = cp.sum(E_kin_arr)
+        if cupy_used:
+            E_kin = cp.asnumpy(E_kin)
 
         return E_kin
 

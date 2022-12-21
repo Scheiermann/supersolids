@@ -971,8 +971,9 @@ class Schroedinger:
         save_script(script_count_old, input_path, filename_schroedinger_prefix, self)
 
         # save used Schroedinger
+        System_np = self.copy_with_all_numpy
         with open(Path(input_path, filename_schroedinger), "wb") as f:
-            dill.dump(obj=self, file=f)
+            dill.dump(obj=System_np, file=f)
 
         frame_end: int = frame_start + self.max_timesteps
         for frame in range(frame_start, frame_end):
@@ -986,7 +987,11 @@ class Schroedinger:
             SystemSummary, summary_name = self.use_summary()
 
             if ((frame % steps_property) == 0) or (frame == frame_end - 1):
-                SystemSummary.monopolar = self.get_center_of_mass(p=2.0)
+                try:
+                    SystemSummary.monopolar = cp.asnumpy(self.get_center_of_mass(p=2.0))
+                except Exception as e:
+                    SystemSummary.monopolar = self.get_center_of_mass(p=2.0)
+                    print(f"Problem with monopolar:\n{e}")
                 # save SchroedingerSummary not Schroedinger to save disk space
                 self.save_summary(SystemSummary, input_path, steps_format, frame)
 
