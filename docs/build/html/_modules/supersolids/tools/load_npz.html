@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.tools.load_npz &mdash; supersolids 0.1.37rc1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">supersolids.tools.load_npz</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for supersolids.tools.load_npz</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># author: Daniel Scheiermann</span>
+<span class="c1"># email: daniel.scheiermann@itp.uni-hannover.de</span>
+<span class="c1"># license: MIT</span>
+<span class="c1"># Please feel free to use and modify this, but keep the above information.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Animation for the numerical solver for the non-linear</span>
+<span class="sd">time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">mayavi</span> <span class="kn">import</span> <span class="n">mlab</span>
+
+<span class="kn">from</span> <span class="nn">supersolids.Animation.Animation</span> <span class="kn">import</span> <span class="n">Animation</span>
+<span class="kn">from</span> <span class="nn">supersolids.Animation</span> <span class="kn">import</span> <span class="n">MayaviAnimation</span>
+<span class="kn">from</span> <span class="nn">supersolids.Animation.MayaviAnimation</span> <span class="kn">import</span> <span class="n">load_System</span><span class="p">,</span> <span class="n">load_System_list</span>
+<span class="kn">from</span> <span class="nn">supersolids.helper</span> <span class="kn">import</span> <span class="n">get_path</span>
+<span class="kn">from</span> <span class="nn">supersolids.helper</span> <span class="kn">import</span> <span class="n">db_helper</span>
+
+
+<div class="viewcode-block" id="load_npz"><a class="viewcode-back" href="../../../autoapi/supersolids/tools/load_npz/index.html#supersolids.tools.load_npz.load_npz">[docs]</a><span class="k">def</span> <span class="nf">load_npz</span><span class="p">(</span><span class="n">flag_args</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">slice_x</span> <span class="o">=</span> <span class="n">flag_args</span><span class="o">.</span><span class="n">slice_indices</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span>
+    <span class="n">slice_y</span> <span class="o">=</span> <span class="n">flag_args</span><span class="o">.</span><span class="n">slice_indices</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
+    <span class="n">slice_z</span> <span class="o">=</span> <span class="n">flag_args</span><span class="o">.</span><span class="n">slice_indices</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dir_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">flag_args</span><span class="o">.</span><span class="n">dir_path</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+        <span class="n">dir_path_output</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">flag_args</span><span class="o">.</span><span class="n">dir_path_output</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">dir_path</span> <span class="o">=</span> <span class="n">flag_args</span><span class="o">.</span><span class="n">dir_path</span>
+        <span class="n">dir_path_output</span> <span class="o">=</span> <span class="n">flag_args</span><span class="o">.</span><span class="n">dir_path_output</span>
+
+    <span class="c1"># System_list = []</span>
+    <span class="c1"># input_path = Path(dir_path, flag_args.dir_name)</span>
+    <span class="c1"># path_schroedinger = Path(input_path, flag_args.filename_schroedinger)</span>
+    <span class="c1"># System = load_System(path_schroedinger, host=host)</span>
+    <span class="c1"># for i in range(0, len(flag_args.filename_steps_list)):</span>
+    <span class="c1">#     # create copies of the System in a list (to fill them later with different psi_val)</span>
+    <span class="c1">#     System_list.append(deepcopy(System))</span>
+
+    <span class="c1"># _, last_index, _, _ = get_path.get_path(dir_path,</span>
+    <span class="c1">#                                         search_prefix=flag_args.filename_steps_list[0],</span>
+    <span class="c1">#                                         file_pattern=&quot;.npz&quot;</span>
+    <span class="c1">#                                         )</span>
+
+    <span class="c1"># frame = flag_args.frame_start</span>
+    <span class="c1"># while True:</span>
+    <span class="c1">#      System_list = load_System_list(System_list, flag_args.filename_steps_list, input_path,</span>
+    <span class="c1">#                                     flag_args.steps_format, frame, flag_args.summary_name)</span>
+    <span class="c1">#      frame = frame + flag_args.steps_per_npz</span>
+
+    <span class="c1">#      if flag_args.frame_end:</span>
+    <span class="c1">#         last_index = flag_args.frame_end </span>
+
+    <span class="c1">#      if frame == last_index + flag_args.steps_per_npz:</span>
+    <span class="c1">#          break</span>
+    <span class="c1">#      elif frame &gt; last_index:</span>
+    <span class="c1">#          frame = last_index</span>
+
+    <span class="n">Anim</span><span class="p">:</span> <span class="n">Animation</span> <span class="o">=</span> <span class="n">Animation</span><span class="p">(</span><span class="n">plot_V</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">plot_V</span><span class="p">,</span>
+                                <span class="n">alpha_psi_list</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">alpha_psi_list</span><span class="p">,</span>
+                                <span class="n">alpha_psi_sol_list</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">alpha_psi_sol_list</span><span class="p">,</span>
+                                <span class="n">alpha_V</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">alpha_V</span><span class="p">,</span>
+                                <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;anim.mp4&quot;</span><span class="p">,</span>
+                                <span class="p">)</span>
+
+    <span class="c1"># mayavi for 3D</span>
+    <span class="n">MayAnim</span> <span class="o">=</span> <span class="n">MayaviAnimation</span><span class="o">.</span><span class="n">MayaviAnimation</span><span class="p">(</span><span class="n">Anim</span><span class="p">,</span>
+                                              <span class="n">dir_path</span><span class="o">=</span><span class="n">dir_path</span><span class="p">,</span>
+                                              <span class="n">slice_indices</span><span class="o">=</span><span class="p">[</span><span class="n">slice_x</span><span class="p">,</span> <span class="n">slice_y</span><span class="p">,</span> <span class="n">slice_z</span><span class="p">],</span>
+                                              <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span>
+                                              <span class="n">dir_path_output</span><span class="o">=</span><span class="n">dir_path_output</span><span class="p">,</span>
+                                              <span class="p">)</span>
+
+    <span class="c1"># db_helper.db_check()</span>
+    <span class="c1"># db_helper.db_query(dir_path.parent)</span>
+    <span class="n">animate_wrapper</span> <span class="o">=</span> <span class="n">mlab</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">MayAnim</span><span class="o">.</span><span class="n">animate_npz</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ui</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">ui</span><span class="p">)</span>
+    <span class="n">MayAnimator</span> <span class="o">=</span> <span class="n">animate_wrapper</span><span class="p">(</span><span class="n">dir_path</span><span class="o">=</span><span class="n">dir_path</span><span class="p">,</span>
+                                  <span class="n">dir_name</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">dir_name</span><span class="p">,</span>
+                                  <span class="n">filename_schroedinger</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">filename_schroedinger</span><span class="p">,</span>
+                                  <span class="n">filename_steps_list</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">filename_steps_list</span><span class="p">,</span>
+                                  <span class="n">steps_format</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">steps_format</span><span class="p">,</span>
+                                  <span class="n">steps_per_npz</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">steps_per_npz</span><span class="p">,</span>
+                                  <span class="n">frame_start</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">frame_start</span><span class="p">,</span>
+                                  <span class="n">frame_end</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">frame_end</span><span class="p">,</span>
+                                  <span class="n">arg_slices</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">arg_slices</span><span class="p">,</span>
+                                  <span class="n">azimuth</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+                                  <span class="n">elevation</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">elevation</span><span class="p">,</span>
+                                  <span class="n">distance</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span>
+                                  <span class="n">sum_along</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">sum_along</span><span class="p">,</span>
+                                  <span class="n">summary_name</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">summary_name</span><span class="p">,</span>
+                                  <span class="n">mixture_slice_index_list</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">mixture_slice_index_list</span><span class="p">,</span>
+                                  <span class="n">no_legend</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">no_legend</span><span class="p">,</span>
+                                  <span class="n">cut1d_y_lim</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">cut1d_y_lim</span><span class="p">,</span>
+                                  <span class="n">cut1d_plot_val_list</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">cut1d_plot_val_list</span><span class="p">,</span>
+                                  <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span>
+                                  <span class="n">experiment_name</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">,</span>
+                                  <span class="p">)</span>
+    <span class="n">mlab</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="n">result_path_anim</span> <span class="o">=</span> <span class="n">MayAnim</span><span class="o">.</span><span class="n">create_movie</span><span class="p">(</span><span class="n">dir_path</span><span class="o">=</span><span class="n">MayAnim</span><span class="o">.</span><span class="n">dir_path</span><span class="p">,</span>
+                                            <span class="n">input_data_file_pattern</span><span class="o">=</span><span class="s2">&quot;anim*.png&quot;</span><span class="p">,</span>
+                                            <span class="n">delete_input</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">delete_input</span><span class="p">)</span>
+    <span class="n">result_path_cut1d</span> <span class="o">=</span> <span class="n">MayAnim</span><span class="o">.</span><span class="n">create_movie</span><span class="p">(</span><span class="n">dir_path</span><span class="o">=</span><span class="n">MayAnim</span><span class="o">.</span><span class="n">dir_path</span><span class="p">,</span>
+                                             <span class="n">input_data_file_pattern</span><span class="o">=</span><span class="s2">&quot;1d_cut_*.png&quot;</span><span class="p">,</span>
+                                             <span class="n">delete_input</span><span class="o">=</span><span class="n">flag_args</span><span class="o">.</span><span class="n">delete_input</span><span class="p">,</span>
+                                             <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;1d_cut.mp4&quot;</span><span class="p">,</span>
+                                             <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="flags"><a class="viewcode-back" href="../../../autoapi/supersolids/tools/load_npz/index.html#supersolids.tools.load_npz.flags">[docs]</a><span class="k">def</span> <span class="nf">flags</span><span class="p">(</span><span class="n">args_array</span><span class="p">):</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Load old simulations of Schrödinger system &quot;</span>
+                                                 <span class="s2">&quot;and create movie.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-experiment_name&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;start&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of the experiment in the database&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-dir_path&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;~/supersolids/results&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Absolute path to load data from&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-dir_path_output&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;~/supersolids/results&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Absolute path to save data to&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-dir_name&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;movie&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%03d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="mi">1</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of directory where the files to load lie. &quot;</span>
+                             <span class="s2">&quot;For example the standard naming convention is movie001&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-filename_schroedinger&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;schroedinger.pkl&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of file, where the Schroedinger object is saved&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-summary_name&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;SchroedingerSummary_ or SchroedingerMixtureSummary_ &quot;</span>
+                             <span class="s2">&quot;to load attributes from.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--filename_steps_list&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;step_&quot;</span><span class="p">],</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;List of filenames, without enumerator for the files. &quot;</span>
+                             <span class="s2">&quot;For example the standard naming convention is step_000001.npz, &quot;</span>
+                             <span class="s2">&quot;the string needed is step_&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-steps_format&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%07d</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Formatting string to enumerate the files. &quot;</span>
+                             <span class="s2">&quot;For example the standard naming convention is step_000001.npz, &quot;</span>
+                             <span class="s2">&quot;the string needed is percent 06d&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-steps_per_npz&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of dt steps skipped between saved npz.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-frame_start&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Counter of first saved npz.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-frame_end&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Counter of last saved npz.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-slice_indices&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;Indices to slice the plot.&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Indices to slice the plot in x, y, z direction.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--mixture_slice_index_list&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;List of indeces of the mixtures in filename_steps_list to take &quot;</span>
+                             <span class="s2">&quot;slices from.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-azimuth&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Phi angle in x-y-plane.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-elevation&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Zenith angle theta in z-axis.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-distance&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Setting for zoom.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-sum_along&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Index to sum along to display slices. None means no sum.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--alpha_psi_list&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Option to adjust the transparency of the list of plots.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--alpha_psi_sol_list&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Option to adjust the transparency of the list of plots.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--alpha_V&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Option to adjust the transparency of the external potential V &quot;</span>
+                             <span class="s2">&quot;(trap + extra).&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--no_legend&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Option to add legend as text to every frame.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--plot_V&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Option to plot the external potential of the system (the trap)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--delete_input&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If flag is not used, the pictures after &quot;</span>
+                             <span class="s2">&quot;animation is created and saved.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--arg_slices&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If flag is not used, psi ** 2 will be plotted on slices, &quot;</span>
+                             <span class="s2">&quot;else arg(psi).&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--ui&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If flag is used, ui for starting/stopping the animation pops up.&quot;</span>
+                             <span class="s2">&quot;This is handy as adjusting plots is just stable for stopped &quot;</span>
+                             <span class="s2">&quot;animation.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--cut1d_y_lim&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Option to set y_lim for cut1d plots.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--cut1d_plot_val_list&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">],</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;List of options to plot System.psi_val instead of &quot;</span>
+                             <span class="o">+</span> <span class="s2">&quot;System.psi_val ** 2 for different filename_steps &quot;</span>
+                             <span class="o">+</span> <span class="s2">&quot;in the cut1d plots.&quot;</span><span class="p">)</span>
+
+    <span class="n">flag_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args_array</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;args: </span><span class="si">{</span><span class="n">flag_args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># convert list of bool strings to list of bool</span>
+    <span class="n">flag_args</span><span class="o">.</span><span class="n">cut1d_plot_val_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">bool_str</span> <span class="o">==</span> <span class="s2">&quot;True&quot;</span>
+                                     <span class="k">for</span> <span class="n">bool_str</span> <span class="ow">in</span> <span class="n">flag_args</span><span class="o">.</span><span class="n">cut1d_plot_val_list</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">flag_args</span></div>
+
+
+<span class="c1"># Script runs, if script is run as main script (called by python *.py)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">load_npz</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

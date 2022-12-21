@@ -1,0 +1,35 @@
+:py:mod:`supersolids.scripts.e_dd_from_p`
+=========================================
+
+.. py:module:: supersolids.scripts.e_dd_from_p
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.scripts.e_dd_from_p.e_dd_func
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.scripts.e_dd_from_p.var1_list
+
+
+.. py:function:: e_dd_func(a_11, a_12, a_22, a_d_11, a_d_12, a_d_22, p)
+
+
+.. py:data:: var1_list
+   :annotation: = []
+
+   
+

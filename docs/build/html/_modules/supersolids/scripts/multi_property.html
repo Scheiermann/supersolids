@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.scripts.multi_property &mdash; supersolids 0.1.37rc1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">supersolids.scripts.multi_property</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for supersolids.scripts.multi_property</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">supersolids.helper</span> <span class="kn">import</span> <span class="n">get_path</span>
+<span class="kn">from</span> <span class="nn">supersolids.scripts.cp_plots</span> <span class="kn">import</span> <span class="n">cp_plots</span>
+
+
+<div class="viewcode-block" id="string_float"><a class="viewcode-back" href="../../../autoapi/supersolids/scripts/multi_property/index.html#supersolids.scripts.multi_property.string_float">[docs]</a><span class="k">def</span> <span class="nf">string_float</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">s</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div>
+
+
+<span class="c1"># Script runs, if script is run as main script (called by python *.py)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">path_anchor_input_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># experiment_suffix = &quot;ramp_13_09_10**eps&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_21_09_a12=70&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_test00&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_05_10&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_05_10_a12=70&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_10_10&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_10_10_small&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_10_65&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_10_775&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_10_85&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_21_10&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_21_10_675&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_21_10_725&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_21_10_825&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_10_85_long&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;stacked_05_10_a11&quot;</span>
+
+    <span class="c1"># experiment_suffix = &quot;ramp_24_10_fix_movie008&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_24_10_fix_movie015&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_21_10_90&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_21_10_925&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_24_10_long_85&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_24_10_long&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_28_10_65_long&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_28_10_85_long&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_01_65_long_wide&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_01_85_long_wide&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+
+    <span class="c1"># experiment_suffix = &quot;ramp_11_04_675_long_wide&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_04_70_long_wide&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_04_725_long_wide&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_04_75_775_80_long_wide&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+
+    <span class="n">experiment_suffix</span> <span class="o">=</span> <span class="s2">&quot;gpu_11_18_real_w-1&quot;</span>
+    <span class="n">path_anchor_input_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/bigwork/dscheier/results/begin_</span><span class="si">{</span><span class="n">experiment_suffix</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">))</span>
+
+    <span class="n">mixture</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">filename_schroedinger</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;schroedinger.pkl&quot;</span>
+
+    <span class="k">if</span> <span class="n">mixture</span><span class="p">:</span>
+        <span class="n">filename_steps</span> <span class="o">=</span> <span class="s2">&quot;step_&quot;</span>
+        <span class="c1"># filename_steps = &quot;mixture_step_&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">filename_steps</span> <span class="o">=</span> <span class="s2">&quot;step_&quot;</span>
+
+    <span class="c1"># frame_start = None</span>
+    <span class="n">frame_start</span> <span class="o">=</span> <span class="mi">350000</span>
+    <span class="k">if</span> <span class="n">frame_start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">take_last</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">take_last</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># frame_start = 0</span>
+        <span class="c1"># frame_end = 1000</span>
+        <span class="n">frame_end</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># movie_start_list = [1]</span>
+    <span class="c1"># movie_end_list = [25]</span>
+    <span class="n">movie_start_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">111</span><span class="p">]</span>
+    <span class="n">movie_end_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">125</span><span class="p">]</span>
+
+    <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.0002</span>
+
+    <span class="n">dir_name</span> <span class="o">=</span> <span class="s2">&quot;movie&quot;</span>
+    <span class="n">counting_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%03d</span><span class="s2">&quot;</span>
+
+    <span class="n">steps_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%07d</span><span class="s2">&quot;</span>
+
+    <span class="k">if</span> <span class="n">take_last</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dir_suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_paper_framestart_</span><span class="si">{</span><span class="n">frame_start</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="c1"># dir_suffix = &quot;_right&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dir_suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_paper_takelast_</span><span class="si">{</span><span class="n">take_last</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># subplots = False</span>
+    <span class="c1"># property_func = False</span>
+    <span class="c1"># property_names = [&quot;E&quot;, &quot;mu_arr&quot;]</span>
+    <span class="c1"># list_of_arrays = False</span>
+
+    <span class="c1"># subplots_list = [True, False, False, True, False]</span>
+    <span class="c1"># property_func_list = [True, False, False, True, True]</span>
+    <span class="c1"># list_of_arrays_list = [True, False, False, True, False]</span>
+    <span class="c1"># property_names_list = [&quot;get_center_of_mass&quot;, &quot;E&quot;, &quot;mu_arr&quot;, &quot;get_parity&quot;, &quot;check_N&quot;]</span>
+    <span class="c1"># property_args_list = [[], [], [], [], []]</span>
+    <span class="c1"># property_args_frame_list = [False, False, False, False, False]</span>
+
+    <span class="c1"># subplots_list = [False, False, False, True, True]</span>
+    <span class="c1"># property_func_list = [False, True, False, True, True]</span>
+    <span class="c1"># list_of_arrays_list = [False, False, False, True, True]</span>
+    <span class="c1"># property_names_list = [&quot;E&quot;, &quot;get_E_explicit&quot;, &quot;mu_arr&quot;, &quot;get_center_of_mass&quot;, &quot;get_parity&quot;]</span>
+    <span class="c1"># property_args_list = [[], [], [], [], []]</span>
+    <span class="c1"># property_args_frame_list = [False, False, False, False, False]</span>
+
+    <span class="c1"># func = &quot;lambda x, y: (x, y)&quot;</span>
+    <span class="c1"># func_mu = &quot;lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))&quot;</span>
+    <span class="c1"># file_suffix_list = [&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;mu_rel&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;_fft&quot;]</span>
+    <span class="c1"># inbuild_func_list = [&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;fft_plot&quot;]</span>
+    <span class="c1"># func_list = [&quot;&quot;, &quot;&quot;, &quot;&quot;, func_mu, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;]</span>
+    <span class="c1"># steps_per_npz_list = [100, 1000, 100, 100, 1000, 1000, 100, 100]</span>
+    <span class="c1"># subplots_list = [False, False, False, False, True, True, True, True]</span>
+    <span class="c1"># property_func_list = [False, True, False, False, True, True, False, False]</span>
+    <span class="c1"># list_of_arrays_list = [False, False, False, False, True, True, True, True]</span>
+    <span class="c1"># property_names_list = [&quot;E&quot;, &quot;get_E_explicit&quot;, &quot;mu_arr&quot;, &quot;mu_arr&quot;, &quot;get_center_of_mass&quot;, &quot;get_parity&quot;, &quot;monopolar&quot;, &quot;monopolar&quot;]</span>
+    <span class="c1"># property_args_list = [[], [], [], [], [], [], [], []]</span>
+    <span class="c1"># property_args_frame_list = [False, False, False, False, False, False, False, False]</span>
+
+    <span class="n">func_mu</span> <span class="o">=</span> <span class="s2">&quot;lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))&quot;</span>
+    <span class="n">file_suffix_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;mu_rel&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">]</span>
+    <span class="n">inbuild_func_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">]</span>
+    <span class="n">func_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">func_mu</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">]</span>
+    <span class="n">steps_per_npz_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>
+    <span class="n">subplots_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
+    <span class="n">property_func_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
+    <span class="n">list_of_arrays_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
+    <span class="n">property_names_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mu_arr&quot;</span><span class="p">,</span> <span class="s2">&quot;mu_arr&quot;</span><span class="p">,</span> <span class="s2">&quot;get_center_of_mass&quot;</span><span class="p">,</span> <span class="s2">&quot;get_parity&quot;</span><span class="p">]</span>
+    <span class="n">property_args_list</span> <span class="o">=</span> <span class="p">[[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]]</span>
+    <span class="n">property_args_frame_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+
+
+    <span class="c1"># func_mu = &quot;lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))&quot;</span>
+    <span class="c1"># file_suffix_list = [&quot;&quot;, &quot;_fft&quot;]</span>
+    <span class="c1"># inbuild_func_list = [&quot;&quot;, &quot;fft_plot&quot;]</span>
+    <span class="c1"># func_list = [&quot;&quot;, &quot;&quot;]</span>
+    <span class="c1"># steps_per_npz_list = [100, 100]</span>
+    <span class="c1"># subplots_list = [True, True]</span>
+    <span class="c1"># property_func_list = [False, False]</span>
+    <span class="c1"># list_of_arrays_list = [True, True]</span>
+    <span class="c1"># property_names_list = [&quot;monopolar&quot;, &quot;monopolar&quot;]</span>
+    <span class="c1"># property_args_list = [[], []]</span>
+    <span class="c1"># property_args_frame_list = [False, False]</span>
+
+    <span class="c1"># file_suffix_list = [&quot;_fft&quot;]</span>
+    <span class="c1"># inbuild_func_list = [&quot;fft_plot&quot;]</span>
+    <span class="c1"># func_list = [&quot;&quot;]</span>
+    <span class="c1"># steps_per_npz_list = [100]</span>
+    <span class="c1"># subplots_list = [True]</span>
+    <span class="c1"># property_func_list = [False]</span>
+    <span class="c1"># list_of_arrays_list = [True]</span>
+    <span class="c1"># property_names_list = [&quot;monopolar&quot;]</span>
+    <span class="c1"># property_args_list = [[]]</span>
+    <span class="c1"># property_args_frame_list = [False]</span>
+
+    <span class="c1"># steps_per_npz_list = [100]</span>
+    <span class="c1"># subplots_list = [True]</span>
+    <span class="c1"># property_func_list = [False]</span>
+    <span class="c1"># list_of_arrays_list = [True]</span>
+    <span class="c1"># property_names_list = [&quot;monopolar&quot;]</span>
+    <span class="c1"># property_args_list = [[]]</span>
+    <span class="c1"># property_args_frame_list = [False]</span>
+
+    <span class="c1"># subplots_list = [False]</span>
+    <span class="c1"># property_func_list = [True]</span>
+    <span class="c1"># list_of_arrays_list = [False]</span>
+    <span class="c1"># property_names_list = [&quot;get_E_explicit&quot;]</span>
+    <span class="c1"># property_args_list = [[]]</span>
+    <span class="c1"># property_args_frame_list = [False]</span>
+
+
+    <span class="c1"># property_names = [&quot;get_parity&quot;]</span>
+    <span class="c1"># property_name = [&quot;get_peak_distances_along&quot;]</span>
+    <span class="c1"># property_name = [&quot;get_peak_positions&quot;]</span>
+    <span class="c1"># property_args = [0]</span>
+
+    <span class="c1"># property_name = &quot;get_polarization&quot;</span>
+    <span class="c1"># property_args = [10.0 ** -9, 10.0 ** -9]</span>
+    <span class="c1"># property_args_frame = True</span>
+
+    <span class="c1"># property_name = &quot;get_contrast&quot;</span>
+    <span class="c1"># property_args = [0.3]</span>
+
+    <span class="c1"># property_name = &quot;get_phase_var&quot;</span>
+    <span class="c1"># property_args = [0, 256, 0, 128, 0, 32]</span>
+    <span class="c1"># property_args = [0, 128, 0, 128, 0, 32]</span>
+    <span class="c1"># property_args = [128, 256, 0, 128, 0, 32]</span>
+
+    <span class="c1"># property_name = &quot;get_phase_var_neighborhood&quot;</span>
+    <span class="c1"># [prob_min, amount]</span>
+    <span class="c1"># property_args = [0.02, 4]</span>
+    <span class="c1">#</span>
+    <span class="c1"># property_name = &quot;get_N_in_droplets&quot;</span>
+    <span class="c1"># number_of_peaks = [5, 4, 1, 1, 1, 1, 1, 1,</span>
+    <span class="c1">#                    5, 4, 3, 1, 1, 1, 1, 1,</span>
+    <span class="c1">#                    5, 5, 3, 1, 1, 1, 1, 1,</span>
+    <span class="c1">#                    5, 5, 4, 1, 1, 1, 1, 1,</span>
+    <span class="c1">#                    6, 5, 6, 3, 1, 1, 1, 1,</span>
+    <span class="c1">#                    ]</span>
+
+    <span class="c1"># we want 2S=D, so that the peaks distance equals the distance between max and min of sin</span>
+    <span class="c1"># delta = s * 2.0</span>
+
+    <span class="c1"># move2graphs = True</span>
+    <span class="n">move2graphs</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">path_anchor_input</span><span class="p">,</span> <span class="n">movie_start</span><span class="p">,</span> <span class="n">movie_end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">path_anchor_input_list</span><span class="p">,</span> <span class="n">movie_start_list</span><span class="p">,</span> <span class="n">movie_end_list</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">property_func</span><span class="p">,</span> <span class="n">property_name</span><span class="p">,</span>
+             <span class="n">property_args</span><span class="p">,</span> <span class="n">property_args_frame</span><span class="p">,</span> <span class="n">subplots</span><span class="p">,</span> <span class="n">list_of_arrays</span><span class="p">,</span> <span class="n">steps_per_npz</span><span class="p">,</span>
+             <span class="n">file_suffix</span><span class="p">,</span> <span class="n">inbuild_func</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">property_func_list</span><span class="p">,</span> <span class="n">property_names_list</span><span class="p">,</span> <span class="n">property_args_list</span><span class="p">,</span>
+                <span class="n">property_args_frame_list</span><span class="p">,</span> <span class="n">subplots_list</span><span class="p">,</span> <span class="n">list_of_arrays_list</span><span class="p">,</span> <span class="n">steps_per_npz_list</span><span class="p">,</span>
+                <span class="n">file_suffix_list</span><span class="p">,</span> <span class="n">inbuild_func_list</span><span class="p">,</span> <span class="n">func_list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">movie_number</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">movie_start</span><span class="p">,</span> <span class="n">movie_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+                <span class="c1"># file_suffix = &quot;&quot;</span>
+                <span class="c1"># file_suffix = &quot;-&quot; + &quot;-&quot;.join(map(str, property_args)) + &quot;.png&quot;</span>
+                <span class="n">property_filename_suffix</span> <span class="o">=</span> <span class="n">dir_suffix</span> <span class="o">+</span> <span class="n">file_suffix</span>
+                <span class="n">property_args_str</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="c1"># property_args_str = [Path(path_anchor_input,</span>
+                                     <span class="c1"># f&quot;{dir_name}{counting_format % movie_number}&quot;),</span>
+                                     <span class="c1"># &quot;pol_&quot;, steps_format]</span>
+                                     <span class="c1"># filename_steps + &quot;pol_&quot;, steps_format]</span>
+                <span class="c1"># property_args = [0.00725, number_of_peaks[i]]</span>
+                <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;supersolids.tools.track_property&quot;</span><span class="p">]</span>
+                <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;-dt=</span><span class="si">{</span><span class="n">dt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                         <span class="sa">f</span><span class="s2">&quot;-dir_path=</span><span class="si">{</span><span class="n">path_anchor_input</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                         <span class="sa">f</span><span class="s2">&quot;-dir_name=</span><span class="si">{</span><span class="n">dir_name</span><span class="si">}{</span><span class="n">counting_format</span> <span class="o">%</span> <span class="n">movie_number</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                         <span class="sa">f</span><span class="s2">&quot;-filename_schroedinger=</span><span class="si">{</span><span class="n">filename_schroedinger</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                         <span class="sa">f</span><span class="s2">&quot;-filename_steps=</span><span class="si">{</span><span class="n">filename_steps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                         <span class="sa">f</span><span class="s2">&quot;-steps_per_npz=</span><span class="si">{</span><span class="n">steps_per_npz</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                         <span class="sa">f</span><span class="s2">&quot;-steps_format=</span><span class="si">{</span><span class="n">steps_format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                         <span class="sa">f</span><span class="s2">&quot;-property_name=</span><span class="si">{</span><span class="n">property_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                         <span class="sa">f</span><span class="s2">&quot;-property_filename_suffix=</span><span class="si">{</span><span class="n">property_filename_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">property_func</span><span class="p">:</span>
+                    <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--property_func&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">property_args</span><span class="p">:</span>
+                    <span class="n">property_args_parsed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">property_args</span><span class="p">))</span>
+                    <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--property_args&quot;</span><span class="p">)</span>
+                    <span class="n">flags</span> <span class="o">+=</span> <span class="n">property_args_parsed</span>
+                <span class="k">if</span> <span class="n">property_args_str</span><span class="p">:</span>
+                    <span class="n">property_args_str_parsed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">property_args_str</span><span class="p">))</span>
+                    <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--property_args_str&quot;</span><span class="p">)</span>
+                    <span class="n">flags</span> <span class="o">+=</span> <span class="n">property_args_str_parsed</span>
+                <span class="k">if</span> <span class="n">subplots</span><span class="p">:</span>
+                    <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--subplots&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">property_args_frame</span><span class="p">:</span>
+                    <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--property_args_frame&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">inbuild_func</span><span class="p">:</span>
+                    <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-inbuild_func=</span><span class="si">{</span><span class="n">inbuild_func</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">func</span><span class="p">:</span>
+                    <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-func=</span><span class="si">{</span><span class="n">func</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">frame_start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-take_last=</span><span class="si">{</span><span class="n">take_last</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-frame_start=</span><span class="si">{</span><span class="n">frame_start</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">frame_end</span><span class="p">:</span>
+                        <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-frame_end=</span><span class="si">{</span><span class="n">frame_end</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">list_of_arrays</span><span class="p">:</span>
+                    <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--list_of_arrays&quot;</span><span class="p">)</span>
+
+
+                <span class="c1"># command needs flags to be provided as list</span>
+                <span class="n">command</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+                <span class="c1"># communicate needs flags to be provided as string seperated by &quot; &quot;.</span>
+                <span class="n">flags_parsed</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
+                <span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">flags_parsed</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;out:</span><span class="se">\n</span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;err:</span><span class="se">\n</span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># copy results from all movies into one directory (to compare them easier in image slideshows)</span>
+            <span class="n">path_anchor_output</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path_anchor_input</span><span class="p">,</span> <span class="s2">&quot;graphs&quot;</span><span class="p">,</span> <span class="n">property_name</span> <span class="o">+</span> <span class="n">dir_suffix</span><span class="p">)</span>
+
+            <span class="n">filename_extensions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.png&quot;</span><span class="p">,</span> <span class="s2">&quot;.npz&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">filename_extension</span> <span class="ow">in</span> <span class="n">filename_extensions</span><span class="p">:</span>
+                <span class="n">cp_plots</span><span class="p">(</span><span class="n">movie_start</span><span class="p">,</span> <span class="p">(</span><span class="n">movie_end</span> <span class="o">-</span> <span class="n">movie_start</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                         <span class="n">path_anchor_input</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">,</span> <span class="n">property_name</span> <span class="o">+</span> <span class="n">property_filename_suffix</span><span class="p">,</span>
+                         <span class="n">path_anchor_output</span><span class="p">,</span> <span class="n">property_name</span> <span class="o">+</span> <span class="n">property_filename_suffix</span><span class="p">,</span>
+                         <span class="n">counting_format</span><span class="p">,</span> <span class="n">filename_extension</span><span class="o">=</span><span class="n">filename_extension</span><span class="p">,</span> <span class="n">move</span><span class="o">=</span><span class="n">move2graphs</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

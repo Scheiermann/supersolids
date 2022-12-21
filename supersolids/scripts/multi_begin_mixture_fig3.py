@@ -6,112 +6,114 @@ import time
 
 from supersolids.helper.dict2str import dic2str
 
-slurm = True
-# mem_in_GB = 8
-mem_in_GB = 4
-xvfb_display = 990
-supersolids_version = "0.1.34rc19"
-# dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_schroedinger/")
-dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_fig3_a11_95/")
-# dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
-movie_string = "movie"
-counting_format = "%03d"
-movie_number = 1
+if __name__ == "__main__":
+    slurm = True
+    # mem_in_GB = 8
+    mem_in_GB = 4
+    xvfb_display = 990
+    supersolids_version = "0.1.37rc1"
+    # dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_schroedinger/")
+    dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_fig3_a11_95/")
+    # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 
-N = 63000
-a11 = 95.0
-a12 = a11
+    movie_string = "movie"
+    counting_format = "%03d"
+    movie_number = 1
 
-m_list = [163.9, 163.9]
-a_dd = 130.8
-a_dd_list = [a_dd, (9.0/10.0) * a_dd, (9.0/10.0) ** 2.0 * a_dd]
+    N = 63000
+    a11 = 95.0
+    a12 = a11
 
-Box = {"x0": -12, "x1": 12, "y0": -3, "y1": 3, "z0": -5, "z1": 5}
-# Res = {"x": 256, "y": 128, "z": 64}
-Res = {"x": 128, "y": 64, "z": 64}
-# Res = {"x": 256, "y": 64, "z": 64}
+    m_list = [163.9, 163.9]
+    a_dd = 130.8
+    a_dd_list = [a_dd, (9.0/10.0) * a_dd, (9.0/10.0) ** 2.0 * a_dd]
 
-noise = [0.9, 1.1]
-accuracy = 0.0
+    Box = {"x0": -12, "x1": 12, "y0": -3, "y1": 3, "z0": -5, "z1": 5}
+    # Res = {"x": 256, "y": 128, "z": 64}
+    Res = {"x": 128, "y": 64, "z": 64}
+    # Res = {"x": 256, "y": 64, "z": 64}
 
-w_x_freq = 33.0
-w_y_freq = 110.0
-w_z_freq = 167.0
-w_x = 2.0 * np.pi * w_x_freq
-w_y = 2.0 * np.pi * w_y_freq
-w_z = 2.0 * np.pi * w_z_freq
+    noise = [0.9, 1.1]
+    accuracy = 0.0
 
-# a_s = 0.000000004656
-# a = {"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}
+    w_x_freq = 33.0
+    w_y_freq = 110.0
+    w_z_freq = 167.0
+    w_x = 2.0 * np.pi * w_x_freq
+    w_y = 2.0 * np.pi * w_y_freq
+    w_z = 2.0 * np.pi * w_z_freq
 
-# for mixtures
-a = {"a_x": 4.2, "a_y": 0.5, "a_z": 1.9}
+    # a_s = 0.000000004656
+    # a = {"a_x": 4.5, "a_y": 2.0, "a_z": 1.5}
 
-max_timesteps = 100001
-dt = 0.0002
-steps_per_npz = 1000
-steps_format = "%07d"
-accuracy = 0.0
+    # for mixtures
+    a = {"a_x": 4.2, "a_y": 0.5, "a_z": 1.9}
 
-N_start = 0.5
-N_end = 0.51
-N_step = 0.05
+    max_timesteps = 100001
+    dt = 0.0002
+    steps_per_npz = 1000
+    steps_format = "%07d"
+    accuracy = 0.0
 
-a22_start = 76.0
-a22_end = 81.0
-a22_step = 2.0
+    N_start = 0.5
+    N_end = 0.51
+    N_step = 0.05
 
-func_filename = "distort.txt"
+    a22_start = 76.0
+    a22_end = 81.0
+    a22_step = 2.0
 
-j_counter = 0
-skip_counter = 0
-skip = 0
-end = 200
+    func_filename = "distort.txt"
 
-movie_list = []
-func_list = []
-func_path_list = []
-dir_path_func_list = []
-for N2_part in np.arange(N_start, N_end, N_step):
-    for a22 in np.arange(a22_start, a22_end, a22_step):
-        skip_counter += 1
-        if skip_counter < skip:
-            continue
-        if skip_counter == end:
-            break
-        func_list.append([])
-        N2_part_string = round(N2_part, ndigits=5)
-        a12_string = round(a12, ndigits=5)
-        N2 = int(N * N2_part)
-        N_list = [N - N2, N2]
+    j_counter = 0
+    skip_counter = 0
+    skip = 0
+    end = 200
 
-        # a_s_list in triu (triangle upper matrix) form: a11, a12, a22
-        a_s_list = [a11, a12, a22]
+    movie_list = []
+    func_list = []
+    func_path_list = []
+    dir_path_func_list = []
+    for N2_part in np.arange(N_start, N_end, N_step):
+        for a22 in np.arange(a22_start, a22_end, a22_step):
+            skip_counter += 1
+            if skip_counter < skip:
+                continue
+            if skip_counter == end:
+                break
+            func_list.append([])
+            N2_part_string = round(N2_part, ndigits=5)
+            a12_string = round(a12, ndigits=5)
+            N2 = int(N * N2_part)
+            N_list = [N - N2, N2]
 
-        # w_y = 2.0 * np.pi * (w_x_freq / a12)
+            # a_s_list in triu (triangle upper matrix) form: a11, a12, a22
+            a_s_list = [a11, a12, a22]
 
-        # d_string = 0.0001 * 10.0 ** round(d, ndigits=5)
+            # w_y = 2.0 * np.pi * (w_x_freq / a12)
 
-        # V = f"lambda x, y, z: {v_string} * np.sin(np.pi*x/{d_string}) ** 2"
-        # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi/4.0) + (np.pi*x/{d_string}) )"
-        # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi*x/{d_string}) )"
-        # V = f"lambda x, y, z: {v_string} * np.exp(-((x ** 2.0) /{d_string} ** 2.0) )"
-        # func_list[j_counter].append(f"-V='{V}' ")
+            # d_string = 0.0001 * 10.0 ** round(d, ndigits=5)
 
-        movie_number_after = movie_number + j_counter
-        movie_after = f"{movie_string}{counting_format % movie_number_after}"
-        dir_name_result = movie_after
-        movie_list.append(movie_after)
-        dir_path_func = Path(dir_path, movie_after)
-        dir_path_func_list.append(dir_path_func)
-        func_path = Path(dir_path_func, func_filename)
-        func_path_list.append(func_path)
+            # V = f"lambda x, y, z: {v_string} * np.sin(np.pi*x/{d_string}) ** 2"
+            # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi/4.0) + (np.pi*x/{d_string}) )"
+            # V = f"lambda x, y, z: {v_string} * np.sin( (np.pi*x/{d_string}) )"
+            # V = f"lambda x, y, z: {v_string} * np.exp(-((x ** 2.0) /{d_string} ** 2.0) )"
+            # func_list[j_counter].append(f"-V='{V}' ")
 
-        jobname = f"{supersolids_version}_N2_{N2_part_string}fig3_95_{a12_string}_m{movie_number_after}"
+            movie_number_after = movie_number + j_counter
+            movie_after = f"{movie_string}{counting_format % movie_number_after}"
+            dir_name_result = movie_after
+            movie_list.append(movie_after)
+            dir_path_func = Path(dir_path, movie_after)
+            dir_path_func_list.append(dir_path_func)
+            func_path = Path(dir_path_func, func_filename)
+            func_path_list.append(func_path)
 
-        if slurm:
-            cluster_flags = f"""#==================================================
+            jobname = f"{supersolids_version}_N2_{N2_part_string}fig3_95_{a12_string}_m{movie_number_after}"
+
+            if slurm:
+                cluster_flags = f"""#==================================================
 #SBATCH --job-name {jobname}
 #SBATCH -D /bigwork/dscheier/supersolids/supersolids/results/log_fig3/
 #SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
@@ -124,8 +126,8 @@ for N2_part in np.arange(N_start, N_end, N_step):
 #SBATCH --mem={mem_in_GB}G
 """
 
-        else:
-            cluster_flags = f"""#==================================================
+            else:
+                cluster_flags = f"""#==================================================
 #PBS -N {jobname}
 #PBS -M daniel.scheiermann@itp.uni-hannover.de
 #PBS -m abe
@@ -138,9 +140,9 @@ for N2_part in np.arange(N_start, N_end, N_step):
 #PBS -l vmem={mem_in_GB}GB
 """
 
-        heredoc = "\n".join(["#!/bin/bash",
-                             cluster_flags,
-                            f""" 
+            heredoc = "\n".join(["#!/bin/bash",
+                                 cluster_flags,
+                                f""" 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/bigwork/dscheier/miniconda/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
@@ -196,59 +198,60 @@ python -m supersolids \
 --offscreen \
 --mixture
 
-"""])
+"""
+            ])
 
-        print(heredoc)
+            print(heredoc)
 
-        if slurm:
-            p = subprocess.Popen(["sbatch"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                 shell=False)
-        else:
-            p = subprocess.Popen(["qsub"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                 shell=False)
+            if slurm:
+                p = subprocess.Popen(["sbatch"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                     shell=False)
+            else:
+                p = subprocess.Popen(["qsub"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                     shell=False)
 
-        out, err = p.communicate(heredoc.encode())
-        p.wait()
+            out, err = p.communicate(heredoc.encode())
+            p.wait()
 
-        j_counter += 1
+            j_counter += 1
 
-        existing_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
-        existing_dirnames = list(map(lambda path: path.name, existing_dirs))
-        print(f"{movie_after}")
-        while not movie_after in existing_dirnames:
-            print(f"Found dirnames: {existing_dirnames}")
-            print(f"Directory for {movie_after} not created yet. Waiting 20 seconds.")
-            time.sleep(20)
             existing_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
             existing_dirnames = list(map(lambda path: path.name, existing_dirs))
-            if existing_dirs:
-                print(f"First path: {existing_dirs[0]}")
+            print(f"{movie_after}")
+            while not movie_after in existing_dirnames:
+                print(f"Found dirnames: {existing_dirnames}")
+                print(f"Directory for {movie_after} not created yet. Waiting 20 seconds.")
+                time.sleep(20)
+                existing_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
+                existing_dirnames = list(map(lambda path: path.name, existing_dirs))
+                if existing_dirs:
+                    print(f"First path: {existing_dirs[0]}")
 
-movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
-movie_dirnames = list(map(lambda path: path.name, movie_dirs))
-while not all(item in movie_dirnames for item in movie_list):
-    print(f"{movie_list}")
-    print(f"{movie_dirnames}")
-    print(f"Not all directories for movies created.  Waiting 5 seconds.")
-    time.sleep(5)
     movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
     movie_dirnames = list(map(lambda path: path.name, movie_dirs))
+    while not all(item in movie_dirnames for item in movie_list):
+        print(f"{movie_list}")
+        print(f"{movie_dirnames}")
+        print(f"Not all directories for movies created.  Waiting 5 seconds.")
+        time.sleep(5)
+        movie_dirs = sorted([x for x in dir_path.glob(movie_string + "*") if x.is_dir()])
+        movie_dirnames = list(map(lambda path: path.name, movie_dirs))
 
-# j_counter = 0
-# # put distort.txt with the used V for every movie
-# for i, v_0 in enumerate(np.arange(N_start, N_end, N_step)):
-    # for j, delta in enumerate(np.arange(a12_start, a12_end, a12_step)):
-        # func = func_list[j_counter]
-        # func_path = func_path_list[j_counter]
-        # dir_path_func = dir_path_func_list[j_counter]
-        # if func_path.is_dir():
-            # print(f"File {func_path} already exists!")
-        # else:
-            # if not dir_path_func.is_dir():
-                # dir_path_func.mkdir(mode=0o751)
+    # j_counter = 0
+    # # put distort.txt with the used V for every movie
+    # for i, v_0 in enumerate(np.arange(N_start, N_end, N_step)):
+        # for j, delta in enumerate(np.arange(a12_start, a12_end, a12_step)):
+            # func = func_list[j_counter]
+            # func_path = func_path_list[j_counter]
+            # dir_path_func = dir_path_func_list[j_counter]
+            # if func_path.is_dir():
+                # print(f"File {func_path} already exists!")
+            # else:
+                # if not dir_path_func.is_dir():
+                    # dir_path_func.mkdir(mode=0o751)
 
-            # with open(func_path, "a") as func_file:
-                # func_string = '\n'.join(func)
-                # func_file.write(f"{func_string}")
+                # with open(func_path, "a") as func_file:
+                    # func_string = '\n'.join(func)
+                    # func_file.write(f"{func_string}")
 
-        # j_counter += 1
+            # j_counter += 1

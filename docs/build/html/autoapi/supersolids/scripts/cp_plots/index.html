@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>supersolids.scripts.cp_plots &mdash; supersolids 0.1.26 documentation</title>
+  <title>supersolids.scripts.cp_plots &mdash; supersolids 0.1.37rc1 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
@@ -15,7 +15,9 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -56,8 +58,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.scripts.cp_plots</span></code></li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.scripts.cp_plots</span></code></li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/autoapi/supersolids/scripts/cp_plots/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -68,25 +70,25 @@
            <div itemprop="articleBody">
              
   <section id="module-supersolids.scripts.cp_plots">
-<span id="supersolids-scripts-cp-plots"></span><h1><a class="reference internal" href="#module-supersolids.scripts.cp_plots" title="supersolids.scripts.cp_plots"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.scripts.cp_plots</span></code></a><a class="headerlink" href="#module-supersolids.scripts.cp_plots" title="Permalink to this headline"></a></h1>
+<span id="supersolids-scripts-cp-plots"></span><h1><a class="reference internal" href="#module-supersolids.scripts.cp_plots" title="supersolids.scripts.cp_plots"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.scripts.cp_plots</span></code></a><a class="headerlink" href="#module-supersolids.scripts.cp_plots" title="Permalink to this heading"></a></h1>
 <section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
 <section id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h3>
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h3>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.scripts.cp_plots.cp_plots" title="supersolids.scripts.cp_plots.cp_plots"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cp_plots</span></code></a>(start, number, path_anchor_input, dir_name, filename_in, path_anchor_output, filename_out, counting_format='%03d', filename_extension='.png')</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.scripts.cp_plots.cp_plots" title="supersolids.scripts.cp_plots.cp_plots"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cp_plots</span></code></a>(start, number, path_anchor_input, dir_name, ...)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline"></a></h3>
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading"></a></h3>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -100,8 +102,13 @@
 </table>
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.scripts.cp_plots.cp_plots">
-<span class="sig-prename descclassname"><span class="pre">supersolids.scripts.cp_plots.</span></span><span class="sig-name descname"><span class="pre">cp_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_anchor_input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_anchor_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counting_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%03d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/scripts/cp_plots.html#cp_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.scripts.cp_plots.cp_plots" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">supersolids.scripts.cp_plots.</span></span><span class="sig-name descname"><span class="pre">cp_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_anchor_input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_anchor_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counting_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%03d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">move</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/scripts/cp_plots.html#cp_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.scripts.cp_plots.cp_plots" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>move</strong> (<em>bool</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="supersolids.scripts.cp_plots.path_anchor_input">

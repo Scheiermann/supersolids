@@ -1,0 +1,14 @@
+:py:mod:`supersolids.scripts.multi_begin_mixture_fig3`
+======================================================
+
+.. py:module:: supersolids.scripts.multi_begin_mixture_fig3
+
+
+Module Contents
+---------------
+
+.. py:data:: slurm
+   :annotation: = True
+
+   
+

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.helper.db_helper &mdash; supersolids 0.1.37rc1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">supersolids.helper.db_helper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for supersolids.helper.db_helper</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Boolean</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">,</span> <span class="n">select</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">sessionmaker</span><span class="p">,</span> <span class="n">declarative_base</span><span class="p">,</span> <span class="n">relationship</span>
+<span class="kn">import</span> <span class="nn">dill</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+<span class="kn">from</span> <span class="nn">supersolids.Schroedinger</span> <span class="kn">import</span> <span class="n">Schroedinger</span>
+<span class="kn">from</span> <span class="nn">supersolids.helper</span> <span class="kn">import</span> <span class="n">constants</span>
+
+
+<div class="viewcode-block" id="db_create"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.db_create">[docs]</a><span class="k">def</span> <span class="nf">db_create</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">filename_schroedinger</span><span class="p">,</span> <span class="n">path_anchor_database</span><span class="p">,</span> <span class="n">database_name</span><span class="o">=</span><span class="s2">&quot;data.db&quot;</span><span class="p">):</span>
+    <span class="n">path_database</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path_anchor_database</span><span class="p">,</span> <span class="n">database_name</span><span class="p">)</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sqlite:///&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">path_database</span><span class="p">),</span> <span class="n">echo</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Load schroedinger&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">filename_schroedinger</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="c1"># WARNING: this is just the input Schroedinger at t=0</span>
+        <span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span> <span class="o">=</span> <span class="n">dill</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">db_commit</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">System</span><span class="p">,</span> <span class="n">path_anchor_database</span><span class="p">,</span> <span class="n">database_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="db_check"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.db_check">[docs]</a><span class="k">def</span> <span class="nf">db_check</span><span class="p">():</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="s2">&quot;/bigwork/dscheier/results/begin_ramp_11_08_eq_65_70_75_80_85_90&quot;</span>
+    <span class="n">path_database</span> <span class="o">=</span> <span class="s2">&quot;/bigwork/dscheier/results/begin_ramp_11_08_eq_65_70_75_80_85_90/data.db&quot;</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sqlite:///&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">path_database</span><span class="p">),</span> <span class="n">echo</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">Session</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+    <span class="c1"># experiment_db = session.query(ExperimentDB.id).filter_by(path=test)</span>
+    <span class="n">experiment_db</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">ExperimentDB</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">test</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">experiment_db</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="db_commit"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.db_commit">[docs]</a><span class="k">def</span> <span class="nf">db_commit</span><span class="p">(</span><span class="n">experiment_name</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">path_anchor_database</span><span class="p">,</span> <span class="n">database_name</span><span class="o">=</span><span class="s2">&quot;data.db&quot;</span><span class="p">):</span>
+    <span class="n">path_database</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path_anchor_database</span><span class="p">,</span> <span class="n">database_name</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Commit entry to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">path_database</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sqlite:///&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">path_database</span><span class="p">),</span> <span class="n">echo</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path_database</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No db found. Initializing!&quot;</span><span class="p">)</span>
+        <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">Session</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+    <span class="n">experiment_db</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">ExperimentDB</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">experiment_name</span><span class="p">)</span>
+    <span class="n">path_experiment_db</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">PathExperimentDB</span><span class="p">,</span>
+                                          <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">input_path</span><span class="o">.</span><span class="n">parent</span><span class="p">),</span>
+                                          <span class="n">id_experiment</span><span class="o">=</span><span class="n">experiment_db</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                          <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;experiment&quot;</span><span class="p">:</span><span class="n">experiment_db</span><span class="p">},</span>
+                                          <span class="p">)</span>
+    <span class="n">system_db</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">SystemDB</span><span class="p">,</span>
+        <span class="n">dim</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span>
+        <span class="n">imag_time</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">imag_time</span><span class="p">,</span>
+        <span class="n">stack_shift</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">stack_shift</span><span class="p">,</span>
+        <span class="n">tilt</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">tilt</span><span class="p">,</span>
+        <span class="n">nA_max</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">nA_max</span><span class="p">,</span>
+        <span class="n">max_timesteps</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">max_timesteps</span><span class="p">,</span>
+        <span class="n">a_s_factor</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">a_s_factor</span><span class="p">,</span>
+        <span class="n">a_dd_factor</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">a_dd_factor</span><span class="p">,</span>
+        <span class="n">dt</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">input_path</span><span class="p">),</span>
+        <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;path_exp&quot;</span><span class="p">:</span><span class="n">path_experiment_db</span><span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="c1"># a = Association()</span>
+    <span class="c1"># a.system_tab = system_db</span>
+    <span class="c1"># path_experiment_db.system.append(a)</span>
+                                             
+    <span class="c1"># frames_db = FramesDB(frame=frame, t=System.t, E=System.E, system=system_db)</span>
+    <span class="n">frames_db</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">FramesDB</span><span class="p">,</span>
+                                 <span class="n">frame</span><span class="o">=</span><span class="n">frame</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">E</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">E</span><span class="p">,</span>
+                                 <span class="n">system</span><span class="o">=</span><span class="n">system_db</span><span class="p">,</span>
+                                 <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;system&quot;</span><span class="p">:</span><span class="n">system_db</span><span class="p">},</span>
+                                 <span class="p">)</span>
+
+    <span class="c1"># w_db = wDB(w_x=System.w_x, w_y=System.w_y, w_z=System.w_z, system=system_db)</span>
+    <span class="n">w_db</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">wDB</span><span class="p">,</span>
+                            <span class="n">w_x</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">w_x</span><span class="p">,</span> <span class="n">w_y</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">w_y</span><span class="p">,</span> <span class="n">w_z</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">w_z</span><span class="p">,</span>
+                            <span class="n">system</span><span class="o">=</span><span class="n">system_db</span><span class="p">,</span>
+                            <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;system&quot;</span><span class="p">:</span><span class="n">system_db</span><span class="p">},</span>
+                            <span class="p">)</span>
+
+
+    <span class="c1"># mu_db = Array_mu_DB(mu_1=System.mu_arr[0], mu_2=System.mu_arr[1], system=system_db)</span>
+    <span class="n">mu_db</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">Array_mu_DB</span><span class="p">,</span>
+                            <span class="n">mu_1</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">mu_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mu_2</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">mu_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">system</span><span class="o">=</span><span class="n">system_db</span><span class="p">,</span>
+                            <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;system&quot;</span><span class="p">:</span><span class="n">system_db</span><span class="p">},</span>
+                            <span class="p">)</span>
+
+
+    <span class="n">l_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">hbar</span> <span class="o">/</span> <span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">m_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">System</span><span class="o">.</span><span class="n">w_x</span><span class="p">))</span>
+    <span class="n">a_dd_bohr</span> <span class="o">=</span> <span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">a_dd_array</span> <span class="o">/</span> <span class="n">constants</span><span class="o">.</span><span class="n">a_0</span><span class="p">)</span> <span class="o">*</span> <span class="n">l_0</span>
+    <span class="n">a_s_bohr</span> <span class="o">=</span> <span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">a_s_array</span> <span class="o">/</span> <span class="n">constants</span><span class="o">.</span><span class="n">a_0</span><span class="p">)</span> <span class="o">*</span> <span class="n">l_0</span>
+
+
+    <span class="c1"># a_dd_db = Array_a_dd_DB(a_dd_11=System.a_dd_array[0, 0], a_dd_12=System.a_dd_array[0, 1],</span>
+    <span class="c1">#                         a_dd_21=System.a_dd_array[1, 0], a_dd_22=System.a_dd_array[1, 1],</span>
+    <span class="c1">#                         system=system_db)</span>
+    <span class="n">a_dd_db</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">Array_a_dd_DB</span><span class="p">,</span>
+                               <span class="n">a_dd_11</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">a_dd_array</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">a_dd_12</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">a_dd_array</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                               <span class="n">a_dd_21</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">a_dd_array</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">a_dd_22</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">a_dd_array</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                               <span class="n">system</span><span class="o">=</span><span class="n">system_db</span><span class="p">,</span>
+                               <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;system&quot;</span><span class="p">:</span><span class="n">system_db</span><span class="p">},</span>
+                               <span class="p">)</span>
+
+
+    <span class="c1"># a_dd_bohr_db = Array_a_dd_bohr_DB(a_dd_11_bohr=a_dd_bohr[0, 0], a_dd_12_bohr=a_dd_bohr[0, 1],</span>
+    <span class="c1">#                                   a_dd_21_bohr=a_dd_bohr[1, 0], a_dd_22_bohr=a_dd_bohr[1, 1],</span>
+    <span class="c1">#                                   system=system_db)</span>
+    <span class="n">a_dd_bohr_db</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">Array_a_dd_bohr_DB</span><span class="p">,</span>
+                                    <span class="n">a_dd_11_bohr</span><span class="o">=</span><span class="n">a_dd_bohr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">a_dd_12_bohr</span><span class="o">=</span><span class="n">a_dd_bohr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                                    <span class="n">a_dd_21_bohr</span><span class="o">=</span><span class="n">a_dd_bohr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">a_dd_22_bohr</span><span class="o">=</span><span class="n">a_dd_bohr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                                    <span class="n">system</span><span class="o">=</span><span class="n">system_db</span><span class="p">,</span>
+                                    <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;system&quot;</span><span class="p">:</span><span class="n">system_db</span><span class="p">},</span>
+                                    <span class="p">)</span>
+
+
+    <span class="c1"># a_s_db = Array_a_s_DB(a_s_11=System.a_s_array[0, 0], a_s_12=System.a_s_array[0, 1],</span>
+    <span class="c1">#                       a_s_21=System.a_s_array[1, 0], a_s_22=System.a_s_array[1, 1],</span>
+    <span class="c1">#                       system=system_db)</span>
+    <span class="n">a_s_db</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">Array_a_s_DB</span><span class="p">,</span>
+                              <span class="n">a_s_11</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">a_s_array</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">a_s_12</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">a_s_array</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                              <span class="n">a_s_21</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">a_s_array</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">a_s_22</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">a_s_array</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                              <span class="n">system</span><span class="o">=</span><span class="n">system_db</span><span class="p">,</span>
+                              <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;system&quot;</span><span class="p">:</span><span class="n">system_db</span><span class="p">},</span>
+                              <span class="p">)</span>
+
+
+    <span class="c1"># a_s_bohr_db = Array_a_s_bohr_DB(a_s_11_bohr=a_s_bohr[0, 0], a_s_12_bohr=a_s_bohr[0, 1],</span>
+    <span class="c1">#                                 a_s_21_bohr=a_s_bohr[1, 0], a_s_22_bohr=a_s_bohr[1, 1],</span>
+    <span class="c1">#                                 system=system_db)</span>
+    <span class="n">a_s_bohr_db</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">Array_a_s_bohr_DB</span><span class="p">,</span>
+                                   <span class="n">a_s_11_bohr</span><span class="o">=</span><span class="n">a_s_bohr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">a_s_12_bohr</span><span class="o">=</span><span class="n">a_s_bohr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                                   <span class="n">a_s_21_bohr</span><span class="o">=</span><span class="n">a_s_bohr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">a_s_22_bohr</span><span class="o">=</span><span class="n">a_s_bohr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                                   <span class="n">system</span><span class="o">=</span><span class="n">system_db</span><span class="p">,</span>
+                                   <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;system&quot;</span><span class="p">:</span><span class="n">system_db</span><span class="p">},</span>
+                                   <span class="p">)</span>
+
+    <span class="n">m_u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">m_list</span><span class="p">)</span> <span class="o">/</span> <span class="n">constants</span><span class="o">.</span><span class="n">u_in_kg</span>
+    <span class="c1"># m_list = List_m_DB(m_1=System.m_list[0], m_2=System.m_list[1], system=system_db)</span>
+    <span class="n">m_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">List_m_DB</span><span class="p">,</span>
+                              <span class="n">m_1</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">m_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m_2</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">m_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                              <span class="n">system</span><span class="o">=</span><span class="n">system_db</span><span class="p">,</span>
+                              <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;system&quot;</span><span class="p">:</span><span class="n">system_db</span><span class="p">},</span>
+                              <span class="p">)</span>
+
+
+    <span class="c1"># m_u_list = List_m_u_DB(m_1_u=m_u[0], m_2_u=m_u[1], system=system_db)</span>
+    <span class="n">m_u_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">List_m_u_DB</span><span class="p">,</span>
+                                <span class="n">m_1_u</span><span class="o">=</span><span class="n">m_u</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m_2_u</span><span class="o">=</span><span class="n">m_u</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                <span class="n">system</span><span class="o">=</span><span class="n">system_db</span><span class="p">,</span>
+                                <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;system&quot;</span><span class="p">:</span><span class="n">system_db</span><span class="p">},</span>
+                                <span class="p">)</span>
+
+
+    <span class="c1"># N_list = List_N_DB(N_1=System.N_list[0], N_2=System.N_list[1], system=system_db)</span>
+    <span class="n">N_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">List_N_DB</span><span class="p">,</span>
+                              <span class="n">N_1</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">N_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">N_2</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">N_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                              <span class="n">system</span><span class="o">=</span><span class="n">system_db</span><span class="p">,</span>
+                              <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;system&quot;</span><span class="p">:</span><span class="n">system_db</span><span class="p">},</span>
+                              <span class="p">)</span>
+
+
+    <span class="c1"># res_db = ResDB(Res_x=System.Res.x, Res_y=System.Res.y, Res_z=System.Res.z, system=system_db)</span>
+    <span class="n">res_db</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">ResDB</span><span class="p">,</span>
+                              <span class="n">Res_x</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">Res</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">Res_y</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">Res</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">Res_z</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">Res</span><span class="o">.</span><span class="n">z</span><span class="p">,</span>
+                              <span class="n">system</span><span class="o">=</span><span class="n">system_db</span><span class="p">,</span>
+                              <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;system&quot;</span><span class="p">:</span><span class="n">system_db</span><span class="p">},</span>
+                              <span class="p">)</span>
+
+
+    <span class="c1"># box_db = BoxDB(Box_x0=System.Box.x0, Box_x1=System.Box.x1,</span>
+    <span class="c1">#                Box_y0=System.Box.y0, Box_y1=System.Box.y1,</span>
+    <span class="c1">#                Box_z0=System.Box.z0, Box_z1=System.Box.z1,</span>
+    <span class="c1">#                system=system_db)</span>
+    <span class="n">box_db</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">BoxDB</span><span class="p">,</span>
+                              <span class="n">Box_x0</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">Box</span><span class="o">.</span><span class="n">x0</span><span class="p">,</span> <span class="n">Box_x1</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">Box</span><span class="o">.</span><span class="n">x1</span><span class="p">,</span>
+                              <span class="n">Box_y0</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">Box</span><span class="o">.</span><span class="n">y0</span><span class="p">,</span> <span class="n">Box_y1</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">Box</span><span class="o">.</span><span class="n">y1</span><span class="p">,</span>
+                              <span class="n">Box_z0</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">Box</span><span class="o">.</span><span class="n">z0</span><span class="p">,</span> <span class="n">Box_z1</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">Box</span><span class="o">.</span><span class="n">z1</span><span class="p">,</span>
+                              <span class="n">system</span><span class="o">=</span><span class="n">system_db</span><span class="p">,</span>
+                              <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;system&quot;</span><span class="p">:</span><span class="n">system_db</span><span class="p">},</span>
+                              <span class="p">)</span>
+
+
+    <span class="n">session</span><span class="o">.</span><span class="n">add_all</span><span class="p">([</span><span class="n">experiment_db</span><span class="p">,</span> <span class="n">path_experiment_db</span><span class="p">,</span> <span class="n">system_db</span><span class="p">,</span> <span class="n">frames_db</span><span class="p">,</span>
+                     <span class="n">w_db</span><span class="p">,</span> <span class="n">mu_db</span><span class="p">,</span> <span class="n">a_dd_db</span><span class="p">,</span> <span class="n">a_dd_bohr_db</span><span class="p">,</span> <span class="n">a_s_db</span><span class="p">,</span> <span class="n">a_s_bohr_db</span><span class="p">,</span>
+                     <span class="n">m_list</span><span class="p">,</span> <span class="n">m_u_list</span><span class="p">,</span> <span class="n">N_list</span><span class="p">,</span> <span class="n">res_db</span><span class="p">,</span> <span class="n">box_db</span>
+                    <span class="p">])</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="db_query"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.db_query">[docs]</a><span class="k">def</span> <span class="nf">db_query</span><span class="p">(</span><span class="n">path_anchor_database</span><span class="p">,</span> <span class="n">database_name</span><span class="o">=</span><span class="s2">&quot;data.db&quot;</span><span class="p">):</span>
+    <span class="n">path_database</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path_anchor_database</span><span class="p">,</span> <span class="n">database_name</span><span class="p">)</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sqlite:///&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">path_database</span><span class="p">),</span> <span class="n">echo</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">Session</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SystemDB</span><span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SystemDB</span><span class="p">,</span> <span class="n">wDB</span><span class="p">,</span> <span class="n">ResDB</span><span class="p">,</span> <span class="n">BoxDB</span><span class="p">,</span> <span class="n">List_N_DB</span><span class="p">,</span> <span class="n">List_m_u_DB</span><span class="p">,</span>
+                  <span class="n">Array_mu_DB</span><span class="p">,</span> <span class="n">Array_a_dd_bohr_DB</span><span class="p">,</span> <span class="n">Array_a_s_bohr_DB</span><span class="p">)</span><span class="o">.</span> \
+            <span class="nb">filter</span><span class="p">(</span><span class="n">SystemDB</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">wDB</span><span class="o">.</span><span class="n">id_system</span><span class="p">)</span><span class="o">.</span> \
+            <span class="nb">filter</span><span class="p">(</span><span class="n">SystemDB</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">ResDB</span><span class="o">.</span><span class="n">id_system</span><span class="p">)</span><span class="o">.</span> \
+            <span class="nb">filter</span><span class="p">(</span><span class="n">SystemDB</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">BoxDB</span><span class="o">.</span><span class="n">id_system</span><span class="p">)</span><span class="o">.</span> \
+            <span class="nb">filter</span><span class="p">(</span><span class="n">SystemDB</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">BoxDB</span><span class="o">.</span><span class="n">id_system</span><span class="p">)</span><span class="o">.</span> \
+            <span class="nb">filter</span><span class="p">(</span><span class="n">SystemDB</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">wDB</span><span class="o">.</span><span class="n">id_system</span><span class="p">)</span><span class="o">.</span> \
+            <span class="nb">filter</span><span class="p">(</span><span class="n">SystemDB</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">List_N_DB</span><span class="o">.</span><span class="n">id_system</span><span class="p">)</span><span class="o">.</span> \
+            <span class="nb">filter</span><span class="p">(</span><span class="n">SystemDB</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">List_m_u_DB</span><span class="o">.</span><span class="n">id_system</span><span class="p">)</span><span class="o">.</span> \
+            <span class="nb">filter</span><span class="p">(</span><span class="n">SystemDB</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">Array_mu_DB</span><span class="o">.</span><span class="n">id_system</span><span class="p">)</span><span class="o">.</span> \
+            <span class="nb">filter</span><span class="p">(</span><span class="n">SystemDB</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">Array_a_dd_bohr_DB</span><span class="o">.</span><span class="n">id_system</span><span class="p">)</span><span class="o">.</span> \
+            <span class="nb">filter</span><span class="p">(</span><span class="n">SystemDB</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">Array_a_s_bohr_DB</span><span class="o">.</span><span class="n">id_system</span><span class="p">)</span><span class="o">.</span> \
+            <span class="nb">all</span><span class="p">()</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="get_or_create"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.get_or_create">[docs]</a><span class="k">def</span> <span class="nf">get_or_create</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">defaults</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">relation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">relation</span><span class="p">:</span>
+        <span class="n">new_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">relation</span><span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">new_kwargs</span><span class="o">=</span><span class="n">kwargs</span>
+
+    <span class="n">instance</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">instance</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">instance</span><span class="p">,</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">kwargs</span> <span class="o">|=</span> <span class="n">defaults</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">new_kwargs</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+            <span class="n">instance</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">instance</span><span class="p">,</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">instance</span><span class="p">,</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ExperimentDB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.ExperimentDB">[docs]</a><span class="k">class</span> <span class="nc">ExperimentDB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;experiments&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+    <span class="n">path_experiment</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;PathExperimentDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;experiment&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExperimentDB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.ExperimentDB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;ExperimentDB(name=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span></div></div>
+
+
+<span class="c1"># class Association(Base):</span>
+<span class="c1">#     __tablename__ = &quot;association_table&quot;</span>
+<span class="c1">#     path_experiments_id = Column(ForeignKey(&quot;path_experiments.id&quot;), primary_key=True)</span>
+<span class="c1">#     systems_id = Column(ForeignKey(&quot;systems.id&quot;), primary_key=True)</span>
+<span class="c1">#     system_tab = relationship(&quot;SystemDB&quot;, back_populates=&quot;path_exp&quot;)</span>
+<span class="c1">#     path_exp_tab = relationship(&quot;PathExperimentDB&quot;, back_populates=&quot;system&quot;)</span>
+
+
+
+<div class="viewcode-block" id="PathExperimentDB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.PathExperimentDB">[docs]</a><span class="k">class</span> <span class="nc">PathExperimentDB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;path_experiments&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_experiment</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;experiments.id&quot;</span><span class="p">))</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+    <span class="n">experiment</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;ExperimentDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;path_experiment&quot;</span><span class="p">)</span>
+    <span class="c1"># system = relationship(&quot;Association&quot;, back_populates=&quot;path_exp_tab&quot;)</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SystemDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;path_exp&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="PathExperimentDB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.PathExperimentDB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;PathExperiment(path=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="SystemDB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.SystemDB">[docs]</a><span class="k">class</span> <span class="nc">SystemDB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;systems&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_path_experiment</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;path_experiments.id&quot;</span><span class="p">))</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">imag_time</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Boolean</span><span class="p">)</span>
+    <span class="n">stack_shift</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">tilt</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">nA_max</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">max_timesteps</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">a_s_factor</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">a_dd_factor</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+
+    <span class="c1"># path_exp = relationship(&quot;Association&quot;, back_populates=&quot;system_tab&quot;)</span>
+    <span class="n">path_exp</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;PathExperimentDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+
+    <span class="n">frames</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;FramesDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+
+    <span class="n">Res</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;ResDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+    <span class="n">Box</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;BoxDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;wDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+
+    <span class="n">N_list</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;List_N_DB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+
+    <span class="n">m_list</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;List_m_DB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+    <span class="n">m_u_list</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;List_m_u_DB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+
+    <span class="n">a_s_array</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Array_a_s_DB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+    <span class="n">a_s_bohr_array</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Array_a_s_bohr_DB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+
+    <span class="n">a_dd_array</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Array_a_dd_DB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+    <span class="n">a_dd_bohr_array</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Array_a_dd_bohr_DB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+
+    <span class="n">mu_arr</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Array_mu_DB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SystemDB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.SystemDB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;SystemDB(path=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39;, dim=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="si">}</span><span class="s2">&#39;, imag_time=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">imag_time</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="FramesDB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.FramesDB">[docs]</a><span class="k">class</span> <span class="nc">FramesDB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;frames&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_system</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;systems.id&quot;</span><span class="p">))</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+
+    <span class="n">system</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SystemDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;frames&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="FramesDB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.FramesDB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;Frames(&quot;</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;frame=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="si">}</span><span class="s2">&#39;, t=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="si">}</span><span class="s2">&#39;, &quot;</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;E=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="wDB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.wDB">[docs]</a><span class="k">class</span> <span class="nc">wDB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;w&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_system</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;systems.id&quot;</span><span class="p">))</span>
+    <span class="n">w_x</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">w_y</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">w_z</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SystemDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="wDB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.wDB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;wDB(w_x=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">w_x</span><span class="si">}</span><span class="s2">&#39;, w_y=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">w_y</span><span class="si">}</span><span class="s2">&#39;, w_z=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">w_z</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="ResDB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.ResDB">[docs]</a><span class="k">class</span> <span class="nc">ResDB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;res&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_system</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;systems.id&quot;</span><span class="p">))</span>
+    <span class="n">Res_x</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">Res_y</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">Res_z</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SystemDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;Res&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="ResDB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.ResDB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;ResDB(Res_x=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Res_x</span><span class="si">}</span><span class="s2">&#39;, Res_y=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Res_y</span><span class="si">}</span><span class="s2">&#39;, Res_z=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Res_z</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="BoxDB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.BoxDB">[docs]</a><span class="k">class</span> <span class="nc">BoxDB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;box&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_system</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;systems.id&quot;</span><span class="p">))</span>
+    <span class="n">Box_x0</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">Box_x1</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+
+    <span class="n">Box_y0</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">Box_y1</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+
+    <span class="n">Box_z0</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">Box_z1</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+
+    <span class="n">system</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SystemDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;Box&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="BoxDB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.BoxDB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;BoxDB(&quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Box_x0=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Box_x0</span><span class="si">}</span><span class="s2">&#39;, Box_x1=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Box_x1</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Box_y0=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Box_y0</span><span class="si">}</span><span class="s2">&#39;, Box_y1=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Box_y1</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Box_z0=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Box_z0</span><span class="si">}</span><span class="s2">&#39;, Box_z1=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Box_z1</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="List_N_DB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.List_N_DB">[docs]</a><span class="k">class</span> <span class="nc">List_N_DB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;N&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_system</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;systems.id&quot;</span><span class="p">))</span>
+    <span class="n">N_1</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">N_2</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SystemDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;N_list&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="List_N_DB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.List_N_DB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;List_N_DB([N_1=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">N_1</span><span class="si">}</span><span class="s2">&#39;, N_2=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">N_2</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="List_m_DB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.List_m_DB">[docs]</a><span class="k">class</span> <span class="nc">List_m_DB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;m&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_system</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;systems.id&quot;</span><span class="p">))</span>
+    <span class="n">m_1</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">m_2</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SystemDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;m_list&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="List_m_DB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.List_m_DB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;List_m_DB([m_1=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">m_1</span><span class="si">}</span><span class="s2">&#39;, m_2=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">m_2</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="List_m_u_DB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.List_m_u_DB">[docs]</a><span class="k">class</span> <span class="nc">List_m_u_DB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;m_u&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_system</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;systems.id&quot;</span><span class="p">))</span>
+    <span class="n">m_1_u</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">m_2_u</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SystemDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;m_u_list&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="List_m_u_DB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.List_m_u_DB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;List_m_DB([m_1_u=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">m_1_u</span><span class="si">}</span><span class="s2">&#39;, m_2_u=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">m_2_u</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Array_a_s_DB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.Array_a_s_DB">[docs]</a><span class="k">class</span> <span class="nc">Array_a_s_DB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;a_s&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_system</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;systems.id&quot;</span><span class="p">))</span>
+    <span class="n">a_s_11</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">a_s_12</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">a_s_21</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">a_s_22</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SystemDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;a_s_array&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="Array_a_s_DB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.Array_a_s_DB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;Array_a_s_DB(a_s_11=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_s_11</span><span class="si">}</span><span class="s2">&#39;, a_s_12=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_s_12</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;a_s_21=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_s_21</span><span class="si">}</span><span class="s2">&#39;, a_s_22=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_s_22</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Array_a_s_bohr_DB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.Array_a_s_bohr_DB">[docs]</a><span class="k">class</span> <span class="nc">Array_a_s_bohr_DB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;a_s_bohr&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_system</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;systems.id&quot;</span><span class="p">))</span>
+    <span class="n">a_s_11_bohr</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">a_s_12_bohr</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">a_s_21_bohr</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">a_s_22_bohr</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SystemDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;a_s_bohr_array&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="Array_a_s_bohr_DB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.Array_a_s_bohr_DB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;Array_a_s_bohr_DB(a_s_11_bohr=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_s_11_bohr</span><span class="si">}</span><span class="s2">&#39;, a_s_12_bohr=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_s_12_bohr</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;a_s_21_bohr=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_s_21_bohr</span><span class="si">}</span><span class="s2">&#39;, a_s_22_bohr=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_s_22_bohr</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Array_a_dd_DB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.Array_a_dd_DB">[docs]</a><span class="k">class</span> <span class="nc">Array_a_dd_DB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;a_dd&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_system</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;systems.id&quot;</span><span class="p">))</span>
+    <span class="n">a_dd_11</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">a_dd_12</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">a_dd_21</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">a_dd_22</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SystemDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;a_dd_array&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="Array_a_dd_DB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.Array_a_dd_DB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;Array_a_dd_DB(a_dd_11=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_dd_11</span><span class="si">}</span><span class="s2">&#39;, a_dd_12=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_dd_12</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;a_dd_21=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_dd_21</span><span class="si">}</span><span class="s2">&#39;, a_dd_22=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_dd_22</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Array_a_dd_bohr_DB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.Array_a_dd_bohr_DB">[docs]</a><span class="k">class</span> <span class="nc">Array_a_dd_bohr_DB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;a_dd_bohr&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_system</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;systems.id&quot;</span><span class="p">))</span>
+    <span class="n">a_dd_11_bohr</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">a_dd_12_bohr</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">a_dd_21_bohr</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">a_dd_22_bohr</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SystemDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;a_dd_bohr_array&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="Array_a_dd_bohr_DB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.Array_a_dd_bohr_DB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;Array_a_dd_bohr_DB(a_dd_11_bohr=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_dd_11_bohr</span><span class="si">}</span><span class="s2">&#39;, a_dd_12_bohr=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_dd_12_bohr</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;a_dd_21_bohr=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_dd_21_bohr</span><span class="si">}</span><span class="s2">&#39;, a_dd_22_bohr=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">a_dd_22_bohr</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Array_mu_DB"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.Array_mu_DB">[docs]</a><span class="k">class</span> <span class="nc">Array_mu_DB</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;mu&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">id_system</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;systems.id&quot;</span><span class="p">))</span>
+    <span class="n">mu_1</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">mu_2</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SystemDB&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;mu_arr&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="Array_mu_DB.__repr__"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/db_helper/index.html#supersolids.helper.db_helper.Array_mu_DB.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;Array_mu_DB(mu_1=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mu_1</span><span class="si">}</span><span class="s2">&#39;, mu_2=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mu_2</span><span class="si">}</span><span class="s2">&#39;&quot;</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.helper.db_helper &mdash; supersolids 0.1.37rc1 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.db_helper</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/supersolids/helper/db_helper/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-supersolids.helper.db_helper">
+<span id="supersolids-helper-db-helper"></span><h1><a class="reference internal" href="#module-supersolids.helper.db_helper" title="supersolids.helper.db_helper"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.db_helper</span></code></a><a class="headerlink" href="#module-supersolids.helper.db_helper" title="Permalink to this heading"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.ExperimentDB" title="supersolids.helper.db_helper.ExperimentDB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExperimentDB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.PathExperimentDB" title="supersolids.helper.db_helper.PathExperimentDB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PathExperimentDB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.SystemDB" title="supersolids.helper.db_helper.SystemDB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SystemDB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.FramesDB" title="supersolids.helper.db_helper.FramesDB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FramesDB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.wDB" title="supersolids.helper.db_helper.wDB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wDB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.ResDB" title="supersolids.helper.db_helper.ResDB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ResDB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.BoxDB" title="supersolids.helper.db_helper.BoxDB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxDB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.List_N_DB" title="supersolids.helper.db_helper.List_N_DB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">List_N_DB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.List_m_DB" title="supersolids.helper.db_helper.List_m_DB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">List_m_DB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.List_m_u_DB" title="supersolids.helper.db_helper.List_m_u_DB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">List_m_u_DB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.Array_a_s_DB" title="supersolids.helper.db_helper.Array_a_s_DB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Array_a_s_DB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.Array_a_s_bohr_DB" title="supersolids.helper.db_helper.Array_a_s_bohr_DB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Array_a_s_bohr_DB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.Array_a_dd_DB" title="supersolids.helper.db_helper.Array_a_dd_DB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Array_a_dd_DB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.Array_a_dd_bohr_DB" title="supersolids.helper.db_helper.Array_a_dd_bohr_DB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Array_a_dd_bohr_DB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.Array_mu_DB" title="supersolids.helper.db_helper.Array_mu_DB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Array_mu_DB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.db_create" title="supersolids.helper.db_helper.db_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">db_create</span></code></a>(input_path, filename_schroedinger, ...[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.db_check" title="supersolids.helper.db_helper.db_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">db_check</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.db_commit" title="supersolids.helper.db_helper.db_commit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">db_commit</span></code></a>(experiment_name, input_path, System, frame, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.db_query" title="supersolids.helper.db_helper.db_query"><code class="xref py py-obj docutils literal notranslate"><span class="pre">db_query</span></code></a>(path_anchor_database[, database_name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.get_or_create" title="supersolids.helper.db_helper.get_or_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_or_create</span></code></a>(session, model[, defaults, relation])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Base">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">Base</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Base" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.db_create">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">db_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_schroedinger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_anchor_database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data.db'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#db_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.db_create" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.db_check">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">db_check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#db_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.db_check" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.db_commit">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">db_commit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_anchor_database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data.db'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#db_commit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.db_commit" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>System</strong> (<a class="reference internal" href="../../Schroedinger/index.html#supersolids.Schroedinger.Schroedinger" title="supersolids.Schroedinger.Schroedinger"><em>supersolids.Schroedinger.Schroedinger</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.db_query">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">db_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_anchor_database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data.db'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#db_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.db_query" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.get_or_create">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">get_or_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#get_or_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.get_or_create" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ExperimentDB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">ExperimentDB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#ExperimentDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.ExperimentDB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ExperimentDB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">experiments</span></em><a class="headerlink" href="#supersolids.helper.db_helper.ExperimentDB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ExperimentDB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.ExperimentDB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ExperimentDB.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#supersolids.helper.db_helper.ExperimentDB.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ExperimentDB.path_experiment">
+<span class="sig-name descname"><span class="pre">path_experiment</span></span><a class="headerlink" href="#supersolids.helper.db_helper.ExperimentDB.path_experiment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ExperimentDB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#ExperimentDB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.ExperimentDB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.PathExperimentDB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">PathExperimentDB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#PathExperimentDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.PathExperimentDB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.PathExperimentDB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">path_experiments</span></em><a class="headerlink" href="#supersolids.helper.db_helper.PathExperimentDB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.PathExperimentDB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.PathExperimentDB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.PathExperimentDB.id_experiment">
+<span class="sig-name descname"><span class="pre">id_experiment</span></span><a class="headerlink" href="#supersolids.helper.db_helper.PathExperimentDB.id_experiment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.PathExperimentDB.path">
+<span class="sig-name descname"><span class="pre">path</span></span><a class="headerlink" href="#supersolids.helper.db_helper.PathExperimentDB.path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.PathExperimentDB.experiment">
+<span class="sig-name descname"><span class="pre">experiment</span></span><a class="headerlink" href="#supersolids.helper.db_helper.PathExperimentDB.experiment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.PathExperimentDB.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.PathExperimentDB.system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.PathExperimentDB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#PathExperimentDB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.PathExperimentDB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">SystemDB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#SystemDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">systems</span></em><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.id_path_experiment">
+<span class="sig-name descname"><span class="pre">id_path_experiment</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.id_path_experiment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.dim">
+<span class="sig-name descname"><span class="pre">dim</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.imag_time">
+<span class="sig-name descname"><span class="pre">imag_time</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.imag_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.stack_shift">
+<span class="sig-name descname"><span class="pre">stack_shift</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.stack_shift" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.tilt">
+<span class="sig-name descname"><span class="pre">tilt</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.tilt" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.nA_max">
+<span class="sig-name descname"><span class="pre">nA_max</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.nA_max" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.max_timesteps">
+<span class="sig-name descname"><span class="pre">max_timesteps</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.max_timesteps" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.a_s_factor">
+<span class="sig-name descname"><span class="pre">a_s_factor</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.a_s_factor" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.a_dd_factor">
+<span class="sig-name descname"><span class="pre">a_dd_factor</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.a_dd_factor" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.dt">
+<span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.dt" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.path">
+<span class="sig-name descname"><span class="pre">path</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.path_exp">
+<span class="sig-name descname"><span class="pre">path_exp</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.path_exp" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.frames">
+<span class="sig-name descname"><span class="pre">frames</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.frames" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.Res">
+<span class="sig-name descname"><span class="pre">Res</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.Res" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.Box">
+<span class="sig-name descname"><span class="pre">Box</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.Box" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.w">
+<span class="sig-name descname"><span class="pre">w</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.w" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.N_list">
+<span class="sig-name descname"><span class="pre">N_list</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.N_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.m_list">
+<span class="sig-name descname"><span class="pre">m_list</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.m_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.m_u_list">
+<span class="sig-name descname"><span class="pre">m_u_list</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.m_u_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.a_s_array">
+<span class="sig-name descname"><span class="pre">a_s_array</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.a_s_array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.a_s_bohr_array">
+<span class="sig-name descname"><span class="pre">a_s_bohr_array</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.a_s_bohr_array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.a_dd_array">
+<span class="sig-name descname"><span class="pre">a_dd_array</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.a_dd_array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.a_dd_bohr_array">
+<span class="sig-name descname"><span class="pre">a_dd_bohr_array</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.a_dd_bohr_array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.mu_arr">
+<span class="sig-name descname"><span class="pre">mu_arr</span></span><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.mu_arr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.SystemDB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#SystemDB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.SystemDB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.FramesDB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">FramesDB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#FramesDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.FramesDB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.FramesDB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">frames</span></em><a class="headerlink" href="#supersolids.helper.db_helper.FramesDB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.FramesDB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.FramesDB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.FramesDB.id_system">
+<span class="sig-name descname"><span class="pre">id_system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.FramesDB.id_system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.FramesDB.frame">
+<span class="sig-name descname"><span class="pre">frame</span></span><a class="headerlink" href="#supersolids.helper.db_helper.FramesDB.frame" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.FramesDB.t">
+<span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#supersolids.helper.db_helper.FramesDB.t" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.FramesDB.E">
+<span class="sig-name descname"><span class="pre">E</span></span><a class="headerlink" href="#supersolids.helper.db_helper.FramesDB.E" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.FramesDB.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.FramesDB.system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.FramesDB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#FramesDB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.FramesDB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.wDB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">wDB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#wDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.wDB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.wDB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">w</span></em><a class="headerlink" href="#supersolids.helper.db_helper.wDB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.wDB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.wDB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.wDB.id_system">
+<span class="sig-name descname"><span class="pre">id_system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.wDB.id_system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.wDB.w_x">
+<span class="sig-name descname"><span class="pre">w_x</span></span><a class="headerlink" href="#supersolids.helper.db_helper.wDB.w_x" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.wDB.w_y">
+<span class="sig-name descname"><span class="pre">w_y</span></span><a class="headerlink" href="#supersolids.helper.db_helper.wDB.w_y" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.wDB.w_z">
+<span class="sig-name descname"><span class="pre">w_z</span></span><a class="headerlink" href="#supersolids.helper.db_helper.wDB.w_z" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.wDB.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.wDB.system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.wDB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#wDB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.wDB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ResDB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">ResDB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#ResDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.ResDB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ResDB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">res</span></em><a class="headerlink" href="#supersolids.helper.db_helper.ResDB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ResDB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.ResDB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ResDB.id_system">
+<span class="sig-name descname"><span class="pre">id_system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.ResDB.id_system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ResDB.Res_x">
+<span class="sig-name descname"><span class="pre">Res_x</span></span><a class="headerlink" href="#supersolids.helper.db_helper.ResDB.Res_x" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ResDB.Res_y">
+<span class="sig-name descname"><span class="pre">Res_y</span></span><a class="headerlink" href="#supersolids.helper.db_helper.ResDB.Res_y" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ResDB.Res_z">
+<span class="sig-name descname"><span class="pre">Res_z</span></span><a class="headerlink" href="#supersolids.helper.db_helper.ResDB.Res_z" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ResDB.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.ResDB.system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.ResDB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#ResDB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.ResDB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.BoxDB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">BoxDB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#BoxDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.BoxDB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.BoxDB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">box</span></em><a class="headerlink" href="#supersolids.helper.db_helper.BoxDB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.BoxDB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.BoxDB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.BoxDB.id_system">
+<span class="sig-name descname"><span class="pre">id_system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.BoxDB.id_system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.BoxDB.Box_x0">
+<span class="sig-name descname"><span class="pre">Box_x0</span></span><a class="headerlink" href="#supersolids.helper.db_helper.BoxDB.Box_x0" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.BoxDB.Box_x1">
+<span class="sig-name descname"><span class="pre">Box_x1</span></span><a class="headerlink" href="#supersolids.helper.db_helper.BoxDB.Box_x1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.BoxDB.Box_y0">
+<span class="sig-name descname"><span class="pre">Box_y0</span></span><a class="headerlink" href="#supersolids.helper.db_helper.BoxDB.Box_y0" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.BoxDB.Box_y1">
+<span class="sig-name descname"><span class="pre">Box_y1</span></span><a class="headerlink" href="#supersolids.helper.db_helper.BoxDB.Box_y1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.BoxDB.Box_z0">
+<span class="sig-name descname"><span class="pre">Box_z0</span></span><a class="headerlink" href="#supersolids.helper.db_helper.BoxDB.Box_z0" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.BoxDB.Box_z1">
+<span class="sig-name descname"><span class="pre">Box_z1</span></span><a class="headerlink" href="#supersolids.helper.db_helper.BoxDB.Box_z1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.BoxDB.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.BoxDB.system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.BoxDB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#BoxDB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.BoxDB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_N_DB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">List_N_DB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#List_N_DB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.List_N_DB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_N_DB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">N</span></em><a class="headerlink" href="#supersolids.helper.db_helper.List_N_DB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_N_DB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_N_DB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_N_DB.id_system">
+<span class="sig-name descname"><span class="pre">id_system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_N_DB.id_system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_N_DB.N_1">
+<span class="sig-name descname"><span class="pre">N_1</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_N_DB.N_1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_N_DB.N_2">
+<span class="sig-name descname"><span class="pre">N_2</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_N_DB.N_2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_N_DB.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_N_DB.system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_N_DB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#List_N_DB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.List_N_DB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_DB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">List_m_DB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#List_m_DB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.List_m_DB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_DB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">m</span></em><a class="headerlink" href="#supersolids.helper.db_helper.List_m_DB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_DB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_m_DB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_DB.id_system">
+<span class="sig-name descname"><span class="pre">id_system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_m_DB.id_system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_DB.m_1">
+<span class="sig-name descname"><span class="pre">m_1</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_m_DB.m_1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_DB.m_2">
+<span class="sig-name descname"><span class="pre">m_2</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_m_DB.m_2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_DB.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_m_DB.system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_DB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#List_m_DB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.List_m_DB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_u_DB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">List_m_u_DB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#List_m_u_DB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.List_m_u_DB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_u_DB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">m_u</span></em><a class="headerlink" href="#supersolids.helper.db_helper.List_m_u_DB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_u_DB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_m_u_DB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_u_DB.id_system">
+<span class="sig-name descname"><span class="pre">id_system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_m_u_DB.id_system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_u_DB.m_1_u">
+<span class="sig-name descname"><span class="pre">m_1_u</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_m_u_DB.m_1_u" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_u_DB.m_2_u">
+<span class="sig-name descname"><span class="pre">m_2_u</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_m_u_DB.m_2_u" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_u_DB.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.List_m_u_DB.system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.List_m_u_DB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#List_m_u_DB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.List_m_u_DB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_DB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">Array_a_s_DB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#Array_a_s_DB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_DB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_DB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">a_s</span></em><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_DB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_DB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_DB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_DB.id_system">
+<span class="sig-name descname"><span class="pre">id_system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_DB.id_system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_DB.a_s_11">
+<span class="sig-name descname"><span class="pre">a_s_11</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_DB.a_s_11" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_DB.a_s_12">
+<span class="sig-name descname"><span class="pre">a_s_12</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_DB.a_s_12" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_DB.a_s_21">
+<span class="sig-name descname"><span class="pre">a_s_21</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_DB.a_s_21" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_DB.a_s_22">
+<span class="sig-name descname"><span class="pre">a_s_22</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_DB.a_s_22" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_DB.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_DB.system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_DB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#Array_a_s_DB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_DB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_bohr_DB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">Array_a_s_bohr_DB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#Array_a_s_bohr_DB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_bohr_DB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_bohr_DB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">a_s_bohr</span></em><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_bohr_DB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_bohr_DB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_bohr_DB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_bohr_DB.id_system">
+<span class="sig-name descname"><span class="pre">id_system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_bohr_DB.id_system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_bohr_DB.a_s_11_bohr">
+<span class="sig-name descname"><span class="pre">a_s_11_bohr</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_bohr_DB.a_s_11_bohr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_bohr_DB.a_s_12_bohr">
+<span class="sig-name descname"><span class="pre">a_s_12_bohr</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_bohr_DB.a_s_12_bohr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_bohr_DB.a_s_21_bohr">
+<span class="sig-name descname"><span class="pre">a_s_21_bohr</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_bohr_DB.a_s_21_bohr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_bohr_DB.a_s_22_bohr">
+<span class="sig-name descname"><span class="pre">a_s_22_bohr</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_bohr_DB.a_s_22_bohr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_bohr_DB.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_bohr_DB.system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_s_bohr_DB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#Array_a_s_bohr_DB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_s_bohr_DB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_DB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">Array_a_dd_DB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#Array_a_dd_DB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_DB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_DB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">a_dd</span></em><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_DB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_DB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_DB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_DB.id_system">
+<span class="sig-name descname"><span class="pre">id_system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_DB.id_system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_DB.a_dd_11">
+<span class="sig-name descname"><span class="pre">a_dd_11</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_DB.a_dd_11" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_DB.a_dd_12">
+<span class="sig-name descname"><span class="pre">a_dd_12</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_DB.a_dd_12" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_DB.a_dd_21">
+<span class="sig-name descname"><span class="pre">a_dd_21</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_DB.a_dd_21" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_DB.a_dd_22">
+<span class="sig-name descname"><span class="pre">a_dd_22</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_DB.a_dd_22" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_DB.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_DB.system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_DB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#Array_a_dd_DB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_DB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_bohr_DB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">Array_a_dd_bohr_DB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#Array_a_dd_bohr_DB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_bohr_DB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_bohr_DB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">a_dd_bohr</span></em><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_bohr_DB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_bohr_DB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_bohr_DB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_bohr_DB.id_system">
+<span class="sig-name descname"><span class="pre">id_system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_bohr_DB.id_system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_bohr_DB.a_dd_11_bohr">
+<span class="sig-name descname"><span class="pre">a_dd_11_bohr</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_bohr_DB.a_dd_11_bohr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_bohr_DB.a_dd_12_bohr">
+<span class="sig-name descname"><span class="pre">a_dd_12_bohr</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_bohr_DB.a_dd_12_bohr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_bohr_DB.a_dd_21_bohr">
+<span class="sig-name descname"><span class="pre">a_dd_21_bohr</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_bohr_DB.a_dd_21_bohr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_bohr_DB.a_dd_22_bohr">
+<span class="sig-name descname"><span class="pre">a_dd_22_bohr</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_bohr_DB.a_dd_22_bohr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_bohr_DB.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_bohr_DB.system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_a_dd_bohr_DB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#Array_a_dd_bohr_DB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.Array_a_dd_bohr_DB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_mu_DB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">supersolids.helper.db_helper.</span></span><span class="sig-name descname"><span class="pre">Array_mu_DB</span></span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#Array_mu_DB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.Array_mu_DB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#supersolids.helper.db_helper.Base" title="supersolids.helper.db_helper.Base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Base</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_mu_DB.__tablename__">
+<span class="sig-name descname"><span class="pre">__tablename__</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">mu</span></em><a class="headerlink" href="#supersolids.helper.db_helper.Array_mu_DB.__tablename__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_mu_DB.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_mu_DB.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_mu_DB.id_system">
+<span class="sig-name descname"><span class="pre">id_system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_mu_DB.id_system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_mu_DB.mu_1">
+<span class="sig-name descname"><span class="pre">mu_1</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_mu_DB.mu_1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_mu_DB.mu_2">
+<span class="sig-name descname"><span class="pre">mu_2</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_mu_DB.mu_2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_mu_DB.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#supersolids.helper.db_helper.Array_mu_DB.system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="supersolids.helper.db_helper.Array_mu_DB.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/db_helper.html#Array_mu_DB.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.db_helper.Array_mu_DB.__repr__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

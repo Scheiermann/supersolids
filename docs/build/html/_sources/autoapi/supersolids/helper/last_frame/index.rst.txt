@@ -1,0 +1,26 @@
+:py:mod:`supersolids.helper.last_frame`
+=======================================
+
+.. py:module:: supersolids.helper.last_frame
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.helper.last_frame.path_mesh_remap
+   supersolids.helper.last_frame.last_frame
+
+
+
+.. py:function:: path_mesh_remap(path_mesh)
+
+
+.. py:function:: last_frame(frame, var1_list, var2_list, experiment_suffix, movie_take_last_list, path_anchor_output_list, suffix_list, merge_suffix, filename_out_list, path_anchor_input_list, movie_start_list, movie_end_list, check_further_list, movie_skip, dir_name = 'movie', counting_format = '%03d', nrow_components = 1, ncol_components = 1, dpi_ratio = 1.0, dpi_ratio_all = 1.0, use_edited = False, dir_name_png = 'movie', counting_format_png = '%03d', filename_pattern = 'anim', filename_format = '%05d', filename_extension = '.png', frame_format = '%07d', video = False, margin = 10, width = 1920, height = 1200, fps = 0.1, mesh_remap_index_list = [], y_lim = (0, 1), cut_names = ['cut_x'], mixture_slice_index_list = [0], filename_steps_list = ['mixture_step_'], normed_plots = True, property_filename_list = [], list_of_arrays_list = [], dir_all = 'all', dir_cuts = 'cuts', dir_frames = 'frames', dir_scripts = 'scripts', dir_videos = 'videos')
+
+

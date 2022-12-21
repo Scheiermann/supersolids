@@ -1,0 +1,33 @@
+:py:mod:`supersolids.SchroedingerMixtureNumpy`
+==============================================
+
+.. py:module:: supersolids.SchroedingerMixtureNumpy
+
+.. autoapi-nested-parse::
+
+   Numerical solver for non-linear time-dependent Schrodinger equation (eGPE) for dipolar mixtures.
+
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.SchroedingerMixtureNumpy.SchroedingerMixtureNumpy
+
+
+
+
+.. py:class:: SchroedingerMixtureNumpy(SystemMixture)
+
+   Bases: :py:obj:`supersolids.SchroedingerMixture.SchroedingerMixture`
+
+   SchroedingerMixture Object with all array as numpy arrays
+
+
+

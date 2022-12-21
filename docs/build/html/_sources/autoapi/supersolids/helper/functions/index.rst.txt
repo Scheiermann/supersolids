@@ -1,0 +1,498 @@
+:py:mod:`supersolids.helper.functions`
+======================================
+
+.. py:module:: supersolids.helper.functions
+
+.. autoapi-nested-parse::
+
+   Functions for Potential and initial wave function :math:`\psi_0`
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.helper.functions.check_ResBox
+   supersolids.helper.functions.get_grid_helper
+   supersolids.helper.functions.get_grid
+   supersolids.helper.functions.BoxResAssert
+   supersolids.helper.functions.aResAssert
+   supersolids.helper.functions.lambda_parsed
+   supersolids.helper.functions.identity
+   supersolids.helper.functions.tensor_grid_mult
+   supersolids.helper.functions.array_to_tensor_grid
+   supersolids.helper.functions.arr_tensor_mult
+   supersolids.helper.functions.fft_plot
+   supersolids.helper.functions.get_droplet_edges
+   supersolids.helper.functions.extract_droplet
+   supersolids.helper.functions.peaks_sort
+   supersolids.helper.functions.peaks_sort_along
+   supersolids.helper.functions.get_peaks
+   supersolids.helper.functions.binary_structures
+   supersolids.helper.functions.fill_holes
+   supersolids.helper.functions.get_meshgrid
+   supersolids.helper.functions.get_meshgrid_3d
+   supersolids.helper.functions.check_provided_lists
+   supersolids.helper.functions.get_mu_combinations
+   supersolids.helper.functions.get_parameters_mixture
+   supersolids.helper.functions.dimensionless
+   supersolids.helper.functions.combinations2array
+   supersolids.helper.functions.symmetric_mat
+   supersolids.helper.functions.w_dimensionsless
+   supersolids.helper.functions.get_parameters
+   supersolids.helper.functions.get_g
+   supersolids.helper.functions.g_qf_helper
+   supersolids.helper.functions.new_int
+   supersolids.helper.functions.get_g_qf
+   supersolids.helper.functions.get_l_ho
+   supersolids.helper.functions.get_alphas
+   supersolids.helper.functions.psi_gauss_2d_pdf
+   supersolids.helper.functions.psi_gauss_2d
+   supersolids.helper.functions.psi_gauss_3d
+   supersolids.helper.functions.psi_gauss_1d
+   supersolids.helper.functions.psi_pdf
+   supersolids.helper.functions.psi_rect
+   supersolids.helper.functions.psi_gauss_solution
+   supersolids.helper.functions.thomas_fermi_1d
+   supersolids.helper.functions.thomas_fermi_2d
+   supersolids.helper.functions.thomas_fermi_2d_pos
+   supersolids.helper.functions.thomas_fermi_3d
+   supersolids.helper.functions.mu_1d
+   supersolids.helper.functions.mu_2d
+   supersolids.helper.functions.mu_3d
+   supersolids.helper.functions.v_harmonic_1d
+   supersolids.helper.functions.v_harmonic_2d
+   supersolids.helper.functions.v_2d
+   supersolids.helper.functions.v_harmonic_3d
+   supersolids.helper.functions.get_r_cut
+   supersolids.helper.functions.dipol_dipol
+   supersolids.helper.functions.dipol_dipol_interaction
+   supersolids.helper.functions.get_V_k_val_ddi
+   supersolids.helper.functions.get_rho_integral_slow
+   supersolids.helper.functions.triu_list2array
+   supersolids.helper.functions.get_rho_integral
+   supersolids.helper.functions.get_rho_integral_quad
+   supersolids.helper.functions.get_V_k_val_ddi_fft_where
+   supersolids.helper.functions.get_V_k_val_ddi_fft
+   supersolids.helper.functions.bessel_func
+   supersolids.helper.functions.f_kappa
+   supersolids.helper.functions.atan_special
+   supersolids.helper.functions.func_125
+   supersolids.helper.functions.func_124
+   supersolids.helper.functions.get_R_rz
+   supersolids.helper.functions.get_kappa
+   supersolids.helper.functions.density_in_trap
+   supersolids.helper.functions.density_in_trap_r
+   supersolids.helper.functions.camera_func_r
+   supersolids.helper.functions.camera_func_phi
+   supersolids.helper.functions.camera_func_z
+   supersolids.helper.functions.camera_3d_trajectory
+   supersolids.helper.functions.noise_mesh
+   supersolids.helper.functions.dt_adaptive
+   supersolids.helper.functions.convert_m_to_dimensionless
+   supersolids.helper.functions.get_l_0
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.helper.functions.datapoints_exponent
+
+
+.. py:function:: check_ResBox(Res, MyBox)
+
+
+.. py:function:: get_grid_helper(Res, MyBox, index)
+
+
+.. py:function:: get_grid(Res, MyBox)
+
+
+.. py:function:: BoxResAssert(Res, Box)
+
+
+.. py:function:: aResAssert(Res, a)
+
+
+.. py:function:: lambda_parsed(s)
+
+
+.. py:function:: identity(*args)
+
+
+.. py:function:: tensor_grid_mult(tensor, tensor_vec)
+
+
+.. py:function:: array_to_tensor_grid(arr, res_x, res_y, res_z)
+
+
+.. py:function:: arr_tensor_mult(self, arr, tensor_vec)
+
+
+.. py:function:: fft_plot(t, property_all, start = None, end = None, step = None)
+
+
+.. py:function:: get_droplet_edges(prob_droplets, peaks_index_3d, cut_axis)
+
+
+.. py:function:: extract_droplet(prob_droplets, peaks_index_3d)
+
+
+.. py:function:: peaks_sort(peaks_indices, peaks_height, number_of_peaks)
+
+
+.. py:function:: peaks_sort_along(peaks_indices, peaks_height, number_of_peaks, axis)
+
+
+.. py:function:: get_peaks(prob)
+
+   Takes an image and detect the peaks using the local maximum filter.
+   Returns a boolean mask of the peaks (i.e. 1 when
+   the pixel's value is the neighborhood maximum, 0 otherwise)
+
+
+.. py:function:: binary_structures()
+
+
+.. py:function:: fill_holes(region, structure_vertical, structure_horizontal)
+
+
+.. py:function:: get_meshgrid(x, y)
+
+
+.. py:function:: get_meshgrid_3d(x, y, z)
+
+
+.. py:function:: check_provided_lists(number_of_mixtures, a_s_list, a_dd_list)
+
+
+.. py:function:: get_mu_combinations(dipol_list)
+
+
+.. py:function:: get_parameters_mixture(l_0, number_of_mixtures, a_dd_list, a_s_list)
+
+
+.. py:function:: dimensionless(arr, l_0)
+
+
+.. py:function:: combinations2array(number_of_mixtures, combinations_list)
+
+
+.. py:function:: symmetric_mat(arr, axis=None)
+
+
+.. py:function:: w_dimensionsless(dimensionless_factor, w_x = 2.0 * np.pi * 30.0, w_y = 2.0 * np.pi * 30.0, w_z = 2.0 * np.pi * 30.0)
+
+
+.. py:function:: get_parameters(N = 10**4, m = 164 * constants.u_in_kg, a_s = 90.0 * constants.a_0, a_dd = 130.0 * constants.a_0, w_x = 2.0 * np.pi * 30.0)
+
+
+.. py:function:: get_g(N, a_s_l_ho_ratio)
+
+
+.. py:function:: g_qf_helper(m = 164 * constants.u_in_kg, a_s = 90.0 * constants.a_0, a_dd = 130.0 * constants.a_0, w_x = 2.0 * np.pi * 30.0)
+
+
+.. py:function:: new_int(epsilon_dd)
+
+
+.. py:function:: get_g_qf(N, a_s_l_ho_ratio, epsilon_dd)
+
+
+.. py:function:: get_l_ho(m = 164.0 * constants.u_in_kg, w_x = 2.0 * np.pi * 30.0)
+
+
+.. py:function:: get_alphas(w_x = 2.0 * np.pi * 30.0, w_y = 2.0 * np.pi * 30.0, w_z = 2.0 * np.pi * 30.0)
+
+
+.. py:function:: psi_gauss_2d_pdf(pos, mu=np.array([0.0, 0.0]), var=np.array([[1.0, 0.0], [0.0, 1.0]]))
+
+   Gives values according to gaus dirstribution (2D)
+   with meshgrid of x,y as input
+
+   :param pos: stacked meshgrid of an x (1D) and y (1D)
+   :param mu: Mean of gauss
+   :param var: Variance of gauss
+
+   :param z_mesh: values according to gaus dirstribution (2D)
+       with meshgrid of x,y as input
+
+
+
+.. py:function:: psi_gauss_2d(x, y, a_x = 1.0, a_y = 1.0, x_0 = 0.0, y_0 = 0.0, k_0 = 0.0)
+
+   Gaussian wave packet of width a and momentum k_0, centered at x_0, y_0
+
+   :param x: mathematical variable
+
+   :param y: mathematical variable
+
+   :param a_x: Stretching factor in x direction (np.sqrt(2) * std_deviation)
+
+   :param a_y: Stretching factor in y direction (np.sqrt(2) * std_deviation)
+
+   :param x_0: Mean spatial x of pulse
+
+   :param y_0: Mean spatial y of pulse
+
+   :param k_0: Group velocity of pulse
+
+
+
+.. py:function:: psi_gauss_3d(x, y, z, a_x = 1.0, a_y = 1.0, a_z = 1.0, x_0 = 0.0, y_0 = 0.0, z_0 = 0.0, k_0 = 0.0)
+
+   Gaussian wave packet of width a and momentum k_0, centered at x_0
+
+   :param x: mathematical variable
+
+   :param y: mathematical variable
+
+   :param z: mathematical variable
+
+   :param a_x: Stretching factor in x direction (np.sqrt(2) * std_deviation)
+
+   :param a_y: Stretching factor in y direction (np.sqrt(2) * std_deviation)
+
+   :param a_z: Stretching factor in z direction (np.sqrt(2) * std_deviation)
+
+   :param x_0: Mean spatial x of pulse
+
+   :param y_0: Mean spatial y of pulse
+
+   :param z_0: Mean spatial z of pulse
+
+   :param k_0: Group velocity of pulse
+
+
+
+.. py:function:: psi_gauss_1d(x, a = 1.0, x_0 = 0.0, k_0 = 0.0)
+
+   Gaussian wave packet of width a and momentum k_0, centered at x_0
+
+   :param x: mathematical variable
+
+   :param a: Amplitude of pulse
+
+   :param x_0: Mean spatial x of pulse
+
+   :param k_0: Group velocity of pulse
+
+
+
+.. py:function:: psi_pdf(x, loc = 0.0, scale = 1.0)
+
+   Mathematical function of gauss pulse
+
+   :param x: mathematical variable
+
+   :param loc: Localization of pulse centre
+
+   :param scale: Scale of pulse
+
+
+
+.. py:function:: psi_rect(x, x_min = -0.5, x_max = 0.5, a = 1.0)
+
+   Mathematical function of rectangular pulse
+   between x_min and x_max with amplitude a
+
+   :param x: mathematical variable
+
+   :param x_min: Minimum x value of pulse (spatial)
+
+   :param x_max: Maximum x value of pulse (spatial)
+
+   :param a: Amplitude of pulse
+
+
+
+.. py:function:: psi_gauss_solution(x)
+
+   Mathematical function of solution of non-linear Schroedinger for g=0
+
+   :param x: mathematical variable
+
+
+
+.. py:function:: thomas_fermi_1d(x, g = 0.0)
+
+   Mathematical function of Thomas-Fermi distribution with coupling constant g
+
+   :param x: mathematical variable
+
+   :param g: coupling constant
+
+
+
+.. py:function:: thomas_fermi_2d(x, y, g = 0.0)
+
+   Mathematical function of Thomas-Fermi distribution with coupling constant g
+
+   :param x: mathematical variable
+
+   :param y: mathematical variable
+
+   :param g: coupling constant
+
+
+
+.. py:function:: thomas_fermi_2d_pos(pos, g = 0.0)
+
+
+.. py:function:: thomas_fermi_3d(x, y, z, g = 0.0)
+
+   Mathematical function of Thomas-Fermi distribution with coupling constant g
+
+   :param x: mathematical variable
+
+   :param y: mathematical variable
+
+   :param z: mathematical variable
+
+   :param g: coupling constant
+
+
+
+.. py:function:: mu_1d(g = 0.0)
+
+
+.. py:function:: mu_2d(g = 0.0)
+
+
+.. py:function:: mu_3d(g = 0.0)
+
+
+.. py:function:: v_harmonic_1d(x)
+
+
+.. py:function:: v_harmonic_2d(pos, alpha_y = 1.0)
+
+
+.. py:function:: v_2d(x, y, alpha_y=1.0)
+
+
+.. py:function:: v_harmonic_3d(x, y, z, alpha_y = 1.0, alpha_z = 1.0, lH0 = 1.0)
+
+
+.. py:function:: get_r_cut(k_mesh, r_cut = 1.0)
+
+
+.. py:function:: dipol_dipol(u)
+
+
+.. py:function:: dipol_dipol_interaction(kx_mesh, ky_mesh, kz_mesh, r_cut = 1.0, use_cut_off = False)
+
+
+.. py:function:: get_V_k_val_ddi(kx_mesh, ky_mesh, kz_mesh, rho_lin, z_lin)
+
+   Explicit calculation of the Fourier transform with the cylindrical cut-off
+
+
+
+.. py:function:: get_rho_integral_slow(k_rho_mesh, kz_mesh, rho_lin, z_lin)
+
+
+.. py:function:: triu_list2array(triu_list, triu_ind, shape)
+
+
+.. py:function:: get_rho_integral(k_rho_mesh, kz_mesh, rho_lin, z_lin, compare)
+
+
+.. py:function:: get_rho_integral_quad(kx_mesh, ky_mesh, kz_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)
+
+
+.. py:function:: get_V_k_val_ddi_fft_where(x_mesh, y_mesh, z_mesh, rho_cut = 1.0, z_cut = 1.0)
+
+
+.. py:function:: get_V_k_val_ddi_fft(x_mesh, y_mesh, z_mesh, x_cut, y_cut, z_cut)
+
+
+.. py:function:: bessel_func(rho, z, k_rho, kz)
+
+
+.. py:function:: f_kappa(kappa, epsilon = 10**(-10))
+
+
+.. py:function:: atan_special(x)
+
+
+.. py:function:: func_125(kappa, alpha_z, e_dd, epsilon = 10**(-10))
+
+
+.. py:function:: func_124(kappa, e_dd, N, a_s_l_ho_ratio)
+
+
+.. py:function:: get_R_rz(kappa, e_dd, N, a_s_l_ho_ratio)
+
+
+.. py:function:: get_kappa(alpha_z, e_dd, x_min = 3.0, x_max = 5.0, res = 1000)
+
+
+.. py:function:: density_in_trap(x, y, z, R_r, R_z, g = 0.0)
+
+
+.. py:function:: density_in_trap_r(r, z, R_r, R_z, g = 0.0)
+
+
+.. py:function:: camera_func_r(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, r_per_frame = 10.0)
+
+
+.. py:function:: camera_func_phi(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, phi_per_frame = 10.0)
+
+
+.. py:function:: camera_func_z(frame, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0, z_per_frame = 10.0)
+
+
+.. py:function:: camera_3d_trajectory(frame, r_func = None, phi_func = None, z_func = None, r_0 = 10.0, phi_0 = 45.0, z_0 = 20.0)
+
+   Computes r, phi, z as the components of the camera position
+   in the animation for the given frame.
+   Depending on, if a callable function is given for the components,
+   it is applied to the parameters
+   or the start values are used.
+
+   :param frame: Index of the frame in the animation
+
+   :param r_func: r component of the movement of the camera.
+
+   :param phi_func: phi component of the movement of the camera.
+
+   :param z_func: z component of the movement of the camera.
+
+   :param r_0: r component of the starting point of the camera movement.
+
+   :param phi_0: phi component of the starting point of the camera movement.
+
+   :param z_0: z component of the starting point of the camera movement.
+
+   :return: r, phi, z as the components of the camera position
+       in the animation for the given frame.
+
+
+
+.. py:function:: noise_mesh(val_min = 0.8, val_max = 1.2, shape = (64, 64, 64))
+
+
+.. py:function:: dt_adaptive(t, dt)
+
+
+.. py:function:: convert_m_to_dimensionless(steps_in_m, res, l_0)
+
+
+.. py:function:: get_l_0(m, w_x)
+
+
+.. py:data:: datapoints_exponent
+   :annotation: :int = 6
+
+   
+

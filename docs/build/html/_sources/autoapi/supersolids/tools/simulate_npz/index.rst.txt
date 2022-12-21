@@ -1,0 +1,53 @@
+:py:mod:`supersolids.tools.simulate_npz`
+========================================
+
+.. py:module:: supersolids.tools.simulate_npz
+
+.. autoapi-nested-parse::
+
+   Animation for the numerical solver for the non-linear
+   time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.tools.simulate_npz.pad_psi_val
+   supersolids.tools.simulate_npz.simulate_npz
+   supersolids.tools.simulate_npz.flags
+   supersolids.tools.simulate_npz.flags_script
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.tools.simulate_npz.args
+
+
+.. py:function:: pad_psi_val(psi_val, Res, SchroedingerInput, System_loaded, box_offset_x, box_offset_steps_x, box_offset_steps_x_end, x_step_new, x_step_old, box_offset_y, box_offset_steps_y, box_offset_steps_y_end, y_step_new, y_step_old, box_offset_z, box_offset_steps_z, box_offset_steps_z_end, z_step_new, z_step_old)
+
+
+.. py:function:: simulate_npz(args)
+
+
+.. py:function:: flags(args_array)
+
+
+.. py:function:: flags_script(args_array)
+
+
+.. py:data:: args
+   
+
+   
+

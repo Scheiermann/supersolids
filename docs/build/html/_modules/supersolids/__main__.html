@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.__main__ &mdash; supersolids 0.1.37rc1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">supersolids.__main__</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for supersolids.__main__</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># author: Daniel Scheiermann</span>
+<span class="c1"># email: daniel.scheiermann@itp.uni-hannover.de</span>
+<span class="c1"># license: MIT</span>
+<span class="c1"># Please feel free to use and modify this, but keep the above information.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Animation for the numerical solver for the non-linear</span>
+<span class="sd">time-dependent Schrodinger equation for 1D, 2D and 3D.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">nullcontext</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span>
+
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">supersolids.helper</span> <span class="kn">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span> <span class="n">get_version</span>
+
+<span class="kn">from</span> <span class="nn">supersolids.Animation.Animation</span> <span class="kn">import</span> <span class="n">Animation</span>
+<span class="kn">from</span> <span class="nn">supersolids.helper.run_time</span> <span class="kn">import</span> <span class="n">run_time</span>
+<span class="kn">from</span> <span class="nn">supersolids.helper.Resolution</span> <span class="kn">import</span> <span class="n">Resolution</span><span class="p">,</span> <span class="n">ResAssert</span>
+<span class="kn">from</span> <span class="nn">supersolids.helper.Box</span> <span class="kn">import</span> <span class="n">Box</span><span class="p">,</span> <span class="n">BoxResAssert</span>
+
+
+<div class="viewcode-block" id="flags"><a class="viewcode-back" href="../../autoapi/supersolids/__main__/index.html#supersolids.__main__.flags">[docs]</a><span class="k">def</span> <span class="nf">flags</span><span class="p">(</span><span class="n">args_array</span><span class="p">):</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Define constants for Schrödinger equation&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-dt&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;dt&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Length of timestep to evolve Schrödinger system.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-Res&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;Resolution&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">},</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Dictionary of resolutions for the box (1D, 2D, 3D). &quot;</span>
+                             <span class="s2">&quot;Needs to be 2 ** int.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-Box&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;Box&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x0&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;y0&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;y1&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;z0&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;z1&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Dictionary for the Box dimensionality. &quot;</span>
+                              <span class="s2">&quot;Two values per dimension to set start and end (1D, 2D, 3D).&quot;</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-l_0&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;l_0&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Help constant for dimensionless formulation of equations.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--N_list&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="mi">4</span><span class="p">],</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of particles in box per mixture&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--m_list&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">,</span>  <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="mf">164.0</span><span class="p">],</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Mass of a particles in atomic mass unit (u) per mixture&quot;</span><span class="p">)</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_mutually_exclusive_group</span><span class="p">()</span>
+    <span class="n">group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--dipol_list&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;mu&quot;</span><span class="p">,</span>  <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Use a_dd_list or this flag (not both), as it is used to construct &quot;</span>
+                            <span class="s2">&quot;a_dd_list. Dipol moment of particles per mixture component. &quot;</span>
+                            <span class="s2">&quot;E.g. for Dy: dipol_list = [9.5 * 10 ** (-23), 9.5 * 10 ** (-23)]&quot;</span><span class="p">)</span>
+    <span class="n">group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--a_dd_list&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;a_dd&quot;</span><span class="p">,</span>  <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="mf">130.8</span><span class="p">],</span>
+                       <span class="n">help</span><span class="o">=</span><span class="s2">&quot;a_dd in a0 per mixture-mixture interaction in a upper triangle &quot;</span>
+                            <span class="s2">&quot;matrix e.g. for 2 mixtures, the index combinations are [11, 12, 22].&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--a_s_list&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;a_s&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="mf">85.0</span><span class="p">],</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;a_s in a0 per mixture-mixture interaction in a upper triangle &quot;</span>
+                             <span class="s2">&quot;matrix e.g. for 2 mixtures, the index combinations are [11, 12, 22].&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-w_x&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;w_x&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">33.0</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Frequency of harmonic trap in x direction&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-w_y&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;w_y&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">80.0</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Frequency of harmonic trap in y direction&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-w_z&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;w_z&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">167.0</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Frequency of harmonic trap in z direction&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-max_timesteps&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;max_timesteps&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">80001</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Simulate until accuracy or maximum of steps of length dt is reached&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-a&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;Amplitude&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;a_x&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;a_y&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;a_z&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Psi amplitudes in x, y, z direction for the gauss packet&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-mu&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;Mean psi_0&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;mu_x&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;mu_y&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;mu_z&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Mean values in x, y, z direction for the gauss packet&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-accuracy&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">12</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Simulate until accuracy or maximum of steps of length dt is reached&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-dir_path&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;dir_path&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;~/supersolids/results&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Absolute path to save data to&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-dir_name_result&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of directory where to save the results at. &quot;</span>
+                             <span class="s2">&quot;For example the standard naming convention is movie002&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-tilt&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;tilt&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Term for +tilt * psi1 and -tilt * psi2 in the eGPE&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-stack_shift&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Term for potential act as components are seperated by distance s&quot;</span>
+                             <span class="s2">&quot; in z direction.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-V&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">functions</span><span class="o">.</span><span class="n">lambda_parsed</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Potential as lambda function. For example: &quot;</span>
+                             <span class="s2">&quot;-V=&#39;lambda x,y,z: 10 * x * y&#39;&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-noise&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;noise&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Min and max of gauss noise added to psi.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--V_none&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If not used, a gauss potential is used.&quot;</span>
+                             <span class="s2">&quot;If used, no potential is used.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--V_interaction&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Just for 3D case. Use to apply V_3d_ddi (Dipol-Dipol-Interaction).&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--V_interaction_cut_x&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Min and max values for x to cut V_3d_ddi (Dipol-Dipol-Interaction).&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--V_interaction_cut_y&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Min and max values for y to cut V_3d_ddi (Dipol-Dipol-Interaction).&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--V_interaction_cut_z&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Min and max values for z to cut V_3d_ddi (Dipol-Dipol-Interaction).&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--real_time&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Switch for Split-Operator method to use imaginary time or not.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--alpha_psi_list&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Option to adjust the transparency of the list of plots.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--alpha_psi_sol_list&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Option to adjust the transparency of the list of plots.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--alpha_V&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Option to adjust the transparency of the external potential V &quot;</span>
+                             <span class="s2">&quot;(trap + extra).&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--plot_V&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Option to plot the external potential of the system (the trap).&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-script_name&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;script&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of file, where to save args of the running simulate_npz&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-script_number_regex&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Regex to find files in method reload_files.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--script_extensions&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;List to reload different files extensions at the same time.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-script_extensions_index&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Index of list of flag script_extension, which is used to get the &quot;</span>
+                             <span class="s2">&quot;script_list from which the counter is deduced.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-filename_steps&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;step_&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of file, without enumerator for the files. &quot;</span>
+                             <span class="s2">&quot;For example the standard naming convention is step_000001.npz, &quot;</span>
+                             <span class="s2">&quot;the string needed is step_&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-steps_format&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%07d</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Formatting string for the enumeration of steps.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-steps_per_npz&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;steps_per_npz&quot;</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of dt steps skipped between saved npz.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-steps_property&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of dt steps skipped between saved summary of properties.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--mixture&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Use to simulate a SchroedingerMixture.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--offscreen&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If flag is not used, interactive animation is &quot;</span>
+                             <span class="s2">&quot;shown and saved as mp4, else Schroedinger is &quot;</span>
+                             <span class="s2">&quot;saved as pkl and allows offscreen usage.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--gpu_off&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Use flag to turn off gpu eventhouh it might be usable&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-gpu_index&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Use to set index of cuda device.&quot;</span><span class="p">)</span>
+
+    <span class="n">flag_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args_array</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;args: </span><span class="si">{</span><span class="n">flag_args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">flag_args</span></div>
+
+
+<span class="c1"># Script runs, if script is run as main script (called by python *.py)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SUPERSOLIDS_GPU_INDEX&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">gpu_index</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SUPERSOLIDS_GPU_OFF&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">gpu_off</span><span class="p">)</span>
+    <span class="n">__GPU_OFF_ENV__</span><span class="p">,</span> <span class="n">__GPU_INDEX_ENV__</span> <span class="o">=</span> <span class="n">get_version</span><span class="o">.</span><span class="n">get_env_variables</span><span class="p">(</span><span class="n">gpu_index_str</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">gpu_index</span><span class="p">)</span>
+    <span class="n">cp</span><span class="p">,</span> <span class="n">cupy_used</span><span class="p">,</span> <span class="n">cuda_used</span><span class="p">,</span> <span class="n">numba_used</span> <span class="o">=</span> <span class="n">get_version</span><span class="o">.</span><span class="n">check_cp_nb</span><span class="p">(</span><span class="n">np</span><span class="p">,</span>
+                                                                   <span class="n">gpu_off</span><span class="o">=</span><span class="n">__GPU_OFF_ENV__</span><span class="p">,</span>
+                                                                   <span class="n">gpu_index</span><span class="o">=</span><span class="n">__GPU_INDEX_ENV__</span><span class="p">)</span>
+    <span class="kn">from</span> <span class="nn">supersolids.Schroedinger</span> <span class="kn">import</span> <span class="n">Schroedinger</span>
+    <span class="kn">from</span> <span class="nn">supersolids.SchroedingerMixture</span> <span class="kn">import</span> <span class="n">SchroedingerMixture</span>
+    <span class="kn">from</span> <span class="nn">supersolids.helper.simulate_case</span> <span class="kn">import</span> <span class="n">simulate_case</span>
+    <span class="kn">from</span> <span class="nn">supersolids.helper.cut_1d</span> <span class="kn">import</span> <span class="n">prepare_cuts</span>
+
+    <span class="c1"># apply units to input</span>
+    <span class="n">m_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">u_in_kg</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">m_list</span><span class="p">]</span>
+    <span class="n">a_s_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">a_s</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">a_0</span> <span class="k">for</span> <span class="n">a_s</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">a_s_list</span><span class="p">]</span>
+    <span class="n">a_dd_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">a_dd</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">a_0</span> <span class="k">for</span> <span class="n">a_dd</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">a_dd_list</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">l_0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># x harmonic oscillator length</span>
+        <span class="n">l_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">hbar</span> <span class="o">/</span> <span class="p">(</span><span class="n">m_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">w_x</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">l_0</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">l_0</span>
+
+    <span class="n">dimensionless_factor</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">hbar</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">m_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">l_0</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">a_dd_helper</span> <span class="o">=</span> <span class="p">(</span><span class="n">m_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">constants</span><span class="o">.</span><span class="n">hbar</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">mu_0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">12.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+
+    <span class="n">BoxResAssert</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">Res</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">Box</span><span class="p">)</span>
+    <span class="n">ResAssert</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">Res</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">ResAssert</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">Res</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">mu</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;means (mu)&quot;</span><span class="p">)</span>
+    <span class="n">Res</span> <span class="o">=</span> <span class="n">Resolution</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="o">.</span><span class="n">Res</span><span class="p">)</span>
+
+    <span class="n">MyBox</span> <span class="o">=</span> <span class="n">Box</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="o">.</span><span class="n">Box</span><span class="p">)</span>
+
+    <span class="n">cut_ratio</span> <span class="o">=</span> <span class="mf">0.95</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">V_interaction_cut_x</span><span class="p">:</span>
+        <span class="n">V_interaction_cut_x</span> <span class="o">=</span> <span class="p">[</span><span class="n">cut_ratio</span> <span class="o">*</span> <span class="n">MyBox</span><span class="o">.</span><span class="n">x0</span><span class="p">,</span> <span class="n">cut_ratio</span> <span class="o">*</span> <span class="n">MyBox</span><span class="o">.</span><span class="n">x1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">V_interaction_cut_x</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">V_interaction_cut_x</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">V_interaction_cut_y</span><span class="p">:</span>
+        <span class="n">V_interaction_cut_y</span> <span class="o">=</span> <span class="p">[</span><span class="n">cut_ratio</span> <span class="o">*</span> <span class="n">MyBox</span><span class="o">.</span><span class="n">y0</span><span class="p">,</span> <span class="n">cut_ratio</span> <span class="o">*</span> <span class="n">MyBox</span><span class="o">.</span><span class="n">y1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">V_interaction_cut_y</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">V_interaction_cut_y</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">V_interaction_cut_z</span><span class="p">:</span>
+        <span class="n">V_interaction_cut_z</span> <span class="o">=</span> <span class="p">[</span><span class="n">cut_ratio</span> <span class="o">*</span> <span class="n">MyBox</span><span class="o">.</span><span class="n">z0</span><span class="p">,</span> <span class="n">cut_ratio</span> <span class="o">*</span> <span class="n">MyBox</span><span class="o">.</span><span class="n">z1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">V_interaction_cut_z</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">V_interaction_cut_z</span><span class="p">))</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dir_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dir_path</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">dir_path</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">dir_path</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">mixture</span><span class="p">:</span>
+        <span class="n">number_of_mixtures</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_list</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dipol_list</span><span class="p">:</span>
+            <span class="n">a_dd_list</span> <span class="o">=</span> <span class="n">a_dd_helper</span> <span class="o">*</span> <span class="n">functions</span><span class="o">.</span><span class="n">get_mu_combinations</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dipol_list</span><span class="p">)</span>
+            <span class="n">functions</span><span class="o">.</span><span class="n">check_provided_lists</span><span class="p">(</span><span class="n">number_of_mixtures</span><span class="p">,</span> <span class="n">a_s_list</span><span class="p">,</span> <span class="n">a_dd_list</span><span class="p">)</span>
+
+        <span class="n">a_s_array</span><span class="p">,</span> <span class="n">a_dd_array</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">get_parameters_mixture</span><span class="p">(</span><span class="n">l_0</span><span class="p">,</span>
+                                                                 <span class="n">number_of_mixtures</span><span class="p">,</span>
+                                                                 <span class="n">a_dd_list</span><span class="p">,</span>
+                                                                 <span class="n">a_s_list</span><span class="p">,</span>
+                                                                 <span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;a_s_array:</span><span class="se">\n</span><span class="si">{</span><span class="n">a_s_array</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;a_dd_array:</span><span class="se">\n</span><span class="si">{</span><span class="n">a_dd_array</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">g</span><span class="p">,</span> <span class="n">g_qf</span><span class="p">,</span> <span class="n">e_dd</span><span class="p">,</span> <span class="n">a_s_l_ho_ratio</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">get_parameters</span><span class="p">(</span>
+            <span class="n">N</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">N_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m</span><span class="o">=</span><span class="n">m_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a_s</span><span class="o">=</span><span class="n">a_s_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a_dd</span><span class="o">=</span><span class="n">a_dd_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">w_x</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">w_x</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;g, g_qf, e_dd: </span><span class="si">{</span><span class="n">g</span><span class="p">,</span> <span class="n">g_qf</span><span class="p">,</span> <span class="n">e_dd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">alpha_y</span><span class="p">,</span> <span class="n">alpha_z</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">get_alphas</span><span class="p">(</span><span class="n">w_x</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">w_x</span><span class="p">,</span> <span class="n">w_y</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">w_y</span><span class="p">,</span> <span class="n">w_z</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">w_z</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;alpha_y, alpha_z: </span><span class="si">{</span><span class="n">alpha_y</span><span class="p">,</span> <span class="n">alpha_z</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Define functions (needed for the Schroedinger equation)</span>
+    <span class="c1"># (e.g. potential: V, initial wave function: psi_0)</span>
+    <span class="n">V_1d</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">v_harmonic_1d</span>
+    <span class="n">V_2d</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">v_harmonic_2d</span><span class="p">,</span> <span class="n">alpha_y</span><span class="o">=</span><span class="n">alpha_y</span><span class="p">)</span>
+    <span class="n">V_3d</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">v_harmonic_3d</span><span class="p">,</span> <span class="n">alpha_y</span><span class="o">=</span><span class="n">alpha_y</span><span class="p">,</span> <span class="n">alpha_z</span><span class="o">=</span><span class="n">alpha_z</span><span class="p">)</span>
+
+    <span class="c1"># radial or no cut-off</span>
+    <span class="n">V_3d_ddi</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">dipol_dipol_interaction</span><span class="p">,</span>
+                                 <span class="n">r_cut</span><span class="o">=</span><span class="mf">0.98</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">MyBox</span><span class="o">.</span><span class="n">lengths</span><span class="p">()),</span>
+                                 <span class="n">use_cut_off</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="p">)</span>
+
+    <span class="c1">## cylindrical cut-off</span>
+    <span class="c1"># rho_bound_factor: float = 2000.0</span>
+    <span class="c1"># rho_num: int = 50000</span>
+    <span class="c1"># z_num: int = 128</span>
+    <span class="c1"># cut_ratio = 0.95</span>
+    <span class="c1"># rho_cut = cut_ratio * cp.sqrt(MyBox.lengths()[0] ** 2.0 + MyBox.lengths()[1] ** 2.0)</span>
+    <span class="c1"># z_cut = cut_ratio * MyBox.lengths()[2]</span>
+    <span class="c1"># rho_bound: float = rho_bound_factor * rho_cut</span>
+    <span class="c1"># rho_lin = cp.linspace(rho_cut, rho_bound, rho_num)</span>
+    <span class="c1"># z_lin = cp.linspace(0.0, z_cut, z_num)</span>
+    <span class="c1"># V_3d_ddi = functools.partial(functions.get_V_k_val_ddi, rho_lin=rho_lin, z_lin=z_lin)</span>
+
+    <span class="c1"># functools.partial sets all arguments except x, y, z,</span>
+    <span class="c1"># psi_0_1d = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">noise</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">psi_0_noise_3d</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">psi_0_noise_3d</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">noise_mesh</span><span class="p">(</span>
+            <span class="n">val_min</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">noise</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">val_max</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">noise</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">Res</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">Res</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">Res</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">MyBox</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">mixture</span><span class="p">:</span>
+            <span class="n">psi_sol_3d</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># psi_sol_3d = functions.thomas_fermi_3d</span>
+            <span class="n">psi_sol_3d</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="n">prepare_cuts</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">density_in_trap</span><span class="p">,</span>
+                                                          <span class="n">args</span><span class="o">.</span><span class="n">N_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">alpha_z</span><span class="p">,</span> <span class="n">e_dd</span><span class="p">,</span>
+                                                          <span class="n">a_s_l_ho_ratio</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">psi_sol_3d</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">psi_0_list</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">psi_0_noise_list</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">psi_sol_list</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">mu_sol_list</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">Res</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">x_lim</span> <span class="o">=</span> <span class="p">(</span><span class="n">MyBox</span><span class="o">.</span><span class="n">x0</span><span class="p">,</span> <span class="n">MyBox</span><span class="o">.</span><span class="n">x1</span><span class="p">)</span>
+        <span class="n">y_lim</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># arbitrary as not used</span>
+        <span class="n">V_trap</span> <span class="o">=</span> <span class="n">V_1d</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_list</span><span class="p">)):</span>
+            <span class="n">psi_0_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">psi_gauss_1d</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;a_x&quot;</span><span class="p">],</span>
+                <span class="n">x_0</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">mu</span><span class="p">[</span><span class="s2">&quot;mu_x&quot;</span><span class="p">],</span> <span class="n">k_0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">psi_0_noise_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">psi_sol_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">thomas_fermi_1d</span><span class="p">)</span>
+            <span class="n">mu_sol_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">mu_1d</span><span class="p">)</span>
+        <span class="n">V_interaction</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="n">Res</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">x_lim</span> <span class="o">=</span> <span class="p">(</span><span class="n">MyBox</span><span class="o">.</span><span class="n">x0</span><span class="p">,</span> <span class="n">MyBox</span><span class="o">.</span><span class="n">x1</span><span class="p">)</span>
+        <span class="n">y_lim</span> <span class="o">=</span> <span class="p">(</span><span class="n">MyBox</span><span class="o">.</span><span class="n">y0</span><span class="p">,</span> <span class="n">MyBox</span><span class="o">.</span><span class="n">y1</span><span class="p">)</span>
+        <span class="n">V_trap</span> <span class="o">=</span> <span class="n">V_2d</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_list</span><span class="p">)):</span>
+            <span class="n">psi_0_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">psi_gauss_2d_pdf</span><span class="p">,</span>
+                <span class="n">mu</span><span class="o">=</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">mu</span><span class="p">[</span><span class="s2">&quot;mu_x&quot;</span><span class="p">],</span> <span class="n">args</span><span class="o">.</span><span class="n">mu</span><span class="p">[</span><span class="s2">&quot;mu_y&quot;</span><span class="p">]],</span>
+                <span class="n">var</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">args</span><span class="o">.</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;a_x&quot;</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;a_y&quot;</span><span class="p">]]])</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">psi_0_noise_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">psi_sol_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">thomas_fermi_2d_pos</span><span class="p">)</span>
+            <span class="n">mu_sol_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">mu_2d</span><span class="p">)</span>
+        <span class="n">V_interaction</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="n">Res</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">x_lim</span> <span class="o">=</span> <span class="p">(</span><span class="n">MyBox</span><span class="o">.</span><span class="n">x0</span><span class="p">,</span> <span class="n">MyBox</span><span class="o">.</span><span class="n">x1</span><span class="p">)</span> <span class="c1"># arbitrary as not used (mayavi vs matplotlib)</span>
+        <span class="n">y_lim</span> <span class="o">=</span> <span class="p">(</span><span class="n">MyBox</span><span class="o">.</span><span class="n">y0</span><span class="p">,</span> <span class="n">MyBox</span><span class="o">.</span><span class="n">y1</span><span class="p">)</span> <span class="c1"># arbitrary as not used (mayavi vs matplotlib)</span>
+        <span class="n">V_trap</span> <span class="o">=</span> <span class="n">V_3d</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_list</span><span class="p">)):</span>
+            <span class="n">psi_0_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
+                <span class="n">functions</span><span class="o">.</span><span class="n">psi_gauss_3d</span><span class="p">,</span>
+                <span class="n">a_x</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;a_x&quot;</span><span class="p">],</span> <span class="n">a_y</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;a_y&quot;</span><span class="p">],</span> <span class="n">a_z</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;a_z&quot;</span><span class="p">],</span>
+                <span class="n">x_0</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">mu</span><span class="p">[</span><span class="s2">&quot;mu_x&quot;</span><span class="p">],</span> <span class="n">y_0</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">mu</span><span class="p">[</span><span class="s2">&quot;mu_y&quot;</span><span class="p">],</span> <span class="n">z_0</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">mu</span><span class="p">[</span><span class="s2">&quot;mu_z&quot;</span><span class="p">],</span>
+                <span class="n">k_0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">psi_0_noise_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">psi_0_noise_3d</span><span class="p">)</span>
+            <span class="n">psi_sol_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">psi_sol_3d</span><span class="p">)</span>
+            <span class="n">mu_sol_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">mu_3d</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">V_interaction</span><span class="p">:</span>
+            <span class="n">V_interaction</span> <span class="o">=</span> <span class="n">V_3d_ddi</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">V_interaction</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Spatial dimension over 3. This is not implemented.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">V_none</span><span class="p">:</span>
+        <span class="c1"># V_val will be 0.0</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">V</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">V</span> <span class="o">=</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">V_trap</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="n">args</span><span class="o">.</span><span class="n">V</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">V</span> <span class="o">=</span> <span class="n">V_trap</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">mixture</span><span class="p">:</span>
+        <span class="n">SchroedingerInput</span><span class="p">:</span> <span class="n">SchroedingerMixture</span> <span class="o">=</span> <span class="n">SchroedingerMixture</span><span class="p">(</span>
+            <span class="n">MyBox</span><span class="p">,</span>
+            <span class="n">Res</span><span class="p">,</span>
+            <span class="n">max_timesteps</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max_timesteps</span><span class="p">,</span>
+            <span class="n">dt</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+            <span class="n">N_list</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">N_list</span><span class="p">,</span>
+            <span class="n">m_list</span><span class="o">=</span><span class="n">m_list</span><span class="p">,</span>
+            <span class="n">a_s_array</span><span class="o">=</span><span class="n">a_s_array</span><span class="p">,</span>
+            <span class="n">a_dd_array</span><span class="o">=</span><span class="n">a_dd_array</span><span class="p">,</span>
+            <span class="n">dt_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">w_x</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">w_x</span><span class="p">,</span>
+            <span class="n">w_y</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">w_y</span><span class="p">,</span>
+            <span class="n">w_z</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">w_z</span><span class="p">,</span>
+            <span class="n">imag_time</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">real_time</span><span class="p">),</span>
+            <span class="n">tilt</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">tilt</span><span class="p">,</span>
+            <span class="n">stack_shift</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">stack_shift</span><span class="p">,</span>
+            <span class="n">mu_arr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">E</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+            <span class="n">V</span><span class="o">=</span><span class="n">V</span><span class="p">,</span>
+            <span class="n">V_interaction</span><span class="o">=</span><span class="n">V_interaction</span><span class="p">,</span>
+            <span class="n">psi_0_list</span><span class="o">=</span><span class="n">psi_0_list</span><span class="p">,</span>
+            <span class="n">psi_0_noise_list</span><span class="o">=</span><span class="n">psi_0_noise_list</span><span class="p">,</span>
+            <span class="n">psi_sol_list</span><span class="o">=</span><span class="n">psi_sol_list</span><span class="p">,</span>
+            <span class="n">mu_sol_list</span><span class="o">=</span><span class="n">mu_sol_list</span><span class="p">,</span>
+            <span class="n">input_path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;~/Documents/itp/master/supersolids/supersolids/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(),</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">SchroedingerInput</span><span class="p">:</span> <span class="n">Schroedinger</span> <span class="o">=</span> <span class="n">Schroedinger</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">N_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">MyBox</span><span class="p">,</span>
+            <span class="n">Res</span><span class="p">,</span>
+            <span class="n">max_timesteps</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max_timesteps</span><span class="p">,</span>
+            <span class="n">dt</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+            <span class="n">dt_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">,</span>
+            <span class="n">g_qf</span><span class="o">=</span><span class="n">g_qf</span><span class="p">,</span>
+            <span class="n">w_x</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">w_x</span><span class="p">,</span>
+            <span class="n">w_y</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">w_y</span><span class="p">,</span>
+            <span class="n">w_z</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">w_z</span><span class="p">,</span>
+            <span class="n">e_dd</span><span class="o">=</span><span class="n">e_dd</span><span class="p">,</span>
+            <span class="n">a_s</span><span class="o">=</span><span class="n">a_s_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">imag_time</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">real_time</span><span class="p">),</span>
+            <span class="n">mu_arr</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">]),</span>
+            <span class="n">E</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+            <span class="n">psi_0</span><span class="o">=</span><span class="n">psi_0_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">V</span><span class="o">=</span><span class="n">V</span><span class="p">,</span>
+            <span class="n">V_interaction</span><span class="o">=</span><span class="n">V_interaction</span><span class="p">,</span>
+            <span class="n">psi_sol</span><span class="o">=</span><span class="n">psi_sol_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">mu_sol</span><span class="o">=</span><span class="n">mu_sol_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">psi_0_noise</span><span class="o">=</span><span class="n">psi_0_noise_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">)</span>
+
+    <span class="n">Anim</span><span class="p">:</span> <span class="n">Animation</span> <span class="o">=</span> <span class="n">Animation</span><span class="p">(</span>
+        <span class="n">Res</span><span class="o">=</span><span class="n">SchroedingerInput</span><span class="o">.</span><span class="n">Res</span><span class="p">,</span>
+        <span class="n">plot_V</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">plot_V</span><span class="p">,</span>
+        <span class="n">alpha_psi_list</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">alpha_psi_list</span><span class="p">,</span>
+        <span class="n">alpha_psi_sol_list</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">alpha_psi_sol_list</span><span class="p">,</span>
+        <span class="n">alpha_V</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">alpha_V</span><span class="p">,</span>
+        <span class="n">camera_r_func</span><span class="o">=</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">camera_func_r</span><span class="p">,</span>
+                                        <span class="n">r_0</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">phi_0</span><span class="o">=</span><span class="mf">45.0</span><span class="p">,</span> <span class="n">z_0</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span>
+                                        <span class="n">r_per_frame</span><span class="o">=</span><span class="mf">0.0</span><span class="p">),</span>
+        <span class="n">camera_phi_func</span><span class="o">=</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">camera_func_phi</span><span class="p">,</span>
+                                          <span class="n">r_0</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">phi_0</span><span class="o">=</span><span class="mf">45.0</span><span class="p">,</span> <span class="n">z_0</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span>
+                                          <span class="n">phi_per_frame</span><span class="o">=</span><span class="mf">5.0</span><span class="p">),</span>
+        <span class="n">camera_z_func</span><span class="o">=</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">camera_func_z</span><span class="p">,</span>
+                                        <span class="n">r_0</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">phi_0</span><span class="o">=</span><span class="mf">45.0</span><span class="p">,</span> <span class="n">z_0</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span>
+                                        <span class="n">z_per_frame</span><span class="o">=</span><span class="mf">0.0</span><span class="p">),</span>
+        <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;anim.mp4&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">MyBox</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">slice_indices</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">Res</span><span class="o">.</span><span class="n">x</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">Res</span><span class="o">.</span><span class="n">y</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">Res</span><span class="o">.</span><span class="n">z</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">slice_indices</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="c1"># TODO: get mayavi lim to work</span>
+    <span class="c1"># 3D works in single core mode</span>
+    <span class="k">if</span> <span class="n">cupy_used</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">cupyx.profiler</span> <span class="kn">import</span> <span class="n">profile</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">profile</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">nullcontext</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">cm</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">run_time</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;simulate_case&quot;</span><span class="p">):</span>
+            <span class="n">SystemResult</span><span class="p">:</span> <span class="n">Schroedinger</span> <span class="o">=</span> <span class="n">simulate_case</span><span class="p">(</span>
+                <span class="n">SchroedingerInput</span><span class="p">,</span>
+                <span class="n">Anim</span><span class="p">,</span>
+                <span class="n">accuracy</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">accuracy</span><span class="p">,</span>
+                <span class="n">delete_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">dir_path</span><span class="o">=</span><span class="n">dir_path</span><span class="p">,</span>
+                <span class="n">dir_name_result</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">dir_name_result</span><span class="p">,</span>
+                <span class="n">filename_steps</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">filename_steps</span><span class="p">,</span>
+                <span class="n">steps_format</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">steps_format</span><span class="p">,</span>
+                <span class="n">steps_per_npz</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">steps_per_npz</span><span class="p">,</span>
+                <span class="n">steps_property</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">steps_property</span><span class="p">,</span>
+                <span class="n">frame_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">script_name</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">script_name</span><span class="p">,</span>
+                <span class="n">script_args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+                <span class="n">script_number_regex</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">script_number_regex</span><span class="p">,</span>
+                <span class="n">script_extensions</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">script_extensions</span><span class="p">,</span>
+                <span class="n">script_extensions_index</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">script_extensions_index</span><span class="p">,</span>
+                <span class="n">slice_indices</span><span class="o">=</span><span class="n">slice_indices</span><span class="p">,</span>  <span class="c1"># from here just mayavi</span>
+                <span class="n">offscreen</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">offscreen</span><span class="p">,</span>
+                <span class="n">x_lim</span><span class="o">=</span><span class="n">x_lim</span><span class="p">,</span>  <span class="c1"># from here just matplotlib</span>
+                <span class="n">y_lim</span><span class="o">=</span><span class="n">y_lim</span><span class="p">,</span>
+                <span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Single core done&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+:py:mod:`supersolids.tools.track_property`
+==========================================
+
+.. py:module:: supersolids.tools.track_property
+
+.. autoapi-nested-parse::
+
+   Track a property of an Schrodinger object. For example the center of mass.
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.tools.track_property.get_dim
+   supersolids.tools.track_property.get_input_path
+   supersolids.tools.track_property.get_last_index
+   supersolids.tools.track_property.get_property
+   supersolids.tools.track_property.property_check
+   supersolids.tools.track_property.track_property
+   supersolids.tools.track_property.property_to_array
+   supersolids.tools.track_property.plot_property
+   supersolids.tools.track_property.flags
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.tools.track_property.args
+
+
+.. py:function:: get_dim(list_of_arrays, property_all)
+
+
+.. py:function:: get_input_path(dir_path, dir_name)
+
+
+.. py:function:: get_last_index(input_path, filename_steps)
+
+
+.. py:function:: get_property(System, property_name = 'get_center_of_mass')
+
+
+.. py:function:: property_check(property, property_name = 'get_center_of_mass', property_func = False, property_args=[])
+
+
+.. py:function:: track_property(input_path, filename_schroedinger=f'schroedinger.pkl', filename_steps=f'step_', steps_format = '%07d', steps_per_npz = 10, frame_start = 0, frame_end = None, property_name = 'get_center_of_mass', property_func = False, property_args=[], property_args_str=[], property_args_frame = False)
+
+
+.. py:function:: property_to_array(property_tuple, list_of_arrays = False)
+
+
+.. py:function:: plot_property(args, func=functions.identity)
+
+
+.. py:function:: flags(args_array)
+
+
+.. py:data:: args
+   
+
+   
+

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>supersolids.helper.get_path &mdash; supersolids 0.1.26 documentation</title>
+  <title>supersolids.helper.get_path &mdash; supersolids 0.1.37rc1 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
@@ -15,7 +15,9 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -56,8 +58,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.get_path</span></code></li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.get_path</span></code></li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/autoapi/supersolids/helper/get_path/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -68,34 +70,34 @@
            <div itemprop="articleBody">
              
   <section id="module-supersolids.helper.get_path">
-<span id="supersolids-helper-get-path"></span><h1><a class="reference internal" href="#module-supersolids.helper.get_path" title="supersolids.helper.get_path"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.get_path</span></code></a><a class="headerlink" href="#module-supersolids.helper.get_path" title="Permalink to this headline"></a></h1>
+<span id="supersolids-helper-get-path"></span><h1><a class="reference internal" href="#module-supersolids.helper.get_path" title="supersolids.helper.get_path"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.get_path</span></code></a><a class="headerlink" href="#module-supersolids.helper.get_path" title="Permalink to this heading"></a></h1>
 <section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
 <section id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h3>
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h3>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_path" title="supersolids.helper.get_path.get_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_path</span></code></a>(dir_path, search_prefix = 'movie', counting_format = '%03d', file_pattern = '', take_last = 1)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_path" title="supersolids.helper.get_path.get_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_path</span></code></a>(dir_path[, search_prefix, counting_format, ...])</p></td>
 <td><p>Looks up all directories with matching dir_name</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_step_index_from_list" title="supersolids.helper.get_path.get_step_index_from_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_step_index_from_list</span></code></a>(dir_paths, filename_prefix = 'step_', file_pattern = '.npz')</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_step_index_from_list" title="supersolids.helper.get_path.get_step_index_from_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_step_index_from_list</span></code></a>(dir_paths[, filename_prefix, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_step_index" title="supersolids.helper.get_path.get_step_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_step_index</span></code></a>(dir_path, filename_prefix = 'step_', file_pattern = '.npz')</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_step_index" title="supersolids.helper.get_path.get_step_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_step_index</span></code></a>(dir_path[, filename_prefix, file_pattern])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_last_png_in_last_anim" title="supersolids.helper.get_path.get_last_png_in_last_anim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_last_png_in_last_anim</span></code></a>(path_movie, dir_name_png, counting_format_png, movie_take_last, filename_pattern, filename_format, filename_extension)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.get_path.get_last_png_in_last_anim" title="supersolids.helper.get_path.get_last_png_in_last_anim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_last_png_in_last_anim</span></code></a>(path_movie, dir_name_png, ...)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.get_path.get_path">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_path.</span></span><span class="sig-name descname"><span class="pre">get_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'movie'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counting_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%03d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_path.html#get_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_path.get_path" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_path.</span></span><span class="sig-name descname"><span class="pre">get_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'movie'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counting_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%03d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_path.html#get_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_path.get_path" title="Permalink to this definition"></a></dt>
 <dd><p>Looks up all directories with matching dir_name
 and counting format in dir_path.
 Gets the highest number and returns a path with dir_name counted one up
@@ -171,7 +173,7 @@ Gets the highest number and returns a path with dir_name counted one up
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.get_path.get_last_png_in_last_anim">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_path.</span></span><span class="sig-name descname"><span class="pre">get_last_png_in_last_anim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_movie</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name_png</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counting_format_png</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">movie_take_last</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_extension</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_path.html#get_last_png_in_last_anim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_path.get_last_png_in_last_anim" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_path.</span></span><span class="sig-name descname"><span class="pre">get_last_png_in_last_anim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_movie</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name_png</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counting_format_png</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">movie_take_last</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_extension</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_path.html#get_last_png_in_last_anim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_path.get_last_png_in_last_anim" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>

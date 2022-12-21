@@ -1,0 +1,14 @@
+:py:mod:`supersolids.scripts.multi_begin_mixture_pretilt_init`
+==============================================================
+
+.. py:module:: supersolids.scripts.multi_begin_mixture_pretilt_init
+
+
+Module Contents
+---------------
+
+.. py:data:: slurm
+   :annotation: = True
+
+   
+

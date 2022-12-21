@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>supersolids.Animation.MatplotlibAnimation &mdash; supersolids 0.1.26 documentation</title>
+  <title>supersolids.Animation.MatplotlibAnimation &mdash; supersolids 0.1.37rc1 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
@@ -15,7 +15,9 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -57,8 +59,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.Animation.MatplotlibAnimation</span></code></li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.Animation.MatplotlibAnimation</span></code></li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/autoapi/supersolids/Animation/MatplotlibAnimation/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -69,12 +71,12 @@
            <div itemprop="articleBody">
              
   <section id="module-supersolids.Animation.MatplotlibAnimation">
-<span id="supersolids-animation-matplotlibanimation"></span><h1><a class="reference internal" href="#module-supersolids.Animation.MatplotlibAnimation" title="supersolids.Animation.MatplotlibAnimation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.Animation.MatplotlibAnimation</span></code></a><a class="headerlink" href="#module-supersolids.Animation.MatplotlibAnimation" title="Permalink to this headline"></a></h1>
+<span id="supersolids-animation-matplotlibanimation"></span><h1><a class="reference internal" href="#module-supersolids.Animation.MatplotlibAnimation" title="supersolids.Animation.MatplotlibAnimation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.Animation.MatplotlibAnimation</span></code></a><a class="headerlink" href="#module-supersolids.Animation.MatplotlibAnimation" title="Permalink to this heading"></a></h1>
 <p>Implements an Animation with matplotlib (for Systems in 1D or 2D).</p>
 <section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
 <section id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline"></a></h3>
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading"></a></h3>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -88,14 +90,14 @@
 </table>
 </section>
 <section id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h3>
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h3>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.Animation.MatplotlibAnimation.plot_2d" title="supersolids.Animation.MatplotlibAnimation.plot_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_2d</span></code></a>(resolution=32, x_lim = (-1, 1), y_lim = (-1, 1), z_lim = (0, 1), alpha = [0.6], **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.Animation.MatplotlibAnimation.plot_2d" title="supersolids.Animation.MatplotlibAnimation.plot_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_2d</span></code></a>([resolution, x_lim, y_lim, z_lim, alpha])</p></td>
 <td><p><dl class="field-list simple">
 <dt class="field-odd">param resolution</dt>
 <dd class="field-odd"><p>number of grid points in one direction</p>
@@ -103,13 +105,13 @@
 </dl>
 </p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.Animation.MatplotlibAnimation.round_z_to_0" title="supersolids.Animation.MatplotlibAnimation.round_z_to_0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">round_z_to_0</span></code></a>(pos, func, tol = 1e-05)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.Animation.MatplotlibAnimation.round_z_to_0" title="supersolids.Animation.MatplotlibAnimation.round_z_to_0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">round_z_to_0</span></code></a>(pos, func[, tol])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.Animation.MatplotlibAnimation.crop_pos_to_limits" title="supersolids.Animation.MatplotlibAnimation.crop_pos_to_limits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">crop_pos_to_limits</span></code></a>(ax, pos, func, func_val=None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.Animation.MatplotlibAnimation.crop_pos_to_limits" title="supersolids.Animation.MatplotlibAnimation.crop_pos_to_limits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">crop_pos_to_limits</span></code></a>(ax, pos, func[, func_val])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.Animation.MatplotlibAnimation.get_V_plot_values" title="supersolids.Animation.MatplotlibAnimation.get_V_plot_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_plot_values</span></code></a>(ax, pos, V, resolution, reserve = 1.0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.Animation.MatplotlibAnimation.get_V_plot_values" title="supersolids.Animation.MatplotlibAnimation.get_V_plot_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_V_plot_values</span></code></a>(ax, pos, V, resolution[, reserve])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -125,7 +127,7 @@
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.set_limits">
-<span class="sig-name descname"><span class="pre">set_limits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MatplotlibAnimation.html#MatplotlibAnimation.set_limits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.set_limits" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_limits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MatplotlibAnimation.html#MatplotlibAnimation.set_limits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.set_limits" title="Permalink to this definition"></a></dt>
 <dd><p>Sets the plot limits appropriate,
 even if the initial wave function <span class="math notranslate nohighlight">\(\psi_0\)</span> is not normalized.</p>
 <dl class="field-list simple">
@@ -144,7 +146,7 @@ even if the initial wave function <span class="math notranslate nohighlight">\(\
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.set_limits_smart">
-<span class="sig-name descname"><span class="pre">set_limits_smart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MatplotlibAnimation.html#MatplotlibAnimation.set_limits_smart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.set_limits_smart" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_limits_smart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MatplotlibAnimation.html#MatplotlibAnimation.set_limits_smart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.set_limits_smart" title="Permalink to this definition"></a></dt>
 <dd><p>Sets the plot limits appropriate,
 even if the initial wave function <span class="math notranslate nohighlight">\(\psi_0\)</span> is not normalized.</p>
 <dl class="field-list simple">
@@ -160,7 +162,7 @@ even if the initial wave function <span class="math notranslate nohighlight">\(\
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.get_V_plot_values">
-<span class="sig-name descname"><span class="pre">get_V_plot_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reserve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MatplotlibAnimation.html#MatplotlibAnimation.get_V_plot_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.get_V_plot_values" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_V_plot_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reserve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MatplotlibAnimation.html#MatplotlibAnimation.get_V_plot_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.get_V_plot_values" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -175,7 +177,7 @@ even if the initial wave function <span class="math notranslate nohighlight">\(\
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.animate">
-<span class="sig-name descname"><span class="pre">animate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span> <span class="pre">**</span> <span class="pre">-</span> <span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MatplotlibAnimation.html#MatplotlibAnimation.animate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.animate" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">animate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10**-6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MatplotlibAnimation.html#MatplotlibAnimation.animate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.animate" title="Permalink to this definition"></a></dt>
 <dd><p>Sets the plot limits appropriate,
 even if the initial wave function <span class="math notranslate nohighlight">\(\psi_0\)</span> is not normalized.</p>
 <dl class="field-list simple">
@@ -192,7 +194,7 @@ than accuracy, where <span class="math notranslate nohighlight">\(\mu = - \log(\
 
 <dl class="py method">
 <dt class="sig sig-object py" id="supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.start">
-<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span> <span class="pre">**</span> <span class="pre">-</span> <span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MatplotlibAnimation.html#MatplotlibAnimation.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.start" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">System</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10**-6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MatplotlibAnimation.html#MatplotlibAnimation.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MatplotlibAnimation.MatplotlibAnimation.start" title="Permalink to this definition"></a></dt>
 <dd><p>Sets the plot limits appropriate,
 even if the initial wave function <span class="math notranslate nohighlight">\(\psi_0\)</span> is not normalized</p>
 <dl class="field-list simple">
@@ -210,7 +212,7 @@ than accuracy, where <span class="math notranslate nohighlight">\(\mu = - \log(\
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.Animation.MatplotlibAnimation.plot_2d">
-<span class="sig-prename descclassname"><span class="pre">supersolids.Animation.MatplotlibAnimation.</span></span><span class="sig-name descname"><span class="pre">plot_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_lim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-</span> <span class="pre">1,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_lim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-</span> <span class="pre">1,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_lim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.6]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MatplotlibAnimation.html#plot_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MatplotlibAnimation.plot_2d" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.Animation.MatplotlibAnimation.</span></span><span class="sig-name descname"><span class="pre">plot_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_lim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-1,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_lim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-1,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_lim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.6]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/Animation/MatplotlibAnimation.html#plot_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.Animation.MatplotlibAnimation.plot_2d" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

@@ -1,0 +1,199 @@
+:py:mod:`supersolids.Schroedinger`
+==================================
+
+.. py:module:: supersolids.Schroedinger
+
+.. autoapi-nested-parse::
+
+   Numerical solver for non-linear time-dependent Schrodinger equation.
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.Schroedinger.Schroedinger
+
+
+
+
+.. py:class:: Schroedinger(N, MyBox, Res, max_timesteps, dt, dt_func = None, g = 0.0, g_qf = 0.0, w_x = 2.0 * np.pi * 33.0, w_y = 2.0 * np.pi * 80.0, w_z = 2.0 * np.pi * 167.0, a_s = 85.0 * constants.a_0, e_dd = 1.0, imag_time = True, mu_arr = np.array([1.1]), E = 1.0, psi_0 = functions.psi_gauss_3d, psi_0_noise = functions.noise_mesh, V = functions.v_harmonic_3d, V_interaction = None, psi_sol = functions.thomas_fermi_3d, mu_sol = functions.mu_3d)
+
+   Implements a numerical solution of the dimensionless time-dependent
+   non-linear Schroedinger equation for an arbitrary potential:
+
+   .. math::
+
+      i \partial_t \psi = [&-\frac{1}{2} \nabla ^2
+                             + \frac{1}{2} (x^2 + (y \alpha_y)^2 + (z \alpha_z)^2) \\
+                            &+ g |\psi|^2  + g_{qf} |\psi|^3 + U_{dd}] \psi \\
+
+   With :math:`U_{dd} = \mathcal{F}^{-1}(\mathcal{F}(H_{pot} \psi) \epsilon_{dd} g (3 (k_z / k)^2 - 1))`
+
+   The split operator method with the Trotter-Suzuki approximation
+   for the commutator relation (:math:`H = H_{pot} + H_{kin}`) is used.
+   Hence the accuracy is proportional to :math:`dt^4`
+   The approximation is needed because of the Baker-Campell-Hausdorff formula.
+
+   .. py:method:: get_density(func_val = None, p = 2.0, jit = True)
+
+      Calculates :math:`|\psi|^p` for 1D, 2D or 3D (depending on self.dim).
+
+      :param p: Exponent of :math:`|\psi|`. Use p=2.0 for density.
+
+      :param func_val: Array of function values to get p-norm for.
+
+      :return: :math:`|\psi|^p`
+
+
+
+   .. py:method:: volume_element(fourier_space = False)
+
+
+   .. py:method:: sum_dV(func_val, fourier_space = False, dV = None)
+
+
+   .. py:method:: get_norm(func_val=None, p = 2.0, fourier_space = False)
+
+      Calculates :math:`\int |\psi|^p \mathrm{dV}` for 1D, 2D or 3D
+      (depending on self.dim). For p=2 it is the 2-norm.
+
+      :param func: If func is not provided self.get_density(p=p) is used.
+
+      :param p: Exponent of |\psi|. Use p=2.0 for density.
+
+      :param fourier_space: Flag to use fourier volume element as dV,
+      so dV = d^3 k.
+
+      :return: \int |\psi|^p dV
+
+
+
+   .. py:method:: trapez_integral(func_val)
+
+      Calculates the integral over func_val. If :math:`func_val = |\psi|^p`, then
+      :math:`\int |\psi|^p \mathrm{dV}` for 1D, 2D or 3D
+      (depending on self.dim) by using the trapez rule.
+
+      For 1D: :math:`h (f(a) + f(a+h)) / 2`
+
+      For 2D: :math:`h (f(a, b) + f(a+h, b) + f(a, b+h) + f(a+h, b+h)) / 2`
+
+      For 3D there are 8 entries in the same manner
+      :math:`(a, b, c) ... (a+h, b+h, c+h)`
+
+      :param func_val: Grid sampled values of the function to integrate.
+
+      :return: :math:`\int |\psi|^p \mathrm{dV}` according to trapez rule
+
+
+   .. py:method:: get_r2()
+
+
+   .. py:method:: get_mesh_list(Mx0 = None, Mx1 = None, My0 = None, My1 = None, Mz0 = None, Mz1 = None)
+
+
+   .. py:method:: sum_along(func_val, axis, l_0 = None)
+
+
+   .. py:method:: get_peaks_along(axis = 0, height = 0.05)
+
+
+   .. py:method:: get_peak_positions_along(axis = 0, height = 0.05, number_of_peaks = 4)
+
+
+   .. py:method:: get_peak_distances_along(axis = 0, height = 0.05)
+
+      Calculates the distances between the peaks in terms of box units.
+
+
+
+   .. py:method:: get_peak_neighborhood_along(axis = 0, height = 0.05, number_of_peaks = 4, fraction = 0.1, peak_distances_cutoff = 0.5)
+
+      Calculates the neighborhood of the peaks,
+      which has at least the given fraction of the maximum probability :math:`|\psi|^2`.
+
+
+
+   .. py:method:: get_peak_neighborhood(prob, prob_min, number_of_peaks)
+
+      Calculates the neighborhood of the peaks,
+      which has at least the given fraction of the maximum probability :math:`|\psi|^2`.
+
+
+
+   .. py:method:: get_N_in_droplets(prob_min, number_of_peaks)
+
+      The first number_of_peaks entries are the number of particles in droplets
+      (defined by :math:`|\psi|^2 > \mathrm{prob_min}`) on the x-axis from left to right.
+      The last entry is the sum of particles of those droplets.
+
+
+
+   .. py:method:: slice_default(Mx0 = None, Mx1 = None, My0 = None, My1 = None, Mz0 = None, Mz1 = None)
+
+
+   .. py:method:: get_center_of_mass(Mx0 = None, Mx1 = None, My0 = None, My1 = None, Mz0 = None, Mz1 = None)
+
+      Calculates the center of mass of the System.
+
+
+
+   .. py:method:: get_parity(axis = 2, Mx0 = None, Mx1 = None, My0 = None, My1 = None, Mz0 = None, Mz1 = None)
+
+
+   .. py:method:: get_phase_var_neighborhood(prob_min, number_of_peaks)
+
+      Calculates the variance of the phase of the System.
+
+
+
+   .. py:method:: get_phase_var(Mx0 = None, Mx1 = None, My0 = None, My1 = None, Mz0 = None, Mz1 = None)
+
+      Calculates the variance of the phase of the System by cos(phi).
+
+
+
+   .. py:method:: split_operator_pot(split_step = 0.5, jit = True)
+
+
+   .. py:method:: split_operator_kin()
+
+
+   .. py:method:: get_H_pot(psi_2, psi_3, U_dd)
+
+
+   .. py:method:: time_step(numba_used, cupy_used)
+
+      Evolves System according Schrödinger Equations by using the
+      split operator method with the Trotter-Suzuki approximation.
+
+
+
+   .. py:method:: get_E()
+
+
+   .. py:method:: get_E_kin()
+
+
+   .. py:method:: use_summary(summary_name = None)
+
+
+   .. py:method:: load_summary(input_path, steps_format, frame, summary_name = 'SchroedingerSummary_')
+
+
+   .. py:method:: save_psi_val(input_path, filename_steps, steps_format, frame)
+
+
+   .. py:method:: save_summary(SystemSummary, input_path, steps_format, frame)
+
+
+   .. py:method:: simulate_raw(accuracy = 10**(-6), dir_path = Path.home().joinpath('supersolids', 'results'), dir_name_load = '', dir_name_result = '', filename_schroedinger = 'schroedinger.pkl', filename_steps = 'step_', steps_format = '%07d', steps_per_npz = 10, steps_property = 10, frame_start = 0, script_name = 'script', script_args = '', script_number_regex = '*', script_extensions = None, script_extensions_index = 0)
+
+
+

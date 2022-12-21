@@ -1,0 +1,14 @@
+:py:mod:`supersolids.scripts.multi_begin_droplet`
+=================================================
+
+.. py:module:: supersolids.scripts.multi_begin_droplet
+
+
+Module Contents
+---------------
+
+.. py:data:: slurm
+   :annotation: = True
+
+   
+

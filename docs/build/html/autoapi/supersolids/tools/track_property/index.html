@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>supersolids.tools.track_property &mdash; supersolids 0.1.26 documentation</title>
+  <title>supersolids.tools.track_property &mdash; supersolids 0.1.37rc1 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
@@ -15,7 +15,9 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -56,8 +58,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.tools.track_property</span></code></li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.tools.track_property</span></code></li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/autoapi/supersolids/tools/track_property/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -68,47 +70,50 @@
            <div itemprop="articleBody">
              
   <section id="module-supersolids.tools.track_property">
-<span id="supersolids-tools-track-property"></span><h1><a class="reference internal" href="#module-supersolids.tools.track_property" title="supersolids.tools.track_property"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.tools.track_property</span></code></a><a class="headerlink" href="#module-supersolids.tools.track_property" title="Permalink to this headline"></a></h1>
+<span id="supersolids-tools-track-property"></span><h1><a class="reference internal" href="#module-supersolids.tools.track_property" title="supersolids.tools.track_property"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.tools.track_property</span></code></a><a class="headerlink" href="#module-supersolids.tools.track_property" title="Permalink to this heading"></a></h1>
 <p>Track a property of an Schrodinger object. For example the center of mass.</p>
 <section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
 <section id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h3>
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h3>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.track_property.get_input_path" title="supersolids.tools.track_property.get_input_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_input_path</span></code></a>(dir_path, dir_name)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.track_property.get_dim" title="supersolids.tools.track_property.get_dim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dim</span></code></a>(list_of_arrays, property_all)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.track_property.get_last_index" title="supersolids.tools.track_property.get_last_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_last_index</span></code></a>(input_path, filename_steps)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.track_property.get_input_path" title="supersolids.tools.track_property.get_input_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_input_path</span></code></a>(dir_path, dir_name)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.track_property.get_property" title="supersolids.tools.track_property.get_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_property</span></code></a>(System, property_name = 'get_center_of_mass')</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.track_property.get_last_index" title="supersolids.tools.track_property.get_last_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_last_index</span></code></a>(input_path, filename_steps)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.track_property.property_check" title="supersolids.tools.track_property.property_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">property_check</span></code></a>(property, property_name = 'get_center_of_mass', property_func = False, property_args=[])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.track_property.get_property" title="supersolids.tools.track_property.get_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_property</span></code></a>(System[, property_name])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.track_property.track_property" title="supersolids.tools.track_property.track_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">track_property</span></code></a>(input_path, filename_schroedinger=f'schroedinger.pkl', filename_steps=f'step_', steps_format = '%07d', steps_per_npz = 10, frame_start = 0, frame_end = None, property_name = 'get_center_of_mass', property_func = False, property_args=[], property_args_str=[], property_args_frame = False)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.track_property.property_check" title="supersolids.tools.track_property.property_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">property_check</span></code></a>(property[, property_name, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.track_property.property_to_array" title="supersolids.tools.track_property.property_to_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">property_to_array</span></code></a>(property_tuple, list_of_arrays = False)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.track_property.track_property" title="supersolids.tools.track_property.track_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">track_property</span></code></a>(input_path[, filename_schroedinger, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.track_property.plot_property" title="supersolids.tools.track_property.plot_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_property</span></code></a>(args, func=functions.identity)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.track_property.property_to_array" title="supersolids.tools.track_property.property_to_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">property_to_array</span></code></a>(property_tuple[, list_of_arrays])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.track_property.flags" title="supersolids.tools.track_property.flags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flags</span></code></a>(args_array)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.tools.track_property.plot_property" title="supersolids.tools.track_property.plot_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_property</span></code></a>(args[, func])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.tools.track_property.flags" title="supersolids.tools.track_property.flags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flags</span></code></a>(args_array)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline"></a></h3>
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading"></a></h3>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -120,6 +125,11 @@
 </tr>
 </tbody>
 </table>
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.tools.track_property.get_dim">
+<span class="sig-prename descclassname"><span class="pre">supersolids.tools.track_property.</span></span><span class="sig-name descname"><span class="pre">get_dim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_arrays</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_all</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/track_property.html#get_dim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.track_property.get_dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.tools.track_property.get_input_path">
 <span class="sig-prename descclassname"><span class="pre">supersolids.tools.track_property.</span></span><span class="sig-name descname"><span class="pre">get_input_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/tools/track_property.html#get_input_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.tools.track_property.get_input_path" title="Permalink to this definition"></a></dt>

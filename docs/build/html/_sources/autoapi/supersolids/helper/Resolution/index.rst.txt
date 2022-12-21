@@ -1,0 +1,47 @@
+:py:mod:`supersolids.helper.Resolution`
+=======================================
+
+.. py:module:: supersolids.helper.Resolution
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.helper.Resolution.Resolution
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.helper.Resolution.ResAssert
+
+
+
+.. py:class:: Resolution(x, y = None, z = None)
+
+   Specifies the resolution of the simulation in x, y, z directions (1D, 2D, 3D).
+
+
+   .. py:method:: __str__()
+
+      Return str(self).
+
+
+   .. py:method:: to_array()
+
+
+   .. py:method:: get_bounds_by_index(index)
+
+
+
+.. py:function:: ResAssert(Res, a, name='Amplitudes')
+
+

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.helper.property_load_npz &mdash; supersolids 0.1.37rc1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">supersolids.helper.property_load_npz</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for supersolids.helper.property_load_npz</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+
+<div class="viewcode-block" id="property_load_npz"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/property_load_npz/index.html#supersolids.helper.property_load_npz.property_load_npz">[docs]</a><span class="k">def</span> <span class="nf">property_load_npz</span><span class="p">(</span><span class="n">path_property_npz</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_property_npz</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)[</span><span class="s2">&quot;t&quot;</span><span class="p">]</span>
+        <span class="n">property_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)[</span><span class="s2">&quot;property_all&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">property_all</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_05_09&quot;</span>
+    <span class="n">experiment_suffix</span> <span class="o">=</span> <span class="s2">&quot;ramp_09_09_10**eps&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_fixed_0_test_24_8&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;pretilt0.05to100_test&quot;</span>
+    <span class="n">path_anchor_input</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/bigwork/dscheier/results/begin_</span><span class="si">{</span><span class="n">experiment_suffix</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span>
+
+    <span class="n">png_suffix</span> <span class="o">=</span> <span class="s2">&quot;_lambda_test&quot;</span>
+
+    <span class="c1"># filename = &quot;E_paper_framestart_0&quot;</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;get_center_of_mass_paper_framestart_0&quot;</span>
+
+    <span class="n">dir_name</span> <span class="o">=</span> <span class="s2">&quot;movie&quot;</span>
+    <span class="n">counting_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%03d</span><span class="s2">&quot;</span>
+    <span class="n">movie_start</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">movie_end</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># movie_end = 2</span>
+
+    <span class="c1"># start = 0</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+    <span class="n">var1_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">var2_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">var1_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">65.0</span><span class="p">,</span> <span class="mf">100.1</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">))</span> <span class="c1"># a11</span>
+    <span class="n">var2_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span> <span class="c1"># tilt</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">movie_number</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">movie_start</span><span class="p">,</span> <span class="n">movie_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+        <span class="n">movie_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dir_name</span><span class="si">}{</span><span class="n">counting_format</span> <span class="o">%</span> <span class="n">movie_number</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">path_property_npz</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path_anchor_input</span><span class="p">,</span> <span class="n">movie_name</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.npz&quot;</span><span class="p">)</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">property_all</span> <span class="o">=</span> <span class="n">property_load_npz</span><span class="p">(</span><span class="n">path_property_npz</span><span class="p">)</span>
+        <span class="n">x_range</span><span class="p">,</span> <span class="n">y_range</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">:</span><span class="n">step</span><span class="p">],</span> <span class="n">property_all</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">:</span><span class="n">step</span><span class="p">]</span>
+        <span class="c1"># property_all[j, i, :]</span>
+        <span class="c1"># for i, ax in enumerate(plt.gcf().get_axes()):</span>
+        <span class="c1">#     if args.list_of_arrays:</span>
+        <span class="c1">#         number_of_components = len(property_all)</span>
+        <span class="c1">#         for j in range(0, number_of_components):</span>
+        <span class="c1">#             labels.append(f&quot;component {j} axis {i}&quot;)</span>
+        <span class="c1">#             x_range, y_range = func(t, property_all[j, i, :])</span>
+        <span class="c1">#             ax.plot(x_range, y_range, &quot;x-&quot;, label=labels[-1])</span>
+
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x_range</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y_range</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s1">&#39;symlog&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">property_all</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="s2">&quot;x-&quot;</span><span class="p">)</span>
+        <span class="c1"># plt.plot(x, y_range, &quot;x-&quot;)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;t with dt=&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lambda:&quot;</span><span class="p">)</span>
+        <span class="n">path_output</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path_property_npz</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">path_property_npz</span><span class="o">.</span><span class="n">stem</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">png_suffix</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Save to </span><span class="si">{</span><span class="n">path_output</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">func_x</span><span class="p">,</span> <span class="n">func_y</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">path_output</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

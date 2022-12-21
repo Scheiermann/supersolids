@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.scripts.e_dd_from_p &mdash; supersolids 0.1.37rc1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">supersolids.scripts.e_dd_from_p</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for supersolids.scripts.e_dd_from_p</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">from</span> <span class="nn">fileinput</span> <span class="kn">import</span> <span class="n">filename</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<div class="viewcode-block" id="e_dd_func"><a class="viewcode-back" href="../../../autoapi/supersolids/scripts/e_dd_from_p/index.html#supersolids.scripts.e_dd_from_p.e_dd_func">[docs]</a><span class="k">def</span> <span class="nf">e_dd_func</span><span class="p">(</span><span class="n">a_11</span><span class="p">,</span> <span class="n">a_12</span><span class="p">,</span> <span class="n">a_22</span><span class="p">,</span> <span class="n">a_d_11</span><span class="p">,</span> <span class="n">a_d_12</span><span class="p">,</span> <span class="n">a_d_22</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">a_d_11</span> <span class="o">+</span> <span class="n">a_d_22</span> <span class="o">*</span> <span class="n">p</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">a_d_12</span> <span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">a_11</span> <span class="o">+</span> <span class="n">a_22</span> <span class="o">*</span> <span class="n">p</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">a_12</span> <span class="o">*</span> <span class="n">p</span><span class="p">)</span></div>
+
+<span class="c1"># Script runs, if script is run as main script (called by python *.py)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">var1_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">var2_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">border_indices_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># path_anchor = Path(&quot;/bigwork/dscheier/results/graphs/test&quot;)</span>
+    <span class="c1"># a_11 = 100.0</span>
+    <span class="c1"># N2_part = np.arange(0.05, 0.51, 0.05)</span>
+    <span class="c1"># a_12_list = np.array([63.7, 65.0, 67.5, 68.75, 70.0, 70.0, 70.0, 71.25, 71.25, 71.25])</span>
+    <span class="c1"># # p_border = np.zeros(10)</span>
+    <span class="c1"># p_border = np.array([0.01, 0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.90])</span>
+    <span class="c1"># p_border_xyz = np.tile(p_border, (3,1)).T</span>
+ 
+    <span class="n">a_11</span> <span class="o">=</span> <span class="mf">95.0</span>
+    <span class="n">path_anchor</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/bigwork/dscheier/results/graphs/last_frame_a11_95_xyz_p-9&quot;</span><span class="p">)</span>
+    <span class="n">border_indices_list</span><span class="o">.</span><span class="n">append</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">]])</span>
+    <span class="n">border_indices_list</span><span class="o">.</span><span class="n">append</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">]])</span>
+    <span class="n">border_indices_list</span><span class="o">.</span><span class="n">append</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">]])</span>
+    <span class="n">border_indices_list</span><span class="o">.</span><span class="n">append</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">]])</span>
+    <span class="n">var2_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.51</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">))</span>
+    <span class="n">var1_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">61.25</span><span class="p">,</span> <span class="mf">91.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">))</span>
+    <span class="n">var1_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">62.5</span><span class="p">,</span> <span class="mf">91.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">))</span>
+    <span class="n">var1_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">63.75</span><span class="p">,</span> <span class="mf">91.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">))</span>
+
+    <span class="c1"># path_anchor = Path(&quot;/bigwork/dscheier/results/graphs/last_frame_mixture_a12_grid_map_xyz_p-9&quot;)</span>
+    <span class="c1"># a_11 = 100.0</span>
+    <span class="c1"># border_indices_list.append([[0, 1], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 3], [9, 3]])</span>
+    <span class="c1"># border_indices_list.append([[0, 1], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2]])</span>
+    <span class="c1"># var2_list.append(np.arange(0.05, 0.51, 0.05))</span>
+    <span class="c1"># var1_list.append(np.arange(60.0, 81.0, 5.0))</span>
+
+    <span class="n">a_22</span> <span class="o">=</span> <span class="n">a_11</span>
+    <span class="n">a_dd_11</span> <span class="o">=</span> <span class="mf">130.8</span>
+    <span class="n">a_dd_12</span> <span class="o">=</span> <span class="mf">130.8</span> <span class="o">*</span> <span class="mf">0.9</span>
+    <span class="n">a_dd_22</span> <span class="o">=</span> <span class="mf">130.8</span> <span class="o">*</span> <span class="mf">0.9</span> <span class="o">*</span> <span class="mf">0.9</span>
+
+    <span class="c1"># possible different files to load</span>
+    <span class="n">filenames</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">filenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;probs_cuts_middle.npz&quot;</span><span class="p">)</span>
+    <span class="n">filenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;probs_cuts_max.npz&quot;</span><span class="p">)</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">path_anchor</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span> <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">]</span>
+
+    <span class="c1"># enumerate the different filenames (example:  [n1, n2, pol])</span>
+    <span class="n">index_property</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="c1"># plot [axis x, axis y, axis z]</span>
+    <span class="n">axis_bool_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+
+    <span class="n">a_12_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">var1_list</span><span class="p">))</span>
+    <span class="n">N2_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">var2_list</span><span class="p">))</span>
+
+    <span class="c1"># load mesh of cuts in x, y, z</span>
+    <span class="n">probs_cuts_mesh_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">probs_cuts_mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="s2">&quot;probs_cuts_mesh&quot;</span><span class="p">]</span>
+            <span class="n">probs_cuts_mesh_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs_cuts_mesh</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">file_index</span><span class="p">,</span> <span class="n">filename</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">filenames</span><span class="p">):</span>
+        <span class="n">mesh_max_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">probs_cuts_mesh_list</span><span class="p">[</span><span class="n">file_index</span><span class="p">])</span>
+        <span class="n">p_simulation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">mesh_max_arr</span><span class="p">))</span>
+        <span class="n">p_simulation_xyz</span> <span class="o">=</span> <span class="n">mesh_max_arr</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">iy</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="n">mesh_max_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)):</span>
+            <span class="n">p_simulation_xyz</span><span class="p">[</span><span class="n">ix</span><span class="p">,</span> <span class="n">iy</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_max_arr</span><span class="p">[</span><span class="n">ix</span><span class="p">,</span> <span class="n">iy</span><span class="p">][</span><span class="n">index_property</span><span class="p">]</span>
+        <span class="n">p_simulation_mirrored_xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">p_simulation_xyz</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">p_border_xyz_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">border_indices</span> <span class="ow">in</span> <span class="n">border_indices_list</span><span class="p">:</span>
+            <span class="c1"># get values at positions of border_index</span>
+            <span class="n">p_border_xyz_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">p_simulation_mirrored_xyz</span><span class="p">[</span><span class="n">border_index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                               <span class="n">border_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+                                     <span class="k">for</span> <span class="n">border_index</span> <span class="ow">in</span> <span class="n">border_indices</span><span class="p">])</span>
+                                     <span class="p">)</span>
+            <span class="n">N2_part</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">N2_all</span><span class="p">[</span><span class="n">border_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="k">for</span> <span class="n">border_index</span> <span class="ow">in</span> <span class="n">border_indices</span><span class="p">])</span>
+            <span class="n">a_12_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">a_12_all</span><span class="p">[</span><span class="n">border_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">border_index</span> <span class="ow">in</span> <span class="n">border_indices</span><span class="p">])</span>
+
+        <span class="c1"># plot</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">26</span><span class="p">,</span> <span class="mi">14</span><span class="p">))</span>
+        <span class="n">fontsize</span> <span class="o">=</span> <span class="mi">16</span>
+
+        <span class="c1"># yticks = np.linspace(1.2, 1.5, num=11)</span>
+        <span class="c1"># labels = np.round_(np.linspace(1.2, 1.5, num=11), decimals=4)</span>
+        <span class="c1"># axes.set_ylim(yticks[0], yticks[-1])</span>
+        <span class="c1"># axes.set_yticks(yticks, labels)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;a_12: </span><span class="si">{</span><span class="n">a_12_list</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">p_border_xyz</span><span class="p">,</span> <span class="n">border_indices</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">p_border_xyz_list</span><span class="p">,</span> <span class="n">border_indices_list</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">axis_bool</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">p_border_xyz</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">axis_bool_list</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">axis_bool</span><span class="p">:</span>
+                    <span class="n">e_dd</span> <span class="o">=</span> <span class="n">e_dd_func</span><span class="p">(</span><span class="n">a_11</span><span class="p">,</span> <span class="n">a_12_list</span><span class="p">,</span> <span class="n">a_22</span><span class="p">,</span> <span class="n">a_dd_11</span><span class="p">,</span> <span class="n">a_dd_12</span><span class="p">,</span> <span class="n">a_dd_22</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+                    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">N2_part</span><span class="p">,</span> <span class="n">e_dd</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;.-&quot;</span><span class="p">,</span> <span class="s2">&quot;x-&quot;</span><span class="p">,</span> <span class="s2">&quot;*-&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">border_indices</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;tab20c&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="mi">4</span> <span class="o">*</span> <span class="n">j</span><span class="p">])</span>
+                    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">N2_part</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;.-&quot;</span><span class="p">,</span> <span class="s2">&quot;x-&quot;</span><span class="p">,</span> <span class="s2">&quot;*-&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">border_indices</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;tab20c&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="mi">4</span> <span class="o">*</span> <span class="n">j</span><span class="p">])</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                    <span class="c1"># print(f&quot;p at border: {p}&quot;)</span>
+                    <span class="c1"># print(f&quot;e_dd: {e_dd}&quot;)</span>
+
+        <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$N_2/N$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span>
+
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\epsilon_</span><span class="si">{dd}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$p$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">path_anchor</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">filenames</span><span class="p">[</span><span class="n">file_index</span><span class="p">])</span><span class="o">.</span><span class="n">stem</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

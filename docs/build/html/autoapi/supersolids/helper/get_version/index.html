@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>supersolids.helper.get_version &mdash; supersolids 0.1.26 documentation</title>
+  <title>supersolids.helper.get_version &mdash; supersolids 0.1.37rc1 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
@@ -15,7 +15,9 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -56,8 +58,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.get_version</span></code></li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.get_version</span></code></li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/autoapi/supersolids/helper/get_version/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -68,18 +70,18 @@
            <div itemprop="articleBody">
              
   <section id="module-supersolids.helper.get_version">
-<span id="supersolids-helper-get-version"></span><h1><a class="reference internal" href="#module-supersolids.helper.get_version" title="supersolids.helper.get_version"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.get_version</span></code></a><a class="headerlink" href="#module-supersolids.helper.get_version" title="Permalink to this headline"></a></h1>
+<span id="supersolids-helper-get-version"></span><h1><a class="reference internal" href="#module-supersolids.helper.get_version" title="supersolids.helper.get_version"><code class="xref py py-mod docutils literal notranslate"><span class="pre">supersolids.helper.get_version</span></code></a><a class="headerlink" href="#module-supersolids.helper.get_version" title="Permalink to this heading"></a></h1>
 <section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
 <section id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h3>
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h3>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_version.get_version" title="supersolids.helper.get_version.get_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_version</span></code></a>(package='supersolids')</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_version.get_version" title="supersolids.helper.get_version.get_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_version</span></code></a>([package])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.get_version.check_numba_used" title="supersolids.helper.get_version.check_numba_used"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_numba_used</span></code></a>()</p></td>
@@ -88,7 +90,10 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_version.check_cupy_used" title="supersolids.helper.get_version.check_cupy_used"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_cupy_used</span></code></a>(np)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.get_version.check_cp_nb" title="supersolids.helper.get_version.check_cp_nb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_cp_nb</span></code></a>(np)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#supersolids.helper.get_version.check_cp_nb" title="supersolids.helper.get_version.check_cp_nb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_cp_nb</span></code></a>(np[, gpu_off, gpu_index])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#supersolids.helper.get_version.get_env_variables" title="supersolids.helper.get_version.get_env_variables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_env_variables</span></code></a>([gpu_index_str])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -105,12 +110,25 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.get_version.check_cupy_used">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_version.</span></span><span class="sig-name descname"><span class="pre">check_cupy_used</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">np</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#supersolids.helper.get_version.check_cupy_used" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_version.</span></span><span class="sig-name descname"><span class="pre">check_cupy_used</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">np</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_version.html#check_cupy_used"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_version.check_cupy_used" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="supersolids.helper.get_version.check_cp_nb">
-<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_version.</span></span><span class="sig-name descname"><span class="pre">check_cp_nb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">np</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#supersolids.helper.get_version.check_cp_nb" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_version.</span></span><span class="sig-name descname"><span class="pre">check_cp_nb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">np</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_off</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_version.html#check_cp_nb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_version.check_cp_nb" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gpu_off</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>gpu_index</strong> (<em>int</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="supersolids.helper.get_version.get_env_variables">
+<span class="sig-prename descclassname"><span class="pre">supersolids.helper.get_version.</span></span><span class="sig-name descname"><span class="pre">get_env_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gpu_index_str</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/supersolids/helper/get_version.html#get_env_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#supersolids.helper.get_version.get_env_variables" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>

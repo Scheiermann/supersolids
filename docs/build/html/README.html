@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supersolids &mdash; supersolids 0.1.37rc1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributing" href="CONTRIBUTING.html" />
+    <link rel="prev" title="Supersolids documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Supersolids</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing">Installing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conda">conda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pip">pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#archlinux">Archlinux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#windows">Windows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#source">Source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#issues">Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Supersolids</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/README.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="supersolids">
+<h1>Supersolids<a class="headerlink" href="#supersolids" title="Permalink to this heading"></a></h1>
+<p>Package to simulate and animate supersolids.
+This is done by solving the dimensionless time-dependent
+non-linear Schrodinger equation for an arbitrary potential.
+The split operator method with the Trotter-Suzuki approximation is used.</p>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h2>
+<p><a class="reference external" href="https://supersolids.readthedocs.io/en/latest/">https://supersolids.readthedocs.io/en/latest/</a></p>
+</section>
+<section id="installing">
+<h2>Installing<a class="headerlink" href="#installing" title="Permalink to this heading"></a></h2>
+<p>For the animation to work, <strong>ffmpeg</strong> needs to be installed on your system.</p>
+<p>As vtk, mayavi and numba have C/C++ dependecies, they are harder to install with pip,
+thus installation with conda (anaconda/miniconda) is recommended.</p>
+</section>
+<section id="conda">
+<h2>conda<a class="headerlink" href="#conda" title="Permalink to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>conda create -n solids python=3.10</p></li>
+<li><p>conda activate solids</p></li>
+<li><p>conda config –add channels conda-forge</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>For main:</dt><dd><ul class="simple">
+<li><p>conda install -c scheiermann supersolids</p></li>
+</ul>
+</dd>
+<dt>For testing:</dt><dd><ul class="simple">
+<li><p>conda install -c scheiermann/label/testing supersolids</p></li>
+</ul>
+</dd>
+<dt>Optional:</dt><dd><ul class="simple">
+<li><p>conda install numba</p></li>
+<li><p>conda install cupy</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="pip">
+<h2>pip<a class="headerlink" href="#pip" title="Permalink to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>pip install mayavi</p></li>
+<li><p>pip install PyQt5</p></li>
+<li><p>pip install supersolids</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Optional:</dt><dd><ul class="simple">
+<li><p>pip install numba</p></li>
+<li><p>pip install cupy</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="archlinux">
+<h2>Archlinux<a class="headerlink" href="#archlinux" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>It is provided in the AUR</dt><dd><ul class="simple">
+<li><p>git clone <a class="reference external" href="https://aur.archlinux.org/python-supersolids.git">https://aur.archlinux.org/python-supersolids.git</a></p></li>
+<li><p>Run “makepkg -sic”, where the PKGBUILD lies</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="windows">
+<h2>Windows<a class="headerlink" href="#windows" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>You need to add python to your path (if you didn’t do it, when installing python/anaconda).</dt><dd><ul class="simple">
+<li><p>Then continue with conda installation</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="source">
+<h2>Source<a class="headerlink" href="#source" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>Choose either the main or testing branch when cloning:</dt><dd><ul class="simple">
+<li><p>git clone -b main <a class="reference external" href="https://github.com/Scheiermann/supersolids.git">https://github.com/Scheiermann/supersolids.git</a></p></li>
+<li><p>git clone -b testing <a class="reference external" href="https://github.com/Scheiermann/supersolids.git">https://github.com/Scheiermann/supersolids.git</a></p></li>
+</ul>
+</dd>
+<dt>Then create a conda environment and install teh package by running the following in console:</dt><dd><ul class="simple">
+<li><p>conda create -n solids python=3.10</p></li>
+<li><p>conda activate solids</p></li>
+<li><p>conda config –add channels conda-forge</p></li>
+<li><p>cd supersolids</p></li>
+<li><p>make conda_install</p></li>
+</ul>
+</dd>
+<dt>Go to the directory, where the “setup.py” lies.</dt><dd><ul class="simple">
+<li><p>For <strong>Linux</strong> use “python setup.py install –user” from console to <strong>build</strong> and <strong>install</strong> the package</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h2>
+<p>The package uses __main__.py, so it can be run as module.
+To get help for the flags, run:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>python -m supersolids -h</p></li>
+<li><p>python -m supersolids.tools.load_npz -h</p></li>
+<li><p>python -m supersolids.tools.simulate_npz -h</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>To actually run (example):</dt><dd><ul class="simple">
+<li><p>python -m supersolids -Res=’{“x”: 16, “y”: 32, “z”: 62}’ -Box=’{“x0”: -10, “x1”: 10, “y0”: -6, “y1”: 5, “z0”: -8, “z1”: 8}’</p></li>
+<li><p>python -m supersolids.tools.load_npz -frame_start=79000</p></li>
+<li><p>python -m supersolids.tools.simulate_npz -dir_name=movie004 -filename_npz=step_079000.npz</p></li>
+</ul>
+</dd>
+<dt>If you use an IDE and your script parameter includes double quotes, escape the double quotes with backslashes, for example:</dt><dd><ul class="simple">
+<li><p>“-Res={\”x\”: 256}” “-Box={\”x0\”: -10, \”x1\”: 10}” “-a={\”a_x\”: 2.0}” -max_timesteps=51 “-V=lambda x, y, z: 100.0 * np.exp(-(x ** 2 + y ** 2)/ 1.0 ** 2)”</p></li>
+</ul>
+</dd>
+</dl>
+<p>The default path for the results is ~/supersolids/results</p>
+</section>
+<section id="issues">
+<h2>Issues<a class="headerlink" href="#issues" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Please read the <strong>README.md</strong> closely.</p></li>
+<li><dl class="simple">
+<dt>If the issue persist please <strong>open an “Issue” in git</strong>:</dt><dd><ul class="simple">
+<li><p>Click on “New Issue” on <a class="reference external" href="https://github.com/Scheiermann/supersolids/issues">https://github.com/Scheiermann/supersolids/issues</a>.</p></li>
+<li><p>Assign a suitable label.</p></li>
+<li><p>Follow the steps on git the to create the issue.
+Please <strong>describe your issue closely</strong> (what are your configurations, did it work before,
+what have you changed, what is the result, what have you expected as a result?).</p></li>
+<li><p>Try to include screenshots.</p></li>
+<li><p>Describe what you think causes the issue and if you have <strong>suggestions how to solve</strong> it,
+mention it!</p></li>
+<li><p><strong>Close the issue</strong>, if you accidentally did something wrong (but mention that before closing).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</section>
+<section id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading"></a></h2>
+<p>Please read the <strong>CONTRIBUTING.rst</strong>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Supersolids documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="CONTRIBUTING.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

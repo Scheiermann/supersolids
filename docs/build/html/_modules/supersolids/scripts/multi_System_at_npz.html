@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.scripts.multi_System_at_npz &mdash; supersolids 0.1.37rc1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">supersolids.scripts.multi_System_at_npz</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for supersolids.scripts.multi_System_at_npz</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span> <span class="nn">dill</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">supersolids.scripts.cp_plots</span> <span class="kn">import</span> <span class="n">cp_plots</span>
+
+
+<div class="viewcode-block" id="string_float"><a class="viewcode-back" href="../../../autoapi/supersolids/scripts/multi_System_at_npz/index.html#supersolids.scripts.multi_System_at_npz.string_float">[docs]</a><span class="k">def</span> <span class="nf">string_float</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">s</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div>
+
+
+<span class="c1"># Script runs, if script is run as main script (called by python *.py)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># path_anchor_input = Path(&quot;/run/media/dsche/scr2/&quot;)</span>
+    <span class="c1"># path_anchor_input = Path(&quot;/run/media/dsche/scr2/graphs/contrast_test&quot;)</span>
+    <span class="n">path_anchor_input</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/run/media/dsche/ITP Transfer/&quot;</span><span class="p">)</span>
+
+    <span class="n">filename_schroedinger</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;schroedinger.pkl&quot;</span>
+    <span class="n">filename_steps</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mixture_step_&quot;</span>
+
+    <span class="n">frame</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># path_dir_name_list = None</span>
+    <span class="n">path_dir_name_list</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/run/media/dsche/ITP Transfer/graphs/dir_name_list_fig3_a11_100.pkl&quot;</span><span class="p">)</span>
+    <span class="c1"># path_dir_name_list = Path(&quot;/run/media/dsche/ITP Transfer/graphs/dir_name_list_fig3_a11_95.pkl&quot;)</span>
+    <span class="c1"># path_dir_name_list = Path(&quot;/run/media/dsche/ITP Transfer/graphs/dir_name_list_a12_a11_100_mini.pkl&quot;)</span>
+    <span class="c1"># path_dir_name_list = Path(&quot;/run/media/dsche/ITP Transfer/graphs/dir_name_list_a12_a11_100.pkl&quot;)</span>
+    <span class="c1"># path_dir_name_list = Path(&quot;/run/media/dsche/ITP Transfer/graphs/dir_name_list_a12_dense.pkl&quot;)</span>
+    <span class="c1"># path_dir_name_list = Path(&quot;/run/media/dsche/ITP Transfer/graphs/dir_name_list_a12_grid.pkl&quot;)</span>
+    <span class="c1"># path_dir_name_list = Path(&quot;/run/media/dsche/scr2/graphs/dir_name_list_big.pkl&quot;)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path_dir_name_list</span><span class="p">:</span>
+        <span class="n">movie_start</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1"># movie_end = 24</span>
+        <span class="c1"># movie_end = 110</span>
+        <span class="c1"># movie_end = 70</span>
+        <span class="n">movie_end</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># var1_arange = (0.01, 0.041, 0.01)</span>
+    <span class="c1"># var2_arange = (0.6, 0.726, 0.025)</span>
+
+    <span class="n">var1_arange</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.76</span><span class="p">,</span> <span class="mf">0.81</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">)</span>
+    <span class="n">var2_arange</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.51</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+
+    <span class="c1"># var1_arange = (0.05, 0.51, 0.05)</span>
+    <span class="c1"># var2_arange = (0.50, 0.751, 0.025)</span>
+    <span class="n">var1_arange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">*</span><span class="n">var1_arange</span><span class="p">)</span>
+    <span class="n">var2_arange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">*</span><span class="n">var2_arange</span><span class="p">)</span>
+
+    <span class="n">dir_name</span> <span class="o">=</span> <span class="s2">&quot;movie&quot;</span>
+    <span class="n">dir_name_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%03d</span><span class="s2">&quot;</span>
+
+    <span class="n">steps_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%07d</span><span class="s2">&quot;</span>
+
+    <span class="c1"># property_func = False</span>
+    <span class="c1"># property_name = &quot;E&quot;</span>
+    <span class="c1"># property_name = &quot;mu_arr&quot;</span>
+
+    <span class="n">property_func</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># property_name = &quot;get_center_of_mass&quot;</span>
+    <span class="c1"># property_name = &quot;get_parity&quot;</span>
+    <span class="c1"># property_name = &quot;get_peak_distances_along&quot;</span>
+    <span class="c1"># property_name = &quot;get_peak_positions&quot;</span>
+    <span class="c1"># property_args = [0]</span>
+    <span class="c1"># property_args = []</span>
+
+    <span class="n">property_name</span> <span class="o">=</span> <span class="s2">&quot;get_contrast_old&quot;</span>
+    <span class="c1"># box = [117, 137, 61, 65, 13, 17]</span>
+    <span class="n">box</span> <span class="o">=</span> <span class="p">[</span><span class="mi">53</span><span class="p">,</span> <span class="mi">73</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="mi">33</span><span class="p">]</span>
+    <span class="n">property_args</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="o">*</span><span class="n">box</span><span class="p">]</span>
+
+    <span class="c1"># property_name = &quot;get_contrast&quot;</span>
+    <span class="c1"># prob_min_start = 0.3</span>
+    <span class="c1"># prob_step = 0.01</span>
+    <span class="c1"># number_of_peaks = [1, 2, 2, 2, 1, 1, 1,</span>
+    <span class="c1">#                    2, 2, 3, 3, 1, 1, 1,</span>
+    <span class="c1">#                    3, 4, 4, 4, 1, 1, 1,</span>
+    <span class="c1">#                    4, 5, 5, 4, 1, 1, 1,</span>
+    <span class="c1">#                    5, 5, 5, 5, 1, 1, 1,</span>
+    <span class="c1">#                    5, 6, 5, 5, 1, 1, 1,</span>
+    <span class="c1">#                    6, 6, 6, 5, 1, 1, 1,</span>
+    <span class="c1">#                    5, 5, 5, 5, 1, 1, 1,</span>
+    <span class="c1">#                    6, 6, 5, 4, 1, 1, 1,</span>
+    <span class="c1">#                    6, 5, 5, 4, 1, 1, 1,</span>
+    <span class="c1">#                    ]</span>
+
+    <span class="c1"># property_name = &quot;get_phase_var&quot;</span>
+    <span class="c1"># property_args = [0, 256, 0, 128, 0, 32]</span>
+    <span class="c1"># property_args = [0, 128, 0, 128, 0, 32]</span>
+    <span class="c1"># property_args = [128, 256, 0, 128, 0, 32]</span>
+
+    <span class="c1"># property_name = &quot;get_phase_var_neighborhood&quot;</span>
+    <span class="c1"># [prob_min, amount]</span>
+    <span class="c1"># property_args = [0.02, 4]</span>
+    <span class="c1">#</span>
+    <span class="c1"># property_name = &quot;get_N_in_droplets&quot;</span>
+    <span class="c1"># number_of_peaks = [5, 4, 1, 1, 1, 1, 1, 1,</span>
+    <span class="c1">#                    5, 4, 3, 1, 1, 1, 1, 1,</span>
+    <span class="c1">#                    5, 5, 3, 1, 1, 1, 1, 1,</span>
+    <span class="c1">#                    5, 5, 4, 1, 1, 1, 1, 1,</span>
+    <span class="c1">#                    6, 5, 6, 3, 1, 1, 1, 1,</span>
+    <span class="c1">#                    ]</span>
+
+    <span class="n">dir_name_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">property_args_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">path_dir_name_list</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_dir_name_list</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># WARNING: this is just the input Schroedinger at t=0</span>
+            <span class="n">dir_name_list</span> <span class="o">=</span> <span class="n">dill</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="n">dir_name_list</span><span class="p">:</span>
+            <span class="n">property_args_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">property_args</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">peak_index</span><span class="p">,</span> <span class="n">movie_number</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">movie_start</span><span class="p">,</span> <span class="n">movie_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="c1"># property_args = [number_of_peaks[peak_index], prob_min_start, prob_step]</span>
+            <span class="n">property_args_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">property_args</span><span class="p">)</span>
+            <span class="n">dir_name_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dir_name</span><span class="si">}{</span><span class="n">dir_name_format</span> <span class="o">%</span> <span class="n">movie_number</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;supersolids.tools.get_System_at_npz&quot;</span><span class="p">]</span>
+    <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;-dir_path=</span><span class="si">{</span><span class="n">path_anchor_input</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+             <span class="sa">f</span><span class="s2">&quot;-filename_schroedinger=</span><span class="si">{</span><span class="n">filename_schroedinger</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+             <span class="sa">f</span><span class="s2">&quot;-filename_steps=</span><span class="si">{</span><span class="n">filename_steps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+             <span class="sa">f</span><span class="s2">&quot;-steps_format=</span><span class="si">{</span><span class="n">steps_format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+             <span class="sa">f</span><span class="s2">&quot;-property_name=</span><span class="si">{</span><span class="n">property_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+             <span class="p">]</span>
+
+    <span class="n">var1_arange_args_parsed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">var1_arange</span><span class="p">))</span>
+    <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-var1_arange&quot;</span><span class="p">)</span>
+    <span class="n">flags</span> <span class="o">+=</span> <span class="n">var1_arange_args_parsed</span>
+
+    <span class="n">var2_arange_args_parsed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">var2_arange</span><span class="p">))</span>
+    <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-var2_arange&quot;</span><span class="p">)</span>
+    <span class="n">flags</span> <span class="o">+=</span> <span class="n">var2_arange_args_parsed</span>
+
+    <span class="k">if</span> <span class="n">dir_name_list</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="n">property_args_parsed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">dir_name_list</span><span class="p">))</span>
+        <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-dir_name_list&quot;</span><span class="p">)</span>
+        <span class="n">flags</span> <span class="o">+=</span> <span class="n">property_args_parsed</span>
+    <span class="k">if</span> <span class="n">property_func</span><span class="p">:</span>
+        <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--property_func&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">property_args_list</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">property_args</span> <span class="ow">in</span> <span class="n">property_args_list</span><span class="p">:</span>
+            <span class="n">property_args_parsed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">property_args</span><span class="p">))</span>
+            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--property_args_list&quot;</span><span class="p">)</span>
+            <span class="n">flags</span> <span class="o">+=</span> <span class="n">property_args_parsed</span>
+    <span class="k">if</span> <span class="n">frame</span><span class="p">:</span>
+        <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-frame=</span><span class="si">{</span><span class="n">frame</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># command needs flags to be provided as list</span>
+    <span class="n">command</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># communicate needs flags to be provided as string seperated by &quot; &quot;.</span>
+    <span class="n">flags_parsed</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">flags_parsed</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;out:</span><span class="se">\n</span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;err:</span><span class="se">\n</span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

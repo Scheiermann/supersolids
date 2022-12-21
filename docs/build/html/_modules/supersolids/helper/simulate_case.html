@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.helper.simulate_case &mdash; supersolids 0.1.37rc1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">supersolids.helper.simulate_case</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for supersolids.helper.simulate_case</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># author: Daniel Scheiermann</span>
+<span class="c1"># email: daniel.scheiermann@itp.uni-hannover.de</span>
+<span class="c1"># license: MIT</span>
+<span class="c1"># Please feel free to use and modify this, but keep the above information.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Animation for the numerical solver for the non-linear</span>
+<span class="sd">time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">mayavi</span> <span class="kn">import</span> <span class="n">mlab</span>
+
+<span class="kn">from</span> <span class="nn">supersolids.Animation</span> <span class="kn">import</span> <span class="n">Animation</span><span class="p">,</span> <span class="n">MayaviAnimation</span><span class="p">,</span> <span class="n">MatplotlibAnimation</span>
+<span class="kn">from</span> <span class="nn">supersolids.Schroedinger</span> <span class="kn">import</span> <span class="n">Schroedinger</span>
+<span class="kn">from</span> <span class="nn">supersolids.helper</span> <span class="kn">import</span> <span class="n">run_time</span>
+<span class="kn">from</span> <span class="nn">supersolids.helper.cut_1d</span> <span class="kn">import</span> <span class="n">cut_1d</span>
+
+
+<div class="viewcode-block" id="simulate_case"><a class="viewcode-back" href="../../../autoapi/supersolids/helper/simulate_case/index.html#supersolids.helper.simulate_case.simulate_case">[docs]</a><span class="k">def</span> <span class="nf">simulate_case</span><span class="p">(</span><span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span><span class="p">,</span>
+                  <span class="n">Anim</span><span class="p">:</span> <span class="n">Animation</span><span class="o">.</span><span class="n">Animation</span><span class="p">,</span>
+                  <span class="n">accuracy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span>
+                  <span class="n">delete_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="n">dir_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;supersolids&quot;</span><span class="p">,</span> <span class="s2">&quot;results&quot;</span><span class="p">),</span>
+                  <span class="n">dir_name_load</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                  <span class="n">dir_name_result</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                  <span class="n">slice_indices</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="n">offscreen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                  <span class="n">x_lim</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                  <span class="n">y_lim</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                  <span class="n">z_lim</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                  <span class="n">filename_schroedinger</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;schroedinger.pkl&quot;</span><span class="p">,</span>
+                  <span class="n">filename_steps</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;step_&quot;</span><span class="p">,</span>
+                  <span class="n">steps_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%07d</span><span class="s2">&quot;</span><span class="p">,</span>
+                  <span class="n">steps_per_npz</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+                  <span class="n">steps_property</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+                  <span class="n">frame_start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="n">script_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;script&quot;</span><span class="p">,</span>
+                  <span class="n">script_args</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                  <span class="n">script_number_regex</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
+                  <span class="n">script_extensions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">script_extensions_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="n">no_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Schroedinger</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper for Animation and Schroedinger to get a working Animation</span>
+<span class="sd">    of a System through the equations given by Schroedinger.</span>
+
+<span class="sd">    :param System: Schrödinger equations for the specified system</span>
+
+<span class="sd">    :param Anim: :class: Animation with configured properties</span>
+
+<span class="sd">    :param accuracy: Convergence is reached when relative error of mu is smaller</span>
+<span class="sd">        than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`</span>
+
+<span class="sd">    :param offscreen: Condition for interactive mode. When camera functions are used,</span>
+<span class="sd">        then interaction is not possible. So interactive=True turn the usage</span>
+<span class="sd">        of camera functions off.</span>
+
+<span class="sd">    :param delete_input: Condition if the input pictures should be deleted,</span>
+<span class="sd">        after creation the creation of the animation as e.g. mp4</span>
+
+<span class="sd">    :param dir_path: Path where to look for old directories (movie data)</span>
+
+<span class="sd">    :param dir_name_result: Name of directory where to save the results at. For example the</span>
+<span class="sd">        standard naming convention is movie002&quot;)</span>
+
+<span class="sd">    :param slice_indices: Numpy array with indices of grid points</span>
+<span class="sd">        in the directions x, y, z (in terms of System.x, System.y, System.z)</span>
+<span class="sd">        to produce a slice/plane in mayavi,</span>
+<span class="sd">        where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice</span>
+<span class="sd">        Max values is for e.g. System.Res.x - 1.</span>
+
+<span class="sd">    :param x_lim: Limits of plot in x direction</span>
+
+<span class="sd">    :param y_lim: Limits of plot in y direction</span>
+
+<span class="sd">    :param z_lim: Limits of plot in z direction</span>
+
+<span class="sd">    :param filename_schroedinger: Name of file, where the Schroedinger object is saved</span>
+
+<span class="sd">    :param filename_steps: Name of file, without enumerator for the files.</span>
+<span class="sd">        For example the standard naming convention is step_000001.npz,</span>
+<span class="sd">        the string needed is step_</span>
+
+<span class="sd">    :param steps_format:</span>
+<span class="sd">        Formatting string for the enumeration of steps.</span>
+
+<span class="sd">    :param steps_per_npz: Number of dt steps skipped between saved npz.</span>
+
+<span class="sd">    :param frame_start: Number of named file, where psi_val is loaded from. For example</span>
+<span class="sd">        the standard naming convention is step_000001.npz</span>
+
+<span class="sd">    :param script_name: Name of file, where to save args of the running simulate_npz.</span>
+
+<span class="sd">    :param no_legend: Option to add legend as text to every frame.</span>
+
+<span class="sd">    :return: Reference to Schroedinger System</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">System</span><span class="o">.</span><span class="n">dim</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="c1"># matplotlib for 1D and 2D</span>
+        <span class="n">MatplotlibAnim</span> <span class="o">=</span> <span class="n">MatplotlibAnimation</span><span class="o">.</span><span class="n">MatplotlibAnimation</span><span class="p">(</span><span class="n">Anim</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">MatplotlibAnim</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">MatplotlibAnim</span><span class="o">.</span><span class="n">set_limits</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">x_lim</span><span class="p">,</span> <span class="o">*</span><span class="n">y_lim</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">MatplotlibAnim</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">MatplotlibAnim</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">*</span><span class="n">x_lim</span><span class="p">)</span>
+            <span class="n">MatplotlibAnim</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">*</span><span class="n">y_lim</span><span class="p">)</span>
+            <span class="n">MatplotlibAnim</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">(</span><span class="o">*</span><span class="n">z_lim</span><span class="p">)</span>
+
+        <span class="c1"># Animation.set_limits_smart(0, System)</span>
+
+        <span class="k">with</span> <span class="n">run_time</span><span class="o">.</span><span class="n">run_time</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Animation.start&quot;</span><span class="p">):</span>
+            <span class="n">MatplotlibAnim</span><span class="o">.</span><span class="n">start</span><span class="p">(</span>
+                <span class="n">System</span><span class="p">,</span>
+                <span class="n">accuracy</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">System</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">offscreen</span><span class="p">:</span>
+            <span class="c1"># mayavi for 3D</span>
+            <span class="n">MayAnim</span> <span class="o">=</span> <span class="n">MayaviAnimation</span><span class="o">.</span><span class="n">MayaviAnimation</span><span class="p">(</span>
+                <span class="n">Anim</span><span class="p">,</span>
+                <span class="n">slice_indices</span><span class="o">=</span><span class="n">slice_indices</span><span class="p">,</span>
+                <span class="n">dir_path</span><span class="o">=</span><span class="n">dir_path</span><span class="p">,</span>
+                <span class="n">offscreen</span><span class="o">=</span><span class="n">offscreen</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">with</span> <span class="n">run_time</span><span class="o">.</span><span class="n">run_time</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;MayaviAnimation.animate&quot;</span><span class="p">):</span>
+                <span class="n">MayAnimator</span> <span class="o">=</span> <span class="n">MayAnim</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">System</span><span class="p">,</span> <span class="n">accuracy</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span>
+                                              <span class="n">interactive</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="n">offscreen</span><span class="p">),</span>
+                                              <span class="n">no_legend</span><span class="o">=</span><span class="n">no_legend</span><span class="p">,</span>
+                                              <span class="p">)</span>
+
+            <span class="k">with</span> <span class="n">run_time</span><span class="o">.</span><span class="n">run_time</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;mlab.show&quot;</span><span class="p">):</span>
+                <span class="n">mlab</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+            <span class="n">result_path</span> <span class="o">=</span> <span class="n">MayAnim</span><span class="o">.</span><span class="n">create_movie</span><span class="p">(</span><span class="n">dir_path</span><span class="o">=</span><span class="n">dir_path</span><span class="p">,</span>
+                                               <span class="n">input_data_file_pattern</span><span class="o">=</span><span class="s2">&quot;*.png&quot;</span><span class="p">,</span>
+                                               <span class="n">delete_input</span><span class="o">=</span><span class="n">delete_input</span><span class="p">)</span>
+
+            <span class="n">cut_1d</span><span class="p">(</span><span class="n">System</span><span class="p">,</span> <span class="n">slice_indices</span><span class="o">=</span><span class="n">slice_indices</span><span class="p">,</span>
+                   <span class="n">dir_path</span><span class="o">=</span><span class="n">result_path</span><span class="p">,</span> <span class="n">y_lim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">simulate_raw</span><span class="p">(</span><span class="n">accuracy</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span>
+                                <span class="n">dir_path</span><span class="o">=</span><span class="n">dir_path</span><span class="p">,</span>
+                                <span class="n">dir_name_load</span><span class="o">=</span><span class="n">dir_name_load</span><span class="p">,</span>
+                                <span class="n">dir_name_result</span><span class="o">=</span><span class="n">dir_name_result</span><span class="p">,</span>
+                                <span class="n">filename_schroedinger</span><span class="o">=</span><span class="n">filename_schroedinger</span><span class="p">,</span>
+                                <span class="n">filename_steps</span><span class="o">=</span><span class="n">filename_steps</span><span class="p">,</span>
+                                <span class="n">steps_format</span><span class="o">=</span><span class="n">steps_format</span><span class="p">,</span>
+                                <span class="n">steps_per_npz</span><span class="o">=</span><span class="n">steps_per_npz</span><span class="p">,</span>
+                                <span class="n">steps_property</span><span class="o">=</span><span class="n">steps_property</span><span class="p">,</span>
+                                <span class="n">frame_start</span><span class="o">=</span><span class="n">frame_start</span><span class="p">,</span>
+                                <span class="n">script_name</span><span class="o">=</span><span class="n">script_name</span><span class="p">,</span>
+                                <span class="n">script_args</span><span class="o">=</span><span class="n">script_args</span><span class="p">,</span>
+                                <span class="n">script_number_regex</span><span class="o">=</span><span class="n">script_number_regex</span><span class="p">,</span>
+                                <span class="n">script_extensions</span><span class="o">=</span><span class="n">script_extensions</span><span class="p">,</span>
+                                <span class="n">script_extensions_index</span><span class="o">=</span><span class="n">script_extensions_index</span><span class="p">,</span>
+                                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">System</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

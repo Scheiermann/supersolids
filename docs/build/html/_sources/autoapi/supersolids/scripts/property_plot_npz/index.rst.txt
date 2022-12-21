@@ -1,0 +1,14 @@
+:py:mod:`supersolids.scripts.property_plot_npz`
+===============================================
+
+.. py:module:: supersolids.scripts.property_plot_npz
+
+
+Module Contents
+---------------
+
+.. py:data:: path_input_list
+   :annotation: = []
+
+   
+

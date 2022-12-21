@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.scripts.multi_load &mdash; supersolids 0.1.37rc1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">supersolids.scripts.multi_load</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for supersolids.scripts.multi_load</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># author: Daniel Scheiermann</span>
+<span class="c1"># email: daniel.scheiermann@itp.uni-hannover.de</span>
+<span class="c1"># license: MIT</span>
+<span class="c1"># Please feel free to use and modify this, but keep the above information.</span>
+
+<span class="kn">from</span> <span class="nn">fabric</span> <span class="kn">import</span> <span class="n">Connection</span>
+<span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">supersolids.helper.get_path</span> <span class="kn">import</span> <span class="n">get_step_index</span>
+<span class="kn">from</span> <span class="nn">supersolids.tools.load_npz</span> <span class="kn">import</span> <span class="n">load_npz</span>
+<span class="kn">from</span> <span class="nn">supersolids.tools.load_npz</span> <span class="kn">import</span> <span class="n">flags</span>
+<span class="kn">from</span> <span class="nn">supersolids.helper.dict2str</span> <span class="kn">import</span> <span class="n">dic2str</span>
+
+
+<div class="viewcode-block" id="string_float"><a class="viewcode-back" href="../../../autoapi/supersolids/scripts/multi_load/index.html#supersolids.scripts.multi_load.string_float">[docs]</a><span class="k">def</span> <span class="nf">string_float</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">s</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div>
+
+
+<span class="c1"># Script runs, if script is run as main script (called by python *.py)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">ssh_hostname</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># ssh_hostname = &quot;transfer&quot;</span>
+    <span class="n">ssh_hostname</span> <span class="o">=</span> <span class="s2">&quot;gpu&quot;</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">experiment_name</span> <span class="o">=</span> <span class="s2">&quot;gpu_begin&quot;</span>
+    <span class="c1"># experiment_name = &quot;test_db&quot;</span>
+
+    <span class="n">path_anchor_input_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">path_anchor_output_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_01_65_long_wide&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_01_85_long_wide&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_28_10_85_m15_fix&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+
+    <span class="c1"># experiment_suffix = &quot;ramp_11_08_eq_65_70_75_80_85_90&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;gpu_tilt_11_19&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;gpu_11_16&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;gpu_11_18&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;gpu_12_06&quot;</span>
+    <span class="c1"># experiment_suffix = &quot;gpu_12_07&quot;</span>
+    <span class="n">experiment_suffix</span> <span class="o">=</span> <span class="s2">&quot;gpu_12_21_test&quot;</span>
+    
+    <span class="n">path_anchor_input_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/home/dscheiermann/results/begin_</span><span class="si">{</span><span class="n">experiment_suffix</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">))</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/home/dscheiermann/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_04_675_long_wide&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_04_70_long_wide&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_04_725_long_wide&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_11_04_75_775_80_long_wide&quot;</span>
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+ 
+
+    <span class="c1"># path_anchor_input_list.append(Path(f&quot;/bigwork/nhbbsche/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="c1"># path_anchor_output_list = path_anchor_input_list</span>
+    <span class="c1"># experiment_suffix = &quot;ramp_luis&quot;</span>
+    <span class="c1"># path_anchor_output_list.append(Path(f&quot;/bigwork/dscheier/results/begin_{experiment_suffix}/&quot;))</span>
+    <span class="n">path_anchor_output_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/bigwork/dscheier/results/begin_</span><span class="si">{</span><span class="n">experiment_suffix</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">))</span>
+    
+    <span class="c1"># mixture = False</span>
+    <span class="n">mixture</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># no_legend = True</span>
+    <span class="n">no_legend</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># take_last = 3</span>
+    <span class="n">take_last</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="c1"># frame_end = 1000</span>
+    <span class="n">frame_start</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># frame_start = 350000</span>
+    <span class="n">frame_end</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># steps_per_npz = 100</span>
+    <span class="c1"># steps_per_npz = 10000</span>
+    <span class="c1"># steps_per_npz = 10000</span>
+    <span class="c1"># steps_per_npz = 100</span>
+    <span class="n">steps_per_npz</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">movie_string</span> <span class="o">=</span> <span class="s2">&quot;movie&quot;</span>
+    <span class="n">counting_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%03d</span><span class="s2">&quot;</span>
+    <span class="c1"># movie_start_list = [1, 11, 21, 31]</span>
+    <span class="c1"># movie_end_list = [2, 12, 22, 32]</span>
+    <span class="c1"># movie_start_list = [1, 1]</span>
+    <span class="c1"># movie_end_list = [2, 2]</span>
+    <span class="c1"># movie_start_list = [1]</span>
+    <span class="c1"># movie_end_list = [15]</span>
+    <span class="n">movie_start_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">movie_end_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># movie_start_list = [31]</span>
+    <span class="c1"># movie_end_list = [52]</span>
+    <span class="n">slice_indices</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">127</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">31</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="mi">31</span><span class="p">}</span>
+    <span class="c1"># slice_indices = {&quot;x&quot;: 63, &quot;y&quot;: 31, &quot;z&quot;: 31}</span>
+    <span class="c1"># slice_indices = {&quot;x&quot;: 31, &quot;y&quot;: 15, &quot;z&quot;: 15}</span>
+
+    <span class="n">mixture_slice_index_list_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">alpha_psi_list_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">alpha_psi_sol_list_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">mixture</span><span class="p">:</span>
+        <span class="c1"># mixture_slice_index_list = [1]</span>
+        <span class="c1"># mixture_slice_index_list = [0]</span>
+        <span class="c1"># filename_steps_list = [&quot;step_&quot;]</span>
+        <span class="c1"># filename_steps_list = [&quot;mixture_step_&quot;]</span>
+        <span class="c1"># filename_steps_list = [&quot;mixture_mixture_step_pol_&quot;]</span>
+        <span class="n">mixture_slice_index_list_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">mixture_slice_index_list_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">filename_steps_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;step_&quot;</span><span class="p">,</span> <span class="s2">&quot;step_&quot;</span><span class="p">]</span>
+        <span class="c1"># filename_steps_list = [&quot;mixture_step_&quot;, &quot;mixture_step_&quot;, &quot;mixture_mixture_step_pol_&quot;]</span>
+        <span class="c1"># filename_steps_list = [&quot;step_&quot;, &quot;step_&quot;, &quot;pol_&quot;]</span>
+        <span class="n">alpha_psi_list_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+        <span class="c1"># alpha_psi_list_list.append([0.0, 0.0])</span>
+        <span class="c1"># alpha_psi_list = [0.0, 0.0]</span>
+        <span class="n">alpha_psi_sol_list_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+        <span class="c1"># alpha_psi_sol_list_list.append([0.0, 0.0])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">filename_steps</span> <span class="o">=</span> <span class="s2">&quot;step_&quot;</span>
+        <span class="n">alpha_psi_list_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
+        <span class="n">alpha_psi_sol_list_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
+        
+    <span class="n">cut1d</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">cut1d</span><span class="p">:</span>
+        <span class="n">cut1d_y_lim</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+        <span class="c1"># cut1d_plot_val_list = [False]</span>
+        <span class="c1"># cut1d_plot_val_list = [False, True]</span>
+        <span class="n">cut1d_plot_val_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
+
+    <span class="n">steps_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%07d</span><span class="s2">&quot;</span>
+    <span class="n">filename_pattern</span> <span class="o">=</span> <span class="s2">&quot;.npz&quot;</span>
+
+    <span class="n">azimuth_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">elevation_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">distance_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1">## xy</span>
+    <span class="n">azimuth_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">elevation_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="c1"># distance_list.append(20.0)</span>
+    <span class="c1"># distance_list.append(24.0)</span>
+    <span class="n">distance_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">24.0</span><span class="p">)</span>
+    <span class="c1"># distance_list.append(25.0)</span>
+    <span class="c1"># distance_list.append(38.0)</span>
+
+    <span class="c1">## xz</span>
+    <span class="c1"># azimuth_list.append(270.0)</span>
+    <span class="c1"># elevation_list.append(90.0)</span>
+    <span class="c1"># distance_list.append(20.0)</span>
+
+    <span class="c1">## diagonal</span>
+    <span class="c1"># azimuth_list.append(45.0)</span>
+    <span class="c1"># elevation_list.append(45.0)</span>
+    <span class="c1"># distance_list.append(40.0)</span>
+
+    <span class="n">alpha_V</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="n">sum_along</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># sum_along = 2</span>
+    <span class="n">arg_slices</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">plot_V</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">ui</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># ui = True</span>
+
+    <span class="k">for</span> <span class="n">azimuth</span><span class="p">,</span> <span class="n">elevation</span><span class="p">,</span> <span class="n">distance</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">azimuth_list</span><span class="p">,</span> <span class="n">elevation_list</span><span class="p">,</span> <span class="n">distance_list</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">mixture_slice_index_list</span><span class="p">,</span> <span class="n">alpha_psi_list</span><span class="p">,</span> <span class="n">alpha_psi_sol_list</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mixture_slice_index_list_list</span><span class="p">,</span> <span class="n">alpha_psi_list_list</span><span class="p">,</span> <span class="n">alpha_psi_sol_list_list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">path_anchor_input</span><span class="p">,</span> <span class="n">path_anchor_output</span><span class="p">,</span> <span class="n">movie_start</span><span class="p">,</span> <span class="n">movie_end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">path_anchor_input_list</span><span class="p">,</span> <span class="n">path_anchor_output_list</span><span class="p">,</span> <span class="n">movie_start_list</span><span class="p">,</span> <span class="n">movie_end_list</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">movie_start</span><span class="p">,</span> <span class="n">movie_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">path_in</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path_anchor_input</span><span class="p">,</span> <span class="n">movie_string</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">counting_format</span> <span class="o">%</span> <span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">ssh_hostname</span><span class="p">:</span>
+                        <span class="n">search</span> <span class="o">=</span> <span class="n">filename_steps_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;*&quot;</span> <span class="o">+</span> <span class="n">filename_pattern</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">with</span> <span class="n">Connection</span><span class="p">(</span><span class="n">ssh_hostname</span><span class="p">)</span> <span class="k">as</span> <span class="n">host</span><span class="p">:</span>
+                                <span class="n">files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">fnmatch</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">host</span><span class="o">.</span><span class="n">sftp</span><span class="p">()</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">path_in</span><span class="p">)),</span>
+                                               <span class="n">search</span><span class="p">))</span>
+                        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Skipped! </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">path_in</span><span class="p">,</span> <span class="n">search</span><span class="p">))</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">path_in</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">filename_steps_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                                        <span class="o">+</span> <span class="s2">&quot;*&quot;</span> <span class="o">+</span> <span class="n">filename_pattern</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">is_file</span><span class="p">()])</span>
+
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">take_last</span><span class="p">:</span>
+                        <span class="n">files_last</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="o">-</span><span class="n">take_last</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">files_last</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                            <span class="c1"># no files in dir</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">path_in</span><span class="p">,</span> <span class="n">filename_steps_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;*&quot;</span> <span class="o">+</span> <span class="n">filename_pattern</span><span class="p">))</span><span class="si">}</span><span class="s1"> &#39;</span>
+                                  <span class="sa">f</span><span class="s1">&#39;not found. Skipping.&#39;</span><span class="p">)</span>
+                            <span class="k">continue</span>
+
+                    <span class="k">if</span> <span class="n">frame_start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">frame_start</span> <span class="o">=</span> <span class="n">get_step_index</span><span class="p">(</span><span class="n">files_last</span><span class="p">,</span>
+                                                     <span class="n">filename_prefix</span><span class="o">=</span><span class="n">filename_steps_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                     <span class="n">file_pattern</span><span class="o">=</span><span class="n">filename_pattern</span><span class="p">)</span>
+
+                    <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;supersolids.tools.load_npz&quot;</span><span class="p">]</span>
+                    <span class="n">flags_given</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;-dir_path=</span><span class="si">{</span><span class="n">path_anchor_input</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                   <span class="sa">f</span><span class="s2">&quot;-dir_path_output=</span><span class="si">{</span><span class="n">path_anchor_output</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                   <span class="sa">f</span><span class="s2">&quot;-dir_name=</span><span class="si">{</span><span class="n">movie_string</span><span class="si">}{</span><span class="n">counting_format</span> <span class="o">%</span> <span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                   <span class="sa">f</span><span class="s2">&quot;-frame_start=</span><span class="si">{</span><span class="n">frame_start</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                   <span class="sa">f</span><span class="s2">&quot;-steps_per_npz=</span><span class="si">{</span><span class="n">steps_per_npz</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                   <span class="sa">f</span><span class="s2">&quot;-steps_format=</span><span class="si">{</span><span class="n">steps_format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                   <span class="sa">f</span><span class="s2">&quot;-slice_indices=</span><span class="si">{</span><span class="n">dic2str</span><span class="p">(</span><span class="n">slice_indices</span><span class="p">,</span> <span class="n">single_quote_wrapped</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                   <span class="sa">f</span><span class="s2">&quot;-azimuth=</span><span class="si">{</span><span class="n">azimuth</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                   <span class="sa">f</span><span class="s2">&quot;-elevation=</span><span class="si">{</span><span class="n">elevation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                   <span class="sa">f</span><span class="s2">&quot;-distance=</span><span class="si">{</span><span class="n">distance</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                   <span class="sa">f</span><span class="s2">&quot;--alpha_V=</span><span class="si">{</span><span class="n">alpha_V</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                   <span class="p">]</span>
+
+                    <span class="n">alpha_args_parsed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">alpha_psi_list</span><span class="p">))</span>
+                    <span class="n">flags_given</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--alpha_psi_list&quot;</span><span class="p">)</span>
+                    <span class="n">flags_given</span> <span class="o">+=</span> <span class="n">alpha_args_parsed</span>
+
+                    <span class="n">alpha_sol_args_parsed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">alpha_psi_sol_list</span><span class="p">))</span>
+                    <span class="n">flags_given</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--alpha_psi_sol_list&quot;</span><span class="p">)</span>
+                    <span class="n">flags_given</span> <span class="o">+=</span> <span class="n">alpha_sol_args_parsed</span>
+
+                    <span class="k">if</span> <span class="n">filename_steps_list</span><span class="p">:</span>
+                        <span class="n">filename_steps_parsed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">filename_steps_list</span><span class="p">))</span>
+                        <span class="n">flags_given</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--filename_steps_list&quot;</span><span class="p">)</span>
+                        <span class="n">flags_given</span> <span class="o">+=</span> <span class="n">filename_steps_parsed</span>
+
+                    <span class="k">if</span> <span class="n">mixture</span><span class="p">:</span>
+                        <span class="n">slice_index_parsed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">mixture_slice_index_list</span><span class="p">))</span>
+                        <span class="n">flags_given</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--mixture_slice_index_list&quot;</span><span class="p">)</span>
+                        <span class="n">flags_given</span> <span class="o">+=</span> <span class="n">slice_index_parsed</span>
+
+                    <span class="k">if</span> <span class="n">cut1d_plot_val_list</span><span class="p">:</span>
+                        <span class="n">cut1d_plot_val_parsed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">cut1d_plot_val_list</span><span class="p">))</span>
+                        <span class="n">flags_given</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--cut1d_plot_val_list&quot;</span><span class="p">)</span>
+                        <span class="n">flags_given</span> <span class="o">+=</span> <span class="n">cut1d_plot_val_parsed</span>
+
+                    <span class="k">if</span> <span class="n">cut1d</span><span class="p">:</span>
+                        <span class="c1"># flags_given.append(f&quot;-cut1d_y_lim={cut1d_y_lim}&quot;)</span>
+                        <span class="n">cut1_y_lim_args_parsed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">cut1d_y_lim</span><span class="p">))</span>
+                        <span class="n">flags_given</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--cut1d_y_lim&quot;</span><span class="p">)</span>
+                        <span class="n">flags_given</span> <span class="o">+=</span> <span class="n">cut1_y_lim_args_parsed</span>
+
+                    <span class="k">if</span> <span class="n">no_legend</span><span class="p">:</span>
+                        <span class="n">flags_given</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--no_legend&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">arg_slices</span><span class="p">:</span>
+                        <span class="n">flags_given</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--arg_slices&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">plot_V</span><span class="p">:</span>
+                        <span class="n">flags_given</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--plot_V&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">ui</span><span class="p">:</span>
+                        <span class="n">flags_given</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--ui&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">sum_along</span><span class="p">:</span>
+                        <span class="n">flags_given</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-sum_along=</span><span class="si">{</span><span class="n">sum_along</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">frame_end</span><span class="p">:</span>
+                        <span class="n">flags_given</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-frame_end=</span><span class="si">{</span><span class="n">frame_end</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">experiment_name</span><span class="p">:</span>
+                        <span class="n">flags_given</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-experiment_name=</span><span class="si">{</span><span class="n">experiment_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="n">flags_parsed</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">flags_given</span><span class="p">)</span>
+
+                    <span class="nb">print</span><span class="p">(</span><span class="n">flags_given</span><span class="p">)</span>
+                    <span class="n">args</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="n">flags_given</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">ssh_hostname</span><span class="p">:</span>
+                            <span class="k">with</span> <span class="n">Connection</span><span class="p">(</span><span class="n">ssh_hostname</span><span class="p">)</span> <span class="k">as</span> <span class="n">host</span><span class="p">:</span>
+                                <span class="n">load_npz</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">load_npz</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="n">Connection</span><span class="p">(</span><span class="n">ssh_hostname</span><span class="p">,</span>
+                                        <span class="n">connect_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span> <span class="k">as</span> <span class="n">host</span><span class="p">:</span>
+                            <span class="n">load_npz</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

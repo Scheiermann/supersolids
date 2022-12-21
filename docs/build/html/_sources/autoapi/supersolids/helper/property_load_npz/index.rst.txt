@@ -1,0 +1,35 @@
+:py:mod:`supersolids.helper.property_load_npz`
+==============================================
+
+.. py:module:: supersolids.helper.property_load_npz
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.helper.property_load_npz.property_load_npz
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.helper.property_load_npz.experiment_suffix
+
+
+.. py:function:: property_load_npz(path_property_npz)
+
+
+.. py:data:: experiment_suffix
+   :annotation: = ramp_09_09_10**eps
+
+   
+

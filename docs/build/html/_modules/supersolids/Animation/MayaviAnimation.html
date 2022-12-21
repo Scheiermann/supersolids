@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>supersolids.Animation.MayaviAnimation &mdash; supersolids 0.1.37rc1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> supersolids
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../README.html">Supersolids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">supersolids</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">supersolids.Animation.MayaviAnimation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for supersolids.Animation.MayaviAnimation</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># author: Daniel Scheiermann</span>
+<span class="c1"># email: daniel.scheiermann@itp.uni-hannover.de</span>
+<span class="c1"># license: MIT</span>
+<span class="c1"># Please feel free to use and modify this, but keep the above information.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Functions for Potential and initial wave function :math:`\psi_0`</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+
+<span class="kn">import</span> <span class="nn">dill</span>
+<span class="kn">from</span> <span class="nn">ffmpeg</span> <span class="kn">import</span> <span class="nb">input</span>
+<span class="kn">from</span> <span class="nn">mayavi</span> <span class="kn">import</span> <span class="n">mlab</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">from</span> <span class="nn">supersolids.Animation</span> <span class="kn">import</span> <span class="n">Animation</span>
+<span class="kn">from</span> <span class="nn">supersolids.Schroedinger</span> <span class="kn">import</span> <span class="n">Schroedinger</span>
+<span class="kn">from</span> <span class="nn">supersolids.SchroedingerMixture</span> <span class="kn">import</span> <span class="n">SchroedingerMixture</span>
+<span class="kn">from</span> <span class="nn">supersolids.helper</span> <span class="kn">import</span> <span class="n">functions</span><span class="p">,</span> <span class="n">constants</span><span class="p">,</span> <span class="n">get_path</span><span class="p">,</span> <span class="n">get_version</span><span class="p">,</span> <span class="n">cut_1d</span><span class="p">,</span> <span class="n">db_helper</span>
+<span class="kn">from</span> <span class="nn">supersolids.scripts.download_last</span> <span class="kn">import</span> <span class="n">download</span>
+
+<span class="n">__GPU_OFF_ENV__</span><span class="p">,</span> <span class="n">__GPU_INDEX_ENV__</span> <span class="o">=</span> <span class="n">get_version</span><span class="o">.</span><span class="n">get_env_variables</span><span class="p">()</span>
+<span class="n">cp</span><span class="p">,</span> <span class="n">cupy_used</span><span class="p">,</span> <span class="n">cuda_used</span><span class="p">,</span> <span class="n">numba_used</span> <span class="o">=</span> <span class="n">get_version</span><span class="o">.</span><span class="n">check_cp_nb</span><span class="p">(</span><span class="n">np</span><span class="p">,</span>
+                                                               <span class="n">gpu_off</span><span class="o">=</span><span class="n">__GPU_OFF_ENV__</span><span class="p">,</span>
+                                                               <span class="n">gpu_index</span><span class="o">=</span><span class="n">__GPU_INDEX_ENV__</span><span class="p">)</span>
+        
+
+<div class="viewcode-block" id="load_System"><a class="viewcode-back" href="../../../autoapi/supersolids/Animation/MayaviAnimation/index.html#supersolids.Animation.MayaviAnimation.load_System">[docs]</a><span class="k">def</span> <span class="nf">load_System</span><span class="p">(</span><span class="n">path_schroedinger</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Load schroedinger&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">host</span><span class="p">:</span>
+        <span class="n">sftp</span> <span class="o">=</span> <span class="n">host</span><span class="o">.</span><span class="n">sftp</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">sftp</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path_schroedinger</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># WARNING: this is just the input Schroedinger at t=0</span>
+            <span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span> <span class="o">=</span> <span class="n">dill</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_schroedinger</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># WARNING: this is just the input Schroedinger at t=0</span>
+            <span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span> <span class="o">=</span> <span class="n">dill</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">System</span></div>
+
+
+<div class="viewcode-block" id="load_System_list"><a class="viewcode-back" href="../../../autoapi/supersolids/Animation/MayaviAnimation/index.html#supersolids.Animation.MayaviAnimation.load_System_list">[docs]</a><span class="k">def</span> <span class="nf">load_System_list</span><span class="p">(</span><span class="n">System_list</span><span class="p">,</span> <span class="n">filename_steps_list</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">steps_format</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span>
+                     <span class="n">summary_name</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">filename_steps</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">filename_steps_list</span><span class="p">):</span>
+        <span class="c1"># get the psi_val of Schroedinger at other timesteps (t!=0)</span>
+        <span class="n">psi_val_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">filename_steps</span> <span class="o">+</span> <span class="n">steps_format</span> <span class="o">%</span> <span class="n">frame</span> <span class="o">+</span> <span class="s2">&quot;.npz&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">System_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">SchroedingerMixture</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">host</span><span class="p">:</span>
+                <span class="n">sftp</span> <span class="o">=</span> <span class="n">host</span><span class="o">.</span><span class="n">sftp</span><span class="p">()</span>
+                <span class="k">with</span> <span class="n">sftp</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">psi_val_path</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">System_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">psi_val_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)[</span><span class="s2">&quot;psi_val_list&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">psi_val_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">System_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">psi_val_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)[</span><span class="s2">&quot;psi_val_list&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">host</span><span class="p">:</span>
+                <span class="n">sftp</span> <span class="o">=</span> <span class="n">host</span><span class="o">.</span><span class="n">sftp</span><span class="p">()</span>
+                <span class="k">with</span> <span class="n">sftp</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">psi_val_path</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">System_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)[</span><span class="s2">&quot;psi_val&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">psi_val_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">System_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">psi_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)[</span><span class="s2">&quot;psi_val&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">summary_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">System_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">System_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">load_summary</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span>
+                                                             <span class="n">steps_format</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span>
+                                                             <span class="n">summary_name</span><span class="o">=</span><span class="n">summary_name</span><span class="p">,</span>
+                                                             <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not load </span><span class="si">{</span><span class="n">summary_name</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">System_list</span></div>
+
+
+<div class="viewcode-block" id="get_legend"><a class="viewcode-back" href="../../../autoapi/supersolids/Animation/MayaviAnimation/index.html#supersolids.Animation.MayaviAnimation.get_legend">[docs]</a><span class="k">def</span> <span class="nf">get_legend</span><span class="p">(</span><span class="n">System</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">frame_start</span><span class="p">,</span> <span class="n">supersolids_version</span><span class="p">,</span> <span class="n">mu_rel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">System</span><span class="p">,</span> <span class="n">SchroedingerMixture</span><span class="p">):</span>
+        <span class="c1"># Update legend (especially time)</span>
+        <span class="n">format_1d</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">format_float_scientific</span><span class="p">,</span> <span class="n">pad_left</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;version=</span><span class="si">{</span><span class="n">supersolids_version</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;N=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">N_list</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Box=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">Box</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Res=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">Res</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;max_timesteps=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">max_timesteps</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;dt=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">dt</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;w_x/2pi=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">w_x</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="si">:</span><span class="s2">05.02f</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;w_y/2pi=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">w_y</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="si">:</span><span class="s2">05.02f</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;w_z/2pi=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">w_z</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="si">:</span><span class="s2">05.02f</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;a_s=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">a_s_array</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;a_dd=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">a_dd_array</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;imag_time=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">imag_time</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;t=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">t</span><span class="si">:</span><span class="s2">07.05f</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;processed=</span><span class="si">{</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">frame</span> <span class="o">-</span> <span class="n">frame_start</span><span class="p">)</span> <span class="o">/</span> <span class="n">System</span><span class="o">.</span><span class="n">max_timesteps</span><span class="si">:</span><span class="s2">03.01f</span><span class="si">}</span><span class="s2">%, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;E=</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">format_float_scientific</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="n">pad_left</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;mu=</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">format_1d</span><span class="p">,</span> <span class="n">System</span><span class="o">.</span><span class="n">mu_arr</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Update legend (especially time)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;version=</span><span class="si">{</span><span class="n">supersolids_version</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;N=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">N</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Box=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">Box</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Res=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">Res</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;max_timesteps=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">max_timesteps</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;dt=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">dt</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;g=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">g</span><span class="si">:</span><span class="s2">.2</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;g_qf=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">g_qf</span><span class="si">:</span><span class="s2">.2</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;e_dd=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">e_dd</span><span class="si">:</span><span class="s2">05.03f</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;a_s/a_0=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">a_s</span> <span class="o">/</span> <span class="n">constants</span><span class="o">.</span><span class="n">a_0</span><span class="si">:</span><span class="s2">05.02f</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;w_x/2pi=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">w_x</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="si">:</span><span class="s2">05.02f</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;w_y/2pi=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">w_y</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="si">:</span><span class="s2">05.02f</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;w_z/2pi=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">w_z</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="si">:</span><span class="s2">05.02f</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;imag_time=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">imag_time</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;t=</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">t</span><span class="si">:</span><span class="s2">07.05f</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;processed=</span><span class="si">{</span><span class="p">(</span><span class="n">frame</span> <span class="o">-</span> <span class="n">frame_start</span><span class="p">)</span> <span class="o">/</span> <span class="n">System</span><span class="o">.</span><span class="n">max_timesteps</span><span class="si">:</span><span class="s2">05.03f</span><span class="si">}</span><span class="s2">%, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;E=</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">format_float_scientific</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="n">pad_left</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;mu=</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">format_float_scientific</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">mu_arr</span><span class="p">,</span> <span class="n">pad_left</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mu_rel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;mu_rel=</span><span class="si">{</span><span class="n">mu_rel</span><span class="si">:</span><span class="s2">+05.05e</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">text</span></div>
+
+
+<div class="viewcode-block" id="axes_style"><a class="viewcode-back" href="../../../autoapi/supersolids/Animation/MayaviAnimation/index.html#supersolids.Animation.MayaviAnimation.axes_style">[docs]</a><span class="k">def</span> <span class="nf">axes_style</span><span class="p">():</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">mlab</span><span class="o">.</span><span class="n">axes</span><span class="p">(</span><span class="n">line_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">nb_labels</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">visibility</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">label_text_property</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">label_text_property</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">title_text_property</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span></div>
+    <span class="c1"># throws error, maybe deprecated</span>
+    <span class="c1"># ax.property_tuple.color = (0.0, 0.0, 0.0)</span>
+    <span class="c1"># ax.property_tuple.line_width = 2.5</span>
+
+
+<div class="viewcode-block" id="MayaviAnimation"><a class="viewcode-back" href="../../../autoapi/supersolids/Animation/MayaviAnimation/index.html#supersolids.Animation.MayaviAnimation.MayaviAnimation">[docs]</a><span class="k">class</span> <span class="nc">MayaviAnimation</span><span class="p">(</span><span class="n">Animation</span><span class="o">.</span><span class="n">Animation</span><span class="p">):</span>
+    <span class="n">mayavi_counter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">Anim</span><span class="p">:</span> <span class="n">Animation</span><span class="o">.</span><span class="n">Animation</span><span class="p">,</span>
+                 <span class="n">slice_indices</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                 <span class="n">dir_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;supersolids&quot;</span><span class="p">,</span> <span class="s2">&quot;results&quot;</span><span class="p">),</span>
+                 <span class="n">offscreen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">dir_path_output</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;supersolids&quot;</span><span class="p">,</span> <span class="s2">&quot;results&quot;</span><span class="p">),</span>
+                 <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates an Animation with mayavi for a Schroedinger equation</span>
+<span class="sd">        Methods need the object Schroedinger with the parameters of the equation</span>
+
+<span class="sd">        :param Anim: Base class Animation with configured properties for the animation.</span>
+
+<span class="sd">        :param slice_indices: Numpy array with indices of grid points</span>
+<span class="sd">            in the directions x, y, z (in terms of System.x, System.y, System.z)</span>
+<span class="sd">            to produce a slice/plane in mayavi,</span>
+<span class="sd">            where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice</span>
+<span class="sd">            Max values is for e.g. System.Res.x - 1.</span>
+
+<span class="sd">        :param dir_path: Path where to look for old directories (movie data)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">Res</span><span class="o">=</span><span class="n">Anim</span><span class="o">.</span><span class="n">Res</span><span class="p">,</span>
+                         <span class="n">plot_V</span><span class="o">=</span><span class="n">Anim</span><span class="o">.</span><span class="n">plot_V</span><span class="p">,</span>
+                         <span class="n">alpha_psi_list</span><span class="o">=</span><span class="n">Anim</span><span class="o">.</span><span class="n">alpha_psi_list</span><span class="p">,</span>
+                         <span class="n">alpha_psi_sol_list</span><span class="o">=</span><span class="n">Anim</span><span class="o">.</span><span class="n">alpha_psi_sol_list</span><span class="p">,</span>
+                         <span class="n">alpha_V</span><span class="o">=</span><span class="n">Anim</span><span class="o">.</span><span class="n">alpha_V</span><span class="p">,</span>
+                         <span class="n">camera_r_func</span><span class="o">=</span><span class="n">Anim</span><span class="o">.</span><span class="n">camera_r_func</span><span class="p">,</span>
+                         <span class="n">camera_phi_func</span><span class="o">=</span><span class="n">Anim</span><span class="o">.</span><span class="n">camera_phi_func</span><span class="p">,</span>
+                         <span class="n">camera_z_func</span><span class="o">=</span><span class="n">Anim</span><span class="o">.</span><span class="n">camera_z_func</span><span class="p">,</span>
+                         <span class="n">filename</span><span class="o">=</span><span class="n">Anim</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+                         <span class="p">)</span>
+        <span class="c1"># dir_path need to be saved to access it after the figure closed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">=</span> <span class="n">dir_path</span>
+        <span class="k">if</span> <span class="n">dir_path_output</span><span class="p">:</span>
+           <span class="bp">self</span><span class="o">.</span><span class="n">dir_path_output</span> <span class="o">=</span> <span class="n">dir_path_output</span>
+           <span class="k">if</span> <span class="ow">not</span> <span class="n">dir_path_output</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+               <span class="n">dir_path_output</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dir_path_output</span> <span class="o">=</span> <span class="n">dir_path</span>
+
+        <span class="k">if</span> <span class="n">host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dir_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="n">dir_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sftp</span> <span class="o">=</span> <span class="n">host</span><span class="o">.</span><span class="n">sftp</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Test if remote_path exists</span>
+                <span class="n">sftp</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dir_path</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                <span class="c1"># Create remote_path</span>
+                <span class="n">sftp</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dir_path</span><span class="p">))</span>
+                <span class="n">sftp</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dir_path</span><span class="p">))</span>
+            
+        <span class="n">MayaviAnimation</span><span class="o">.</span><span class="n">mayavi_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slice_indices</span> <span class="o">=</span> <span class="n">slice_indices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offscreen</span> <span class="o">=</span> <span class="n">offscreen</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">offscreen</span><span class="p">:</span>
+            <span class="n">mlab</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">offscreen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offscreen</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span> <span class="o">=</span> <span class="n">mlab</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">MayaviAnimation</span><span class="o">.</span><span class="n">mayavi_counter</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">disable_render</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="c1"># anti_aliasing default is 8,</span>
+            <span class="c1"># and removes res issues when downscaling, but takes longer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">anti_aliasing_frames</span> <span class="o">=</span> <span class="mi">8</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">movie_maker</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="c1"># set dir_path to save images to</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">movie_maker</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">dir_path_output</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">show_axes</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="MayaviAnimation.create_movie"><a class="viewcode-back" href="../../../autoapi/supersolids/Animation/MayaviAnimation/index.html#supersolids.Animation.MayaviAnimation.MayaviAnimation.create_movie">[docs]</a>    <span class="k">def</span> <span class="nf">create_movie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                     <span class="n">dir_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                     <span class="n">dir_path_output</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                     <span class="n">input_data_file_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;*.png&quot;</span><span class="p">,</span>
+                     <span class="n">delete_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                     <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates movie filename with all matching pictures from</span>
+<span class="sd">        input_data_file_pattern.</span>
+<span class="sd">        By default deletes all input pictures after creation of movie</span>
+<span class="sd">        to save disk space.</span>
+
+<span class="sd">        :param dir_path: Path where to look for old directories (movie data)</span>
+
+<span class="sd">        :param input_data_file_pattern: Regex pattern to find all input data</span>
+
+<span class="sd">        :param delete_input: Condition if the input pictures should be deleted,</span>
+<span class="sd">            after creation the creation of the animation as e.g. mp4</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dir_path_output</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dir_path_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path_output</span>
+
+        <span class="k">if</span> <span class="n">dir_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">input_path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_path</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+            <span class="n">output_anchor</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_path</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_path_output</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">input_path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_path</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+            <span class="n">output_anchor</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_path</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="n">dir_path_output</span><span class="p">)</span>
+
+        <span class="n">input_data</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_anchor</span><span class="p">,</span> <span class="n">input_data_file_pattern</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
+            <span class="n">output_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_anchor</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_anchor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;input_data: </span><span class="si">{</span><span class="n">input_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># if host:</span>
+           <span class="c1"># output_path = Path(&quot;/bigwork/dscheier/results/begin_ramp_21_09_a12_70_big/movie013/&quot;)</span>
+           <span class="c1"># input_path, _, _, _ = get_path.get_path(output_path)</span>
+
+        <span class="c1"># requires either mencoder or ffmpeg to be installed on your system</span>
+        <span class="c1"># from command line:</span>
+        <span class="c1"># ffmpeg -f image2 -r 10 -i anim%05d.png -qscale 0 anim.mp4 -pass 2</span>
+        <span class="nb">input</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span>
+              <span class="n">pattern_type</span><span class="o">=</span><span class="s2">&quot;glob&quot;</span><span class="p">,</span>
+              <span class="n">framerate</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">output_path</span><span class="p">))</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">delete_input</span><span class="p">:</span>
+            <span class="c1"># remove all input files (pictures),</span>
+            <span class="c1"># after animation is created and saved</span>
+            <span class="n">input_data_used</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span>
+                               <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">output_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">input_data_file_pattern</span><span class="p">)</span>
+                               <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">is_file</span><span class="p">()]</span>
+            <span class="k">for</span> <span class="n">trash_file</span> <span class="ow">in</span> <span class="n">input_data_used</span><span class="p">:</span>
+                <span class="n">trash_file</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">output_path</span></div>
+
+<div class="viewcode-block" id="MayaviAnimation.prepare"><a class="viewcode-back" href="../../../autoapi/supersolids/Animation/MayaviAnimation/index.html#supersolids.Animation.MayaviAnimation.MayaviAnimation.prepare">[docs]</a>    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span><span class="p">,</span> <span class="n">mixture_slice_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cupy_used</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">x_mesh</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">x_mesh</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">y_mesh</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">y_mesh</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">z_mesh</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">z_mesh</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">V_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">V_val</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="c1"># cupy is installed, but data was saved as numpy array</span>
+                <span class="n">x_mesh</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">x_mesh</span>
+                <span class="n">y_mesh</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">y_mesh</span>
+                <span class="n">z_mesh</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">z_mesh</span>
+                <span class="n">V_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">V_val</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x_mesh</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">x_mesh</span>
+            <span class="n">y_mesh</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">y_mesh</span>
+            <span class="n">z_mesh</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">z_mesh</span>
+            <span class="n">V_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">V_val</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">System</span><span class="p">,</span> <span class="n">SchroedingerMixture</span><span class="p">):</span>
+            <span class="n">prob_plots</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">psi_val_list</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha_psi_list</span><span class="p">):</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;System.psi_val_list (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">psi_val_list</span><span class="p">)</span><span class="si">}</span><span class="s2">) &quot;</span>
+                         <span class="o">+</span> <span class="s2">&quot;and Anim.alpha_psi_list &quot;</span>
+                         <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha_psi_list</span><span class="p">)</span><span class="si">}</span><span class="s2">) need to have same length.&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">psi_val</span><span class="p">,</span> <span class="n">alpha_psi</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">psi_val_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha_psi_list</span><span class="p">)):</span>
+                <span class="n">colormap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;spectral&quot;</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">mixture_slice_index</span><span class="p">:</span>
+                    <span class="n">colormap</span> <span class="o">=</span> <span class="s2">&quot;cool&quot;</span>
+                    <span class="k">if</span> <span class="n">cupy_used</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">prob1_3d</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">psi_val</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                            <span class="c1"># cupy is installed, but data was saved as numpy array</span>
+                            <span class="n">prob1_3d</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">psi_val</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">prob1_3d</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">psi_val</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span>
+
+                <span class="k">if</span> <span class="n">cupy_used</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">prob</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">psi_val</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="c1"># cupy is installed, but data was saved as numpy array</span>
+                        <span class="n">prob</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">psi_val</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">prob</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">psi_val</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span>
+
+
+                <span class="n">prob_plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mlab</span><span class="o">.</span><span class="n">contour3d</span><span class="p">(</span><span class="n">x_mesh</span><span class="p">,</span>
+                                                 <span class="n">y_mesh</span><span class="p">,</span>
+                                                 <span class="n">z_mesh</span><span class="p">,</span>
+                                                 <span class="n">prob</span><span class="p">,</span>
+                                                 <span class="n">colormap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span>
+                                                 <span class="n">opacity</span><span class="o">=</span><span class="n">alpha_psi</span><span class="p">,</span>
+                                                 <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                                  <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cupy_used</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">prob1_3d</span> <span class="o">=</span> <span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">psi_val</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="c1"># cupy is installed, but data was saved as numpy array</span>
+                    <span class="n">prob1_3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">psi_val</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prob1_3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">psi_val</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span>
+
+            <span class="n">prob1_plot</span> <span class="o">=</span> <span class="n">mlab</span><span class="o">.</span><span class="n">contour3d</span><span class="p">(</span><span class="n">x_mesh</span><span class="p">,</span>
+                                        <span class="n">y_mesh</span><span class="p">,</span>
+                                        <span class="n">z_mesh</span><span class="p">,</span>
+                                        <span class="n">prob1_3d</span><span class="p">,</span>
+                                        <span class="n">colormap</span><span class="o">=</span><span class="s2">&quot;spectral&quot;</span><span class="p">,</span>
+                                        <span class="n">opacity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha_psi_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                        <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">prob_plots</span> <span class="o">=</span> <span class="p">[</span><span class="n">prob1_plot</span><span class="p">]</span>
+
+        <span class="n">slice_x_plot</span> <span class="o">=</span> <span class="n">mlab</span><span class="o">.</span><span class="n">volume_slice</span><span class="p">(</span><span class="n">x_mesh</span><span class="p">,</span>
+                                         <span class="n">y_mesh</span><span class="p">,</span>
+                                         <span class="n">z_mesh</span><span class="p">,</span>
+                                         <span class="n">prob1_3d</span><span class="p">,</span>
+                                         <span class="n">colormap</span><span class="o">=</span><span class="s2">&quot;spectral&quot;</span><span class="p">,</span>
+                                         <span class="n">plane_orientation</span><span class="o">=</span><span class="s2">&quot;x_axes&quot;</span><span class="p">,</span>
+                                         <span class="n">slice_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">slice_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                         <span class="p">)</span>
+
+        <span class="n">slice_y_plot</span> <span class="o">=</span> <span class="n">mlab</span><span class="o">.</span><span class="n">volume_slice</span><span class="p">(</span><span class="n">x_mesh</span><span class="p">,</span>
+                                         <span class="n">y_mesh</span><span class="p">,</span>
+                                         <span class="n">z_mesh</span><span class="p">,</span>
+                                         <span class="n">prob1_3d</span><span class="p">,</span>
+                                         <span class="n">colormap</span><span class="o">=</span><span class="s2">&quot;spectral&quot;</span><span class="p">,</span>
+                                         <span class="n">plane_orientation</span><span class="o">=</span><span class="s2">&quot;y_axes&quot;</span><span class="p">,</span>
+                                         <span class="n">slice_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">slice_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                         <span class="p">)</span>
+
+        <span class="n">slice_z_plot</span> <span class="o">=</span> <span class="n">mlab</span><span class="o">.</span><span class="n">volume_slice</span><span class="p">(</span><span class="n">x_mesh</span><span class="p">,</span>
+                                         <span class="n">y_mesh</span><span class="p">,</span>
+                                         <span class="n">z_mesh</span><span class="p">,</span>
+                                         <span class="n">prob1_3d</span><span class="p">,</span>
+                                         <span class="n">colormap</span><span class="o">=</span><span class="s2">&quot;spectral&quot;</span><span class="p">,</span>
+                                         <span class="n">plane_orientation</span><span class="o">=</span><span class="s2">&quot;z_axes&quot;</span><span class="p">,</span>
+                                         <span class="n">slice_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">slice_indices</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                                         <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_V</span><span class="p">:</span>
+            <span class="n">V_val</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">asnumpy</span><span class="p">(</span><span class="n">V_val</span><span class="p">)</span>
+            <span class="n">V_plot</span> <span class="o">=</span> <span class="n">mlab</span><span class="o">.</span><span class="n">contour3d</span><span class="p">(</span><span class="n">x_mesh</span><span class="p">,</span>
+                                    <span class="n">y_mesh</span><span class="p">,</span>
+                                    <span class="n">z_mesh</span><span class="p">,</span>
+                                    <span class="n">V_val</span><span class="p">,</span>
+                                    <span class="n">colormap</span><span class="o">=</span><span class="s2">&quot;hot&quot;</span><span class="p">,</span>
+                                    <span class="n">opacity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha_V</span><span class="p">,</span>
+                                    <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">V_plot</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">System</span><span class="p">,</span> <span class="n">SchroedingerMixture</span><span class="p">):</span>
+            <span class="n">psi_sol_plot</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">System</span><span class="o">.</span><span class="n">psi_sol_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">cupy_used</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">psi_sol_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">psi_sol_val</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="c1"># cupy is installed, but data was saved as numpy array</span>
+                        <span class="n">psi_sol_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">psi_sol_val</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">psi_sol_val</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">psi_sol_val</span>
+
+                <span class="n">psi_sol_plot</span> <span class="o">=</span> <span class="n">mlab</span><span class="o">.</span><span class="n">contour3d</span><span class="p">(</span><span class="n">x_mesh</span><span class="p">,</span>
+                                              <span class="n">y_mesh</span><span class="p">,</span>
+                                              <span class="n">z_mesh</span><span class="p">,</span>
+                                              <span class="n">psi_sol_val</span><span class="p">,</span>
+                                              <span class="n">colormap</span><span class="o">=</span><span class="s2">&quot;cool&quot;</span><span class="p">,</span>
+                                              <span class="n">opacity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha_psi_sol_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                              <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">psi_sol_plot</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">axes_style</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">prob_plots</span><span class="p">,</span> <span class="n">slice_x_plot</span><span class="p">,</span> <span class="n">slice_y_plot</span><span class="p">,</span> <span class="n">slice_z_plot</span><span class="p">,</span> <span class="n">V_plot</span><span class="p">,</span> <span class="n">psi_sol_plot</span></div>
+
+    <span class="c1"># @mlab.animate(delay=10, ui=True)</span>
+<div class="viewcode-block" id="MayaviAnimation.animate_npz"><a class="viewcode-back" href="../../../autoapi/supersolids/Animation/MayaviAnimation/index.html#supersolids.Animation.MayaviAnimation.MayaviAnimation.animate_npz">[docs]</a>    <span class="k">def</span> <span class="nf">animate_npz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">dir_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">dir_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">filename_schroedinger</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;schroedinger.pkl&quot;</span><span class="p">,</span>
+                    <span class="n">filename_steps_list</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;step_&quot;</span><span class="p">],</span>
+                    <span class="n">steps_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%06d</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">steps_per_npz</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+                    <span class="n">frame_start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="n">frame_end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">arg_slices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="n">azimuth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                    <span class="n">elevation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                    <span class="n">distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span><span class="p">,</span>
+                    <span class="n">sum_along</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">summary_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">mixture_slice_index_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">no_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="n">cut1d_y_lim</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                    <span class="n">cut1d_plot_val_list</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">],</span>
+                    <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">experiment_name</span><span class="o">=</span><span class="s2">&quot;start_real&quot;</span><span class="p">,</span>
+                    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Animates solving of the Schroedinger equations of System with mayavi in 3D.</span>
+<span class="sd">        Loaded from npz-files.</span>
+
+<span class="sd">        :param no_legend: Option to add legend as text to every frame.</span>
+
+<span class="sd">        :param mixture_slice_index: Index of component of which the slices are taken.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">supersolids_version</span> <span class="o">=</span> <span class="n">get_version</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span>
+
+        <span class="n">path_anchor_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span>
+        <span class="n">path_anchor_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path_output</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dir_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">dir_path</span> <span class="o">==</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;~/supersolids/results&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">dir_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">input_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">)</span>
+                <span class="n">output_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_path_output</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">input_path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_path</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">)</span>
+                <span class="n">output_path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_path</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_path_output</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dir_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">input_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">)</span>
+                <span class="n">output_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_path_output</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">input_path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_path</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">=</span> <span class="n">input_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dir_path_output</span> <span class="o">=</span> <span class="n">output_path</span>
+        <span class="k">if</span> <span class="n">host</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;input_path: </span><span class="si">{</span><span class="n">input_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output_path: </span><span class="si">{</span><span class="n">output_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">output_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mkdir: </span><span class="si">{</span><span class="n">output_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">output_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">movie_maker</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path_output</span>
+            <span class="n">script_singles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;script.txt&quot;</span><span class="p">]</span>
+            <span class="n">script_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;script_&quot;</span><span class="p">]</span>
+            <span class="n">script_format_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%04d</span><span class="s2">&quot;</span><span class="p">]</span>
+            <span class="n">script_pattern_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.pkl&quot;</span><span class="p">]</span>
+            <span class="n">script_number_regex_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">]</span>
+
+            <span class="n">filename_singles_all</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">filename_steps_list_all</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sbatch_movie&quot;</span><span class="p">]</span>
+            <span class="n">steps_format_list_all</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%03d</span><span class="s2">&quot;</span><span class="p">]</span>
+            <span class="n">filename_pattern_list_all</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.sh&quot;</span><span class="p">]</span>
+            <span class="n">filename_number_regex_list_all</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">]</span>
+            <span class="n">download_steps</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">take_last</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">download</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path_output</span><span class="p">,</span> <span class="n">script_singles</span><span class="p">,</span>
+                     <span class="n">download_steps</span><span class="p">,</span> <span class="n">take_last</span><span class="p">,</span> <span class="n">script_list</span><span class="p">,</span> <span class="n">script_format_list</span><span class="p">,</span>
+                     <span class="n">script_pattern_list</span><span class="p">,</span> <span class="n">script_number_regex_list</span><span class="p">)</span>
+            <span class="n">download</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">path_anchor_in</span><span class="p">,</span> <span class="n">path_anchor_out</span><span class="p">,</span> <span class="n">filename_singles_all</span><span class="p">,</span>
+                     <span class="n">download_steps</span><span class="p">,</span> <span class="n">take_last</span><span class="p">,</span> <span class="n">filename_steps_list_all</span><span class="p">,</span> <span class="n">steps_format_list_all</span><span class="p">,</span>
+                     <span class="n">filename_pattern_list_all</span><span class="p">,</span> <span class="n">filename_number_regex_list_all</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">movie_maker</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path_output</span>
+
+
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">last_index</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_path</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">,</span>
+                                                <span class="n">search_prefix</span><span class="o">=</span><span class="n">filename_steps_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                <span class="n">file_pattern</span><span class="o">=</span><span class="s2">&quot;.npz&quot;</span><span class="p">,</span>
+                                                <span class="n">host</span><span class="o">=</span><span class="n">host</span>
+                                                <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Last index: </span><span class="si">{</span><span class="n">last_index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">path_schroedinger</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">filename_schroedinger</span><span class="p">)</span>
+        <span class="n">System</span> <span class="o">=</span> <span class="n">load_System</span><span class="p">(</span><span class="n">path_schroedinger</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+
+        <span class="p">(</span><span class="n">prob_plots</span><span class="p">,</span> <span class="n">slice_x_plot</span><span class="p">,</span> <span class="n">slice_y_plot</span><span class="p">,</span> <span class="n">slice_z_plot</span><span class="p">,</span>
+         <span class="n">V_plot</span><span class="p">,</span> <span class="n">psi_sol_plot</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">System</span><span class="p">,</span>
+                                              <span class="n">mixture_slice_index</span><span class="o">=</span><span class="n">mixture_slice_index_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">yield</span>
+
+        <span class="n">System_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Schroedinger</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">filename_steps_list</span><span class="p">)):</span>
+            <span class="c1"># create copies of the System in a list (to fill them later with different psi_val)</span>
+            <span class="n">System_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">System</span><span class="p">))</span>
+
+        <span class="c1"># read new frames until Exception (last frame read)</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">frame_start</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;frame=</span><span class="si">{</span><span class="n">frame</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># self.fig.scene.movie_maker._count = frame</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">System_list</span> <span class="o">=</span> <span class="n">load_System_list</span><span class="p">(</span><span class="n">System_list</span><span class="p">,</span> <span class="n">filename_steps_list</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span>
+                                               <span class="n">steps_format</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">summary_name</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+                <span class="n">System</span> <span class="o">=</span> <span class="n">System_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">no_legend</span><span class="p">:</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="n">get_legend</span><span class="p">(</span><span class="n">System</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">frame_start</span><span class="p">,</span> <span class="n">supersolids_version</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">frame</span> <span class="o">==</span> <span class="n">frame_start</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">no_legend</span><span class="p">:</span>
+                        <span class="c1"># create title for first frame</span>
+                        <span class="n">title</span> <span class="o">=</span> <span class="n">mlab</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
+                                           <span class="n">height</span><span class="o">=</span><span class="mf">0.93</span><span class="p">,</span>
+                                           <span class="n">line_width</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                                           <span class="n">size</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                                           <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                                           <span class="p">)</span>
+                    <span class="n">mlab</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">azimuth</span><span class="o">=</span><span class="n">azimuth</span><span class="p">,</span> <span class="n">elevation</span><span class="o">=</span><span class="n">elevation</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="n">distance</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">arg_slices</span><span class="p">:</span>
+                        <span class="n">cbar</span> <span class="o">=</span> <span class="n">mlab</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="nb">object</span><span class="o">=</span><span class="n">slice_x_plot</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span>
+                                             <span class="n">nb_labels</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+                        <span class="n">cbar</span><span class="o">.</span><span class="n">use_default_range</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="n">cbar</span><span class="o">.</span><span class="n">data_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">])</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">no_legend</span><span class="p">:</span>
+                    <span class="n">title</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">System</span><span class="p">,</span> <span class="n">SchroedingerMixture</span><span class="p">):</span>
+                    <span class="n">densities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">psi_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">psi_val_list</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">cut1d_plot_val_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                            <span class="n">densities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">psi_val</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">densities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">get_density</span><span class="p">(</span><span class="n">func_val</span><span class="o">=</span><span class="n">psi_val</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+                                                                <span class="n">jit</span><span class="o">=</span><span class="n">numba_used</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">mixture_slice_index_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                            <span class="k">if</span> <span class="n">sum_along</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="n">psi_val1</span> <span class="o">=</span> <span class="n">psi_val</span>
+                                <span class="n">density1</span> <span class="o">=</span> <span class="n">densities</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">psi_val1</span> <span class="o">=</span> <span class="n">psi_val</span>
+                                <span class="n">density1</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">sum_along</span><span class="p">(</span><span class="n">func_val</span><span class="o">=</span><span class="n">psi_val</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">sum_along</span><span class="p">,</span>
+                                                            <span class="n">l_0</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">arg_slices</span><span class="p">:</span>
+                        <span class="n">psi_arg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">psi_val1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+                        <span class="n">slice_x_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">psi_arg</span><span class="p">)</span>
+                        <span class="n">slice_y_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">psi_arg</span><span class="p">)</span>
+                        <span class="n">slice_z_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">psi_arg</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">slice_x_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">density1</span><span class="p">)</span>
+                        <span class="n">slice_y_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">density1</span><span class="p">)</span>
+                        <span class="n">slice_z_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">density1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Update plot functions</span>
+                    <span class="k">if</span> <span class="n">cut1d_plot_val_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">sum_along</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">density1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">psi_val</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">density1</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">sum_along</span><span class="p">(</span><span class="n">func_val</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">psi_val</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">sum_along</span><span class="p">,</span>
+                                                        <span class="n">l_0</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">density</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">get_density</span><span class="p">(</span><span class="n">func_val</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">psi_val</span><span class="p">,</span>
+                                                                  <span class="n">p</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">jit</span><span class="o">=</span><span class="n">numba_used</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">sum_along</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">density1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">density</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">density1</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">sum_along</span><span class="p">(</span><span class="n">func_val</span><span class="o">=</span><span class="n">density</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">sum_along</span><span class="p">,</span>
+                                                        <span class="n">l_0</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+                    <span class="n">densities</span> <span class="o">=</span> <span class="p">[</span><span class="n">density1</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">arg_slices</span><span class="p">:</span>
+                        <span class="n">psi_arg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">psi_val</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+                        <span class="n">slice_x_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">psi_arg</span><span class="p">)</span>
+                        <span class="n">slice_y_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">psi_arg</span><span class="p">)</span>
+                        <span class="n">slice_z_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">psi_arg</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">slice_x_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">density1</span><span class="p">)</span>
+                        <span class="n">slice_y_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">density1</span><span class="p">)</span>
+                        <span class="n">slice_z_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">density1</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">prob_plot</span><span class="p">,</span> <span class="n">density</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">prob_plots</span><span class="p">,</span> <span class="n">densities</span><span class="p">):</span>
+                    <span class="n">prob_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+
+                <span class="k">yield</span>
+
+            <span class="k">except</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">BadZipFile</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Zipfile with frame </span><span class="si">{</span><span class="n">frame</span><span class="si">}</span><span class="s2"> can&#39;t be read. Maybe the simulation &quot;</span>
+                      <span class="s2">&quot;was stopped before file was successfully created.&quot;</span>
+                      <span class="s2">&quot;Animation is built until, but without that frame.&quot;</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="kc">None</span>
+                <span class="k">break</span>
+
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="kc">None</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+                <span class="k">break</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">output_path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_path</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_path_output</span><span class="p">)</span>
+                <span class="n">cut_1d</span><span class="o">.</span><span class="n">cut_1d</span><span class="p">(</span><span class="n">System_list</span><span class="p">,</span>
+                              <span class="n">slice_indices</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">slice_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">slice_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">slice_indices</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span>
+                              <span class="n">psi_sol_3d_cut_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">psi_sol_3d_cut_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">psi_sol_3d_cut_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="c1"># dir_path=self.dir_path,</span>
+                              <span class="n">dir_path</span><span class="o">=</span><span class="n">output_path</span><span class="p">,</span>
+                              <span class="n">y_lim</span><span class="o">=</span><span class="n">cut1d_y_lim</span><span class="p">,</span>
+                              <span class="n">plot_val_list</span><span class="o">=</span><span class="n">cut1d_plot_val_list</span><span class="p">,</span>
+                              <span class="n">frame</span><span class="o">=</span><span class="n">frame</span><span class="p">,</span>
+                              <span class="n">steps_format</span><span class="o">=</span><span class="n">steps_format</span><span class="p">,</span>
+                              <span class="n">mixture_slice_index_list</span><span class="o">=</span><span class="n">mixture_slice_index_list</span><span class="p">,</span>
+                              <span class="n">filename_steps_list</span><span class="o">=</span><span class="n">filename_steps_list</span><span class="p">,</span>
+                              <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cut1d did not work!</span><span class="se">\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">anim_name_special</span> <span class="o">=</span> <span class="s2">&quot;anextra&quot;</span>
+            <span class="n">anim_name</span> <span class="o">=</span> <span class="s2">&quot;anim&quot;</span>
+            <span class="n">anim_extension</span> <span class="o">=</span> <span class="s2">&quot;.png&quot;</span>
+            <span class="n">path_anim</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span>
+                             <span class="n">anim_name</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%05d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">int</span><span class="p">((</span><span class="n">frame</span> <span class="o">-</span> <span class="n">frame_start</span><span class="p">)</span> <span class="o">/</span> <span class="n">steps_per_npz</span><span class="p">)</span>
+                             <span class="o">+</span> <span class="n">anim_extension</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">frame</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">path_anim_new</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">anim_name_special</span> <span class="o">+</span> <span class="s2">&quot;_init&quot;</span> <span class="o">+</span> <span class="n">anim_extension</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">path_anim_new</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span>
+                                     <span class="n">anim_name</span>
+                                     <span class="o">+</span> <span class="n">steps_format</span> <span class="o">%</span> <span class="p">(</span><span class="n">frame</span> <span class="o">-</span> <span class="n">steps_per_npz</span><span class="p">)</span>
+                                     <span class="o">+</span> <span class="n">anim_extension</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">path_anim</span><span class="p">,</span> <span class="n">path_anim_new</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;from: </span><span class="si">{</span><span class="n">path_anim</span><span class="si">}</span><span class="s2">, to: </span><span class="si">{</span><span class="n">path_anim_new</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># add System to database</span>
+            <span class="n">db_helper</span><span class="o">.</span><span class="n">db_commit</span><span class="p">(</span><span class="n">experiment_name</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">System</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span>
+                                <span class="n">path_anchor_database</span><span class="o">=</span><span class="n">output_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span>
+                                <span class="n">database_name</span><span class="o">=</span><span class="s2">&quot;data.db&quot;</span><span class="p">)</span>
+
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span> <span class="o">+</span> <span class="n">steps_per_npz</span>
+
+            <span class="k">if</span> <span class="n">frame_end</span><span class="p">:</span>
+               <span class="n">last_index</span> <span class="o">=</span> <span class="n">frame_end</span> 
+
+            <span class="k">if</span> <span class="n">frame</span> <span class="o">==</span> <span class="n">last_index</span> <span class="o">+</span> <span class="n">steps_per_npz</span><span class="p">:</span>
+                <span class="c1"># path_anim_new = Path(output_path, anim_name + &quot;_last&quot; + anim_extension)</span>
+                <span class="n">path_anim</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span>
+                                 <span class="n">anim_name</span>
+                                 <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%05d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">int</span><span class="p">((</span><span class="n">frame</span> <span class="o">-</span> <span class="n">frame_start</span><span class="p">)</span> <span class="o">/</span> <span class="n">steps_per_npz</span><span class="p">)</span>
+                                 <span class="o">+</span> <span class="n">anim_extension</span><span class="p">)</span>
+                <span class="n">path_anim_new</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span>
+                                     <span class="n">anim_name</span>
+                                     <span class="o">+</span> <span class="n">steps_format</span> <span class="o">%</span> <span class="p">(</span><span class="n">frame</span> <span class="o">-</span> <span class="n">steps_per_npz</span><span class="p">)</span>
+                                     <span class="o">+</span> <span class="n">anim_extension</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">path_anim</span><span class="p">,</span> <span class="n">path_anim_new</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;from: </span><span class="si">{</span><span class="n">path_anim</span><span class="si">}</span><span class="s2">, to: </span><span class="si">{</span><span class="n">path_anim_new</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="kc">None</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="n">frame</span> <span class="o">&gt;</span> <span class="n">last_index</span><span class="p">:</span>
+                <span class="n">frame</span> <span class="o">=</span> <span class="n">last_index</span>
+
+        <span class="c1"># Finally close</span>
+        <span class="n">mlab</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># move last picture, as it is produced 2nd time, when closing the plot</span>
+        <span class="n">path_anim</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span>
+                         <span class="n">anim_name</span>
+                         <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%05d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">int</span><span class="p">((</span><span class="n">frame</span> <span class="o">-</span> <span class="n">frame_start</span><span class="p">)</span> <span class="o">/</span> <span class="n">steps_per_npz</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                         <span class="o">+</span> <span class="n">anim_extension</span><span class="p">)</span>
+        <span class="n">path_anim_new</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">anim_name_special</span> <span class="o">+</span> <span class="s2">&quot;_last&quot;</span> <span class="o">+</span> <span class="n">anim_extension</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;from: </span><span class="si">{</span><span class="n">path_anim</span><span class="si">}</span><span class="s2">, to: </span><span class="si">{</span><span class="n">path_anim_new</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">path_anim</span><span class="p">,</span> <span class="n">path_anim_new</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MayaviAnimation.animate"><a class="viewcode-back" href="../../../autoapi/supersolids/Animation/MayaviAnimation/index.html#supersolids.Animation.MayaviAnimation.MayaviAnimation.animate">[docs]</a>    <span class="nd">@mlab</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">delay</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ui</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">System</span><span class="p">:</span> <span class="n">Schroedinger</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span>
+                <span class="n">interactive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="n">mixture_slice_index_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">no_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Animates solving of the Schroedinger equations of System with mayavi in 3D.</span>
+<span class="sd">        Animation is limited to System.max_timesteps or</span>
+<span class="sd">        the convergence according to accuracy.</span>
+
+<span class="sd">        :param System: Schrödinger equations for the specified system</span>
+
+<span class="sd">        :param accuracy: Convergence is reached when relative error of mu is smaller</span>
+<span class="sd">            than accuracy, where :math:`\mu = - \\log(\psi_{normed}) / (2 dt)`</span>
+
+<span class="sd">        :param slice_indices: Numpy array with indices of grid points</span>
+<span class="sd">            in the directions x, y, z (in terms of System.x, System.y, System.z)</span>
+<span class="sd">            to produce a slice/plane in mayavi,</span>
+<span class="sd">            where :math:`\psi_{prob}` = :math:`|\psi|^2` is used for the slice</span>
+<span class="sd">            Max values is for e.g. System.Res.x - 1.</span>
+
+<span class="sd">        :param interactive: Condition for interactive mode. When camera functions are used,</span>
+<span class="sd">            then interaction is not possible. So interactive=True turn the usage</span>
+<span class="sd">            of camera functions off.</span>
+
+<span class="sd">        :param no_legend: Option to add legend as text to every frame.</span>
+
+<span class="sd">        :param mixture_slice_index: List of indeces of the mixtures in filename_steps_list of the</span>
+<span class="sd">            components of which the slices are taken.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">prob_plots</span><span class="p">,</span> <span class="n">slice_x_plot</span><span class="p">,</span> <span class="n">slice_y_plot</span><span class="p">,</span> <span class="n">slice_z_plot</span><span class="p">,</span>
+         <span class="n">V_plot</span><span class="p">,</span> <span class="n">psi_sol_plot</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">System</span><span class="p">,</span>
+                                              <span class="n">mixture_slice_index</span><span class="o">=</span><span class="n">mixture_slice_index_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">supersolids_version</span> <span class="o">=</span> <span class="n">get_version</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">System</span><span class="o">.</span><span class="n">max_timesteps</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">interactive</span><span class="p">:</span>
+                <span class="c1"># rotate camera</span>
+                <span class="n">camera_r</span><span class="p">,</span> <span class="n">camera_phi</span><span class="p">,</span> <span class="n">camera_z</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">camera_3d_trajectory</span><span class="p">(</span>
+                    <span class="n">frame</span><span class="p">,</span>
+                    <span class="n">r_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">camera_r_func</span><span class="p">,</span>
+                    <span class="n">phi_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">camera_phi_func</span><span class="p">,</span>
+                    <span class="n">z_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">camera_z_func</span>
+                <span class="p">)</span>
+
+                <span class="n">mlab</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">distance</span><span class="o">=</span><span class="n">camera_r</span><span class="p">,</span>
+                          <span class="n">azimuth</span><span class="o">=</span><span class="n">camera_phi</span><span class="p">,</span>
+                          <span class="n">elevation</span><span class="o">=</span><span class="n">camera_z</span><span class="p">)</span>
+
+            <span class="c1"># Initialize mu_rel</span>
+            <span class="n">mu_rel</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="c1"># The initial plot needs to be shown first,</span>
+            <span class="c1"># also a timestep is needed for mu_rel</span>
+            <span class="k">if</span> <span class="n">frame</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">mu_old</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">mu_arr</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">time_step</span><span class="p">(</span><span class="n">numba_used</span><span class="p">,</span> <span class="n">cupy_used</span><span class="p">)</span>
+
+                <span class="n">mu_rel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">System</span><span class="o">.</span><span class="n">mu_arr</span> <span class="o">-</span> <span class="n">mu_old</span><span class="p">)</span> <span class="o">/</span> <span class="n">System</span><span class="o">.</span><span class="n">mu_arr</span><span class="p">)</span>
+
+                <span class="c1"># Stop animation when accuracy is reached</span>
+                <span class="k">if</span> <span class="n">mu_rel</span> <span class="o">&lt;</span> <span class="n">accuracy</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy reached: </span><span class="si">{</span><span class="n">mu_rel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">yield</span> <span class="kc">None</span>
+                    <span class="k">break</span>
+
+                <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">mu_rel</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">mu_arr</span><span class="p">):</span>
+                    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">E</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;E should be nan, when mu is nan.&quot;</span>
+                                                <span class="s2">&quot;Then the system is divergent.&quot;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy NOT reached! System diverged.&quot;</span><span class="p">)</span>
+                    <span class="k">yield</span> <span class="kc">None</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">frame</span> <span class="o">==</span> <span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">max_timesteps</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="c1"># Animation stops at the next step, to actually show the last step</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum timesteps are reached. Animation is stopped.&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">no_legend</span><span class="p">:</span>
+                <span class="c1"># Update legend (especially time)</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">get_legend</span><span class="p">(</span><span class="n">System</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">supersolids_version</span><span class="p">,</span> <span class="n">mu_rel</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">frame</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">no_legend</span><span class="p">:</span>
+                    <span class="c1"># create title for first frame</span>
+                    <span class="n">title</span> <span class="o">=</span> <span class="n">mlab</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
+                                       <span class="n">height</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+                                       <span class="n">line_width</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                                       <span class="n">size</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                                       <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                                       <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">no_legend</span><span class="p">:</span>
+                <span class="n">title</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">)</span>
+
+            <span class="c1"># Update plot functions</span>
+            <span class="n">density1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">get_density</span><span class="p">(</span><span class="n">func_val</span><span class="o">=</span><span class="n">System</span><span class="o">.</span><span class="n">psi_val</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+                                                      <span class="n">jit</span><span class="o">=</span><span class="n">numba_used</span><span class="p">)</span>
+            <span class="n">densities</span> <span class="o">=</span> <span class="p">[</span><span class="n">density1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">System</span><span class="p">,</span> <span class="n">SchroedingerMixture</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">psi_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">psi_val_list</span><span class="p">):</span>
+                    <span class="n">densities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">get_density</span><span class="p">(</span><span class="n">func_val</span><span class="o">=</span><span class="n">psi_val</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">jit</span><span class="o">=</span><span class="n">numba_used</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">mixture_slice_index_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                        <span class="n">psi_val1</span> <span class="o">=</span> <span class="n">psi_val</span>
+                        <span class="n">density1</span> <span class="o">=</span> <span class="n">densities</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">prob_plot</span><span class="p">,</span> <span class="n">density</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">prob_plots</span><span class="p">,</span> <span class="n">densities</span><span class="p">):</span>
+                <span class="n">prob_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+
+            <span class="n">slice_x_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">density1</span><span class="p">)</span>
+            <span class="n">slice_y_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">density1</span><span class="p">)</span>
+            <span class="n">slice_z_plot</span><span class="o">.</span><span class="n">mlab_source</span><span class="o">.</span><span class="n">trait_set</span><span class="p">(</span><span class="n">scalars</span><span class="o">=</span><span class="n">density1</span><span class="p">)</span>
+
+            <span class="k">yield</span>
+
+        <span class="c1"># Finally close</span>
+        <span class="n">mlab</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Daniel Scheiermann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

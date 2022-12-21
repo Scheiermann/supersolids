@@ -1,0 +1,14 @@
+:py:mod:`supersolids.scripts.multi_begin`
+=========================================
+
+.. py:module:: supersolids.scripts.multi_begin
+
+
+Module Contents
+---------------
+
+.. py:data:: slurm
+   :annotation: = True
+
+   
+

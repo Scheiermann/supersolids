@@ -1,0 +1,808 @@
+:py:mod:`supersolids.helper.db_helper`
+======================================
+
+.. py:module:: supersolids.helper.db_helper
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.helper.db_helper.ExperimentDB
+   supersolids.helper.db_helper.PathExperimentDB
+   supersolids.helper.db_helper.SystemDB
+   supersolids.helper.db_helper.FramesDB
+   supersolids.helper.db_helper.wDB
+   supersolids.helper.db_helper.ResDB
+   supersolids.helper.db_helper.BoxDB
+   supersolids.helper.db_helper.List_N_DB
+   supersolids.helper.db_helper.List_m_DB
+   supersolids.helper.db_helper.List_m_u_DB
+   supersolids.helper.db_helper.Array_a_s_DB
+   supersolids.helper.db_helper.Array_a_s_bohr_DB
+   supersolids.helper.db_helper.Array_a_dd_DB
+   supersolids.helper.db_helper.Array_a_dd_bohr_DB
+   supersolids.helper.db_helper.Array_mu_DB
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.helper.db_helper.db_create
+   supersolids.helper.db_helper.db_check
+   supersolids.helper.db_helper.db_commit
+   supersolids.helper.db_helper.db_query
+   supersolids.helper.db_helper.get_or_create
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   supersolids.helper.db_helper.Base
+
+
+.. py:data:: Base
+   
+
+   
+
+.. py:function:: db_create(input_path, filename_schroedinger, path_anchor_database, database_name='data.db')
+
+
+.. py:function:: db_check()
+
+
+.. py:function:: db_commit(experiment_name, input_path, System, frame, path_anchor_database, database_name='data.db')
+
+
+.. py:function:: db_query(path_anchor_database, database_name='data.db')
+
+
+.. py:function:: get_or_create(session, model, defaults=None, relation=None, **kwargs)
+
+
+.. py:class:: ExperimentDB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = experiments
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: name
+      
+
+      
+
+   .. py:attribute:: path_experiment
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: PathExperimentDB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = path_experiments
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_experiment
+      
+
+      
+
+   .. py:attribute:: path
+      
+
+      
+
+   .. py:attribute:: experiment
+      
+
+      
+
+   .. py:attribute:: system
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: SystemDB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = systems
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_path_experiment
+      
+
+      
+
+   .. py:attribute:: dim
+      
+
+      
+
+   .. py:attribute:: imag_time
+      
+
+      
+
+   .. py:attribute:: stack_shift
+      
+
+      
+
+   .. py:attribute:: tilt
+      
+
+      
+
+   .. py:attribute:: nA_max
+      
+
+      
+
+   .. py:attribute:: max_timesteps
+      
+
+      
+
+   .. py:attribute:: a_s_factor
+      
+
+      
+
+   .. py:attribute:: a_dd_factor
+      
+
+      
+
+   .. py:attribute:: dt
+      
+
+      
+
+   .. py:attribute:: path
+      
+
+      
+
+   .. py:attribute:: path_exp
+      
+
+      
+
+   .. py:attribute:: frames
+      
+
+      
+
+   .. py:attribute:: Res
+      
+
+      
+
+   .. py:attribute:: Box
+      
+
+      
+
+   .. py:attribute:: w
+      
+
+      
+
+   .. py:attribute:: N_list
+      
+
+      
+
+   .. py:attribute:: m_list
+      
+
+      
+
+   .. py:attribute:: m_u_list
+      
+
+      
+
+   .. py:attribute:: a_s_array
+      
+
+      
+
+   .. py:attribute:: a_s_bohr_array
+      
+
+      
+
+   .. py:attribute:: a_dd_array
+      
+
+      
+
+   .. py:attribute:: a_dd_bohr_array
+      
+
+      
+
+   .. py:attribute:: mu_arr
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: FramesDB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = frames
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_system
+      
+
+      
+
+   .. py:attribute:: frame
+      
+
+      
+
+   .. py:attribute:: t
+      
+
+      
+
+   .. py:attribute:: E
+      
+
+      
+
+   .. py:attribute:: system
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: wDB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = w
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_system
+      
+
+      
+
+   .. py:attribute:: w_x
+      
+
+      
+
+   .. py:attribute:: w_y
+      
+
+      
+
+   .. py:attribute:: w_z
+      
+
+      
+
+   .. py:attribute:: system
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: ResDB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = res
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_system
+      
+
+      
+
+   .. py:attribute:: Res_x
+      
+
+      
+
+   .. py:attribute:: Res_y
+      
+
+      
+
+   .. py:attribute:: Res_z
+      
+
+      
+
+   .. py:attribute:: system
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: BoxDB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = box
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_system
+      
+
+      
+
+   .. py:attribute:: Box_x0
+      
+
+      
+
+   .. py:attribute:: Box_x1
+      
+
+      
+
+   .. py:attribute:: Box_y0
+      
+
+      
+
+   .. py:attribute:: Box_y1
+      
+
+      
+
+   .. py:attribute:: Box_z0
+      
+
+      
+
+   .. py:attribute:: Box_z1
+      
+
+      
+
+   .. py:attribute:: system
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: List_N_DB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = N
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_system
+      
+
+      
+
+   .. py:attribute:: N_1
+      
+
+      
+
+   .. py:attribute:: N_2
+      
+
+      
+
+   .. py:attribute:: system
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: List_m_DB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = m
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_system
+      
+
+      
+
+   .. py:attribute:: m_1
+      
+
+      
+
+   .. py:attribute:: m_2
+      
+
+      
+
+   .. py:attribute:: system
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: List_m_u_DB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = m_u
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_system
+      
+
+      
+
+   .. py:attribute:: m_1_u
+      
+
+      
+
+   .. py:attribute:: m_2_u
+      
+
+      
+
+   .. py:attribute:: system
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: Array_a_s_DB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = a_s
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_system
+      
+
+      
+
+   .. py:attribute:: a_s_11
+      
+
+      
+
+   .. py:attribute:: a_s_12
+      
+
+      
+
+   .. py:attribute:: a_s_21
+      
+
+      
+
+   .. py:attribute:: a_s_22
+      
+
+      
+
+   .. py:attribute:: system
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: Array_a_s_bohr_DB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = a_s_bohr
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_system
+      
+
+      
+
+   .. py:attribute:: a_s_11_bohr
+      
+
+      
+
+   .. py:attribute:: a_s_12_bohr
+      
+
+      
+
+   .. py:attribute:: a_s_21_bohr
+      
+
+      
+
+   .. py:attribute:: a_s_22_bohr
+      
+
+      
+
+   .. py:attribute:: system
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: Array_a_dd_DB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = a_dd
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_system
+      
+
+      
+
+   .. py:attribute:: a_dd_11
+      
+
+      
+
+   .. py:attribute:: a_dd_12
+      
+
+      
+
+   .. py:attribute:: a_dd_21
+      
+
+      
+
+   .. py:attribute:: a_dd_22
+      
+
+      
+
+   .. py:attribute:: system
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: Array_a_dd_bohr_DB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = a_dd_bohr
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_system
+      
+
+      
+
+   .. py:attribute:: a_dd_11_bohr
+      
+
+      
+
+   .. py:attribute:: a_dd_12_bohr
+      
+
+      
+
+   .. py:attribute:: a_dd_21_bohr
+      
+
+      
+
+   .. py:attribute:: a_dd_22_bohr
+      
+
+      
+
+   .. py:attribute:: system
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+
+.. py:class:: Array_mu_DB
+
+   Bases: :py:obj:`Base`
+
+   .. py:attribute:: __tablename__
+      :annotation: = mu
+
+      
+
+   .. py:attribute:: id
+      
+
+      
+
+   .. py:attribute:: id_system
+      
+
+      
+
+   .. py:attribute:: mu_1
+      
+
+      
+
+   .. py:attribute:: mu_2
+      
+
+      
+
+   .. py:attribute:: system
+      
+
+      
+
+   .. py:method:: __repr__()
+
+
+

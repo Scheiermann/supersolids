@@ -1,0 +1,14 @@
+:py:mod:`supersolids.scripts.multi_simulate_gpu`
+================================================
+
+.. py:module:: supersolids.scripts.multi_simulate_gpu
+
+
+Module Contents
+---------------
+
+.. py:data:: supersolids_version
+   :annotation: = 0.1.37rc1
+
+   
+
