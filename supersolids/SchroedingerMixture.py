@@ -852,7 +852,10 @@ class SchroedingerMixture(Schroedinger):
         r = self.get_mesh_list(x0, x1, y0, y1, z0, z1)
         com_list = []
         for prob in prob_list:
-            center_of_mass_along_axis = [prob * r_i ** p for r_i in r]
+            if cupy_used:
+                center_of_mass_along_axis = [cp.array(prob) * cp.array(r_i) ** p for r_i in r]
+            else:
+                center_of_mass_along_axis = [prob * r_i ** p for r_i in r]
             com_list.append([self.trapez_integral(com_along_axis) / self.trapez_integral(prob)
                              for com_along_axis in center_of_mass_along_axis])
         return com_list
