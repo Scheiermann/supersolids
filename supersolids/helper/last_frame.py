@@ -460,8 +460,10 @@ def last_frame(frame: Optional[int],
                 # for iy, ax in enumerate(plt.gcf().get_axes()):
                 frequency_plot = True 
                 if frequency_plot:
+                    # annotation = False
                     annotation = True
-                    plot_log = True
+                    # plot_log = True
+                    plot_log = False
                     if annotation:
                        annotation_decimals = 0
                     spin = True
@@ -481,7 +483,8 @@ def last_frame(frame: Optional[int],
                             for j in range(number_of_components):
                                 # try a12 vs frequency monopolar
                                 if frequency_plot:
-                                    x_range = var2_list[k]
+                                    # x_range = var2_list[k]
+                                    x_range = var_mesh_y.flatten()
                                     if spin:
                                         y_range = mesh_property_all[:, iy, 0, i, :] + (-1) ** j * mesh_property_all[:, iy, 1, i, :]
                                     else:
@@ -497,13 +500,16 @@ def last_frame(frame: Optional[int],
                                         w_max, ampl = map(np.array, zipped_sorted_by_max)
                                         w_list.append(w_max[w_index])
                                     y_range = np.array(w_list)
-                                    x_range = var2_list[k]
+                                    # x_range = var2_list[k]
+                                    x_range = var_mesh_y.flatten()
                                     axes[iy, i].plot(x_range, y_range, "x-")
                                 else:
-                                    x_range, y_range = var2_list[k], mesh_property_all[:, iy, j, i, lambda_frame]
+                                    x_range = var_mesh_y.flatten()
+                                    y_range = mesh_property_all[:, iy, j, i, lambda_frame]
                                     axes[iy, i].plot(x_range, y_range, "x-")
                         else:
-                            x_range, y_range = var2_list[k], mesh_property_all[:, iy, lambda_frame]
+                            x_range = var_mesh_y.flatten()
+                            y_range = mesh_property_all[:, iy, lambda_frame]
                             axes[iy, 0].plot(x_range, y_range, "x-")
 
                 for ax in axes.flatten():

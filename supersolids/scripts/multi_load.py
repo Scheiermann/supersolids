@@ -39,7 +39,10 @@ if __name__ == "__main__":
     # experiment_suffix = "ramp_11_08_eq_65_70_75_80_85_90"
     # experiment_suffix = "gpu_tilt_11_19"
     # experiment_suffix = "gpu_11_16"
-    experiment_suffix = "gpu_11_18"
+    # experiment_suffix = "gpu_11_18"
+    experiment_suffix = "gpu_12_05"
+    # experiment_suffix = "gpu_12_06"
+    # experiment_suffix = "gpu_12_07"
     
     # path_anchor_input_list.append(Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/"))
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
@@ -68,26 +71,20 @@ if __name__ == "__main__":
     # take_last = 3
     take_last = np.inf
     # frame_end = 1000
-    # frame_start = None
-    frame_start = 350000
+    frame_start = None
+    # frame_start = 350000
     frame_end = None
 
     # steps_per_npz = 100
+    # steps_per_npz = 1000
     steps_per_npz = 10000
-    # steps_per_npz = 10000
     # steps_per_npz = 100
     # steps_per_npz = 1
 
     movie_string = "movie"
     counting_format = "%03d"
-    # movie_start_list = [1, 11, 21, 31]
-    # movie_end_list = [2, 12, 22, 32]
-    # movie_start_list = [1, 1]
-    # movie_end_list = [2, 2]
-    # movie_start_list = [1]
-    # movie_end_list = [15]
-    movie_start_list = [111]
-    movie_end_list = [125]
+    movie_start_list = [1, 1]
+    movie_end_list = [15, 15]
     slice_indices = {"x": 127, "y": 31, "z": 31}
     # slice_indices = {"x": 63, "y": 31, "z": 31}
     # slice_indices = {"x": 31, "y": 15, "z": 15}
@@ -101,16 +98,16 @@ if __name__ == "__main__":
         # filename_steps_list = ["step_"]
         # filename_steps_list = ["mixture_step_"]
         # filename_steps_list = ["mixture_mixture_step_pol_"]
-        # mixture_slice_index_list_list.append([0, 1])
+        mixture_slice_index_list_list.append([0, 1])
         mixture_slice_index_list_list.append([1, 0])
         filename_steps_list = ["step_", "step_"]
         # filename_steps_list = ["mixture_step_", "mixture_step_", "mixture_mixture_step_pol_"]
         # filename_steps_list = ["step_", "step_", "pol_"]
         alpha_psi_list_list.append([0.0, 0.0])
-        # alpha_psi_list_list.append([0.0, 0.0])
+        alpha_psi_list_list.append([0.0, 0.0])
         # alpha_psi_list = [0.0, 0.0]
         alpha_psi_sol_list_list.append([0.0, 0.0])
-        # alpha_psi_sol_list_list.append([0.0, 0.0])
+        alpha_psi_sol_list_list.append([0.0, 0.0])
     else:
         filename_steps = "step_"
         alpha_psi_list_list.append([0.0])

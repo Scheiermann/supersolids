@@ -12,7 +12,7 @@ if __name__ == "__main__":
     slurm = True
     mem_in_GB = 4
     xvfb_display = 900
-    supersolids_version = "0.1.37rc1"
+    supersolids_version = "0.1.37rc5"
     dir_path = Path("/bigwork/dscheier/results/begin_paper_a11_100/")
 
     dir_path_log = Path(dir_path, "log")

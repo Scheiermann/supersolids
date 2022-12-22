@@ -63,7 +63,7 @@ conda_install:
 
 conda_upload_test:
 	make conda_build
-	anaconda upload $(shell conda build . --output) --label testing
+	anaconda upload $(shell conda build . --output) --label test
 
 conda_upload:
 	make conda_build

@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 if __name__ == "__main__":
-    supersolids_version = "0.1.37rc1"
+    supersolids_version = "0.1.37rc5"
     dir_path = Path("/bigwork/dscheier/results/begin_stacked_a11_05_09/")
 
     slurm: bool = True

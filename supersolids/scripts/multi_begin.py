@@ -10,7 +10,7 @@ if __name__ == "__main__":
     slurm = True
     mem_in_GB = 8
     xvfb_display = 500
-    supersolids_version = "0.1.37rc1"
+    supersolids_version = "0.1.37rc5"
     dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_13/")
     # dir_path = Path("/home/dsche/supersolids/supersolids/results/begin/")
 

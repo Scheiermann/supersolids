@@ -70,7 +70,10 @@ if __name__ == "__main__":
     # experiment_suffix = "ramp_11_04_75_775_80_long_wide"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
 
-    experiment_suffix = "gpu_11_18_real_w-1"
+    # experiment_suffix = "gpu_11_18_real_w-1"
+    experiment_suffix = "gpu_12_05"
+    # experiment_suffix = "gpu_12_06"
+    # experiment_suffix = "gpu_12_07"
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
 
     mixture = True
@@ -94,8 +97,10 @@ if __name__ == "__main__":
 
     # movie_start_list = [1]
     # movie_end_list = [25]
-    movie_start_list = [111]
-    movie_end_list = [125]
+    # movie_start_list = [31]
+    # movie_end_list = [52]
+    movie_start_list = [21]
+    movie_end_list = [35]
 
     dt = 0.0002
 
@@ -142,20 +147,19 @@ if __name__ == "__main__":
     # property_args_list = [[], [], [], [], [], [], [], []]
     # property_args_frame_list = [False, False, False, False, False, False, False, False]
 
-    func_mu = "lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))"
-    file_suffix_list = ["", "mu_rel", "", ""]
-    inbuild_func_list = ["", "", "", ""]
-    func_list = ["", func_mu, "", ""]
-    steps_per_npz_list = [100, 100, 1000, 1000]
-    subplots_list = [False, False, True, True]
-    property_func_list = [False, False, True, True]
-    list_of_arrays_list = [False, False, True, True]
-    property_names_list = ["mu_arr", "mu_arr", "get_center_of_mass", "get_parity"]
-    property_args_list = [[], [], [], []]
-    property_args_frame_list = [False, False, False, False]
-
-
     # func_mu = "lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))"
+    # file_suffix_list = ["", "mu_rel", "", ""]
+    # inbuild_func_list = ["", "", "", ""]
+    # func_list = ["", func_mu, "", ""]
+    # steps_per_npz_list = [100, 100, 1000, 1000]
+    # subplots_list = [False, False, True, True]
+    # property_func_list = [False, False, True, True]
+    # list_of_arrays_list = [False, False, True, True]
+    # property_names_list = ["mu_arr", "mu_arr", "get_center_of_mass", "get_parity"]
+    # property_args_list = [[], [], [], []]
+    # property_args_frame_list = [False, False, False, False]
+
+
     # file_suffix_list = ["", "_fft"]
     # inbuild_func_list = ["", "fft_plot"]
     # func_list = ["", ""]
@@ -167,16 +171,17 @@ if __name__ == "__main__":
     # property_args_list = [[], []]
     # property_args_frame_list = [False, False]
 
-    # file_suffix_list = ["_fft"]
-    # inbuild_func_list = ["fft_plot"]
-    # func_list = [""]
-    # steps_per_npz_list = [100]
-    # subplots_list = [True]
-    # property_func_list = [False]
-    # list_of_arrays_list = [True]
-    # property_names_list = ["monopolar"]
-    # property_args_list = [[]]
-    # property_args_frame_list = [False]
+    file_suffix_list = ["_fft"]
+    inbuild_func_list = ["fft_plot"]
+    func_list = [""]
+    steps_per_npz_list = [100]
+    subplots_list = [True]
+    property_func_list = [False]
+    list_of_arrays_list = [True]
+    property_names_list = ["monopolar"]
+    property_args_list = [[]]
+    inbuild_func_args_list = [[1, 62, 1]]
+    property_args_frame_list = [False]
 
     # steps_per_npz_list = [100]
     # subplots_list = [True]
@@ -232,10 +237,10 @@ if __name__ == "__main__":
     for path_anchor_input, movie_start, movie_end in zip(path_anchor_input_list, movie_start_list, movie_end_list):
         for (property_func, property_name,
              property_args, property_args_frame, subplots, list_of_arrays, steps_per_npz,
-             file_suffix, inbuild_func, func) in zip(
+             file_suffix, inbuild_func, inbuild_func_args, func) in zip(
                 property_func_list, property_names_list, property_args_list,
                 property_args_frame_list, subplots_list, list_of_arrays_list, steps_per_npz_list,
-                file_suffix_list, inbuild_func_list, func_list):
+                file_suffix_list, inbuild_func_list, inbuild_func_args_list, func_list):
             for i, movie_number in enumerate(range(movie_start, movie_end + 1)):
                 # file_suffix = ""
                 # file_suffix = "-" + "-".join(map(str, property_args)) + ".png"
@@ -273,6 +278,10 @@ if __name__ == "__main__":
                     flags.append(f"--property_args_frame")
                 if inbuild_func:
                     flags.append(f"-inbuild_func={inbuild_func}")
+                if inbuild_func_args:
+                    inbuild_func_args_parsed = list(map(str, inbuild_func_args))
+                    flags.append(f"--inbuild_func_args")
+                    flags += inbuild_func_args_parsed
                 if func:
                     flags.append(f"-func={func}")
                 if frame_start is None:

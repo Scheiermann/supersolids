@@ -12,7 +12,7 @@ if __name__ == "__main__":
     slurm = True
     mem_in_MB = 600
     xvfb_display = 800
-    supersolids_version = "0.1.37rc1"
+    supersolids_version = "0.1.37rc5"
     # dir_path = Path("/bigwork/dscheier/results/begin_stacked_a11_05_09_s0/")
     dir_path = Path("/bigwork/dscheier/results/begin_stacked_05_10_a11/")
 
