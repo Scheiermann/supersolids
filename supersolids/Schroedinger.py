@@ -993,6 +993,8 @@ class Schroedinger:
 
             if ((frame % steps_property) == 0) or (frame == frame_end - 1):
                 try:
+                    # convert cupy array to numpy element wise
+                    com_list = self.get_center_of_mass(p=2.0)
                     SystemSummary.monopolar = [[com.get() for com in comp] for comp in com_list]
                 except Exception as e:
                     SystemSummary.monopolar = self.get_center_of_mass(p=2.0)
