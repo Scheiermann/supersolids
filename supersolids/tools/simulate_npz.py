@@ -25,7 +25,6 @@ from supersolids.helper import functions, get_version
 
 from supersolids.Animation.Animation import Animation
 
-from supersolids.helper.simulate_case import simulate_case
 from supersolids.helper.Resolution import Resolution
 from supersolids.helper.Box import Box
 
@@ -609,6 +608,8 @@ if __name__ == "__main__":
 
         args = args_loaded
 
+    os.environ["SUPERSOLIDS_GPU_INDEX"] = str(args.gpu_index)
+    os.environ["SUPERSOLIDS_GPU_OFF"] = str(args.gpu_off)
     __GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables(gpu_index_str=args.gpu_index)
     cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
                                                                    gpu_off=__GPU_OFF_ENV__,
@@ -616,6 +617,7 @@ if __name__ == "__main__":
 
     from supersolids.Schroedinger import Schroedinger
     from supersolids.SchroedingerMixture import SchroedingerMixture
+    from supersolids.helper.simulate_case import simulate_case
 
     print(f"args finally: {args}")
     simulate_npz(args)
