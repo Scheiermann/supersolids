@@ -13,15 +13,17 @@ from supersolids.helper.dict2str import dic2str
 
 
 if __name__ == "__main__":
-    supersolids_version = "0.1.37rc5"
+    supersolids_version = "0.1.37rc7"
     # dir_path = Path("/bigwork/dscheier/results/begin_gpu_big/")
-    dir_path = Path("/home/dscheiermann/results/begin_gpu_11_18/")
+    # dir_path = Path("/home/dscheiermann/results/begin_gpu_12_28/")
+    # dir_path = Path("/home/dscheiermann/results/begin_gpu_12_28_to_102/")
+    dir_path = Path("/home/dscheiermann/results/begin_gpu_12_28_to_102_dip9/")
 
     dir_path_log = Path(f"{dir_path}/log/")
     dir_path_log.mkdir(parents=True, exist_ok=True)
 
-    mem_in_GB = 4
-    xvfb_display = 990
+    mem_in_MB = 1400
+    xvfb_display = 490
     gpu_index=0
 
     mixture: bool = True
@@ -29,9 +31,9 @@ if __name__ == "__main__":
     Box = {"x0": -12, "x1": 12, "y0": -3, "y1": 3, "z0": -5, "z1": 5}
     Res = {"x": 256, "y": 64, "z": 64}
 
-    max_timesteps = 1001
+    max_timesteps = 1000001
     dt = 0.0002
-    steps_per_npz = 10
+    steps_per_npz = 10000
     accuracy = 0.0
 
     f_y = 110.0
@@ -41,14 +43,15 @@ if __name__ == "__main__":
 
     f_x_open = 33.0
     # delta_f_x_start = -4.5
-    delta_f_x_start = -1.5
+    # delta_f_x_start = -1.5
+    delta_f_x_start = -1.0
     delta_f_x_end = -0.4
     delta_f_x_step = 1.0
 
-    a12_start = 62.5
+    # a12_start = 62.5
     # a12_end = 97.6
-    a12_end = 62.6
-    a12_step = 2.5
+    # a12_end = 62.6
+    # a12_step = 2.5
 
     if mixture:
         file_start = "step_"
@@ -63,7 +66,7 @@ if __name__ == "__main__":
     movie_string = "movie"
     counting_format = "%03d"
     movie_number = 1
-    files2last = 20
+    files2last = 40
     load_from_multi = True
     load_outer_loop = True
 
@@ -77,7 +80,10 @@ if __name__ == "__main__":
     func_list = []
     func_path_list = []
     dir_path_func_list = []
-    for a12 in np.arange(a12_start, a12_end, a12_step):
+    # a12_array = np.array([70.5, 71.0, 71.5, 72.0, 73.0, 73.5, 74.0, 74.5, 75.5, 76.0, 76.5, 77.0, 78.0, 78.5, 79.0, 79.5, 80.5, 81.0, 81.5, 82.0, 83.0, 83.5, 84.0, 84.5, 85.5, 86.0, 86.5, 87.0, 88.0, 88.5, 89.0, 89.5])
+    a12_array = np.array([90.5, 91.0, 91.5, 92.0, 93.0, 93.5, 94.0, 94.5, 95.5, 96.0, 96.5, 97.0, 98.0, 98.5, 99.0, 99.5, 100.0, 100.5, 101.0, 101.5, 102.0])
+    # a12_array = np.arange(a12_start, a12_end, a12_step)
+    for a12 in a12_array:
         for delta_f_x in np.arange(delta_f_x_start, delta_f_x_end, delta_f_x_step):
             skip_counter += 1
             if skip_counter < skip:
@@ -156,9 +162,9 @@ echo {jobname}
 --V_reload \
 -w={dic2str(w)} \
 -gpu_index={gpu_index} \
+--real_time \
 --offscreen
 
-# --real_time \
 # -V={V} \
 # -noise_func='{noise_func}'\
 # -neighborhood 0.02 4
@@ -176,7 +182,7 @@ echo {jobname}
     j_counter = 0
     # put distort.txt with the used V for every movie
     for i, f_x in enumerate(np.arange(delta_f_x_start, delta_f_x_end, delta_f_x_step)):
-        for j, a12 in enumerate(np.arange(a12_start, a12_end, a12_step)):
+        for j, a12 in enumerate(a12_array):
             func = func_list[j_counter]
             func_path = func_path_list[j_counter]
             dir_path_func = dir_path_func_list[j_counter]

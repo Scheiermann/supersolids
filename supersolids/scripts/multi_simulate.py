@@ -13,7 +13,7 @@ from supersolids.helper.dict2str import dic2str
 
 
 if __name__ == "__main__":
-    supersolids_version = "0.1.37rc5"
+    supersolids_version = "0.1.37rc7"
     dir_path = Path("/bigwork/dscheier/results/begin_gpu/")
 
     slurm: bool = True

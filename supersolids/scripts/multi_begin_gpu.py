@@ -9,10 +9,13 @@ from supersolids.helper.dict2str import dic2str
 
 
 if __name__ == "__main__":
-    supersolids_version = "0.1.37rc5"
-    dir_path = Path("/home/dscheiermann/results/begin_gpu_11_18/")
+    supersolids_version = "0.1.37rc7"
+    dir_path = Path("/home/dscheiermann/results/begin_gpu_12_28/")
+    # dir_path = Path("/home/dscheiermann/results/begin_gpu_12_28_to_102_dip9/")
+    if not dir_path.is_dir():
+        dir_path.mkdir(parents=True)
 
-    xvfb_display = 970
+    xvfb_display = 690
     movie_string = "movie"
     counting_format = "%03d"
 
@@ -21,15 +24,15 @@ if __name__ == "__main__":
 
     m_list = [163.9, 163.9]
     a_dd = 130.8
-    dipol = 9.0
-    # dipol = 10.0
+    # dipol = 9.0
+    dipol = 10.0
     dipol2 = 10.0
     a_dd_list = [a_dd, (dipol/dipol2) * a_dd, (dipol/dipol2) ** 2.0 * a_dd]
     # a_dd_list = [a_dd, 0.0, (dipol/10.0) ** 2.0 * a_dd]
 
-    movie_number = 1
-    mem_in_MB = 750
-    gpu_index = 0
+    movie_number = 41
+    mem_in_MB = 1400
+    gpu_index = 1
     Box = {"x0": -12, "x1": 12, "y0": -3, "y1": 3, "z0": -5, "z1": 5}
     # Box = {"x0": -20, "x1": 20, "y0": -3, "y1": 3, "z0": -5, "z1": 5}
     Res = {"x": 256, "y": 64, "z": 64}
@@ -78,12 +81,12 @@ if __name__ == "__main__":
     epsilon_end = 0.1
     epsilon_step = 0.2
 
-    a12_start = 62.5
-    a12_end = 97.6
+    # a12_start = 62.5
+    # a12_end = 97.6
     # a12_start = 62.5
     # a12_end = 98.1
-    a12_step = 5.0
-    a12_step = 2.5
+    # a12_step = 5.0
+    # a12_step = 2.5
 
     func_filename = "distort.txt"
 
@@ -93,8 +96,11 @@ if __name__ == "__main__":
     # j_counter = skip - 1
     end = 0
 
+    a12_array = np.array([70.5, 71.0, 71.5, 72.0, 73.0, 73.5, 74.0, 74.5, 75.5, 76.0, 76.5, 77.0, 78.0, 78.5, 79.0, 79.5, 80.5, 81.0, 81.5, 82.0, 83.0, 83.5, 84.0, 84.5, 85.5, 86.0, 86.5, 87.0, 88.0, 88.5, 89.0, 89.5])
+    # a12_array = np.array([90.5, 91.0, 91.5, 92.0, 93.0, 93.5, 94.0, 94.5, 95.5, 96.0, 96.5, 97.0, 98.0, 98.5, 99.0, 99.5, 100.0, 100.5, 101.0, 101.5, 102.0])
+    # a12_array = np.arange(a12_start, a12_end, a12_step)
     for epsilon in np.arange(epsilon_start, epsilon_end, epsilon_step):
-        for a12 in np.arange(a12_start, a12_end, a12_step):
+        for a12 in a12_array:
             skip_counter += 1
             if skip_counter < skip:
                 continue
@@ -154,7 +160,7 @@ echo {jobname}
 -tilt={tilt} \
 --V_interaction \
 --offscreen \
---gpu_index={gpu_index} \
+-gpu_index={gpu_index} \
 --mixture &
 
 """

@@ -11,7 +11,7 @@ from supersolids.helper.dict2str import dic2str
 if __name__ == "__main__":
     slurm = True
     xvfb_display = 960
-    supersolids_version = "0.1.37rc5"
+    supersolids_version = "0.1.37rc7"
     # dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_schroedinger/")
     # dir_path = Path("/bigwork/dscheier/supersolids/supersolids/results/begin_mixture_a12_small_grid/")
     dir_path = Path("/bigwork/dscheier/results/begin_pretilt0.05_a11_70to120_Res4x/")

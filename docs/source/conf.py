@@ -23,7 +23,7 @@ copyright = '2021, Daniel Scheiermann'
 author = 'Daniel Scheiermann'
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.37rc5"
+release = "0.1.37rc7"
 
 
 # -- General configuration ---------------------------------------------------
