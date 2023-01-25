@@ -77,11 +77,16 @@ def download(host, path_in, path_out, filename_singles, download_steps, take_las
 
 
 if __name__ == "__main__":
-    ssh_hostname = 'transfer'
+    ssh_hostname = 'gpu'
+    # ssh_hostname = 'transfer'
     password = None
 
-    path_anchor_input = Path("/bigwork/nhbbsche/results/begin_gpu_big/")
-    path_anchor_output = Path("/bigwork/dscheier/results/begin_gpu_big/")
+    # experiment_suffix = "gpu_11_18"
+    experiment_suffix = "gpu_12_05"
+    # experiment_suffix = "gpu_12_06"
+    # experiment_suffix = "gpu_12_07"
+    path_anchor_input = Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/")
+    path_anchor_output = Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/")
     # path_anchor_output = Path("/run/media/dsche/scr2/begin_gpu/")
     # path_anchor_output = Path("/run/media/dsche/scr2/begin_gpu_big/")
 
@@ -91,14 +96,14 @@ if __name__ == "__main__":
 
     movie_string = "movie"
     counting_format = "%03d"
-    movie_start = 1
-    movie_end = 6
+    movie_start = 21
+    movie_end = 35
 
     mixture = True
 
     if mixture:
         filename_steps_list = ["script_", "schroedinger_",
-                               "mixture_step_", "SchroedingerMixtureSummary_"]
+                               "step_", "SchroedingerMixtureSummary_"]
     else:
         filename_steps_list = ["script_", "schroedinger_",
                                "step_", "SchroedingerSummary_"]

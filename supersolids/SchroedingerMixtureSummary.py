@@ -14,6 +14,12 @@ from typing import Callable, Optional, List
 
 import numpy as np
 
+from supersolids.helper import get_version
+__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables()
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
+                                                               gpu_off=__GPU_OFF_ENV__,
+                                                               gpu_index=__GPU_INDEX_ENV__)
+
 from supersolids.SchroedingerSummary import SchroedingerSummary
 from supersolids.helper.Box import Box
 from supersolids.helper.Resolution import Resolution
@@ -57,6 +63,9 @@ class SchroedingerMixtureSummary:
         self.psi_sol_list: List[Optional[Callable]] = SystemMixture.psi_sol_list
         self.mu_sol_list: List[Optional[Callable]] = SystemMixture.mu_sol_list
         self.input_path: Path = SystemMixture.input_path
+        self.monopolar: Optional[float] = None
+        self.tilt: Optional[float] = None
+        self.stack_shift: Optional[float] = None
 
     def copy_to(self, SystemMixture):
         SystemMixture.name: str = self.name
@@ -86,3 +95,20 @@ class SchroedingerMixtureSummary:
         SystemMixture.psi_sol_list: List[Optional[Callable]] = self.psi_sol_list
         SystemMixture.mu_sol_list: List[Optional[Callable]] = self.mu_sol_list
         SystemMixture.input_path: Path = self.input_path
+        SystemMixture.monopolar: Optional[float] = self.monopolar
+        
+        # added in later versions
+        try:
+            SystemMixture.tilt: Optional[float] = self.tilt
+        except AttributeError as e:
+            print(f"{e}")
+        try:
+            SystemMixture.stack_shift: Optional[float] = self.stack_shift
+        except AttributeError as e:
+            print(f"{e}")
+
+    def convert_all_to_numpy(self):
+        self.a_s_array: np.ndarray = cp.asnumpy(self.a_s_array)
+        self.a_dd_array: np.ndarray = cp.asnumpy(self.a_dd_array)
+        self.mu_arr: np.ndarray = cp.asnumpy(self.mu_arr)
+        self.psi_0_list: List[np.ndarray] = [cp.asnumpy(psi_0) for psi_0 in self.psi_0_list]

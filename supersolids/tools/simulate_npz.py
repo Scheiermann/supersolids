@@ -13,6 +13,7 @@ time-dependent Schrodinger equation for 1D, 2D and 3D in single-core.
 import argparse
 import functools
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Optional, Callable
@@ -21,13 +22,9 @@ import dill
 import numpy as np
 
 from supersolids.helper import functions, get_version
-cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np)
 
 from supersolids.Animation.Animation import Animation
 
-from supersolids.Schroedinger import Schroedinger
-from supersolids.SchroedingerMixture import SchroedingerMixture
-from supersolids.helper.simulate_case import simulate_case
 from supersolids.helper.Resolution import Resolution
 from supersolids.helper.Box import Box
 
@@ -187,8 +184,7 @@ def simulate_npz(args):
             if args.dt is None:
                 dt = System_loaded.dt
             else:
-                # dt: float = float(args.dt[0])
-                dt: float = float(args.dt)
+                dt: float = float(args.dt[0])
 
             # check if changes of Box or Res, can be done
             x_step_old = (System_loaded.Box.lengths()[0] / System_loaded.Res.x)
@@ -441,6 +437,7 @@ def simulate_npz(args):
                 filename_steps=args.filename_steps,
                 steps_format=args.steps_format,
                 steps_per_npz=args.steps_per_npz,
+                steps_property=args.steps_property,
                 frame_start=frame,
                 script_name=args.script_name,
                 script_args=args,
@@ -506,6 +503,8 @@ def flags(args_array):
                         help="Formatting string for the enumeration of steps.")
     parser.add_argument("-steps_per_npz", type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
+    parser.add_argument("-steps_property", type=int, default=10,
+                        help="Number of dt steps skipped between saved summary of properties.")
     parser.add_argument("--offscreen", default=False, action="store_true",
                         help="If not used, interactive animation is shown and saved as mp4."
                              "If used, Schroedinger is saved as pkl and allows offscreen usage.")
@@ -518,6 +517,10 @@ def flags(args_array):
     parser.add_argument("-load_script", type=str, default=None,
                         help="Load system to simulate and namespace (configuration for experiment) "
                              "from pkl-files e.g. script_0001.pkl")
+    parser.add_argument("--gpu_off", default=False, action="store_true",
+                        help="Use flag to turn off gpu eventhouh it might be usable")
+    parser.add_argument("-gpu_index", type=int, default=0,
+                        help="Use to set index of cuda device.")
 
     args = parser.parse_args(args_array)
     print(f"args: {args}")
@@ -604,6 +607,17 @@ if __name__ == "__main__":
             args_loaded.max_timesteps = args_overwrite.max_timesteps
 
         args = args_loaded
+
+    os.environ["SUPERSOLIDS_GPU_INDEX"] = str(args.gpu_index)
+    os.environ["SUPERSOLIDS_GPU_OFF"] = str(args.gpu_off)
+    __GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables(gpu_index_str=args.gpu_index)
+    cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
+                                                                   gpu_off=__GPU_OFF_ENV__,
+                                                                   gpu_index=__GPU_INDEX_ENV__)
+
+    from supersolids.Schroedinger import Schroedinger
+    from supersolids.SchroedingerMixture import SchroedingerMixture
+    from supersolids.helper.simulate_case import simulate_case
 
     print(f"args finally: {args}")
     simulate_npz(args)

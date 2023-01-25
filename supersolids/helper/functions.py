@@ -13,7 +13,7 @@ Functions for Potential and initial wave function :math:`\psi_0`
 import functools
 import itertools
 import sys
-from typing import Tuple, Callable, List
+from typing import Optional, Tuple, Callable, List
 
 import numpy as np
 from scipy.integrate import quad
@@ -134,12 +134,16 @@ def arr_tensor_mult(self, arr, tensor_vec):
     return tensor_result
 
 
-def fft_plot(t, property_all):
-    T = t[-1]
+def fft_plot(t, property_all, start: Optional[int] = None, end: Optional[int] = None,
+             step: Optional[int] = None):
+    T = t[-1] - t[0]
     N = len(t)
     sample_rate = N / T
-    freq = np.fft.rfftfreq(len(t), 1.0 / sample_rate)
-    property_fft = np.abs(np.fft.rfft(property_all))
+    freq = np.fft.fftfreq(len(t), 1.0 / sample_rate) * 2.0 * np.pi
+    property_fft = np.abs(np.fft.fft(property_all))
+
+    freq = freq[start:end:step]
+    property_fft = property_fft[start:end:step]
 
     return freq, property_fft
 

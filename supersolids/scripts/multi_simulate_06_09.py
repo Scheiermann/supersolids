@@ -8,40 +8,42 @@
 import subprocess
 from pathlib import Path
 
-supersolids_version = "0.1.36rc4"
-dir_path = Path("/bigwork/dscheier/results/begin_stacked_a11_05_09/")
 
-slurm: bool = True
-mem_in_GB = 4
-xvfb_display = 990
+if __name__ == "__main__":
+    supersolids_version = "0.1.37rc7"
+    dir_path = Path("/bigwork/dscheier/results/begin_stacked_a11_05_09/")
 
-max_timesteps = 220000
+    slurm: bool = True
+    mem_in_GB = 4
+    xvfb_display = 990
 
-file_start = "step_"
-file_number = 130000
-file_format = "%07d"
-file_pattern = ".npz"
-file_name = f"{file_start}{file_format % file_number}{file_pattern}"
+    max_timesteps = 220000
 
-movie_string = "movie"
-counting_format = "%03d"
-movie_number = 6
-files2last = 10
+    file_start = "step_"
+    file_number = 130000
+    file_format = "%07d"
+    file_pattern = ".npz"
+    file_name = f"{file_start}{file_format % file_number}{file_pattern}"
 
-func_filename = "distort.txt"
+    movie_string = "movie"
+    counting_format = "%03d"
+    movie_number = 6
+    files2last = 10
 
-load_script = "script_0001.pkl"
+    func_filename = "distort.txt"
 
-movie_number_now = movie_number
+    load_script = "script_0001.pkl"
 
-movie_now = f"{movie_string}{counting_format % movie_number_now}"
-movie_number_after = movie_number + files2last
-movie_after = f"{movie_string}{counting_format % movie_number_after}"
+    movie_number_now = movie_number
 
-jobname = f"{supersolids_version}_m6_simulate"
+    movie_now = f"{movie_string}{counting_format % movie_number_now}"
+    movie_number_after = movie_number + files2last
+    movie_after = f"{movie_string}{counting_format % movie_number_after}"
 
-if slurm:
-    cluster_flags = f"""#==================================================
+    jobname = f"{supersolids_version}_m6_simulate"
+
+    if slurm:
+        cluster_flags = f"""#==================================================
 #SBATCH --job-name {jobname}
 #SBATCH -D {dir_path}/log/
 #SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
@@ -55,20 +57,20 @@ if slurm:
 #SBATCH --mem={mem_in_GB}G
 """
 
-heredoc = "\n".join(["#!/bin/bash",
-                     cluster_flags,
-                     f"""
+    heredoc = "\n".join(["#!/bin/bash",
+                         cluster_flags,
+                         f"""
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/bigwork/dscheier/miniconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
-eval "$__conda_setup"
+    eval "$__conda_setup"
 else
-if [ -f "/bigwork/dscheier/miniconda/etc/profile.d/conda.sh" ]; then
-. "/bigwork/dscheier/miniconda/etc/profile.d/conda.sh"
-else
-export PATH="/bigwork/dscheier/miniconda/bin:$PATH"
-fi
+    if [ -f "/bigwork/dscheier/miniconda/etc/profile.d/conda.sh" ]; then
+        . "/bigwork/dscheier/miniconda/etc/profile.d/conda.sh"
+    else
+        export PATH="/bigwork/dscheier/miniconda/bin:$PATH"
+    fi
 fi
 unset __conda_setup
 # <<< conda initialize <<<
@@ -102,11 +104,12 @@ python -m supersolids.tools.simulate_npz \
 -dir_name_result={movie_after} \
 -max_timesteps={max_timesteps}
 
-"""])
+"""
+    ])
 
-print(heredoc)
+    print(heredoc)
 
-p = subprocess.Popen(["sbatch"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=False)
+    p = subprocess.Popen(["sbatch"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=False)
 
-out, err = p.communicate(heredoc.encode())
-p.wait()
+    out, err = p.communicate(heredoc.encode())
+    p.wait()

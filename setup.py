@@ -16,7 +16,7 @@ with open(path.join(this_directory, "README.rst"), encoding="utf-8") as f:
 
 setup(
     name="supersolids",
-    version="0.1.36rc7",
+    version="0.1.37rc7",
     packages=find_packages(),
     package_data={"supersolids": []},
     url="https://github.com/Scheiermann/supersolids",
@@ -34,11 +34,9 @@ setup(
                       "psutil",
                       "pyqt5",
                       "scipy",
-                      "sphinx-autoapi",
-                      "sphinx-rtd-theme",
                       "sqlalchemy",
                       ],
-    extra_require=["numba"],
+    extra_require=["numba", "cupy", "sphinx-autoapi", "sphinx-rtd-theme"],
     # ext_modules=[cc.distutils_extension()],
     # ext_modules=cythonize("*.pyx", language_level=3),
     python_requires=">=3.6",

@@ -131,6 +131,8 @@ def flags(args_array):
     parser.add_argument("-steps_per_npz", metavar="steps_per_npz",
                         type=int, default=10,
                         help="Number of dt steps skipped between saved npz.")
+    parser.add_argument("-steps_property", type=int, default=10,
+                        help="Number of dt steps skipped between saved summary of properties.")
     parser.add_argument("--mixture", default=False, action="store_true",
                         help="Use to simulate a SchroedingerMixture.")
     parser.add_argument("--offscreen", default=False, action="store_true",
@@ -154,11 +156,10 @@ if __name__ == "__main__":
 
     os.environ["SUPERSOLIDS_GPU_INDEX"] = str(args.gpu_index)
     os.environ["SUPERSOLIDS_GPU_OFF"] = str(args.gpu_off)
-    # if env variable found, it will be a string "False" or "True": trick to convert to bool
-    __GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False) in ["True", "true"])
-    gpu_index_str = int(os.environ.get("SUPERSOLIDS_GPU_INDEX", 0))
-    __GPU_INDEX__= int("0" if gpu_index_str=="" else gpu_index_str)
-    cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__, gpu_index=__GPU_INDEX__)
+    __GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables(gpu_index_str=args.gpu_index)
+    cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
+                                                                   gpu_off=__GPU_OFF_ENV__,
+                                                                   gpu_index=__GPU_INDEX_ENV__)
     from supersolids.Schroedinger import Schroedinger
     from supersolids.SchroedingerMixture import SchroedingerMixture
     from supersolids.helper.simulate_case import simulate_case
@@ -433,6 +434,7 @@ if __name__ == "__main__":
                 filename_steps=args.filename_steps,
                 steps_format=args.steps_format,
                 steps_per_npz=args.steps_per_npz,
+                steps_property=args.steps_property,
                 frame_start=0,
                 script_name=args.script_name,
                 script_args=args,

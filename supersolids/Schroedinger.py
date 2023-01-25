@@ -11,7 +11,6 @@ Numerical solver for non-linear time-dependent Schrodinger equation.
 """
 
 import functools
-import os
 from pathlib import Path
 import sys
 from typing import Callable, Union, Optional, List, Tuple
@@ -21,11 +20,11 @@ import numpy as np
 import scipy.signal
 
 from supersolids.helper import constants, functions, get_path, get_version
-# if env variable found, it will be a string "False" or "True": trick to convert to bool
-__GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False) in ["True", "true"])
-gpu_index_str = int(os.environ.get("SUPERSOLIDS_GPU_INDEX",0))
-__GPU_INDEX__= int("0" if gpu_index_str=="" else gpu_index_str)
-cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__, gpu_index=__GPU_INDEX__)
+
+__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables()
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
+                                                               gpu_off=__GPU_OFF_ENV__,
+                                                               gpu_index=__GPU_INDEX_ENV__)
 if numba_used:
     import supersolids.helper.numbas as numbas
 
@@ -899,6 +898,10 @@ class Schroedinger:
         with open(Path(input_path, filename_steps + steps_format % frame + ".npz"), "wb") as g:
             np.savez_compressed(g, psi_val=self.psi_val)
 
+    def save_summary(self, SystemSummary, input_path: Path, steps_format: str, frame: int) -> None:
+        with open(Path(input_path, self.name + steps_format % frame + ".pkl"), "wb") as f:
+            dill.dump(obj=SystemSummary, file=f)
+
     def simulate_raw(self,
                      accuracy: float = 10 ** -6,
                      dir_path: Path = Path.home().joinpath("supersolids", "results"),
@@ -908,6 +911,7 @@ class Schroedinger:
                      filename_steps: str = "step_",
                      steps_format: str = "%07d",
                      steps_per_npz: int = 10,
+                     steps_property: int = 10,
                      frame_start: int = 0,
                      script_name: str = "script",
                      script_args: str = "",
@@ -966,25 +970,38 @@ class Schroedinger:
         save_script(script_count_old, input_path, filename_schroedinger_prefix, self)
 
         # save used Schroedinger
-        with open(Path(input_path, filename_schroedinger), "wb") as f:
-            dill.dump(obj=self, file=f)
+        try:
+            System_np = self.copy_with_all_numpy()
+            with open(Path(input_path, filename_schroedinger), "wb") as f:
+                dill.dump(obj=System_np, file=f)
+        except Exception as e:
+            print(f"{e}")
+            with open(Path(input_path, filename_schroedinger), "wb") as f:
+                dill.dump(obj=self, file=f)
 
         frame_end: int = frame_start + self.max_timesteps
         for frame in range(frame_start, frame_end):
             mu_old: np.ndarray = np.copy(self.mu_arr)
             self.time_step(numba_used, cupy_used)
-            if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
+            if ((frame % steps_property == 0) or (frame % steps_per_npz == 0)
+                 or (frame == frame_end - 1)):
                 # calculate energy just when saving, but before creating a summary
                 self.get_E()
 
             SystemSummary, summary_name = self.use_summary()
 
-            if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
-                with open(Path(input_path, self.name + steps_format % frame + ".pkl"),
-                          "wb") as f:
-                    # save SchroedingerSummary not Schroedinger to save disk space
-                    dill.dump(obj=SystemSummary, file=f)
+            if ((frame % steps_property) == 0) or (frame == frame_end - 1):
+                try:
+                    # convert cupy array to numpy element wise
+                    com_list = self.get_center_of_mass(p=2.0)
+                    SystemSummary.monopolar = [[com.get() for com in comp] for comp in com_list]
+                except Exception as e:
+                    SystemSummary.monopolar = self.get_center_of_mass(p=2.0)
+                    print(f"Problem with monopolar:\n{e}")
+                # save SchroedingerSummary not Schroedinger to save disk space
+                self.save_summary(SystemSummary, input_path, steps_format, frame)
 
+            if ((frame % steps_per_npz) == 0) or (frame == frame_end - 1):
                 # save psi_val after steps_per_npz steps of dt (to save disk space)
                 self.save_psi_val(input_path, filename_steps, steps_format, frame)
 

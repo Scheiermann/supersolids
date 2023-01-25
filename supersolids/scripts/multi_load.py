@@ -24,8 +24,9 @@ def string_float(s):
 if __name__ == "__main__":
     ssh_hostname = None
     # ssh_hostname = "transfer"
+    # ssh_hostname = "gpu"
     password = None
-    experiment_name = "start_real"
+    experiment_name = "gpu_begin"
     # experiment_name = "test_db"
 
     path_anchor_input_list = []
@@ -35,8 +36,17 @@ if __name__ == "__main__":
     # experiment_suffix = "ramp_28_10_85_m15_fix"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
 
-    experiment_suffix = "ramp_11_08_eq_65_70_75_80_85_90"
+    # experiment_suffix = "ramp_11_08_eq_65_70_75_80_85_90"
+    # experiment_suffix = "gpu_tilt_11_19"
+    # experiment_suffix = "gpu_11_16"
+    # experiment_suffix = "gpu_11_18"
+    experiment_suffix = "gpu_12_05"
+    # experiment_suffix = "gpu_12_06"
+    # experiment_suffix = "gpu_12_07"
+    
+    # path_anchor_input_list.append(Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/"))
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # path_anchor_input_list.append(Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/"))
     # experiment_suffix = "ramp_11_04_675_long_wide"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # experiment_suffix = "ramp_11_04_70_long_wide"
@@ -48,9 +58,10 @@ if __name__ == "__main__":
  
 
     # path_anchor_input_list.append(Path(f"/bigwork/nhbbsche/results/begin_{experiment_suffix}/"))
-    path_anchor_output_list = path_anchor_input_list
+    # path_anchor_output_list = path_anchor_input_list
     # experiment_suffix = "ramp_luis"
     # path_anchor_output_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    path_anchor_output_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     
     # mixture = False
     mixture = True
@@ -60,21 +71,20 @@ if __name__ == "__main__":
     # take_last = 3
     take_last = np.inf
     # frame_end = 1000
+    frame_start = None
+    # frame_start = 350000
     frame_end = None
 
-    steps_per_npz = 10000
+    # steps_per_npz = 100
     # steps_per_npz = 1000
+    steps_per_npz = 10000
     # steps_per_npz = 100
     # steps_per_npz = 1
 
     movie_string = "movie"
     counting_format = "%03d"
-    # movie_start_list = [1, 11, 21, 31]
-    # movie_end_list = [2, 12, 22, 32]
-    # movie_start_list = [1, 1]
-    # movie_end_list = [2, 2]
-    movie_start_list = [1]
-    movie_end_list = [13]
+    movie_start_list = [1, 1]
+    movie_end_list = [15, 15]
     slice_indices = {"x": 127, "y": 31, "z": 31}
     # slice_indices = {"x": 63, "y": 31, "z": 31}
     # slice_indices = {"x": 31, "y": 15, "z": 15}
@@ -89,15 +99,15 @@ if __name__ == "__main__":
         # filename_steps_list = ["mixture_step_"]
         # filename_steps_list = ["mixture_mixture_step_pol_"]
         mixture_slice_index_list_list.append([0, 1])
-        # mixture_slice_index_list_list.append([1, 0])
+        mixture_slice_index_list_list.append([1, 0])
         filename_steps_list = ["step_", "step_"]
         # filename_steps_list = ["mixture_step_", "mixture_step_", "mixture_mixture_step_pol_"]
         # filename_steps_list = ["step_", "step_", "pol_"]
         alpha_psi_list_list.append([0.0, 0.0])
-        # alpha_psi_list_list.append([0.0, 0.0])
+        alpha_psi_list_list.append([0.0, 0.0])
         # alpha_psi_list = [0.0, 0.0]
         alpha_psi_sol_list_list.append([0.0, 0.0])
-        # alpha_psi_sol_list_list.append([0.0, 0.0])
+        alpha_psi_sol_list_list.append([0.0, 0.0])
     else:
         filename_steps = "step_"
         alpha_psi_list_list.append([0.0])
@@ -120,9 +130,9 @@ if __name__ == "__main__":
     ## xy
     azimuth_list.append(0.0)
     elevation_list.append(0.0)
-    distance_list.append(20.0)
+    # distance_list.append(20.0)
     # distance_list.append(24.0)
-    # distance_list.append(24.0)
+    distance_list.append(24.0)
     # distance_list.append(25.0)
     # distance_list.append(38.0)
 
@@ -151,11 +161,14 @@ if __name__ == "__main__":
                 for i in range(movie_start, movie_end + 1):
                     path_in = Path(path_anchor_input, movie_string + f"{counting_format % i}")
                     if ssh_hostname:
-                        with Connection(ssh_hostname) as host:
-                            files = sorted(fnmatch.filter(host.sftp().listdir(path=str(path_in)),
-                                                          filename_steps_list[0]
-                                                          + "*"
-                                                          + filename_pattern))
+                        search = filename_steps_list[0] + "*" + filename_pattern
+                        try:
+                            with Connection(ssh_hostname) as host:
+                                files = sorted(fnmatch.filter(host.sftp().listdir(path=str(path_in)),
+                                               search))
+                        except FileNotFoundError as e:
+                            files = []
+                            print(f"Skipped! {str(Path(path_in, search))}\n{e}")
                     else:
                         files = sorted([x for x in path_in.glob(filename_steps_list[0]
                                         + "*" + filename_pattern) if x.is_file()])
@@ -171,9 +184,10 @@ if __name__ == "__main__":
                                   f'not found. Skipping.')
                             continue
 
-                    frame_start = get_step_index(files_last,
-                                                 filename_prefix=filename_steps_list[0],
-                                                 file_pattern=filename_pattern)
+                    if frame_start is None:
+                        frame_start = get_step_index(files_last,
+                                                     filename_prefix=filename_steps_list[0],
+                                                     file_pattern=filename_pattern)
 
                     command = ["python", "-m", "supersolids.tools.load_npz"]
                     flags_given = [f"-dir_path={path_anchor_input}",

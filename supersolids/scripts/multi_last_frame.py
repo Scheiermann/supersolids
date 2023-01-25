@@ -13,6 +13,8 @@ if __name__ == "__main__":
     path_anchor_input_list: List[Path] = []
     var1_list = []
     var2_list = []
+    movie_start_list = []
+    movie_end_list = []
 
     use_edited = False
 
@@ -124,12 +126,60 @@ if __name__ == "__main__":
     # movie_start_list = [6]
     # movie_end_list = [25]
 
-    experiment_suffix = "ramp_11_04_75_775_80_long_wide"
-    var1_list.append(np.arange(75.0, 80.1, 2.5)) # a11 11_04_75_775_80_long_wide
-    var2_list.append(np.arange(3.2, 7.01, 0.2)) # tilt 11_04_75_775_80_long_wide
+    # experiment_suffix = "ramp_11_04_75_775_80_long_wide"
+    # var1_list.append(np.arange(75.0, 80.1, 2.5)) # a11 11_04_75_775_80_long_wide
+    # var2_list.append(np.arange(3.2, 7.01, 0.2)) # tilt 11_04_75_775_80_long_wide
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # movie_start_list = [1]
+    # movie_end_list = [60]
+
+    # # experiment_suffix = "gpu_11_18"
+    # experiment_suffix = "gpu_11_18_real_w-1"
+    # # var1_list.append(np.arange(62.5, 97.6, 2.5)) # a12 gpu_11_18 
+    # # var2_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_11_18
+    # var2_list.append(np.arange(62.5, 97.6, 2.5)) # a12 gpu_11_18 
+    # var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_11_18
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # movie_start_list = [111]
+    # movie_end_list = [125]
+
+    # experiment_suffix = "gpu_12_05"
+    # var2_list.append(np.arange(62.5, 97.6, 2.5)) # a_12 gpu_12_05
+    # var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_12_06
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # # movie_start_list = [21]
+    # # movie_end_list = [35]
+    # movie_start_list.append(21)
+    # movie_end_list.append(35)
+
+    # experiment_suffix = "gpu_12_06"
+    # a12_array = np.array([57.5, 58.0, 58.5, 59.0, 59.5, 60.0, 60.5, 61.0, 61.5, 62.0, 63.0, 63.5, 64.0, 64.5, 65.5, 66.0, 66.5, 67.0, 68.0, 68.5, 69.0, 69.5])
+    # var2_list.append(a12_array) # a12 gpu_12_06 
+    # var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_12_06
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # # movie_start_list = [31]
+    # # movie_end_list = [52]
+    # movie_start_list.append(31)
+    # movie_end_list.append(52)
+
+    # experiment_suffix = "gpu_11_18"
+    experiment_suffix = "gpu_11_18_real_w-1"
+    var2_list.append(np.arange(62.5, 97.6, 2.5)) # a12 gpu_11_18 
+    var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_11_18
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    movie_start_list = [1]
-    movie_end_list = [60]
+    movie_start_list.append(111)
+    movie_end_list.append(125)
+
+
+    experiment_suffix = "gpu_12_07"
+    a12_array = np.array([57.5, 58.0, 58.5, 59.0, 59.5, 60.0, 60.5, 61.0, 61.5, 62.0, 63.0, 63.5, 64.0, 64.5, 65.5, 66.0, 66.5, 67.0, 68.0, 68.5, 69.0, 69.5])
+    var2_list.append(a12_array) # a12 gpu_12_06 
+    var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_12_06
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    movie_start_list.append(31)
+    movie_end_list.append(52)
+
+    experiment_suffix = "gpu_dipol_9_10"
 
     # experiment_suffix = "ramp_24_10_long"
     # var1_list.append(np.arange(72.5, 80.1, 2.5)) # a11 24_10_long
@@ -159,40 +209,67 @@ if __name__ == "__main__":
     # movie_take_last_list: int = [4, 3]
     movie_take_last_list: int = [2, 1]
     suffix_list = [f"_map_x_0", f"_map_x_1"]
+    # movie_take_last_list: int = [1]
+    # suffix_list = [f"_map_x_0"]
     # property_filename_list = []
     # list_of_arrays_list = []
-    property_filename_list = ["E_paper_framestart_0.png",
-                              "get_E_explicit_paper_framestart_0.png", 
-                              "mu_arr_paper_framestart_0.png",
-                              "get_center_of_mass_paper_framestart_0.png",
-                              "get_parity_paper_framestart_0.png",
-                              ]
+
+    # property_filename_list = ["E_paper_framestart_0.png",
+    #                           "get_E_explicit_paper_framestart_0.png", 
+    #                           "mu_arr_paper_framestart_0.png",
+    #                           "get_center_of_mass_paper_framestart_0.png",
+    #                           "get_parity_paper_framestart_0.png",
+    #                           ]
+    # list_of_arrays_list = [False, False, False, True, True]
+
+    # property_filename_list = ["E_paper_framestart_350000.png",
+    #                           "get_E_explicit_paper_framestart_350000.png", 
+    #                           "mu_arr_paper_framestart_350000.png",
+    #                           "get_center_of_mass_paper_framestart_350000.png",
+    #                           "get_parity_paper_framestart_350000.png",
+    #                           ]
+    # list_of_arrays_list = [False, False, False, True, True]
+
+    # property_filename_list = ["E_paper_framestart_350000.png",
+    #                           "get_E_explicit_paper_framestart_350000.png", 
+    #                           "mu_arr_paper_framestart_350000.png",
+    #                           "get_center_of_mass_paper_framestart_350000.png",
+    #                           "get_parity_paper_framestart_350000.png",
+    #                           "monopolar_paper_framestart_350000.png", 
+    #                           "monopolar_paper_framestart_350000_fft.png", 
+    #                           ]
+    # list_of_arrays_list = [False, False, False, True, True, True, True]
+
+    # property_filename_list = ["monopolar_paper_framestart_350000.png", 
+    #                           "monopolar_paper_framestart_350000_fft.png", 
+    #                           ]
+    # list_of_arrays_list = [True, True]
+
+    property_filename_list = ["monopolar_paper_framestart_350000_fft.png"]
+    list_of_arrays_list = [True]
+
     # list_of_arrays_list = [False]
     # list_of_arrays_list = [False, False, False]
     # list_of_arrays_list = [False, False, False, True]
-    list_of_arrays_list = [False, False, False, True, True]
+    # list_of_arrays_list = [False, False, False, True, True]
     cut_names: List[str] = ["cut_x", "cut_y", "cut_z"]
     normed_plots = False
     if normed_plots:
         suffix_list[0] += "_normed"
 
-    nrow_components = 1
-    ncol_components = 2
-    # nrow_components = 2
-    # ncol_components = 1
+    # nrow_components = 1
+    # ncol_components = 2
+    nrow_components = 2
+    ncol_components = 1
     
     frames = False
     # frames = True
     if frames:
-        frame_start = 0
-        # frame_step = 1
-        # frame_end = 101
+        # frame_start = 0
+        frame_start = 350000
         frame_step = 10000
-        frame_end = 75001
-        # frame_start = 1000
-        # frame_step = 1000
-        # frame_end = 100001
-        # frame_end = 20001
+        frame_end = 350001
+        # frame_end = 1350001
         frames = np.arange(frame_start, frame_end, frame_step)
     else:
         frames = np.array([False])
@@ -230,6 +307,7 @@ if __name__ == "__main__":
     mixture_slice_index_list: List[int] = [0, 1]
     filename_steps_list: List[str] = ["step_", "step_"]
 
+    # video = True
     video = False
     if video:
         filename_format = None

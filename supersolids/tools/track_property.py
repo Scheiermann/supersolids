@@ -173,9 +173,17 @@ def property_to_array(property_tuple, list_of_arrays: bool=False):
     for i, property_components_all in enumerate(property_tuple):
         try:
             if list_of_arrays:
-                property_all = np.dstack((property_all, property_components_all))
+                try:
+                    property_all = np.dstack((property_all, property_components_all))
+                except Exception as e:
+                    print(f"Conversion from np to cp needed:\n{e}")
+                    property_all = cp.dstack((property_all, property_components_all))
             else:
-                property_all = np.vstack((property_all, property_components_all))
+                try:
+                    property_all = np.vstack((property_all, property_components_all))
+                except Exception as e:
+                    print(f"Conversion from np to cp needed:\n{e}")
+                    property_all = cp.vstack((property_all, property_components_all))
         except ValueError:
             sys.exit(f"Failed at {i}: {property_components_all}. Not enough values. "
                      "Adjust provided arguments of property.")
@@ -250,7 +258,7 @@ def plot_property(args, func=functions.identity):
     path_output = Path(input_path, f"{args.property_name + args.property_filename_suffix}")
     if dim == 1:
         property_all = property_all.ravel()
-        x_range, y_range = func(t, property_all)
+        x_range, y_range = func(t, property_all, *args.inbuild_func_args)
 
         plt.plot(x_range, y_range, "x-")
         plt.xlabel(rf"t with dt={args.dt}")
@@ -268,12 +276,12 @@ def plot_property(args, func=functions.identity):
                     number_of_components = len(property_all)
                     for j in range(0, number_of_components):
                         labels.append(f"component {j} axis {i}")
-                        x_range, y_range = func(t, property_all[j, i, :])
+                        x_range, y_range = func(t, property_all[j, i, :], *args.inbuild_func_args)
                         ax.plot(x_range, y_range, "x-", label=labels[-1])
 
                 else:
                     labels.append(str(i))
-                    x_range, y_range = func(t, property_all.T[i])
+                    x_range, y_range = func(t, property_all.T[i], *args.inbuild_func_args)
                     ax.plot(x_range, y_range, "x-", label=labels[i])
                 ax.grid()
                 ax.legend()
@@ -287,7 +295,7 @@ def plot_property(args, func=functions.identity):
         else:
             for i in range(0, dim):
                 labels.append(str(i))
-                x_range, y_range = func(t, property_all.T[i])
+                x_range, y_range = func(t, property_all.T[i], *args.inbuild_func_args)
                 plt.plot(x_range, y_range, "x-", label=labels[i])
 
             plt.setp(plt.gca().get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
@@ -351,6 +359,8 @@ def flags(args_array):
     parser.add_argument("-inbuild_func", type=functions.lambda_parsed,
                         help="Function to construct new properties "
                              "from t and the in-build property_name.")
+    parser.add_argument("--inbuild_func_args", type=json.loads, default=[], action='store', nargs="*",
+                        help="Arguments for inbuild_func, if used.")
     parser.add_argument("--list_of_arrays", default=False, action="store_true",
                         help="Use to track properties that are arrays of SchroedingerMixture. "
                              "As example center_of_mass for 2 components Mixture: "

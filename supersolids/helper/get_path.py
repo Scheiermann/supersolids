@@ -3,6 +3,7 @@
 import fnmatch
 
 from pathlib import Path
+import traceback
 from typing import Tuple, List, Optional
 from stat import S_ISDIR, S_ISREG
 
@@ -43,7 +44,11 @@ def get_path(dir_path: Path,
             # for files
             if host:
                 sftp = host.sftp()
-                files = [x.filename for x in sftp.listdir_attr(path=str(dir_path)) if S_ISREG(x.st_mode)]
+                try:
+                    files = [x.filename for x in sftp.listdir_attr(path=str(dir_path)) if S_ISREG(x.st_mode)]
+                except FileNotFoundError as e:
+                    print(f"{e}")
+                    traceback.print_exc()
                 existing = sorted(fnmatch.filter(files, search_prefix + "*"))
                 existing = [Path(dir_path, file) for file in existing]
             else:
