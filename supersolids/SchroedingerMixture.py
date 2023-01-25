@@ -12,7 +12,6 @@ Numerical solver for non-linear time-dependent Schrodinger equation (eGPE) for d
 """
 from copy import deepcopy
 import functools
-import os
 import pickle
 import sys
 
@@ -28,11 +27,10 @@ from scipy.ndimage import distance_transform_edt
 
 from supersolids.helper import constants, functions, get_path, get_version
 
-# if env variable found, it will be a string "False" or "True": trick to convert to bool
-__GPU_OFF_ENV__ = bool(os.environ.get("SUPERSOLIDS_GPU_OFF", False) in ["True", "true"])
-gpu_index_str = int(os.environ.get("SUPERSOLIDS_GPU_INDEX",0))
-__GPU_INDEX__= int("0" if gpu_index_str=="" else gpu_index_str)
-cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np, gpu_off=__GPU_OFF_ENV__, gpu_index=__GPU_INDEX__)
+__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables()
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
+                                                               gpu_off=__GPU_OFF_ENV__,
+                                                               gpu_index=__GPU_INDEX_ENV__)
 import supersolids.helper.numbas as numbas
 
 from supersolids.Schroedinger import Schroedinger
@@ -451,19 +449,51 @@ class SchroedingerMixture(Schroedinger):
         for m in self.m_list:
             self.H_kin_list.append(self.H_kin)
 
-    def cupy2numpy(self):
-        self.x_mesh = cp.asnumpy(self.x_mesh)
-        self.y_mesh = cp.asnumpy(self.y_mesh)
-        self.z_mesh = cp.asnumpy(self.z_mesh)
-        self.kz_mesh = cp.asnumpy(self.kz_mesh)
-        self.V_val = cp.asnumpy(self.V_val)
-        self.V_k_val = cp.asnumpy(self.V_k_val)
-        self.k_squared = cp.asnumpy(self.k_squared)
-        self.H_kin = cp.asnumpy(self.H_kin)
+    def convert_all_to_numpy(self):
+        self.a_s_array: np.ndarray = cp.asnumpy(self.a_s_array)
+        self.a_dd_array: np.ndarray = cp.asnumpy(self.a_dd_array)
 
-        self.H_kin_list = [cp.asnumpy(H_kin) for H_kin in self.H_kin_list]
-        self.psi_val_list = [cp.asnumpy(psi_val) for psi_val in self.psi_val_list]
-        self.psi_sol_val_list = [cp.asnumpy(psi_sol_val) for psi_sol_val in self.psi_sol_val_list]
+        self.k_squared: np.ndarray = cp.asnumpy(self.k_squared)
+
+        self.V_k_val: np.ndarray = cp.asnumpy(self.V_k_val)
+        self.V_val: np.ndarray = cp.asnumpy(self.V_val)
+
+        self.A: np.ndarray = cp.asnumpy(self.A)
+
+        self.H_kin: np.ndarray = cp.asnumpy(self.H_kin)
+        self.H_kin_list: List[np.ndarray] = [cp.asnumpy(H_kin) for H_kin in self.H_kin_list]
+
+        self.psi_0_list: List[np.ndarray] = [cp.asnumpy(psi_0) for psi_0 in self.psi_0_list]
+
+        # self.x_mesh = cp.asnumpy(self.x_mesh)
+        # self.y_mesh = cp.asnumpy(self.y_mesh)
+        # self.z_mesh = cp.asnumpy(self.z_mesh)
+        # self.kz_mesh = cp.asnumpy(self.kz_mesh)
+        # self.k_squared = cp.asnumpy(self.k_squared)
+        #
+        # self.psi_val_list = [cp.asnumpy(psi_val) for psi_val in self.psi_val_list]
+        # self.psi_sol_val_list = [cp.asnumpy(psi_sol_val) for psi_sol_val in self.psi_sol_val_list]
+
+    def copy_with_all_numpy(self):
+        System = deepcopy(self)
+
+        System.a_s_array: np.ndarray = cp.asnumpy(self.a_s_array)
+        System.a_dd_array: np.ndarray = cp.asnumpy(self.a_dd_array)
+
+        System.k_squared: np.ndarray = cp.asnumpy(self.k_squared)
+
+        System.V_k_val: np.ndarray = cp.asnumpy(self.V_k_val)
+        System.V_val: np.ndarray = cp.asnumpy(self.V_val)
+
+        System.A: np.ndarray = cp.asnumpy(self.A)
+
+        System.H_kin: np.ndarray = cp.asnumpy(self.H_kin)
+        System.H_kin_list: List[np.ndarray] = [cp.asnumpy(H_kin) for H_kin in self.H_kin_list]
+
+        System.psi_0_list: List[np.ndarray] = [cp.asnumpy(psi_0) for psi_0 in self.psi_0_list]
+
+        return System
+
 
     def func_energy(self, u: float) -> np.ndarray:
         """
@@ -566,11 +596,13 @@ class SchroedingerMixture(Schroedinger):
     def use_summary(self, summary_name: Optional[str] = None) -> Tuple[SchroedingerMixtureSummary,
                                                                        Optional[str]]:
         Summary: SchroedingerMixtureSummary = SchroedingerMixtureSummary(self)
+        Summary.convert_all_to_numpy()
 
         return Summary, summary_name
 
     def load_summary(self, input_path: Path, steps_format: str, frame: int,
-                     summary_name: Optional[str] = "SchroedingerMixtureSummary_"):
+                     summary_name: Optional[str] = "SchroedingerMixtureSummary_",
+                     host=None):
         if summary_name:
             system_summary_path = Path(input_path, summary_name + steps_format % frame + ".pkl")
         else:
@@ -578,11 +610,17 @@ class SchroedingerMixture(Schroedinger):
 
         try:
             # load SchroedingerSummary
-            with open(system_summary_path, "rb") as f:
-                SystemSummary: SchroedingerMixtureSummary = dill.load(file=f)
-                SystemSummary.copy_to(self)
-        except Exception:
-            print(f"{system_summary_path} not found.")
+            if host:
+                sftp = host.sftp()
+                with sftp.file(str(system_summary_path), "rb") as f:
+                    SystemSummary: SchroedingerMixtureSummary = dill.load(file=f)
+                    SystemSummary.copy_to(self)
+            else:
+                with open(system_summary_path, "rb") as f:
+                    SystemSummary: SchroedingerMixtureSummary = dill.load(file=f)
+                    SystemSummary.copy_to(self)
+        except Exception as e:
+            print(f"{system_summary_path} not found.\n {e}")
 
         return self
 
@@ -707,16 +745,18 @@ class SchroedingerMixture(Schroedinger):
 
 
     def get_E_kin(self, dV: float = None) -> None:
-        psi_val_array = np.array(self.psi_val_list)
+        psi_val_array = cp.array(self.psi_val_list)
         fft_dim = range(1, psi_val_array.ndim)
-        psi_val_array_k = np.fft.fftn(psi_val_array, axes=fft_dim)
-        H_kin_array = np.array(self.H_kin_list)
-        E_kin_grid_helper = np.einsum("i...,i...->i...", H_kin_array, psi_val_array_k)
-        E_kin_grid_helper_fft = np.fft.ifftn(E_kin_grid_helper, axes=fft_dim)
-        E_kin_grid = np.einsum("i...,i...->i...", np.conjugate(psi_val_array), E_kin_grid_helper_fft)
-        E_kin_arr = np.fromiter(map(functools.partial(self.sum_dV, dV=dV), E_kin_grid.real),
-                                 dtype=float) * np.array(self.N_list)
-        E_kin = np.sum(E_kin_arr)
+        psi_val_array_k = cp.fft.fftn(psi_val_array, axes=fft_dim)
+        H_kin_array = cp.array(self.H_kin_list)
+        E_kin_grid_helper = cp.einsum("i...,i...->i...", H_kin_array, psi_val_array_k)
+        E_kin_grid_helper_fft = cp.fft.ifftn(E_kin_grid_helper, axes=fft_dim)
+        E_kin_grid = cp.einsum("i...,i...->i...", np.conjugate(psi_val_array), E_kin_grid_helper_fft)
+        E_kin_arr = cp.fromiter(map(functools.partial(self.sum_dV, dV=dV), E_kin_grid.real),
+                                 dtype=float) * cp.array(self.N_list)
+        E_kin = cp.sum(E_kin_arr)
+        if cupy_used:
+            E_kin = cp.asnumpy(E_kin)
 
         return E_kin
 
@@ -808,7 +848,8 @@ class SchroedingerMixture(Schroedinger):
     def get_center_of_mass(self,
                            Mx0: Optional[int] = None, Mx1: Optional[int] = None,
                            My0: Optional[int] = None, My1: Optional[int] = None,
-                           Mz0: Optional[int] = None, Mz1: Optional[int] = None) -> List[float]:
+                           Mz0: Optional[int] = None, Mz1: Optional[int] = None,
+                           p: float = 1.0) -> List[float]:
         """
         Calculates the center of mass of the System.
 
@@ -820,7 +861,10 @@ class SchroedingerMixture(Schroedinger):
         r = self.get_mesh_list(x0, x1, y0, y1, z0, z1)
         com_list = []
         for prob in prob_list:
-            center_of_mass_along_axis = [prob * r_i for r_i in r]
+            if cupy_used:
+                center_of_mass_along_axis = [cp.array(prob) * cp.array(r_i) ** p for r_i in r]
+            else:
+                center_of_mass_along_axis = [prob * r_i ** p for r_i in r]
             com_list.append([self.trapez_integral(com_along_axis) / self.trapez_integral(prob)
                              for com_along_axis in center_of_mass_along_axis])
         return com_list
