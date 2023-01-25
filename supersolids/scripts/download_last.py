@@ -82,9 +82,16 @@ if __name__ == "__main__":
     password = None
 
     # experiment_suffix = "gpu_11_18"
-    experiment_suffix = "gpu_12_05"
+    # experiment_suffix = "gpu_12_05"
     # experiment_suffix = "gpu_12_06"
     # experiment_suffix = "gpu_12_07"
+    # experiment_suffix = "gpu_12_23"
+    # experiment_suffix = "gpu_12_28"
+    # experiment_suffix = "gpu_12_28_to_102"
+    # experiment_suffix = "gpu_12_28_to_102_dip9"
+    # experiment_suffix = "gpu_01_13_dip9"
+    # experiment_suffix = "gpu_01_20_dip9"
+    experiment_suffix = "gpu_01_21_dip9"
     path_anchor_input = Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/")
     path_anchor_output = Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/")
     # path_anchor_output = Path("/run/media/dsche/scr2/begin_gpu/")
@@ -96,8 +103,13 @@ if __name__ == "__main__":
 
     movie_string = "movie"
     counting_format = "%03d"
-    movie_start = 21
-    movie_end = 35
+    # movie_start = 1
+    # movie_end = 50
+    movie_start = 61
+    movie_end = 90
+    # movie_end = 110
+    # movie_end = 40
+    # movie_end = 15
 
     mixture = True
 

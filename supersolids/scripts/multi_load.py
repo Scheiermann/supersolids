@@ -39,13 +39,37 @@ if __name__ == "__main__":
     # experiment_suffix = "ramp_11_08_eq_65_70_75_80_85_90"
     # experiment_suffix = "gpu_tilt_11_19"
     # experiment_suffix = "gpu_11_16"
-    # experiment_suffix = "gpu_11_18"
-    experiment_suffix = "gpu_12_05"
+
+    # experiment_suffix = "gpu_11_18_real_w-1"
+    # experiment_suffix = "gpu_12_05"
     # experiment_suffix = "gpu_12_06"
+
+    ## dip10
+    # experiment_suffix = "gpu_12_05"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "gpu_12_06"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "gpu_12_23"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "gpu_12_28_to_102"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+ 
+    ## dip9
+    # experiment_suffix = "gpu_11_18_imag"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # experiment_suffix = "gpu_12_07"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "gpu_12_28"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "gpu_12_28_to_102"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "gpu_12_28_to_102_dip9"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    experiment_suffix = "gpu_01_13_dip9"
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     
     # path_anchor_input_list.append(Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/"))
-    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # path_anchor_input_list.append(Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/"))
     # experiment_suffix = "ramp_11_04_675_long_wide"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
@@ -83,8 +107,8 @@ if __name__ == "__main__":
 
     movie_string = "movie"
     counting_format = "%03d"
-    movie_start_list = [1, 1]
-    movie_end_list = [15, 15]
+    movie_start_list = [31]
+    movie_end_list = [55]
     slice_indices = {"x": 127, "y": 31, "z": 31}
     # slice_indices = {"x": 63, "y": 31, "z": 31}
     # slice_indices = {"x": 31, "y": 15, "z": 15}
@@ -155,9 +179,14 @@ if __name__ == "__main__":
     ui = False
     # ui = True
 
-    for azimuth, elevation, distance in zip(azimuth_list, elevation_list, distance_list):
-        for mixture_slice_index_list, alpha_psi_list, alpha_psi_sol_list in zip(mixture_slice_index_list_list, alpha_psi_list_list, alpha_psi_sol_list_list):
-            for path_anchor_input, path_anchor_output, movie_start, movie_end in zip(path_anchor_input_list, path_anchor_output_list, movie_start_list, movie_end_list):
+    for azimuth, elevation, distance in zip(
+        azimuth_list, elevation_list, distance_list, strict=True):
+        for mixture_slice_index_list, alpha_psi_list, alpha_psi_sol_list in zip(
+            mixture_slice_index_list_list, alpha_psi_list_list, alpha_psi_sol_list_list,
+            strict=True):
+            for path_anchor_input, path_anchor_output, movie_start, movie_end in zip(
+                path_anchor_input_list, path_anchor_output_list, movie_start_list, movie_end_list,
+                strict=True):
                 for i in range(movie_start, movie_end + 1):
                     path_in = Path(path_anchor_input, movie_string + f"{counting_format % i}")
                     if ssh_hostname:

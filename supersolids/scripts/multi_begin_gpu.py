@@ -15,7 +15,7 @@ if __name__ == "__main__":
     if not dir_path.is_dir():
         dir_path.mkdir(parents=True)
 
-    xvfb_display = 690
+    xvfb_display = 990
     movie_string = "movie"
     counting_format = "%03d"
 
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     a_dd_list = [a_dd, (dipol/dipol2) * a_dd, (dipol/dipol2) ** 2.0 * a_dd]
     # a_dd_list = [a_dd, 0.0, (dipol/10.0) ** 2.0 * a_dd]
 
-    movie_number = 41
+    movie_number = 1
     mem_in_MB = 1400
     gpu_index = 1
     Box = {"x0": -12, "x1": 12, "y0": -3, "y1": 3, "z0": -5, "z1": 5}

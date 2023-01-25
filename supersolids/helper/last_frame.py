@@ -93,14 +93,16 @@ def last_frame(frame: Optional[int],
             if movie_number == movie_skip:
                 continue
             path_movie = Path(path_anchor_input, f"{dir_name}{counting_format % movie_number}"),
-            path_movie = check_if_further(path_anchor_input, dir_name, counting_format,
-                                          movie_number, experiment_step=number_of_movies,
-                                          check_further=check_further)
+            if check_further != 0:
+                path_movie = check_if_further(path_anchor_input, dir_name, counting_format,
+                                              movie_number, experiment_step=number_of_movies,
+                                              check_further=check_further)
             path_inner_list.append(path_movie)
 
         path_list.append(path_inner_list)
         path_mesh_list.append(np.array(path_inner_list).reshape(len(var2_list[i]),
                                                                 len(var1_list[i])))
+    print(f"path_mesh_list created!")
 
     var_mesh_list = [np.meshgrid(var1, var2, indexing="ij") for var1, var2 in zip(var1_list,
                                                                                   var2_list)]
@@ -234,6 +236,7 @@ def last_frame(frame: Optional[int],
             script_extension = ".txt"
             path_out_script: Path = Path(path_anchor_scripts,
                                          f"{script_filename}"
+                                         + f"_{path_currently_old.parent.stem}"
                                          + f"_{path_currently_old.stem}{script_extension}")
             path_in_script: Path = Path(path_currently_old, f"{script_filename}{script_extension}")
             shutil.copy(path_in_script, path_out_script)
@@ -300,6 +303,7 @@ def last_frame(frame: Optional[int],
             paste_together_videos(path_mesh_new_mirrored, path_out_video, margin, width, height, fps)
 
         else:
+            print("Pasting all images together, may take some time.")
             paste_together(path_mesh_new_mirrored.ravel(), path_out_periodic, nrow, ncol, ratio=dpi_ratio)
 
     if not video:
@@ -370,217 +374,242 @@ def last_frame(frame: Optional[int],
                 property_length_list.append(max(property_length_of_movie_list))
                 property_dim_list.append(max(property_dim_of_movie_list))
 
-        # plot property of last frame along var2 for every var1
-        for k, _ in enumerate(path_anchor_input_list):
-            # properties in periodic tables
-            for (property_filename, list_of_arrays,
-                 property_length, property_dim) in zip(property_filename_list, list_of_arrays_list,
-                                                       property_length_list, property_dim_list):
-                for ix, iy in np.ndindex(path_mesh.shape):
-                    path_mesh_property[ix, iy]: Path = Path(path_mesh[ix, iy], f"{property_filename}")
-                    path_property_npz = path_mesh_property[ix, iy].with_suffix('.npz')
-                    # create arrays of right dimensions on first element
-                    if ix == iy == 0:
-                        mesh_t = np.zeros((path_mesh_property.shape[0],
-                                           path_mesh_property.shape[1],
-                                           property_length))
-                        if property_dim == 1:
-                            mesh_property_all = np.zeros((path_mesh_property.shape[0],
-                                                          path_mesh_property.shape[1],
-                                                          property_length))
-                        else:
-                            if list_of_arrays:
+        if property_filename_list:
+            # plot property of last frame along var2 for every var1
+            for k, _ in enumerate(path_anchor_input_list):
+                # properties in periodic tables
+                for (property_filename, list_of_arrays,
+                     property_length, property_dim) in zip(property_filename_list, list_of_arrays_list,
+                                                           property_length_list, property_dim_list):
+                    for ix, iy in np.ndindex(path_mesh.shape):
+                        path_mesh_property[ix, iy]: Path = Path(path_mesh[ix, iy], f"{property_filename}")
+                        path_property_npz = path_mesh_property[ix, iy].with_suffix('.npz')
+                        # create arrays of right dimensions on first element
+                        if ix == iy == 0:
+                            mesh_t = np.zeros((path_mesh_property.shape[0],
+                                               path_mesh_property.shape[1],
+                                               property_length))
+                            if property_dim == 1:
                                 mesh_property_all = np.zeros((path_mesh_property.shape[0],
                                                               path_mesh_property.shape[1],
-                                                              number_of_components,
-                                                              property_dim,
-                                                              property_length,
-                                                              ))
+                                                              property_length))
                             else:
-                                mesh_property_all = np.zeros((path_mesh_property.shape[0],
-                                                              path_mesh_property.shape[1],
-                                                              property_length,
-                                                              property_dim))
-
-                    try:
-                        a, b = property_load_npz(path_property_npz) 
-                        # mesh_t[ix, iy], mesh_property_all[ix, iy] = property_load_npz(path_property_npz) 
-                        mesh_t[ix, iy], mesh_property_all[ix, iy] = a, b
-                    except Exception as e:
-                        print(f"Problem with {path_property_npz}, "
-                              f"check out if list_of_arrays_list needs to be True.\n{e}")
-                        traceback.print_tb(e.__traceback__)
-                        try:
-                            mesh_t[ix, iy] = np.pad(a, (0, len(mesh_t[ix, iy]) - len(a)), 'constant')
-                            # mesh_property_all[ix, iy] = np.pad(a, (0, len(mesh_property_all[ix, iy]) - len(a)), 'constant')
-                            print("Padding with 0 worked!")
-                        except Exception as e:
-                            print("Padding did not work!")
-                            sys.exit(1)
-
-                path_out_property_all: Path = Path(path_anchor_output,
-                                                   f"property_all_{experiment_suffix}"
-                                                   + f"{merge_suffix}"
-                                                   + f"_{property_filename}")
-                
-                path_mesh_all = path_out_property_all.with_suffix('.npz')
-                with open(path_mesh_all, "wb") as g:
-                    # np.savez_compressed(g, x=mesh_t, y=mesh_property_all, z=path_mesh_mirrored)
-                    np.savez_compressed(g, x=mesh_t, y=mesh_property_all, z=path_mesh)
-
-                # turn off decompression bomb checker
-                Image.MAX_IMAGE_PIXELS = number_of_movies * Image.MAX_IMAGE_PIXELS
-                path_mesh_property_mirrored: List[Path] = np.flip(path_mesh_property, axis=0)
-                paste_together(path_in_list=path_mesh_property_mirrored.ravel(),
-                               path_out=path_out_property_all,
-                               nrow=nrow, ncol=ncol, ratio=dpi_ratio_all) 
-
-                # rows = path_mesh_mirrored.shape[1]
-                rows = path_mesh.shape[1]
-                if list_of_arrays:
-                    cols = property_dim
-                else:
-                    cols = 1
-                fig, axes = plt.subplots(nrows=rows, ncols=cols, squeeze=False,
-                                         sharex='col', figsize=(16,9))
-                fig.suptitle(f"{Path(property_filename).stem}")
-
-                # give titles to rows and columns
-                for i, ax in enumerate(axes[0, :]):
-                    ax.set_title(f"axis {i}")
-
-                title_rows = list(map(str, var1_list[k][::-1]))
-                for ax, title_row in zip(axes[:,0], title_rows):
-                    pad = 5
-                    ax.annotate(title_row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
-                                xycoords=ax.yaxis.label, textcoords='offset points',
-                                size='large', ha='right', va='center')
-                    # ax.set_ylabel(title_row, rotation=0, size='large')
-
-                # for iy, ax in enumerate(plt.gcf().get_axes()):
-                frequency_plot = True 
-                if frequency_plot:
-                    # annotation = False
-                    annotation = True
-                    # plot_log = True
-                    plot_log = False
-                    if annotation:
-                       annotation_decimals = 0
-                    spin = True
-                    w_index = 0 # w with largest amplitude
-                    fft_start = 1
-                    fft_end = int(property_length / 2 / 80)
-                    fft_length = fft_end - fft_start
-                    ampl_arr = np.zeros(shape=(path_mesh.shape[0], path_mesh.shape[1],
-                                               number_of_components, property_dim, fft_length))
-                for iy in range(rows):
-                    # fixed a11
-                    lambda_frame = -1
-                    labels = []
-
-                    for i in range(property_dim):
-                        if list_of_arrays:
-                            for j in range(number_of_components):
-                                # try a12 vs frequency monopolar
-                                if frequency_plot:
-                                    # x_range = var2_list[k]
-                                    x_range = var_mesh_y.flatten()
-                                    if spin:
-                                        y_range = mesh_property_all[:, iy, 0, i, :] + (-1) ** j * mesh_property_all[:, iy, 1, i, :]
-                                    else:
-                                        y_range = mesh_property_all[:, iy, j, i, :]
-                                    w_list = []
-                                    # collect all ix
-                                    for ix in range(path_mesh.shape[0]):
-                                        w0, amplitude0 = fft_plot(mesh_t[ix, iy, :], y_range[ix, :],
-                                                                  start=fft_start, end=fft_end)
-                                        ampl_arr[ix, iy, j, i, :] = np.array(amplitude0)
-                                        zipped_sorted_by_max = zip(*sorted(zip(w0, amplitude0),
-                                                                           key=lambda t: t[1]))
-                                        w_max, ampl = map(np.array, zipped_sorted_by_max)
-                                        w_list.append(w_max[w_index])
-                                    y_range = np.array(w_list)
-                                    # x_range = var2_list[k]
-                                    x_range = var_mesh_y.flatten()
-                                    axes[iy, i].plot(x_range, y_range, "x-")
+                                if list_of_arrays:
+                                    mesh_property_all = np.zeros((path_mesh_property.shape[0],
+                                                                  path_mesh_property.shape[1],
+                                                                  number_of_components,
+                                                                  property_dim,
+                                                                  property_length,
+                                                                  ))
                                 else:
-                                    x_range = var_mesh_y.flatten()
-                                    y_range = mesh_property_all[:, iy, j, i, lambda_frame]
-                                    axes[iy, i].plot(x_range, y_range, "x-")
-                        else:
-                            x_range = var_mesh_y.flatten()
-                            y_range = mesh_property_all[:, iy, lambda_frame]
-                            axes[iy, 0].plot(x_range, y_range, "x-")
+                                    mesh_property_all = np.zeros((path_mesh_property.shape[0],
+                                                                  path_mesh_property.shape[1],
+                                                                  property_length,
+                                                                  property_dim))
 
-                for ax in axes.flatten():
-                    ax.grid()
-                if list_of_arrays:
-                    labels = [f"component {j}" for j in range(number_of_components)]
-                    fig.legend(labels, loc='center right')
+                        try:
+                            a, b = property_load_npz(path_property_npz) 
+                            # mesh_t[ix, iy], mesh_property_all[ix, iy] = property_load_npz(path_property_npz) 
+                            mesh_t[ix, iy], mesh_property_all[ix, iy] = a, b
+                        except Exception as e:
+                            print(f"Problem with {path_property_npz}, "
+                                  f"check out if list_of_arrays_list needs to be True.\n{e}")
+                            traceback.print_tb(e.__traceback__)
+                            try:
+                                mesh_t[ix, iy] = np.pad(a, (0, len(mesh_t[ix, iy]) - len(a)), 'constant')
+                                # mesh_property_all[ix, iy] = np.pad(a, (0, len(mesh_property_all[ix, iy]) - len(a)), 'constant')
+                                print("Padding with 0 worked!")
+                            except Exception as e:
+                                print("Padding did not work!")
+                                sys.exit(1)
 
-                path_out_property_ix: Path = Path(path_anchor_output,
-                                                      f"property_all_{experiment_suffix}"
-                                                      + f"{merge_suffix}"
-                                                      + f"_ix_{property_filename}")
-                print(f"Save to: {path_out_property_ix}")
-                fig.savefig(path_out_property_ix)
+                    path_out_property_all: Path = Path(path_anchor_output,
+                                                       f"property_all_{experiment_suffix}"
+                                                       + f"{merge_suffix}"
+                                                       + f"_{property_filename}")
+                    
+                    path_mesh_all = path_out_property_all.with_suffix('.npz')
+                    with open(path_mesh_all, "wb") as g:
+                        # np.savez_compressed(g, x=mesh_t, y=mesh_property_all, z=path_mesh_mirrored)
+                        np.savez_compressed(g, x=mesh_t, y=mesh_property_all, z=path_mesh)
 
-            if frequency_plot:
-                for j in range(number_of_components):
-                    fig_w, axes_w = plt.subplots(nrows=rows, ncols=cols, squeeze=False,
-                                                 sharex='col', figsize=(16,9))
-                    fig_w.suptitle(f"component {j}")
+                    # turn off decompression bomb checker
+                    Image.MAX_IMAGE_PIXELS = number_of_movies * Image.MAX_IMAGE_PIXELS
+                    path_mesh_property_mirrored: List[Path] = np.flip(path_mesh_property, axis=0)
+                    paste_together(path_in_list=path_mesh_property_mirrored.ravel(),
+                                   path_out=path_out_property_all,
+                                   nrow=nrow, ncol=ncol, ratio=dpi_ratio_all) 
 
-                    for iy in range(path_mesh.shape[1]):
-                        for i in range(property_dim):
-                            if plot_log:
-                               Z = np.log(ampl_arr[:, iy, j, i, :]) 
-                            else:
-                               Z = ampl_arr[:, iy, j, i, :]
-                            X, Y = np.meshgrid(x_range, w0, indexing="ij")
-                            im = axes_w[iy, i].pcolormesh(X, Y, Z,
-                                                          shading="auto")
-                            if iy == 0:
-                                # colorbar for every axis and comp
-                                fig_w.colorbar(im)
-                            if spin:
-                                path_out_property_ix_meshplot: Path = Path(path_anchor_output,
-                                    f"property_all_{experiment_suffix}"
-                                    + f"{merge_suffix}"
-                                    + f"_mesh_ix_comp_{j}_spin"
-                                    + f"_{property_filename}"
-                                    )
-                            else:
-                                path_out_property_ix_meshplot: Path = Path(path_anchor_output,
-                                    f"property_all_{experiment_suffix}"
-                                    + f"{merge_suffix}"
-                                    + f"_mesh_ix_comp_{j}"
-                                    + f"_{property_filename}"
-                                    )
-                                    
-                            if annotation:
-                                # text of value for every mesh-point
-                                Z_shape = ampl_arr[:, iy, j, i, :].shape
-                                for m in range(0, Z_shape[0]):
-                                    for n in range(0, Z_shape[1]):
-                                        if annotation_decimals == 0:
-                                            vals = np.round(ampl_arr[m, iy, j, i, n],
-                                                            annotation_decimals).astype(int)
-                                        text = axes_w[iy, i].text(X[m, n], Y[m, n], vals,
-                                            ha="center", va="center",
-                                            color="black", size=5, rotation="horizontal")
+                    # rows = path_mesh_mirrored.shape[1]
+                    rows = path_mesh.shape[1]
+                    if list_of_arrays:
+                        cols = property_dim
+                    else:
+                        cols = 1
+                    fig, axes = plt.subplots(nrows=rows, ncols=cols, squeeze=False,
+                                             sharex='col', figsize=(16,9))
+                    fig.suptitle(f"{Path(property_filename).stem}")
 
                     # give titles to rows and columns
-                    for r, ax in enumerate(axes_w[0, :]):
-                        ax.set_title(f"axis {r}")
+                    for i, ax in enumerate(axes[0, :]):
+                        ax.set_title(f"axis {i}")
+
                     title_rows = list(map(str, var1_list[k][::-1]))
-                    for ax, title_row in zip(axes_w[:,0], title_rows):
+                    for ax, title_row in zip(axes[:,0], title_rows):
                         pad = 5
                         ax.annotate(title_row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
                                     xycoords=ax.yaxis.label, textcoords='offset points',
                                     size='large', ha='right', va='center')
+                        # ax.set_ylabel(title_row, rotation=0, size='large')
 
-                    # fig.supxlabel(r"$a_{12}$", fontsize=18)
-                    # fig.supxlabel(r"$\frac{\omega}{\omega_{x}}$", fontsize=18)
-                    print(f"Save to: {path_out_property_ix_meshplot}")
-                    fig_w.savefig(path_out_property_ix_meshplot)
+                    # for iy, ax in enumerate(plt.gcf().get_axes()):
+                    frequency_plot = True 
+                    if frequency_plot:
+                        annotation = False
+                        # annotation = True
+                        # plot_log = True
+                        # plot_log = False
+                        plot_log_list = [True, False]
+                        if annotation:
+                           annotation_decimals = 0
+                        # spin = True
+                        spin_list = [True, False]
+                        w_index = 0 # w with largest amplitude
+                        fft_start = 1
+                        fft_end = int(property_length / 2 / 80)
+                        fft_length = fft_end - fft_start
+                        ampl_arr = np.zeros(shape=(path_mesh.shape[0], path_mesh.shape[1],
+                                                   number_of_components, property_dim, fft_length))
+                        ampl_arr_list = [ampl_arr, np.zeros_like(ampl_arr)]
+                    for iy in range(rows):
+                        # fixed a11
+                        lambda_frame = -1
+                        labels = []
+
+                        for i in range(property_dim):
+                            if list_of_arrays:
+                                for j in range(number_of_components):
+                                    # try a12 vs frequency monopolar
+                                    if frequency_plot:
+                                        # x_range = var2_list[k]
+                                        x_range = var_mesh_y.flatten()
+                                        for s, spin in enumerate(spin_list):
+                                            if spin:
+                                                y_range = mesh_property_all[:, iy, 0, i, :] + (-1) ** j * mesh_property_all[:, iy, 1, i, :]
+                                            else:
+                                                y_range = mesh_property_all[:, iy, j, i, :]
+                                            w_list = []
+                                            # collect all ix
+                                            for ix in range(path_mesh.shape[0]):
+                                                w0, amplitude0 = fft_plot(mesh_t[ix, iy, :], y_range[ix, :],
+                                                                          start=fft_start, end=fft_end)
+                                                ampl_arr_list[s][ix, iy, j, i, :] = np.array(amplitude0)
+                                                zipped_sorted_by_max = zip(*sorted(zip(w0, amplitude0),
+                                                                                   key=lambda t: t[1]))
+                                                w_max, ampl = map(np.array, zipped_sorted_by_max)
+                                                w_list.append(w_max[w_index])
+                                        y_range = np.array(w_list)
+                                        # x_range = var2_list[k]
+                                        x_range = var_mesh_y.flatten()
+                                        axes[iy, i].plot(x_range, y_range, "x-")
+                                    else:
+                                        x_range = var_mesh_y.flatten()
+                                        y_range = mesh_property_all[:, iy, j, i, lambda_frame]
+                                        axes[iy, i].plot(x_range, y_range, "x-")
+                            else:
+                                x_range = var_mesh_y.flatten()
+                                y_range = mesh_property_all[:, iy, lambda_frame]
+                                axes[iy, 0].plot(x_range, y_range, "x-")
+
+                    for ax in axes.flatten():
+                        ax.grid()
+                    if list_of_arrays:
+                        labels = [f"component {j}" for j in range(number_of_components)]
+                        fig.legend(labels, loc='center right')
+
+                    path_out_property_ix: Path = Path(path_anchor_output,
+                                                          f"property_all_{experiment_suffix}"
+                                                          + f"{merge_suffix}"
+                                                          + f"_ix_{property_filename}")
+                    print(f"Save to: {path_out_property_ix}")
+                    fig.savefig(path_out_property_ix)
+
+                if frequency_plot:
+                    for s, spin in enumerate(spin_list):
+                        for plot_log in plot_log_list:
+                            for j in range(number_of_components):
+                                fig_w, axes_w = plt.subplots(nrows=rows, ncols=cols, squeeze=False,
+                                                             sharex='col', figsize=(16,9))
+                                if spin:
+                                    if ((-1) ** j == 1):
+                                        fig_w.suptitle(r"$|\psi_{0}|^2 + |\psi_{1}|^2$")
+                                    else:
+                                        fig_w.suptitle(r"$|\psi_{0}|^2 - |\psi_{1}|^2$")
+                                else:
+                                    fig_w.suptitle(f"$|\psi_{j}|^2$")
+
+                                for iy in range(path_mesh.shape[1]):
+                                    for i in range(property_dim):
+                                        if plot_log:
+                                           Z = np.log(ampl_arr_list[s][:, iy, j, i, :]) 
+                                        else:
+                                           Z = ampl_arr_list[s][:, iy, j, i, :]
+                                        X, Y = np.meshgrid(x_range, w0, indexing="ij")
+                                        im = axes_w[iy, i].pcolormesh(X, Y, Z,
+                                                                      shading="auto")
+                                        if iy == 0:
+                                            # colorbar for every axis and comp
+                                            fig_w.colorbar(im)
+                                        if spin:
+                                            mesh_plot_name = ("spin_"
+                                                + f"property_all_{experiment_suffix}"
+                                                + f"{merge_suffix}"
+                                                + f"_mesh_ix_comp_{j}"
+                                                + f"_{property_filename}"
+                                                )
+                                        else:
+                                            mesh_plot_name = (f"property_all_{experiment_suffix}"
+                                                + f"{merge_suffix}"
+                                                + f"_mesh_ix_comp_{j}"
+                                                + f"_{property_filename}"
+                                                )
+                                            
+                                        if plot_log:
+                                            mesh_plot_name = "log_" + mesh_plot_name
+                                        else:
+                                            mesh_plot_name = "lin_" + mesh_plot_name
+                                            
+                                        path_out_property_ix_meshplot: Path = Path(
+                                            path_anchor_output,
+                                            mesh_plot_name)
+                                            
+                                        if annotation:
+                                            # text of value for every mesh-point
+                                            Z_shape = ampl_arr_list[s][:, iy, j, i, :].shape
+                                            for m in range(0, Z_shape[0]):
+                                                for n in range(0, Z_shape[1]):
+                                                    if annotation_decimals == 0:
+                                                        vals = np.round(
+                                                            ampl_arr_list[s][m, iy, j, i, n],
+                                                            annotation_decimals).astype(int)
+                                                    text = axes_w[iy, i].text(X[m, n], Y[m, n],
+                                                            vals,
+                                                        ha="center", va="center",
+                                                        color="black", size=5,
+                                                        rotation="horizontal")
+
+                                # give titles to rows and columns
+                                for r, ax in enumerate(axes_w[0, :]):
+                                    ax.set_title(f"axis {r}")
+                                title_rows = list(map(str, var1_list[k][::-1]))
+                                for ax, title_row in zip(axes_w[:,0], title_rows):
+                                    pad = 5
+                                    ax.annotate(title_row, xy=(0, 0.5),
+                                                xytext=(-ax.yaxis.labelpad - pad, 0),
+                                                xycoords=ax.yaxis.label, textcoords='offset points',
+                                                size='large', ha='right', va='center')
+
+                                # fig.supxlabel(r"$a_{12}$", fontsize=18)
+                                # fig.supxlabel(r"$\frac{\omega}{\omega_{x}}$", fontsize=18)
+                                print(f"Save to: {path_out_property_ix_meshplot}")
+                                fig_w.savefig(path_out_property_ix_meshplot)

@@ -71,9 +71,14 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
 
     # experiment_suffix = "gpu_11_18_real_w-1"
-    experiment_suffix = "gpu_12_05"
+    # experiment_suffix = "gpu_12_05"
     # experiment_suffix = "gpu_12_06"
     # experiment_suffix = "gpu_12_07"
+    # experiment_suffix = "gpu_12_23"
+    # experiment_suffix = "gpu_12_28"
+    # experiment_suffix = "gpu_12_28_to_102"
+    # experiment_suffix = "gpu_12_28_to_102_dip9"
+    experiment_suffix = "gpu_01_13_dip9"
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
 
     mixture = True
@@ -99,8 +104,11 @@ if __name__ == "__main__":
     # movie_end_list = [25]
     # movie_start_list = [31]
     # movie_end_list = [52]
-    movie_start_list = [21]
-    movie_end_list = [35]
+    # movie_start_list = [21]
+    # movie_end_list = [35]
+    movie_start_list = [31]
+    # movie_end_list = [72]
+    movie_end_list = [55]
 
     dt = 0.0002
 
@@ -171,17 +179,30 @@ if __name__ == "__main__":
     # property_args_list = [[], []]
     # property_args_frame_list = [False, False]
 
-    file_suffix_list = ["_fft"]
-    inbuild_func_list = ["fft_plot"]
+    # file_suffix_list = ["_fft"]
+    # inbuild_func_list = ["fft_plot"]
+    # func_list = [""]
+    # steps_per_npz_list = [100]
+    # subplots_list = [True]
+    # property_func_list = [False]
+    # list_of_arrays_list = [True]
+    # property_names_list = ["monopolar"]
+    # property_args_list = [[]]
+    # inbuild_func_args_list = [[1, 62, 1]]
+    # property_args_frame_list = [False]
+
+    file_suffix_list = ["_contrast"]
+    inbuild_func_list = [""]
     func_list = [""]
-    steps_per_npz_list = [100]
-    subplots_list = [True]
-    property_func_list = [False]
-    list_of_arrays_list = [True]
-    property_names_list = ["monopolar"]
-    property_args_list = [[]]
-    inbuild_func_args_list = [[1, 62, 1]]
+    steps_per_npz_list = [1000]
+    subplots_list = [False]
+    property_func_list = [True]
+    list_of_arrays_list = [False]
+    property_names_list = ["get_contrast"]
+    property_args_list = [[5, 0.3]]
+    inbuild_func_args_list = [[]]
     property_args_frame_list = [False]
+
 
     # steps_per_npz_list = [100]
     # subplots_list = [True]
@@ -234,13 +255,13 @@ if __name__ == "__main__":
     # move2graphs = True
     move2graphs = False
 
-    for path_anchor_input, movie_start, movie_end in zip(path_anchor_input_list, movie_start_list, movie_end_list):
+    for path_anchor_input, movie_start, movie_end in zip(path_anchor_input_list, movie_start_list, movie_end_list, strict=True):
         for (property_func, property_name,
              property_args, property_args_frame, subplots, list_of_arrays, steps_per_npz,
              file_suffix, inbuild_func, inbuild_func_args, func) in zip(
                 property_func_list, property_names_list, property_args_list,
                 property_args_frame_list, subplots_list, list_of_arrays_list, steps_per_npz_list,
-                file_suffix_list, inbuild_func_list, inbuild_func_args_list, func_list):
+                file_suffix_list, inbuild_func_list, inbuild_func_args_list, func_list, strict=True):
             for i, movie_number in enumerate(range(movie_start, movie_end + 1)):
                 # file_suffix = ""
                 # file_suffix = "-" + "-".join(map(str, property_args)) + ".png"

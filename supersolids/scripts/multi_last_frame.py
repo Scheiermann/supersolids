@@ -15,6 +15,9 @@ if __name__ == "__main__":
     var2_list = []
     movie_start_list = []
     movie_end_list = []
+    # if simulation for movie_number was continued in dir with name movie_number + number_of_movies
+    check_further_list = []
+
 
     use_edited = False
 
@@ -29,30 +32,35 @@ if __name__ == "__main__":
     # var2_list.append(np.arange(0.0, 2.01, 0.2)) # tilt 65
     # movie_start_list = [1]
     # movie_end_list = [11]
+    # check_further_list.append(0)
     # experiment_suffix = "ramp_11_10_775"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # var1_list.append(np.arange(77.5, 77.6, 1.0)) # a11 77.5
     # var2_list.append(np.arange(0.0, 2.01, 0.2)) # tilt 77.5
     # movie_start_list = [1]
     # movie_end_list = [11]
+    # check_further_list.append(0)
     # experiment_suffix = "ramp_11_10_85"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # var1_list.append(np.arange(85.0, 85.1, 1.0)) # a11 85
     # var2_list.append(np.arange(0.0, 2.01, 0.2)) # tilt 85
     # movie_start_list = [1]
     # movie_end_list = [11]
+    # check_further_list.append(0)
     # experiment_suffix = "ramp_10_10_small"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # var1_list.append(np.arange(70.0, 70.1, 1.0)) # a11 10_10_small
     # var2_list.append(np.arange(0.0, 1.01, 0.2)) # tilt 10_10_small
     # movie_start_list = [1]
     # movie_end_list = [6]
+    # check_further_list.append(0)
     # experiment_suffix = "ramp_10_10"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # var1_list.append(np.arange(72.5, 82.6, 2.5)) # a11 10_10
     # var2_list.append(np.arange(0.0, 1.01, 0.2)) # tilt 10_10
     # movie_start_list = [1]
     # movie_end_list = [30]
+    # check_further_list.append(0)
     # experiment_suffix = "ramp_21_10"
     # var1_list.append(np.arange(70.0, 80.1, 5.0)) # a11 21_10
     # experiment_suffix = "ramp_21_10_675"
@@ -69,6 +77,7 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # movie_start_list = [1]
     # movie_end_list = [11]
+    # check_further_list.append(0)
 
     # experiment_suffix = "ramp_21_10_925"
     # var1_list.append(np.arange(92.5, 92.6, 5.0)) # a11 24_10_925
@@ -76,6 +85,7 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # movie_start_list = [1]
     # movie_end_list = [11]
+    # check_further_list.append(0)
 
     # experiment_suffix = "ramp_28_10_65_long"
     # var1_list.append(np.arange(65.0, 65.1, 5.0)) # a11 24_10_65_long
@@ -83,6 +93,7 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # movie_start_list = [1]
     # movie_end_list = [25]
+    # check_further_list.append(0)
 
     # experiment_suffix = "ramp_28_10_85_long"
     # var1_list.append(np.arange(85.0, 85.1, 5.0)) # a11 24_10_85_long
@@ -90,6 +101,7 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # movie_start_list = [1]
     # movie_end_list = [25]
+    # check_further_list.append(0)
 
     # experiment_suffix = "ramp_11_01_65_long_wide"
     # var1_list.append(np.arange(85.0, 85.1, 5.0)) # a11 24_10_85_long
@@ -97,6 +109,7 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # movie_start_list = [1]
     # movie_end_list = [25]
+    # check_further_list.append(0)
 
     # experiment_suffix = "ramp_11_01_85_long_wide"
     # var1_list.append(np.arange(85.0, 85.1, 5.0)) # a11 24_10_85_long
@@ -104,6 +117,7 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # movie_start_list = [1]
     # movie_end_list = [25]
+    # check_further_list.append(0)
 
     # experiment_suffix = "ramp_11_04_675_long_wide"
     # var1_list.append(np.arange(67.5, 67.6, 5.0)) # a11 11_04_675_long_wide
@@ -111,6 +125,7 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # movie_start_list = [1]
     # movie_end_list = [25]
+    # check_further_list.append(0)
 
     # experiment_suffix = "ramp_11_04_70_long_wide"
     # var1_list.append(np.arange(70.0, 70.1, 5.0)) # a11 11_04_70_long_wide
@@ -118,6 +133,7 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # movie_start_list = [1]
     # movie_end_list = [25]
+    # check_further_list.append(0)
 
     # experiment_suffix = "ramp_11_04_725_long_wide"
     # var1_list.append(np.arange(72.5, 72.6, 5.0)) # a11 11_04_725_long_wide
@@ -125,6 +141,7 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # movie_start_list = [6]
     # movie_end_list = [25]
+    # check_further_list.append(0)
 
     # experiment_suffix = "ramp_11_04_75_775_80_long_wide"
     # var1_list.append(np.arange(75.0, 80.1, 2.5)) # a11 11_04_75_775_80_long_wide
@@ -132,54 +149,133 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # movie_start_list = [1]
     # movie_end_list = [60]
+    # check_further_list.append(0)
 
-    # # experiment_suffix = "gpu_11_18"
-    # experiment_suffix = "gpu_11_18_real_w-1"
-    # # var1_list.append(np.arange(62.5, 97.6, 2.5)) # a12 gpu_11_18 
-    # # var2_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_11_18
-    # var2_list.append(np.arange(62.5, 97.6, 2.5)) # a12 gpu_11_18 
-    # var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_11_18
-    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    # movie_start_list = [111]
-    # movie_end_list = [125]
-
-    # experiment_suffix = "gpu_12_05"
+    # experiment_suffix = "gpu_12_05" # dip10
     # var2_list.append(np.arange(62.5, 97.6, 2.5)) # a_12 gpu_12_05
     # var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_12_06
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    # # movie_start_list = [21]
-    # # movie_end_list = [35]
+    # # movie_start_list.append(1)
+    # # movie_end_list.append(15)
     # movie_start_list.append(21)
     # movie_end_list.append(35)
+    # check_further_list.append(0)
 
-    # experiment_suffix = "gpu_12_06"
+    # experiment_suffix = "gpu_12_06" # dip10
     # a12_array = np.array([57.5, 58.0, 58.5, 59.0, 59.5, 60.0, 60.5, 61.0, 61.5, 62.0, 63.0, 63.5, 64.0, 64.5, 65.5, 66.0, 66.5, 67.0, 68.0, 68.5, 69.0, 69.5])
     # var2_list.append(a12_array) # a12 gpu_12_06 
     # var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_12_06
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    # # movie_start_list = [31]
-    # # movie_end_list = [52]
+    # # movie_start_list.append(1)
+    # # movie_end_list.append(22)
     # movie_start_list.append(31)
     # movie_end_list.append(52)
+    # check_further_list.append(0)
 
-    # experiment_suffix = "gpu_11_18"
-    experiment_suffix = "gpu_11_18_real_w-1"
+    # experiment_suffix = "gpu_12_23" # dip10
+    # a12_array = np.array([70.5, 71.0, 71.5, 72.0, 73.0, 73.5, 74.0, 74.5, 75.5, 76.0, 76.5, 77.0, 78.0, 78.5, 79.0, 79.5, 80.5, 81.0, 81.5, 82.0, 83.0, 83.5, 84.0, 84.5, 85.5, 86.0, 86.5, 87.0, 88.0, 88.5,  89.0, 89.5])
+    # var2_list.append(a12_array) # a12
+    # var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_12_06
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # # movie_start_list.append(1)
+    # # movie_end_list.append(32)
+    # movie_start_list.append(41)
+    # movie_end_list.append(72)
+    # check_further_list.append(0)
+
+    # experiment_suffix = "gpu_12_28_to_102" # dip10
+    # a12_array = np.array([90.5, 91.0, 91.5, 92.0, 93.0, 93.5, 94.0, 94.5, 95.5, 96.0, 96.5, 97.0, 98.0, 98.5, 99.0, 99.5])
+    # var2_list.append(a12_array) # a12
+    # var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_12_06
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # # movie_start_list.append(1)
+    # # movie_end_list.append(21)
+    # movie_start_list.append(41)
+    # movie_end_list.append(56)
+    # check_further_list.append(0)
+
+    # ## problem with movie057, so split other movies apart
+    # experiment_suffix = "gpu_12_28_to_102" # dip10
+    # a12_array = np.array([100.5, 101.0, 101.5, 102.0])
+    # var2_list.append(a12_array) # a12
+    # var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_12_06
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # # movie_start_list.append(1)
+    # # movie_end_list.append(21)
+    # movie_start_list.append(58)
+    # movie_end_list.append(61)
+    # check_further_list.append(0)
+
+    experiment_suffix = "gpu_01_13_dip9"
+    a12_array = np.arange(45.0, 57.1, 0.5)
+    var2_list.append(a12_array) # a12
+    var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_12_06
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    movie_start_list.append(31)
+    movie_end_list.append(55)
+    check_further_list.append(0)
+
+    # experiment_suffix = "gpu_11_18_imag" #dip9
+    experiment_suffix = "gpu_11_18_real_w-1" # dip9
     var2_list.append(np.arange(62.5, 97.6, 2.5)) # a12 gpu_11_18 
     var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_11_18
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     movie_start_list.append(111)
     movie_end_list.append(125)
+    # movie_start_list.append(1)
+    # movie_end_list.append(15)
+    check_further_list.append(0)
 
-
-    experiment_suffix = "gpu_12_07"
+    experiment_suffix = "gpu_12_07" # dip9
     a12_array = np.array([57.5, 58.0, 58.5, 59.0, 59.5, 60.0, 60.5, 61.0, 61.5, 62.0, 63.0, 63.5, 64.0, 64.5, 65.5, 66.0, 66.5, 67.0, 68.0, 68.5, 69.0, 69.5])
     var2_list.append(a12_array) # a12 gpu_12_06 
     var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_12_06
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     movie_start_list.append(31)
     movie_end_list.append(52)
+    # movie_start_list.append(1)
+    # movie_end_list.append(22)
+    check_further_list.append(0)
 
-    experiment_suffix = "gpu_dipol_9_10"
+    experiment_suffix = "gpu_12_28" # dip9
+    a12_array = np.array([70.5, 71.0, 71.5, 72.0, 73.0, 73.5, 74.0, 74.5, 75.5, 76.0, 76.5, 77.0, 78.0, 78.5, 79.0, 79.5, 80.5, 81.0, 81.5, 82.0, 83.0, 83.5, 84.0, 84.5, 85.5, 86.0, 86.5, 87.0, 88.0, 88.5,  89.0, 89.5])
+    var2_list.append(a12_array) # a12
+    var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_12_06
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    movie_start_list.append(41)
+    movie_end_list.append(72)
+    # movie_start_list.append(1)
+    # movie_end_list.append(32)
+    check_further_list.append(0)
+
+    experiment_suffix = "gpu_12_28_to_102_dip9"
+    # a12_array = np.array([90.5, 91.0, 91.5, 92.0, 93.0, 93.5, 94.0, 94.5, 95.5, 96.0, 96.5, 97.0, 98.0, 98.5, 99.0, 99.5, 100.0, 100.5, 101.0, 101.5, 102.0])
+    a12_array = np.array([90.5, 91.0, 91.5, 92.0, 93.0, 93.5, 94.0, 94.5, 95.5, 96.0, 96.5, 97.0, 98.0, 98.5, 99.0, 99.5])
+    var2_list.append(a12_array) # a12
+    var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_12_06
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    movie_start_list.append(41)
+    movie_end_list.append(56)
+    # movie_start_list.append(1)
+    # movie_end_list.append(21)
+    check_further_list.append(0)
+
+    ## problem with movie057, so split other movies apart
+    experiment_suffix = "gpu_12_28_to_102_dip9"
+    a12_array = np.array([100.5, 101.0, 101.5, 102.0])
+    var2_list.append(a12_array) # a12
+    var1_list.append(np.arange(-1.0, -0.95, 0.1)) # omega_epsilon gpu_12_06
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    movie_start_list.append(58)
+    movie_end_list.append(61)
+    check_further_list.append(0)
+
+    # experiment_suffix = "gpu_dipol_10_10_extended"
+    # experiment_suffix = "gpu_dipol_10_10_extended_init"
+
+    experiment_suffix = "gpu_dipol_9_10_extended_left"
+    # experiment_suffix = "gpu_dipol_9_10_extended"
+    # experiment_suffix = "gpu_dipol_9_10_extended_init"
 
     # experiment_suffix = "ramp_24_10_long"
     # var1_list.append(np.arange(72.5, 80.1, 2.5)) # a11 24_10_long
@@ -187,6 +283,7 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # movie_start_list = [1]
     # movie_end_list = [100]
+    # check_further_list.append(0)
 
     # experiment_suffix = "ramp_11_10_85_long"
     # var1_list.append(np.arange(85.0, 85.6, 5.0)) # a11 21_10_long
@@ -194,6 +291,7 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # movie_start_list = [1]
     # movie_end_list = [15]
+    # check_further_list.append(0)
 
     # experiment_suffix = "stacked_05_10_a11"
     # var1_list.append(np.arange(80.0, 110.1, 10.0)) # a11 stack
@@ -201,6 +299,7 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # movie_start_list = [1]
     # movie_end_list = [28]
+    # check_further_list.append(0)
 
     # movie_start_list = [1, 1, 1, 1, 1]
     # movie_end_list = [11, 6, 11, 6, 30]
@@ -247,6 +346,8 @@ if __name__ == "__main__":
 
     property_filename_list = ["monopolar_paper_framestart_350000_fft.png"]
     list_of_arrays_list = [True]
+    # property_filename_list = []
+    # list_of_arrays_list = []
 
     # list_of_arrays_list = [False]
     # list_of_arrays_list = [False, False, False]
@@ -257,10 +358,10 @@ if __name__ == "__main__":
     if normed_plots:
         suffix_list[0] += "_normed"
 
-    # nrow_components = 1
-    # ncol_components = 2
-    nrow_components = 2
-    ncol_components = 1
+    nrow_components = 1
+    ncol_components = 2
+    # nrow_components = 2
+    # ncol_components = 1
     
     frames = False
     # frames = True
@@ -281,10 +382,6 @@ if __name__ == "__main__":
     merge_suffix = suffix_list[0]
 
     movie_skip = None
-
-    # if simulation for movie_number was continued in dir with name movie_number + number_of_movies
-    # check_further_list = [2, 2, 2]
-    check_further_list = [0, 0, 0]
 
     dir_name = "movie"
     counting_format = "%03d"
