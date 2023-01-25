@@ -451,6 +451,19 @@ class SchroedingerMixture(Schroedinger):
         for m in self.m_list:
             self.H_kin_list.append(self.H_kin)
 
+    def cupy2numpy(self):
+        self.x_mesh = cp.asnumpy(self.x_mesh)
+        self.y_mesh = cp.asnumpy(self.y_mesh)
+        self.z_mesh = cp.asnumpy(self.z_mesh)
+        self.kz_mesh = cp.asnumpy(self.kz_mesh)
+        self.V_val = cp.asnumpy(self.V_val)
+        self.V_k_val = cp.asnumpy(self.V_k_val)
+        self.k_squared = cp.asnumpy(self.k_squared)
+        self.H_kin = cp.asnumpy(self.H_kin)
+
+        self.H_kin_list = [cp.asnumpy(H_kin) for H_kin in self.H_kin_list]
+        self.psi_val_list = [cp.asnumpy(psi_val) for psi_val in self.psi_val_list]
+        self.psi_sol_val_list = [cp.asnumpy(psi_sol_val) for psi_sol_val in self.psi_sol_val_list]
 
     def func_energy(self, u: float) -> np.ndarray:
         """
