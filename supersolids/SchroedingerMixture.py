@@ -1166,8 +1166,7 @@ class SchroedingerMixture(Schroedinger):
                 + mu_lhy
                 )
 
-    def split_operator_pot(self, split_step: float = 0.5,
-            jit: bool = True, cupy_used: bool = False) -> Tuple[List[cp.ndarray], List[cp.ndarray]]:
+    def get_dipol_U_dd_mu_lhy(self):
         if cupy_used:
             jit = False
         density_list: List[cp.ndarray] = self.get_density_list(jit=jit, cupy_used=cupy_used)
@@ -1197,20 +1196,42 @@ class SchroedingerMixture(Schroedinger):
                 for U_dd in U_dd_list:
                     U_dd_list_np.append(U_dd.get())
                 U_dd_tensor_vec: np.ndarray = np.stack(U_dd_list_np, axis=0)
-            dipol_term_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
-                                                   self.a_dd_array,
-                                                   U_dd_tensor_vec)
+            try:
+                print(f"einsum for dipol_term_vec not worked in cupy. Try in np.")
+                dipol_term_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
+                                                       self.a_dd_array,
+                                                       U_dd_tensor_vec)
+            except Exception:
+                print(f"einsum for dipol_term_vec not worked in cupy. Try in np.")
+                dipol_term_vec: np.ndarray = np.einsum("...ij, j...->i...",
+                                                       cp.asnumpy(self.a_dd_array),
+                                                       cp.asnumpy(U_dd_tensor_vec)
+                                                       )
 
+        try:
+            contact_interaction_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
+                                                            self.a_s_array,
+                                                            density_tensor_vec)
+        except Exception:
+            print(f"einsum for contact_interaction_vec not worked in cupy. Try in np.")
+            contact_interaction_vec: np.ndarray = np.einsum("...ij, j...->i...",
+                                                            cp.asnumpy(self.a_s_array),
+                                                            cp.asnumpy(density_tensor_vec),
+                                                            )
 
-        # update H_pot before use
-        contact_interaction_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
-                                                        self.a_s_array,
-                                                        density_tensor_vec)
 
         # contact_interaction_vec = self.arr_tensor_mult(self.a_s_array, density_tensor_vec)
         # dipol_term_vec = self.arr_tensor_mult(self.a_dd_array, U_dd_tensor_vec)
 
         mu_lhy_list: List[cp.ndarray] = self.get_mu_lhy_list(density_list)
+        
+        return contact_interaction_vec, dipol_term_vec, mu_lhy_list
+
+
+    def split_operator_pot(self, split_step: float = 0.5,
+            jit: bool = True, cupy_used: bool = False) -> Tuple[List[cp.ndarray], List[cp.ndarray]]:
+        # update H_pot before use
+        contact_interaction_vec, dipol_term_vec, mu_lhy_list = self.get_dipol_U_dd_mulhy()
         for i, (contact_interaction, dipol_term, mu_lhy) in enumerate(zip(
                 list(contact_interaction_vec),
                 list(dipol_term_vec),
