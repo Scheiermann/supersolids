@@ -80,6 +80,9 @@ def load_npz(flag_args, host=None):
                                               dir_path_output=dir_path_output,
                                               )
 
+    # convert list of string to list of floats
+    cut1d_y_lim = tuple(map(float, flag_args.cut1d_y_lim))
+
     # db_helper.db_check()
     # db_helper.db_query(dir_path.parent)
     animate_wrapper = mlab.animate(MayAnim.animate_npz, delay=10, ui=flag_args.ui)
@@ -99,7 +102,7 @@ def load_npz(flag_args, host=None):
                                   summary_name=flag_args.summary_name,
                                   mixture_slice_index_list=flag_args.mixture_slice_index_list,
                                   no_legend=flag_args.no_legend,
-                                  cut1d_y_lim=flag_args.cut1d_y_lim,
+                                  cut1d_y_lim=cut1d_y_lim,
                                   cut1d_plot_val_list=flag_args.cut1d_plot_val_list,
                                   host=host,
                                   experiment_name=flag_args.experiment_name,
