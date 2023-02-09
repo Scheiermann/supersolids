@@ -62,10 +62,10 @@ def cut_1d(System_list: List[Schroedinger],
     fig, ax = plt.subplots(figsize=(20, 10))
     ax = fig.gca()
     # plt.cla()
-
+    
     ax.set_ylim(y_lim)
-    ax.set_yticks(ticks=np.linspace(0.0, 1.0, num=11),
-               labels=np.round_(np.linspace(0.0, 1.0, num=11), decimals=4))
+    ax.set_yticks(ticks=np.linspace(*y_lim, num=11),
+                  labels=np.round_(np.linspace(*y_lim, num=11), decimals=4))
 
     cuts = []
     probs = []
@@ -88,6 +88,11 @@ def cut_1d(System_list: List[Schroedinger],
                 psi_sol = System.psi_sol
             except Exception as e:
                 print(f"cut1d: Problem with psi_val or psi_sol!\n{e}")
+        if psi_sol is None:
+            l_ho = functions.get_l_ho(System.m_list[0], System.w_x)
+            g = 4.0 * np.pi * System.a_s_array[0, 0] * System.N_list[0]
+            # print(f"g, l_ho, a_s: {g}, {l_ho}, {System.a_s_array[0, 0]}")
+            psi_sol = functools.partial(functions.thomas_fermi_3d, g=g)
 
         # prepare the axis where to cut through
         cut_x = np.linspace(System.Box.x0, System.Box.x1, System.Res.x)
@@ -120,16 +125,26 @@ def cut_1d(System_list: List[Schroedinger],
 
         # plot probability cuts of solution, if given
         if psi_sol_3d_cut_x is not None:
-            functools.partial(psi_sol, y=slice_indices[1], z=slice_indices[2])
-            ax.plot(cut_x, psi_sol_3d_cut_x(x=cut_x), "x-", color="tab:cyan", label="x cut sol")
+            psi_sol_3d_cut_x = functools.partial(psi_sol,
+                                                 y=System.y[slice_indices[1]],
+                                                 z=System.z[slice_indices[2]])
+            psi_sol_x = psi_sol_3d_cut_x(x=cut_x)
+            ax.plot(cut_x, psi_sol_x, "x-", color="tab:cyan", label="x cut sol")
 
         if psi_sol_3d_cut_y is not None:
-            functools.partial(psi_sol, x=slice_indices[0], z=slice_indices[2])
-            ax.plot(cut_y, psi_sol_3d_cut_y(y=cut_y), "x-", color="tab:green", label="y cut sol")
+            psi_sol_3d_cut_y = functools.partial(psi_sol,
+                                                 x=System.x[slice_indices[0]],
+                                                 z=System.z[slice_indices[2]])
+            psi_sol_y = psi_sol_3d_cut_y(y=cut_y)
+            ax.plot(cut_y, psi_sol_y, "x-", color="tab:green", label="y cut sol")
 
         if psi_sol_3d_cut_z is not None:
-            functools.partial(psi_sol, x=slice_indices[0], y=slice_indices[1])
-            ax.plot(cut_z, psi_sol_3d_cut_z(z=cut_z), "x-", color="tab:olive", label="z cut sol")
+            psi_sol_3d_cut_z = functools.partial(psi_sol,
+                                                 x=System.x[slice_indices[0]],
+                                                 y=System.y[slice_indices[1]])
+            psi_sol_z = psi_sol_3d_cut_z(z=cut_z)
+            ax.plot(cut_z, psi_sol_z, "x-", color="tab:olive", label="z cut sol")
+
 
     ax.legend()
     ax.grid()
@@ -145,7 +160,7 @@ def cut_1d(System_list: List[Schroedinger],
     fig.savefig(Path(dir_path, f"1d_cut_{frame_formatted}.png"), bbox_inches='tight')
 
     for i, filename_steps in enumerate(filename_steps_list):
-        for name, cut, prob in zip(names[i], cuts[i], probs[i]):
+        for name, cut, prob in zip(names[i], cuts[i], probs[i], strict=True):
             path_npz = Path(dir_path, filename_steps + name + "_" + frame_formatted + ".npz")
             with open(path_npz, "wb") as g:
                 np.savez_compressed(g, cut=cut, prob=prob)
