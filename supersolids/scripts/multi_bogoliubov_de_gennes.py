@@ -72,25 +72,26 @@ echo {jobname}
 # export QT_QPA_PLATFORM=xcb
 
 # /home/dscheiermann/miniconda/envs/solids/bin/python3.10 -m supersolids.tools.bogoliubov_de_gennes \
+
 /home/dscheiermann/miniconda/envs/solids/bin/python3.10 /home/dscheiermann/supersolids/supersolids/tools/bogoliubov_de_gennes.py \
 -dir_path={dir_path} \
 -dir_name={dir_name} \
 -filename_schroedinger={filename_schroedinger} \
 -filename_steps={filename_steps} \
 -steps_format={steps_format} \
--frame={frame} \
 -nx={nx} \
 -ny={ny} \
 -nz={nz} \
 -recalculate={recalculate} \
 -print_num_eigenvalues={print_num_eigenvalues} \
 -graphs_dirname={graphs_dirname} &
+# -frame={frame} \
 
 """
         ])
 
         print(heredoc)
-        with open(Path(dir_path, f"sbatch_{dir_name}_{nx}_{ny}_{nz}.sh"), "w") as f:
+        with open(Path(dir_path, f"sbatch_bog_{dir_name}_{nx}_{ny}_{nz}.sh"), "w") as f:
             f.write(f"{heredoc}\n")
 
         j_counter += 1
