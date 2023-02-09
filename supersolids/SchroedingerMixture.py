@@ -927,6 +927,9 @@ class SchroedingerMixture(Schroedinger):
         for N, prob in zip(self.N_list, prob_list):
             mask = cp.full(cp.shape(prob), False)
             mask[x0:x1, y0:y1, z0:z1] = True
+            if cupy_used:
+               prob = cp.asnumpy(prob)
+               mask = cp.asnumpy(mask)
 
             bec_min_edgeless = ndimage.minimum(prob, labels=mask)
             bec_max_edgeless = ndimage.maximum(prob, labels=mask)
@@ -955,6 +958,11 @@ class SchroedingerMixture(Schroedinger):
             while min_on_edge_bool:
                 mask_slice = cp.full(cp.shape(prob), False)
                 mask_slice[slice_x0:slice_x1, slice_y0:slice_y1, slice_z0:slice_z1] = True
+                if cupy_used:
+                   prob = cp.asnumpy(prob)
+                   mask_slice = cp.asnumpy(mask_slice)
+                   mask = cp.asnumpy(mask)
+
                 bec_min_edgeless_pos = ndimage.minimum_position(prob, labels=mask_slice)
 
                 (min_on_edge_bool,
@@ -1231,7 +1239,7 @@ class SchroedingerMixture(Schroedinger):
     def split_operator_pot(self, split_step: float = 0.5,
             jit: bool = True, cupy_used: bool = False) -> Tuple[List[cp.ndarray], List[cp.ndarray]]:
         # update H_pot before use
-        contact_interaction_vec, dipol_term_vec, mu_lhy_list = self.get_dipol_U_dd_mulhy()
+        contact_interaction_vec, dipol_term_vec, mu_lhy_list = self.get_dipol_U_dd_mu_lhy()
         for i, (contact_interaction, dipol_term, mu_lhy) in enumerate(zip(
                 list(contact_interaction_vec),
                 list(dipol_term_vec),
