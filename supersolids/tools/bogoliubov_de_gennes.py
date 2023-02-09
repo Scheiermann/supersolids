@@ -5,12 +5,17 @@ import sys
 from pathlib import Path
 
 import numpy as np
+import dask.array as da
+from dask.distributed import Client
+
 from scipy.special import hermite
 from scipy.sparse.linalg import eigs
+
 from supersolids.helper import functions, get_path, get_version
 from supersolids.helper.run_time import run_time
 
-__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables()
+# __GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables()
+__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = True, 0
 cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
                                                                gpu_off=__GPU_OFF_ENV__,
                                                                gpu_index=__GPU_INDEX_ENV__)
@@ -41,7 +46,7 @@ def flags(args_array):
                              "the string needed is %07d")
     parser.add_argument("-frame", type=json.loads, default=None, help="Counter of first saved npz.")
     parser.add_argument("-graphs_dirname", type=str, default="graphs",
-                        help="Name of directory for the results."
+                        help="Name of directory for the results.")
     parser.add_argument("--recalculate", default=False, action="store_true",
                         help="Ignores saved results for the parameters, "
                              "then recalculates and overwrites the old results.")
@@ -67,6 +72,43 @@ def harmonic_eigenstate(x, n):
 
     return result
 
+    
+def harmonic_eigenstate_3d(System, i, j, k):
+    harmonic_eigenstate_2d = harmonic_eigenstate(System.x_mesh, i) * harmonic_eigenstate(System.y_mesh, j)
+    harmonic_eigenstate_3d = harmonic_eigenstate_2d * harmonic_eigenstate(System.z_mesh, k)
+
+    return cp.asarray(harmonic_eigenstate_3d)
+
+
+def harmonic_eigenstate_3d_dask(x_mesh, y_mesh, z_mesh, i, j, k):
+    harmonic_eigenstate_2d = harmonic_eigenstate(x_mesh, i) * harmonic_eigenstate(y_mesh, j)
+    harmonic_eigenstate_3d = harmonic_eigenstate_2d * harmonic_eigenstate(z_mesh, k)
+
+    return cp.asarray(harmonic_eigenstate_3d)
+
+
+def hermite_transform(System, operator, comb1, comb2,
+                      fourier_space: bool = False, dV: float = None):
+    if (operator is None) or (comb1 is None) or (comb2 is None):
+        return cp.array(0.0)
+    integrand = (harmonic_eigenstate_3d(System, comb1[0], comb1[1], comb1[2]) * operator \
+                 * harmonic_eigenstate_3d(System, comb2[0], comb2[1], comb2[2]))
+    transform: float = System.sum_dV(integrand, fourier_space=fourier_space, dV=dV)
+    
+    return transform
+
+def hermite_transform_dask(dV, x_mesh, y_mesh, z_mesh, operator, comb1, comb2):
+    if (operator is None) or (comb1 is None) or (comb2 is None):
+        return cp.array(0.0)
+    integrand = (harmonic_eigenstate_3d_dask(x_mesh, y_mesh, z_mesh, comb1[0], comb1[1], comb1[2]) * operator \
+                 * harmonic_eigenstate_3d_dask(x_mesh, y_mesh, z_mesh, comb2[0], comb2[1], comb2[2]))
+    transform: float = cp.sum(integrand) * dV
+
+    
+    return transform
+
+
+
 def get_index_dict(nx, ny, nz):
     dict = {i * ny * nz + j * nz + k : [i, j, k]
             for i in range(nx)
@@ -79,7 +121,7 @@ def get_bog_dict(dim, maxi=0.00001):
     comb_list_list = []
     sum_list_list = []
     for j in range(dim):
-        ind = np.ravel(np.argwhere(np.abs(bogoliubov_matrix[j, : nx * ny * nz]) > maxi))
+        ind = np.ravel(np.argwhere(np.abs(bogoliubov_matrix[j, : dim]) > maxi))
         comb_list = [dict[ind[i]] for i in range(len(ind))]
         sum_list = list(map(sum , [dict[ind[i]] for i in range(len(ind))]))
         comb_list_list.append(comb_list)
@@ -93,6 +135,61 @@ def get_parity(comb1, comb2):
     parity = len([i for i in summed if i % 2 == 0]) == len(comb1)
 
     return parity
+
+def get_hermit_matrix(dict, System, operator, dim):
+    hermite_matrix = cp.zeros((dim, dim))
+    E_H0 = cp.zeros((dim, dim))
+    triu_0, triu_1 = np.triu_indices(dim)
+    for l, m in zip(triu_0, triu_1):
+        comb1 = dict[l]
+        comb2 = dict[m]
+        if l == m:
+            E_H0[l, m] = ((comb1[0] + 0.5)
+                          + (System.w_y / System.w_x) * (comb1[1] + 0.5)
+                          + (System.w_z / System.w_x) * (comb1[2] + 0.5))
+        # with run_time(name=f"{l},{m} integrated"):
+        if get_parity(comb1, comb2):
+            hermite_matrix[l, m] = hermite_transform(System, operator, comb1, comb2)
+        else:
+            hermite_matrix[l, m] = 0.0
+
+    return hermite_matrix, E_H0
+
+
+def get_hermit_matrix_dask(dict, System, operator, dim, fast = True):
+    hermite_matrix = cp.zeros((dim, dim))
+    E_H0 = cp.zeros((dim, dim))
+    triu_0, triu_1 = np.triu_indices(dim)
+    if fast:
+        dV = System.volume_element(fourier_space=False)
+        [a1, a2, a3, a4, a5] = client.scatter([dV, System.x_mesh, System.y_mesh, System.z_mesh,
+                                               operator])
+    else:
+        [System_dask, operator_dask] = client.scatter([System, operator])
+
+    futures = []
+    for l, m in zip(triu_0, triu_1):
+        comb1 = dict[l]
+        comb2 = dict[m]
+        if l == m:
+            E_H0[l, m] = ((comb1[0] + 0.5)
+                          + (System.w_y / System.w_x) * (comb1[1] + 0.5)
+                          + (System.w_z / System.w_x) * (comb1[2] + 0.5))
+        if not get_parity(comb1, comb2):
+            comb1 = None
+            comb2 = None
+        if fast:
+            futures.append(client.submit(hermite_transform_dask, a1, a2, a3, a4, a5, comb1, comb2))
+        else:
+            futures.append(client.submit(hermite_transform, System_dask, operator_dask, comb1, comb2))
+    results = client.gather(futures)
+
+    #  put results into correct array shape
+    results_arr = cp.array(results)
+    for i, (l, m) in enumerate(zip(triu_0, triu_1)):
+        hermite_matrix[l, m] = results_arr[i]
+
+    return hermite_matrix, E_H0
 
 
 def get_bogoliuv_matrix(System, operator, nx, ny, nz):
@@ -113,26 +210,13 @@ def get_bogoliuv_matrix(System, operator, nx, ny, nz):
 
     grid_shape = System.x_mesh.shape
     dim = int(nx * ny * nz)
-    # buffer = cp.zeros((nx, ny, nz, *grid_shape))
-    hermite_matrix = cp.zeros((dim, dim))
-    E_H0 = cp.zeros((dim, dim))
 
     dict = get_index_dict(nx, ny, nz)
-    triu_0, triu_1 = np.triu_indices(dim)
-    with run_time(name="all"):
-        for l, m in zip(triu_0, triu_1):
-            comb1 = dict[l]
-            comb2 = dict[m]
-            E_H0[l, l] = ((comb1[0] + 0.5)
-                          + (System.w_y / System.w_x) * (comb1[1] + 0.5)
-                          + (System.w_z / System.w_x) * (comb1[2] + 0.5))
-            with run_time(name=f"{l},{m} integrated"):
-                if get_parity(comb1, comb2):
-                    hermite_matrix[l, m] = hermite_transform(System, operator, comb1, comb2)
-                else:
-                    hermite_matrix[l, m] = 0.0
-                g = 4.0 * np.pi * System.a_s_array[0, 0]
+    # with run_time(name="cupy"):
+    #     hermite_matrix_cp, E_H0_cp = get_hermit_matrix(dict, System, operator, dim)
 
+    with run_time(name="dask"):
+        hermite_matrix, E_H0 = get_hermit_matrix_dask(dict, System, operator, dim, fast=True)
     hermite_matrix = functions.symmetric_mat(hermite_matrix)
 
     g = 4.0 * np.pi * System.a_s_array[0, 0]
@@ -160,23 +244,16 @@ def hermite_laplace(System, i):
     return herm_laplace
 
 
-def hermite_transform(System, operator, comb1, comb2,
-                      fourier_space: bool = False, dV: float = None):
-    integrand = (harmonic_eigenstate_3d(System, comb1[0], comb1[1], comb1[2]) * operator \
-                 * harmonic_eigenstate_3d(System, comb2[0], comb2[1], comb2[2]))
-    transform: float = System.sum_dV(integrand, fourier_space=fourier_space, dV=dV)
-    
-    return transform
-    
-def harmonic_eigenstate_3d(System, i, j, k):
-    harmonic_eigenstate_2d = harmonic_eigenstate(System.x_mesh, i) * harmonic_eigenstate(System.y_mesh, j)
-    harmonic_eigenstate_3d = harmonic_eigenstate_2d * harmonic_eigenstate(System.z_mesh, k)
-
-    return cp.asarray(harmonic_eigenstate_3d)
+def add(x, y):
+    if (x is None) or (y is None):
+        return None
+    else:
+        return x + y
 
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
+    client = Client() 
     args = flags(sys.argv[1:])
 
     # home = "/bigwork/dscheier"
@@ -207,10 +284,10 @@ if __name__ == "__main__":
     path_bogoliubov = Path(path_graphs,
                            f"Matrix_BdG_{args.dir_name}_{args.nx}_{args.ny}_{args.nz}.npz")
 
-    if not path_result.is_dir():
-        path_result.mkdir(parents=True)
-    if not path_bogoliubov.is_dir():
-        path_bogoliubov.mkdir(parents=True)
+    # if not path_result.is_dir():
+    #     path_result.mkdir(parents=True)
+    # if not path_bogoliubov.is_dir():
+    #     path_bogoliubov.mkdir(parents=True)
 
     if args.frame is None:
         _, last_index, _, _ = get_path.get_path(Path(dir_path, args.dir_name),
@@ -229,6 +306,7 @@ if __name__ == "__main__":
                                frame=frame,
                                )
     print(f"{System}")
+    print(f"{System.mu_arr}")
     System.stack_shift = 0.0
 
 
