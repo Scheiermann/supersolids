@@ -88,11 +88,13 @@ def harmonic_eigenstate_3d_dask(x_mesh, y_mesh, z_mesh, i, j, k):
 
 
 def hermite_transform(System, operator, comb1, comb2,
-                      fourier_space: bool = False, dV: float = None):
+                      fourier_space: bool = False, dV: float = None, sandwich = True):
     if (operator is None) or (comb1 is None) or (comb2 is None):
         return cp.array(0.0)
-    integrand = (harmonic_eigenstate_3d(System, comb1[0], comb1[1], comb1[2]) * operator \
-                 * harmonic_eigenstate_3d(System, comb2[0], comb2[1], comb2[2]))
+    integrand = harmonic_eigenstate_3d(System, comb1[0], comb1[1], comb1[2]) * operator
+    if sandwich:
+        integrand = integrand * harmonic_eigenstate_3d(System, comb2[0], comb2[1], comb2[2])
+
     transform: float = System.sum_dV(integrand, fourier_space=fourier_space, dV=dV)
     
     return transform
@@ -215,11 +217,12 @@ def get_bogoliuv_matrix(System, operator, nx, ny, nz):
     # with run_time(name="cupy"):
     #     hermite_matrix_cp, E_H0_cp = get_hermit_matrix(dict, System, operator, dim)
 
-    with run_time(name="dask"):
+    with run_time(name=f"dask {nx} {ny} {nz}"):
         hermite_matrix, E_H0 = get_hermit_matrix_dask(dict, System, operator, dim, fast=True)
     hermite_matrix = functions.symmetric_mat(hermite_matrix)
 
-    g = 4.0 * np.pi * System.a_s_array[0, 0]
+    # g = 4.0 * np.pi * System.a_s_array[0, 0]
+    g = 4.0 * np.pi * System.a_s_array[0, 0] * System.N_list[0]
     # mu = functions.mu_3d(g * System.N_list[0])
     mu = System.mu_arr[0]
     # mu = 14.408167497573881
@@ -229,8 +232,8 @@ def get_bogoliuv_matrix(System, operator, nx, ny, nz):
 
     matrix = cp.zeros((2*dim, 2*dim))
     matrix[0:dim, 0:dim] = a
-    matrix[0:dim, dim:] = b
-    matrix[dim:, 0:dim] = -b
+    matrix[0:dim, dim:] = -b
+    matrix[dim:, 0:dim] = b
     matrix[dim:, dim:] = -a
     
     return matrix
@@ -243,13 +246,33 @@ def hermite_laplace(System, i):
     
     return herm_laplace
 
+def check_sol(System, nx, ny, nz, bog_mat):
+    dim = int(nx * ny * nz)
+    psi_0 = cp.zeros(dim)
+    herm_norm = cp.zeros((dim, dim))
 
-def add(x, y):
-    if (x is None) or (y is None):
-        return None
-    else:
-        return x + y
+    operator = cp.real(System.psi_val_list[0])
+    operator_h = cp.ones_like(System.x_mesh)
 
+    dict = get_index_dict(nx, ny, nz)
+
+    psi_norm = System.get_norm(func_val=System.psi_val_list[0])
+    # for l in range(dim):
+    #     for m in range(dim):
+    #         comb1 = dict[l]
+    #         comb2 = dict[m]
+    #         herm_norm[l, m] = hermite_transform(System, operator_h, comb1, comb2, sandwich=True)
+     
+    for l in range(dim):
+        comb1 = dict[l]
+        psi_0[l] = hermite_transform(System, operator, comb1, comb1, sandwich=False)
+   
+    psi_0_2dim = cp.hstack((psi_0, psi_0))
+    norm = cp.dot(psi_0, psi_0)
+    
+    result = cp.einsum("ij,j->i", bog_mat, psi_0_2dim)
+    
+    return result
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
@@ -339,6 +362,9 @@ if __name__ == "__main__":
         with run_time(name="eig"):
             eigen_values, eigen_vectors = np.linalg.eig(bogoliubov_matrix)
             # eigen_values, eigen_vectors = eigs(bogoliubov_matrix, k=10, which="SM")
+
+        checked = check_sol(System, args.nx, args.ny, args.nz, bogoliubov_matrix)
+        print(checked)
 
         vals_over0 = np.sort(eigen_values)
         print(vals_over0[vals_over0 >= 0])

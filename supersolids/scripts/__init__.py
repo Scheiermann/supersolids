@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-__all__ = ["bogoliubov_de_gennes",
+__all__ = ["multi_bogoliubov_de_gennes",
            "cp_plots",
            "density_in_trap",
            "deprecated",
