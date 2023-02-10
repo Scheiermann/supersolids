@@ -269,6 +269,7 @@ def check_sol(System, nx, ny, nz, bog_mat):
    
     psi_0_2dim = cp.hstack((psi_0, psi_0))
     norm = cp.dot(psi_0, psi_0)
+    print(f"Norm psi_0: {norm}")
     
     result = cp.einsum("ij,j->i", bog_mat, psi_0_2dim)
     
