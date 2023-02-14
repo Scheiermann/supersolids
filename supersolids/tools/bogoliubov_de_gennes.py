@@ -46,6 +46,8 @@ def flags(args_array):
                              "For example the standard naming convention is step_0000001.npz, "
                              "the string needed is %07d")
     parser.add_argument("-frame", type=json.loads, default=None, help="Counter of first saved npz.")
+    parser.add_argument("-mode", type=str, default="dask",
+                        help="Different ways of calculation. Choose between dask, cupy, flat.")
     parser.add_argument("-graphs_dirname", type=str, default="graphs",
                         help="Name of directory for the results.")
     parser.add_argument("--recalculate", default=False, action="store_true",
@@ -289,7 +291,7 @@ def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask"):
         with run_time(name=f"{mode} {nx} {ny} {nz}"):
             hermite_matrix = get_hermit_matrix_flat(System, operator, nx, ny, nz)
     else:
-        sys.exit("Mode not implemented. Chose between dask, cupy, flat.")
+        sys.exit("Mode not implemented. Choose between dask, cupy, flat.")
 
     g = 4.0 * np.pi * System.a_s_array[0, 0]
     # mu = functions.mu_3d(g * System.N_list[0])
@@ -426,7 +428,8 @@ if __name__ == "__main__":
         operator = density_list[0]
         print(f"max(operator): {np.max(operator)}")
 
-        bogoliubov_matrix = get_bogoliuv_matrix(System, operator, args.nx, args.ny, args.nz)
+        bogoliubov_matrix = get_bogoliuv_matrix(System, operator, args.nx, args.ny, args.nz,
+                                                mode=args.mode)
         if cupy_used:
             bogoliubov_matrix = cp.asnumpy(bogoliubov_matrix)
 
