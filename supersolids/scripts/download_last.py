@@ -11,7 +11,7 @@ from pathlib import Path
 from fabric import Connection
 
 
-def download(host, path_in, path_out, filename_singles, download_steps, take_last,
+def download(host, path_in, path_out, filename_singles, download_steps, take_last_list,
              filename_steps_list, steps_format_list,
              filename_pattern_list, filename_number_regex_list):
     # Create a results dir, if there is none
@@ -45,9 +45,9 @@ def download(host, path_in, path_out, filename_singles, download_steps, take_las
                 continue
 
     if download_steps:
-        for filename_steps, steps_format, filename_pattern, filename_number_regex in zip(
+        for filename_steps, steps_format, filename_pattern, filename_number_regex, take_last in zip(
                 filename_steps_list, steps_format_list,
-                filename_pattern_list, filename_number_regex_list):
+                filename_pattern_list, filename_number_regex_list, take_last_list):
 
             try:
                 files_all = sorted(fnmatch.filter(host.sftp().listdir(path=str(path_in)),
@@ -90,8 +90,8 @@ if __name__ == "__main__":
     # experiment_suffix = "gpu_12_28_to_102"
     # experiment_suffix = "gpu_12_28_to_102_dip9"
     # experiment_suffix = "gpu_01_13_dip9"
-    # experiment_suffix = "gpu_01_20_dip9"
-    experiment_suffix = "gpu_01_21_dip9"
+    experiment_suffix = "gpu_01_20_dip9"
+    # experiment_suffix = "gpu_01_21_dip9"
     path_anchor_input = Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/")
     path_anchor_output = Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/")
     # path_anchor_output = Path("/run/media/dsche/scr2/begin_gpu/")
@@ -106,17 +106,19 @@ if __name__ == "__main__":
     # movie_start = 1
     # movie_end = 50
     movie_start = 61
-    movie_end = 90
-    # movie_end = 110
+    # movie_end = 90
+    movie_end = 110
     # movie_end = 40
     # movie_end = 15
 
     mixture = True
 
     if mixture:
+        take_last_list = [take_last, take_last, take_last, (take_last - 1) * 100]
         filename_steps_list = ["script_", "schroedinger_",
                                "step_", "SchroedingerMixtureSummary_"]
     else:
+        take_last_list = [take_last, take_last, take_last, (take_last - 1) * 100]
         filename_steps_list = ["script_", "schroedinger_",
                                "step_", "SchroedingerSummary_"]
     steps_format_list = ["%04d", "%04d", "%07d", "%07d"]
@@ -134,11 +136,11 @@ if __name__ == "__main__":
         print(f"\npath_in: {path_in}")
         if password is None:
             with Connection(ssh_hostname) as host:
-                download(host, path_in, path_out, filename_singles, download_steps, take_last,
+                download(host, path_in, path_out, filename_singles, download_steps, take_last_list,
                          filename_steps_list, steps_format_list, filename_pattern_list,
                          filename_number_regex_list)
         else:
             with Connection(ssh_hostname, connect_kwargs={'password': f"{password}"}) as host:
-                download(host, path_in, path_out, filename_singles, download_steps, take_last,
+                download(host, path_in, path_out, filename_singles, download_steps, take_last_list,
                          filename_steps_list, steps_format_list, filename_pattern_list,
                          filename_number_regex_list)
