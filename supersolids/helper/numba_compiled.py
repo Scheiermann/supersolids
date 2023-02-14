@@ -24,17 +24,18 @@ cc.verbose = True
 
 
 @cc.export('get_H_pot_exponent_terms_jit',
-           'c16[:,:,:](f8[:,:,:], f8, f8, c16[:,:,:], f8[:,:,:], f8[:,:,:])')
+           'c16[:,:,:](f8[:,:,:], f8, f8, c16[:,:,:], f8[:,:,:], f8[:,:,:], f8)')
 def get_H_pot_exponent_terms_jit(V_val: cp.ndarray,
                                  a_dd_factor: float,
                                  a_s_factor: float,
                                  dipol_term: cp.ndarray,
                                  contact_interaction: cp.ndarray,
-                                 mu_lhy: cp.ndarray) -> cp.ndarray:
+                                 mu_lhy: cp.ndarray,
+                                 lhy_factor: float) -> cp.ndarray:
     return (V_val
             + a_dd_factor * dipol_term
             + a_s_factor * contact_interaction
-            + mu_lhy
+            + lhy_factor * mu_lhy
             )
 
 

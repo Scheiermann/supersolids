@@ -59,6 +59,8 @@ def flags(args_array):
     parser.add_argument("--a_s_list", metavar="a_s", type=float, nargs="+", default=[85.0],
                         help="a_s in a0 per mixture-mixture interaction in a upper triangle "
                              "matrix e.g. for 2 mixtures, the index combinations are [11, 12, 22].")
+    parser.add_argument("-lhy_factor", type=float, default=1.0,
+                        help="Factor to multiply mu_lhy in the Hamiltonian.")
     parser.add_argument("-w_x", metavar="w_x", type=float, default=2.0 * np.pi * 33.0,
                         help="Frequency of harmonic trap in x direction")
     parser.add_argument("-w_y", metavar="w_y", type=float, default=2.0 * np.pi * 80.0,
@@ -349,6 +351,7 @@ if __name__ == "__main__":
             m_list=m_list,
             a_s_array=a_s_array,
             a_dd_array=a_dd_array,
+            lhy_factor=args.lhy_factor,
             dt_func=None,
             w_x=args.w_x,
             w_y=args.w_y,

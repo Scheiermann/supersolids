@@ -272,6 +272,7 @@ def simulate_npz(args):
                     a_dd_array=System_loaded.a_dd_array,
                     a_s_factor=System_loaded.a_s_factor,
                     a_dd_factor=System_loaded.a_dd_factor,
+                    lhy_factor=System_loaded.lhy_factor,
                     nA_max=System_loaded.nA_max,
                     dt_func=System_loaded.dt_func,
                     w_x=w_x,

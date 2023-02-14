@@ -163,6 +163,7 @@ class SchroedingerMixture(Schroedinger):
                  t: float = 0.0,
                  a_s_factor: float = 4.0 * np.pi,
                  a_dd_factor: float = 3.0,
+                 lhy_factor: float = 1.0,
                  nA_max: int = 100,
                  dt_func: Optional[Callable] = None,
                  w_x: float = 2.0 * np.pi * 33.0,
@@ -198,6 +199,7 @@ class SchroedingerMixture(Schroedinger):
 
         self.a_s_factor: float = a_s_factor
         self.a_dd_factor: float = a_dd_factor
+        self.lhy_factor: float = lhy_factor
 
         self.a_s_array: np.ndarray = a_s_array
         self.a_dd_array: np.ndarray = a_dd_array
@@ -404,39 +406,27 @@ class SchroedingerMixture(Schroedinger):
         eta_dVdna = functools.partial(numbas.eta_dVdna_jit, A=self.A)
         eta_dVdnb = functools.partial(numbas.eta_dVdnb_jit, A=self.A)
  
-        mu_lhy_integrand_a = functools.partial(self.mu_lhy_integrand, eta_dVdn=eta_dVdna)
-        mu_lhy_integrand_b = functools.partial(self.mu_lhy_integrand, eta_dVdn=eta_dVdnb)
+        if self.lhy_factor == 0.0:
+            self.mu_lhy_interpolation_list = None
+        else:
+            mu_lhy_integrand_a = functools.partial(self.mu_lhy_integrand, eta_dVdn=eta_dVdna)
+            mu_lhy_integrand_b = functools.partial(self.mu_lhy_integrand, eta_dVdn=eta_dVdnb)
         
-        ######## testing
-        eta_array: np.ndarray = (self.a_s_factor * self.a_s_array
-                                 + self.a_dd_factor * self.a_dd_array * quad_vec(functions.dipol_dipol, 0.0, 1.0)[0]
-                                 )
-        eta_aa = eta_array[0, 0]
-        eta_ab = eta_array[0, 1]
-        eta_bb = eta_array[1, 1]
-        c_t1 = eta_dVdna(lam=1, eta_aa=eta_aa, eta_bb=eta_bb, eta_ab=eta_ab)
-        c_t2 = eta_dVdna(lam=-1, eta_aa=eta_aa, eta_bb=eta_bb, eta_ab=eta_ab)
-        d_t1 = eta_dVdnb(lam=1, eta_aa=eta_aa, eta_bb=eta_bb, eta_ab=eta_ab)
-        d_t2 = eta_dVdnb(lam=-1, eta_aa=eta_aa, eta_bb=eta_bb, eta_ab=eta_ab)
-        b_t = quad_vec(mu_lhy_integrand_b, 0.0, 1.0)[0]
-        a_t = quad_vec(mu_lhy_integrand_a, 0.0, 1.0)[0]
-        ######## testing
+            mu_lhy_integrated_list = get_mu_lhy_integrated_list(func_list=[mu_lhy_integrand_a,
+                                                                           mu_lhy_integrand_b])
 
-        mu_lhy_integrated_list = get_mu_lhy_integrated_list(func_list=[mu_lhy_integrand_a,
-                                                                       mu_lhy_integrand_b])
+            # V_symb: List[Callable] = func_V_symb()
+            # func_fa_symb = functools.partial(self.func_f_symb, func=V_symb[0],
+            #                                  eta_a=self.A, eta_b=1.0 - self.A)
+            # func_fb_symb = functools.partial(self.func_f_symb, func=V_symb[1],
+            #                                  eta_a=self.A, eta_b=1.0 - self.A)
+            # mu_v_list_symb = construct_mu_lhy_list(func_list=[func_fa_symb, func_fb_symb])
 
-        # V_symb: List[Callable] = func_V_symb()
-        # func_fa_symb = functools.partial(self.func_f_symb, func=V_symb[0],
-        #                                  eta_a=self.A, eta_b=1.0 - self.A)
-        # func_fb_symb = functools.partial(self.func_f_symb, func=V_symb[1],
-        #                                  eta_a=self.A, eta_b=1.0 - self.A)
-        # mu_v_list_symb = construct_mu_lhy_list(func_list=[func_fa_symb, func_fb_symb])
+            mu_lhy_interpolation_list = []
+            for mu_lhy_integrated in mu_lhy_integrated_list:
+                mu_lhy_interpolation_list.append(interpolate.interp1d(self.A, mu_lhy_integrated))
 
-        mu_lhy_interpolation_list = []
-        for mu_lhy_integrated in mu_lhy_integrated_list:
-            mu_lhy_interpolation_list.append(interpolate.interp1d(self.A, mu_lhy_integrated))
-
-        self.mu_lhy_interpolation_list = mu_lhy_interpolation_list
+            self.mu_lhy_interpolation_list = mu_lhy_interpolation_list
 
         energy_v = quad_vec(self.func_energy, 0.0, 1.0)[0]
         self.energy_helper_function = interpolate.interp1d(self.A, energy_v)
@@ -717,10 +707,12 @@ class SchroedingerMixture(Schroedinger):
     def get_E(self) -> None:
         # update for energy calculation
         density_list = self.get_density_list(jit=numba_used)
-        mu_lhy_list: List[np.ndarray] = self.get_mu_lhy_list(density_list)
-
-        # use normalized inputs for energy
-        self.E = self.energy(density_list, mu_lhy_list)
+        if self.lhy_factor == 0.0:
+            self.E = self.energy(density_list, mu_lhy_list=None)
+        else:
+            mu_lhy_list: List[np.ndarray] = self.get_mu_lhy_list(density_list)
+            # use normalized inputs for energy
+            self.E = self.energy(density_list, mu_lhy_list)
 
 
     def get_E_pot(self, density_list: List[cp.ndarray], dV: float = None) -> None:
@@ -778,7 +770,10 @@ class SchroedingerMixture(Schroedinger):
         #     # norm
             # density_list_per_particle.append((1.0 / N) * density)
 
-        E_lhy = self.sum_dV(self.get_energy_lhy(density_list), dV=dV)
+        if self.lhy_factor == 0.0:
+            E_lhy = 0.0
+        else:
+            E_lhy = self.sum_dV(self.get_energy_lhy(density_list), dV=dV)
         E_dd, E_scatter = self.energy_density_interaction_explicit(density_list)
         E_pot = self.get_E_pot(density_list, dV=dV)
         E_kin = self.get_E_kin(dV=dV)
@@ -798,14 +793,17 @@ class SchroedingerMixture(Schroedinger):
         """
         dV = self.volume_element(fourier_space=False)
 
-        mu_lhy_part_list: List[float] = []
-        for mu_lhy, density in zip(mu_lhy_list, density_list):
-            mu_lhy_part_list.append(self.sum_dV(mu_lhy * density, dV=dV))
-        mu_lhy_part = cp.sum(cp.array(mu_lhy_part_list))
+        if self.lhy_factor == 0.0:
+            E_lhy = 0.0
+            mu_lhy_part = 0.0
+        else:
+            mu_lhy_part_list: List[float] = []
+            for mu_lhy, density in zip(mu_lhy_list, density_list):
+                mu_lhy_part_list.append(self.sum_dV(mu_lhy * density, dV=dV))
+            mu_lhy_part = cp.sum(cp.array(mu_lhy_part_list))
+            E_lhy = self.sum_dV(self.get_energy_lhy(density_list), dV=dV)
 
         p_int = self.energy_density_interaction(density_list)
-
-        E_lhy = self.sum_dV(self.get_energy_lhy(density_list), dV=dV)
 
         # p_ext_list: List[float] = []
         # for density in density_list:
@@ -1167,11 +1165,12 @@ class SchroedingerMixture(Schroedinger):
     def get_H_pot_exponent_terms(self,
                                  dipol_term: cp.ndarray,
                                  contact_interaction: cp.ndarray,
-                                 mu_lhy: cp.ndarray) -> cp.ndarray:
+                                 mu_lhy: cp.ndarray,
+                                 ) -> cp.ndarray:
         return (self.V_val
                 + self.a_dd_factor * dipol_term
                 + self.a_s_factor * contact_interaction
-                + mu_lhy
+                + self.lhy_factor * mu_lhy
                 )
 
     def get_dipol_U_dd_mu_lhy(self):
@@ -1236,8 +1235,8 @@ class SchroedingerMixture(Schroedinger):
         return contact_interaction_vec, dipol_term_vec, mu_lhy_list
 
 
-    def split_operator_pot(self, split_step: float = 0.5,
-            jit: bool = True, cupy_used: bool = False) -> Tuple[List[cp.ndarray], List[cp.ndarray]]:
+    def split_operator_pot(self, split_step: float = 0.5, jit: bool = True,
+                           cupy_used: bool = False,) -> Tuple[List[cp.ndarray], List[cp.ndarray]]:
         # update H_pot before use
         contact_interaction_vec, dipol_term_vec, mu_lhy_list = self.get_dipol_U_dd_mu_lhy()
         for i, (contact_interaction, dipol_term, mu_lhy) in enumerate(zip(
@@ -1255,14 +1254,15 @@ class SchroedingerMixture(Schroedinger):
                                                                        self.a_s_factor,
                                                                        dipol_term,
                                                                        contact_interaction,
-                                                                       mu_lhy
+                                                                       mu_lhy,
+                                                                       lhy_factor=self.lhy_factor,
                                                                        )
                 term_and_tilt = term + tilt_term
                 H_pot_propagator: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt, term_and_tilt, split_step)
             else:
                 term: cp.ndarray = self.get_H_pot_exponent_terms(dipol_term,
                                                                  contact_interaction,
-                                                                 mu_lhy
+                                                                 mu_lhy,
                                                                  )
                 term_and_tilt = term + tilt_term
                 H_pot_propagator: cp.ndarray = self.get_H_pot(term_and_tilt, split_step)

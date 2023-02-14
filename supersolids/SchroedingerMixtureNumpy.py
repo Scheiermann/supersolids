@@ -58,6 +58,7 @@ class SchroedingerMixtureNumpy(SchroedingerMixture):
         self.m_list: List[float] = SystemMixture.m_list
         self.a_s_factor: float = SystemMixture.a_s_factor
         self.a_dd_factor: float = SystemMixture.a_dd_factor
+        self.lhy_factor: float = SystemMixture.lhy_factor
         self.a_s_array: np.ndarray = SystemMixture.a_s_array
         self.a_dd_array: np.ndarray = SystemMixture.a_dd_array
         self.w_x: float = SystemMixture.w_x
