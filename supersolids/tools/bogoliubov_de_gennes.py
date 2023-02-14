@@ -8,6 +8,7 @@ import numpy as np
 import dask.array as da
 from dask.distributed import Client
 
+from scipy.special import eval_hermite, factorial
 from scipy.special import hermite
 from scipy.sparse.linalg import eigs
 
@@ -65,12 +66,59 @@ def flags(args_array):
     return args
 
 
+def mat2d(mat, label="", precision=4, formatter={'float': '{:0.1f}'.format}, linewidth=250):
+    with np.printoptions(precision=precision, suppress=True, formatter=formatter,
+                         linewidth=linewidth):
+        print(f"{label}\n{np.matrix(mat)}") 
+
+
+
 def harmonic_eigenstate(x, n):
-    prefactor = np.sqrt(1 / (np.math.factorial(n) * 2 ** n )) * np.pi ** -0.25
+    prefactor = np.sqrt(1 / (factorial(n) * 2 ** n )) * np.pi ** -0.25
     herm = hermite(n)(x)
     result = prefactor * np.exp(-x ** 2 / 2) * herm
 
     return result
+
+
+def HO_1D(ind, x, a=1):
+    return (1./np.sqrt(2**ind * factorial(ind) * np.sqrt(np.pi)) * a**0.25
+            * np.exp(-a * x**2/2) * eval_hermite(ind, np.sqrt(a) * x))
+
+
+def indices(ind, ind_y_max, ind_z_max):
+    ind_x = ind//(ind_y_max * ind_z_max)
+    ind_y = (ind - ind_x * ind_y_max * ind_z_max)//ind_y_max
+    ind_z = ind - ind_x * ind_y_max * ind_z_max - ind_y * ind_z_max
+    return ind_x, ind_y, ind_z
+
+def position(pos, xmax, ymax, zmax, nxmax, nymax, nzmax):
+    pos_x = pos//(nymax * nzmax)
+    pos_y = (pos - pos_x * nymax * nzmax)//nymax
+    pos_z = pos - pos_x * nymax * nzmax - pos_y * nzmax
+    dx, dy, dz = 2 * xmax/nxmax, 2 * ymax/nymax, 2 * zmax/nzmax
+    x = -xmax + dx * pos_x
+    y = -ymax + dy * pos_y
+    z = -zmax + dz * pos_z    
+    return x, y, z
+
+def HO_3D(ind, pos, ind_y_max, ind_z_max):
+    ay, az = 1, 1
+    nxmax, nymax, nzmax = System.Res.x, System.Res.y, System.Res.z
+    xmax, ymax, zmax = System.Box.x1, System.Box.y1, System.Box.z1
+    ind_x, ind_y, ind_z = indices(ind, ind_y_max, ind_z_max)
+    x, y, z = position(pos, xmax, ymax, zmax, nxmax, nymax, nzmax)
+    herm_3d = HO_1D(ind_x, x, 1) * HO_1D(ind_y, y, ay) * HO_1D(ind_z, z, az)
+
+    return herm_3d
+
+def En_TF(nr,l):
+    return np.sqrt(2 * nr**2 + 2 * nr * l + 3 * nr + l)
+
+
+def En(ind, ind_y_max, ind_z_max, ay=1, az=1):
+    ind_x, ind_y, ind_z = indices(ind, ind_y_max, ind_z_max)
+    return (ind_x + 0.5) + ay * (ind_y + 0.5) + az * (ind_z + 0.5)
 
     
 def harmonic_eigenstate_3d(System, i, j, k):
@@ -106,9 +154,7 @@ def hermite_transform_dask(dV, x_mesh, y_mesh, z_mesh, operator, comb1, comb2):
                  * harmonic_eigenstate_3d_dask(x_mesh, y_mesh, z_mesh, comb2[0], comb2[1], comb2[2]))
     transform: float = cp.sum(integrand) * dV
 
-    
     return transform
-
 
 
 def get_index_dict(nx, ny, nz):
@@ -164,8 +210,11 @@ def get_hermit_matrix_dask(dict, System, operator, dim, fast = True):
     triu_0, triu_1 = np.triu_indices(dim)
     if fast:
         dV = System.volume_element(fourier_space=False)
-        [a1, a2, a3, a4, a5] = client.scatter([dV, System.x_mesh, System.y_mesh, System.z_mesh,
-                                               operator])
+        [dV_dask, x_dask, y_dask, z_dask, operator_dask] = client.scatter([dV,
+                                                                           System.x_mesh,
+                                                                           System.y_mesh,
+                                                                           System.z_mesh,
+                                                                           operator])
     else:
         [System_dask, operator_dask] = client.scatter([System, operator])
 
@@ -181,7 +230,8 @@ def get_hermit_matrix_dask(dict, System, operator, dim, fast = True):
             comb1 = None
             comb2 = None
         if fast:
-            futures.append(client.submit(hermite_transform_dask, a1, a2, a3, a4, a5, comb1, comb2))
+            futures.append(client.submit(hermite_transform_dask, dV_dask, x_dask, y_dask, z_dask,
+                                         operator_dask, comb1, comb2))
         else:
             futures.append(client.submit(hermite_transform, System_dask, operator_dask, comb1, comb2))
     results = client.gather(futures)
@@ -193,8 +243,21 @@ def get_hermit_matrix_dask(dict, System, operator, dim, fast = True):
 
     return hermite_matrix, E_H0
 
+def get_hermit_matrix_flat(System, operator, nx, ny, nz):
+    pos_max = System.Res.x * System.Res.y * System.Res.z
+    pos_vec = np.arange(0, pos_max, 1)
+    ind_vec = np.arange(0, int(nx * ny * nz), 1)
+    ind_v, pos_v = np.meshgrid(ind_vec, pos_vec, indexing='ij')
+    dV = System.volume_element(fourier_space=False)
+    bog_helper = HO_3D(ind_v, pos_v, ny, nz)
+    hermite_matrix = cp.dot(bog_helper * cp.ravel(operator), np.swapaxes(bog_helper, 0, 1)) * dV
+    E_H0 = np.diag(En(ind_vec, ny, nz))
+    
+    return hermite_matrix, E_H0
 
-def get_bogoliuv_matrix(System, operator, nx, ny, nz):
+
+
+def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask"):
     # contact_interaction_vec, dipol_term_vec, _ = System.get_dipol_U_dd_mu_lhy()
 
     # contact_interaction_vec = cp.array(contact_interaction_vec)
@@ -214,34 +277,42 @@ def get_bogoliuv_matrix(System, operator, nx, ny, nz):
     dim = int(nx * ny * nz)
 
     dict = get_index_dict(nx, ny, nz)
-    # with run_time(name="cupy"):
-    #     hermite_matrix_cp, E_H0_cp = get_hermit_matrix(dict, System, operator, dim)
 
-    with run_time(name=f"dask {nx} {ny} {nz}"):
-        hermite_matrix, E_H0 = get_hermit_matrix_dask(dict, System, operator, dim, fast=True)
-    hermite_matrix = functions.symmetric_mat(hermite_matrix)
+    if mode == "dask":
+        with run_time(name=f"{mode} {nx} {ny} {nz}"):
+            hermite_matrix_triu, E_H0 = get_hermit_matrix_dask(dict, System, operator, dim, fast=True)
+        hermite_matrix = functions.symmetric_mat(hermite_matrix_triu)
+    elif mode == "cupy":
+        with run_time(name=f"{mode} {nx} {ny} {nz}"):
+            hermite_matrix, E_H0 = get_hermit_matrix(dict, System, operator, dim)
+    elif mode == "flat":
+        with run_time(name=f"{mode} {nx} {ny} {nz}"):
+            hermite_matrix = get_hermit_matrix_flat(System, operator, nx, ny, nz)
+    else:
+        sys.exit("Mode not implemented. Chose between dask, cupy, flat.")
 
-    # g = 4.0 * np.pi * System.a_s_array[0, 0]
-    g = 4.0 * np.pi * System.a_s_array[0, 0] * System.N_list[0]
+    g = 4.0 * np.pi * System.a_s_array[0, 0]
     # mu = functions.mu_3d(g * System.N_list[0])
     mu = System.mu_arr[0]
-    # mu = 14.408167497573881
 
     b = g * hermite_matrix
     a = E_H0 + 2.0 * b - cp.diag(dim * [mu])
+    # a = np.diag(En(ind_vec, ny, nz) - mu) + 2.0 * b
 
     matrix = cp.zeros((2*dim, 2*dim))
     matrix[0:dim, 0:dim] = a
     matrix[0:dim, dim:] = -b
     matrix[dim:, 0:dim] = b
     matrix[dim:, dim:] = -a
+
+    mat2d(matrix, "bog:")
     
     return matrix
 
     
 def hermite_laplace(System, i):
     k = 2
-    factor = 2 ** k * (np.math.factorial(i) / np.math.factorial(i - k))
+    factor = 2 ** k * (factorial(i) / np.math.factorial(i - k))
     herm_laplace = factor * harmonic_eigenstate_3d(System, i - k)
     
     return herm_laplace
@@ -256,13 +327,6 @@ def check_sol(System, nx, ny, nz, bog_mat):
 
     dict = get_index_dict(nx, ny, nz)
 
-    psi_norm = System.get_norm(func_val=System.psi_val_list[0])
-    # for l in range(dim):
-    #     for m in range(dim):
-    #         comb1 = dict[l]
-    #         comb2 = dict[m]
-    #         herm_norm[l, m] = hermite_transform(System, operator_h, comb1, comb2, sandwich=True)
-     
     for l in range(dim):
         comb1 = dict[l]
         psi_0[l] = hermite_transform(System, operator, comb1, comb1, sandwich=False)
@@ -273,7 +337,12 @@ def check_sol(System, nx, ny, nz, bog_mat):
     
     result = cp.einsum("ij,j->i", bog_mat, psi_0_2dim)
     
+    result_0 = np.where(result > 0.0001, result, 0)
+    mat2d(psi_0_2dim, "psi_0_2dim:")
+    mat2d(result_0, "result_0:")
+    
     return result
+
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
@@ -283,17 +352,18 @@ if __name__ == "__main__":
     # home = "/bigwork/dscheier"
     # experiment_suffix = "gpu_02_06_no_V_1comp"
     # args.dir_path = Path(f"{home}/results/begin_{experiment_suffix}/")
-    # args.dir_name = "movie027"
+    # args.dir_name = "movie040"
     # args.filename_schroedinger = "schroedinger.pkl"
     # args.filename_steps = "step_"
     # args.steps_format = "%07d"
     # args.frame = None
 
-    # args.nx = 16
-    # args.ny = 16
-    # args.nz = 16
+    # n = 14
+    # args.nx = n
+    # args.ny = n
+    # args.nz = n
     # args.recalculate = False
-    # args.print_num_eigenvalues = 20
+    # args.print_num_eigenvalues = 30
 
     # args.graphs_dirname = "graphs"
 
@@ -330,7 +400,7 @@ if __name__ == "__main__":
                                frame=frame,
                                )
     print(f"{System}")
-    print(f"{System.mu_arr}")
+    print(f"mu: {System.mu_arr}")
     System.stack_shift = 0.0
 
 
@@ -346,15 +416,15 @@ if __name__ == "__main__":
             sol = np.load(file=f)
             val = sol["val"]
             vec = sol["vec"]
-        vals_sorted = np.sort(val)
-        vals_over0 = vals_sorted[vals_sorted > 0]
-        print(vals_over0[:args.print_num_eigenvalues])
-        vals_sorted2 = np.sort(np.abs(np.real(val)))
-        print(vals_sorted2[:args.print_num_eigenvalues])
+        ev_sorted = np.sort(np.where(val < 0, 100000, val))
+        ev_print = np.real(ev_sorted)[:args.print_num_eigenvalues]
+        print(f"ev_print:\n{ev_print}")
+
         print(f"Loaded solution as val, vec from: {path_result}")
     else:
         density_list = System.get_density_list(jit=False, cupy_used=cupy_used)
         operator = density_list[0]
+        print(f"max(operator): {np.max(operator)}")
 
         bogoliubov_matrix = get_bogoliuv_matrix(System, operator, args.nx, args.ny, args.nz)
         if cupy_used:
@@ -365,12 +435,10 @@ if __name__ == "__main__":
             # eigen_values, eigen_vectors = eigs(bogoliubov_matrix, k=10, which="SM")
 
         checked = check_sol(System, args.nx, args.ny, args.nz, bogoliubov_matrix)
-        print(checked)
 
-        vals_over0 = np.sort(eigen_values)
-        print(vals_over0[vals_over0 >= 0])
-        vals_sorted2 = np.sort(np.abs(np.real(eigen_values)))
-        print(vals_sorted2)
+        ev_sorted = np.sort(np.where(eigen_values < 0, 100000, eigen_values))
+        ev_print = np.real(ev_sorted)[:args.print_num_eigenvalues]
+        print(f"ev_print:\n{ev_print}")
 
         print(f"Save solution as val, vec to: {path_result}")
         with open(path_result, "wb") as g:
