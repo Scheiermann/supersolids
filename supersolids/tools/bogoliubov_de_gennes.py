@@ -68,7 +68,8 @@ def flags(args_array):
     return args
 
 
-def mat2d(mat, label="", precision=4, formatter={'float': '{:0.1f}'.format}, linewidth=250):
+def mat2d(mat, label="", precision=4, formatter={'float': '{:0.3f}'.format}, linewidth=250):
+
     with np.printoptions(precision=precision, suppress=True, formatter=formatter,
                          linewidth=linewidth):
         print(f"{label}\n{np.matrix(mat)}") 
@@ -94,25 +95,47 @@ def indices(ind, ind_y_max, ind_z_max):
     ind_z = ind - ind_x * ind_y_max * ind_z_max - ind_y * ind_z_max
     return ind_x, ind_y, ind_z
 
-def position(pos, xmax, ymax, zmax, nxmax, nymax, nzmax):
-    pos_x = pos//(nymax * nzmax)
-    pos_y = (pos - pos_x * nymax * nzmax)//nymax
-    pos_z = pos - pos_x * nymax * nzmax - pos_y * nzmax
-    dx, dy, dz = 2 * xmax/nxmax, 2 * ymax/nymax, 2 * zmax/nzmax
-    x = -xmax + dx * pos_x
-    y = -ymax + dy * pos_y
-    z = -zmax + dz * pos_z    
+
+def position(System, pos):
+    pos_x, pos_y, pos_z = indices(pos, System.Res.y, System.Res.z)
+    x = System.Box.x0 + System.dx * pos_x
+    y = System.Box.y0 + System.dy * pos_y
+    z = System.Box.z0 + System.dz * pos_z    
+
     return x, y, z
 
-def HO_3D(ind, pos, ind_y_max, ind_z_max):
-    ay, az = 1, 1
-    nxmax, nymax, nzmax = System.Res.x, System.Res.y, System.Res.z
-    xmax, ymax, zmax = System.Box.x1, System.Box.y1, System.Box.z1
+
+def operator_ravel(operator, pos, nymax, nzmax):
+    pos_x, pos_y, pos_z = indices(pos, nymax, nzmax)
+    operator_list = []
+    index_list = []
+    for ix, iy, iz in zip(pos_x[0, :], pos_y[0, :], pos_z[0, :]):
+        operator_list.append(operator[ix, iy, iz])
+        index_list.append((ix, iy, iz))
+       
+    operator_ordered = cp.array(operator_list)
+
+    return operator_ordered
+
+
+def position_revert(x, y, z, xmax, ymax, zmax, nxmax, nymax, nzmax):
+    dx, dy, dz = 2 * xmax/nxmax, 2 * ymax/nymax, 2 * zmax/nzmax
+    pos_x = (x + xmax) / dx
+    pos_y = (y + ymax) / dy
+    pos_z = (z + zmax) / dz
+
+    pos = np.vectorize(int)(pos_z + pos_x * nymax * nzmax + pos_y * nzmax)
+
+    return pos
+
+
+def HO_3D(x, y, z, ind, ind_y_max, ind_z_max):
+    ax, ay, az = 1, 1, 1
     ind_x, ind_y, ind_z = indices(ind, ind_y_max, ind_z_max)
-    x, y, z = position(pos, xmax, ymax, zmax, nxmax, nymax, nzmax)
-    herm_3d = HO_1D(ind_x, x, 1) * HO_1D(ind_y, y, ay) * HO_1D(ind_z, z, az)
+    herm_3d = HO_1D(ind_x, x, ax) * HO_1D(ind_y, y, ay) * HO_1D(ind_z, z, az)
 
     return herm_3d
+
 
 def En_TF(nr,l):
     return np.sqrt(2 * nr**2 + 2 * nr * l + 3 * nr + l)
@@ -251,12 +274,16 @@ def get_hermit_matrix_flat(System, operator, nx, ny, nz):
     ind_vec = np.arange(0, int(nx * ny * nz), 1)
     ind_v, pos_v = np.meshgrid(ind_vec, pos_vec, indexing='ij')
     dV = System.volume_element(fourier_space=False)
-    bog_helper = HO_3D(ind_v, pos_v, ny, nz)
-    hermite_matrix = cp.dot(bog_helper * cp.ravel(operator), np.swapaxes(bog_helper, 0, 1)) * dV
+    x, y, z = position(System, pos_v) 
+
+    bog_helper = HO_3D(x, y, z, ind_v, ny, nz)
+
+    # bring operator in same order as x
+    operator_raveled = operator_ravel(operator, pos_v, System.Res.y, System.Res.z)
+    hermite_matrix = cp.dot(bog_helper * operator_raveled, np.swapaxes(bog_helper, 0, 1)) * dV
     E_H0 = np.diag(En(ind_vec, ny, nz))
     
     return hermite_matrix, E_H0
-
 
 
 def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask"):
@@ -289,7 +316,7 @@ def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask"):
             hermite_matrix, E_H0 = get_hermit_matrix(dict, System, operator, dim)
     elif mode == "flat":
         with run_time(name=f"{mode} {nx} {ny} {nz}"):
-            hermite_matrix = get_hermit_matrix_flat(System, operator, nx, ny, nz)
+            hermite_matrix, E_H0 = get_hermit_matrix_flat(System, operator, nx, ny, nz)
     else:
         sys.exit("Mode not implemented. Choose between dask, cupy, flat.")
 
@@ -322,10 +349,8 @@ def hermite_laplace(System, i):
 def check_sol(System, nx, ny, nz, bog_mat):
     dim = int(nx * ny * nz)
     psi_0 = cp.zeros(dim)
-    herm_norm = cp.zeros((dim, dim))
 
     operator = cp.real(System.psi_val_list[0])
-    operator_h = cp.ones_like(System.x_mesh)
 
     dict = get_index_dict(nx, ny, nz)
 
@@ -339,16 +364,15 @@ def check_sol(System, nx, ny, nz, bog_mat):
     
     result = cp.einsum("ij,j->i", bog_mat, psi_0_2dim)
     
-    result_0 = np.where(result > 0.0001, result, 0)
-    mat2d(psi_0_2dim, "psi_0_2dim:")
-    mat2d(result_0, "result_0:")
+    # result_0 = np.where(np.abs(result) > 0.0001, result, 0)
+    # mat2d(psi_0_2dim, "psi_0_2dim:")
+    mat2d(result, "result:")
     
     return result
 
 
 # Script runs, if script is run as main script (called by python *.py)
 if __name__ == "__main__":
-    client = Client() 
     args = flags(sys.argv[1:])
 
     # home = "/bigwork/dscheier"
@@ -359,6 +383,8 @@ if __name__ == "__main__":
     # args.filename_steps = "step_"
     # args.steps_format = "%07d"
     # args.frame = None
+    # args.mode = "dask"
+    ## args.mode = "flat"
 
     # n = 14
     # args.nx = n
@@ -376,9 +402,11 @@ if __name__ == "__main__":
     except Exception:
         dir_path = args.dir_path
     path_graphs = Path(dir_path, args.graphs_dirname)
-    path_result = Path(path_graphs, f"BdG_{args.dir_name}_{args.nx}_{args.ny}_{args.nz}.npz")
+    path_result = Path(path_graphs,
+                       f"BdG_{args.dir_name}_{args.nx}_{args.ny}_{args.nz}_{args.mode}.npz")
     path_bogoliubov = Path(path_graphs,
-                           f"Matrix_BdG_{args.dir_name}_{args.nx}_{args.ny}_{args.nz}.npz")
+                           f"Matrix_BdG_{args.dir_name}_{args.nx}_{args.ny}_{args.nz}"
+                           + f"_{args.mode}.npz")
 
     # if not path_result.is_dir():
     #     path_result.mkdir(parents=True)
@@ -428,6 +456,8 @@ if __name__ == "__main__":
         operator = density_list[0]
         print(f"max(operator): {np.max(operator)}")
 
+        if args.mode == "dask":
+            client = Client() 
         bogoliubov_matrix = get_bogoliuv_matrix(System, operator, args.nx, args.ny, args.nz,
                                                 mode=args.mode)
         if cupy_used:
