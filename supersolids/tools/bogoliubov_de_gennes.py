@@ -15,8 +15,7 @@ from scipy.sparse.linalg import eigs
 from supersolids.helper import functions, get_path, get_version
 from supersolids.helper.run_time import run_time
 
-# __GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables()
-__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = True, 0
+__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables()
 cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
                                                                gpu_off=__GPU_OFF_ENV__,
                                                                gpu_index=__GPU_INDEX_ENV__)
@@ -53,6 +52,8 @@ def flags(args_array):
     parser.add_argument("--recalculate", default=False, action="store_true",
                         help="Ignores saved results for the parameters, "
                              "then recalculates and overwrites the old results.")
+    parser.add_argument("--dipol", default=False, action="store_true",
+                        help="Calculates dipolterms for the BdG matrix.")
     parser.add_argument("-print_num_eigenvalues", type=int, default=20,
                         help="Number of eigenvalues printed.")
     parser.add_argument("-nx", type=int, default=4,
@@ -70,9 +71,9 @@ def flags(args_array):
 
 def mat2d(mat, label="", precision=4, formatter={'float': '{:0.3f}'.format}, linewidth=250):
 
-    with np.printoptions(precision=precision, suppress=True, formatter=formatter,
+    with cp.printoptions(precision=precision, suppress=True, formatter=formatter,
                          linewidth=linewidth):
-        print(f"{label}\n{np.matrix(mat)}") 
+        print(f"{label}\n{cp.matrix(mat)}") 
 
 
 
@@ -133,8 +134,48 @@ def HO_3D(x, y, z, ind, ind_y_max, ind_z_max):
     ax, ay, az = 1, 1, 1
     ind_x, ind_y, ind_z = indices(ind, ind_y_max, ind_z_max)
     herm_3d = HO_1D(ind_x, x, ax) * HO_1D(ind_y, y, ay) * HO_1D(ind_z, z, az)
+    if cupy_used:
+        herm_3d = cp.array(herm_3d)
 
     return herm_3d
+
+
+def get_hermite_dipol(System, entry, comb1, comb2, ground_state=True):
+    phi_i = harmonic_eigenstate_3d_dask(System.x_mesh, System.y_mesh, System.z_mesh,
+                                        comb1[0], comb1[1], comb1[2])
+    phi_j = harmonic_eigenstate_3d_dask(System.x_mesh, System.y_mesh, System.z_mesh,
+                                        comb2[0], comb2[1], comb2[2])
+
+    if ground_state:
+        op = System.psi_val_list[0]
+        op_in_fft = op
+    else:
+        if entry == "A":
+            op = System.psi_val_list[0]
+            op_in_fft = cp.conjugate(System.psi_val_list[0])
+        elif entry == "B":
+            op = System.psi_val_list[0]
+            op_in_fft = System.psi_val_list[0]
+        elif entry == "C":
+            op = cp.conjugate(System.psi_val_list[0])
+            op_in_fft = cp.conjugate(System.psi_val_list[0])
+        elif entry == "D":
+            op = cp.conjugate(System.psi_val_list[0])
+            op_in_fft = System.psi_val_list[0]
+        else:
+            sys.exit("No such entry. Choose between A, B, C, D.")
+
+    if cupy_used:
+       op  = cp.array(op)
+       op_in_fft  = cp.array(op_in_fft)
+       V_k_val = cp.array(System.V_k_val)
+    herm_dip = phi_j * cp.fft.ifftn(V_k_val *
+                                    cp.fft.fftn(phi_i * op_in_fft)
+                                    ) * op
+    
+    hermite_dipol = System.sum_dV(cp.real(herm_dip), fourier_space=False) 
+
+    return hermite_dipol
 
 
 def En_TF(nr,l):
@@ -280,13 +321,13 @@ def get_hermit_matrix_flat(System, operator, nx, ny, nz):
 
     # bring operator in same order as x
     operator_raveled = operator_ravel(operator, pos_v, System.Res.y, System.Res.z)
-    hermite_matrix = cp.dot(bog_helper * operator_raveled, np.swapaxes(bog_helper, 0, 1)) * dV
-    E_H0 = np.diag(En(ind_vec, ny, nz))
-    
+    hermite_matrix = cp.dot(bog_helper * operator_raveled, cp.swapaxes(bog_helper, 0, 1)) * dV
+    E_H0 = cp.diag(En(ind_vec, ny, nz))
+
     return hermite_matrix, E_H0
 
 
-def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask"):
+def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask", dipol=False):
     # contact_interaction_vec, dipol_term_vec, _ = System.get_dipol_U_dd_mu_lhy()
 
     # contact_interaction_vec = cp.array(contact_interaction_vec)
@@ -313,7 +354,8 @@ def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask"):
         hermite_matrix = functions.symmetric_mat(hermite_matrix_triu)
     elif mode == "cupy":
         with run_time(name=f"{mode} {nx} {ny} {nz}"):
-            hermite_matrix, E_H0 = get_hermit_matrix(dict, System, operator, dim)
+            hermite_matrix_triu, E_H0 = get_hermit_matrix(dict, System, operator, dim)
+        hermite_matrix = functions.symmetric_mat(hermite_matrix_triu)
     elif mode == "flat":
         with run_time(name=f"{mode} {nx} {ny} {nz}"):
             hermite_matrix, E_H0 = get_hermit_matrix_flat(System, operator, nx, ny, nz)
@@ -329,10 +371,44 @@ def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask"):
     # a = np.diag(En(ind_vec, ny, nz) - mu) + 2.0 * b
 
     matrix = cp.zeros((2*dim, 2*dim))
-    matrix[0:dim, 0:dim] = a
-    matrix[0:dim, dim:] = -b
-    matrix[dim:, 0:dim] = b
-    matrix[dim:, dim:] = -a
+
+    if dipol:
+        hermite_dipol_a_triu = cp.zeros((dim, dim))
+        hermite_dipol_b_triu = cp.zeros((dim, dim))
+        hermite_dipol_c_triu = cp.zeros((dim, dim))
+        hermite_dipol_d_triu = cp.zeros((dim, dim))
+        triu_0, triu_1 = np.triu_indices(dim)
+        with run_time(name=f"hermite_dipol {nx} {ny} {nz}"):
+            for l, m in zip(triu_0, triu_1):
+                comb1 = dict[l]
+                comb2 = dict[m]
+                hermite_dipol_a_triu[l, m] = get_hermite_dipol(System, "A", comb1, comb2)
+                hermite_dipol_b_triu[l, m] = get_hermite_dipol(System, "B", comb1, comb2)
+                hermite_dipol_c_triu[l, m] = get_hermite_dipol(System, "C", comb1, comb2)
+                hermite_dipol_d_triu[l, m] = get_hermite_dipol(System, "D", comb1, comb2)
+        hermite_dipol_a_triu = functions.symmetric_mat(hermite_dipol_a_triu)
+        hermite_dipol_b_triu = functions.symmetric_mat(hermite_dipol_b_triu)
+        hermite_dipol_c_triu = functions.symmetric_mat(hermite_dipol_c_triu)
+        hermite_dipol_d_triu = functions.symmetric_mat(hermite_dipol_d_triu)
+
+        
+        g_qf = 1.0
+        density_list = System.get_density_list(jit=False, cupy_used=cupy_used)
+        hermite_lhy_a = g_qf * 2.5 * density_list[0] ** 1.5
+        hermite_lhy_b = g_qf * 1.5 * (density_list[0] ** 0.5) * System.psi_val_list[0] ** 2
+        hermite_lhy_c = g_qf * 1.5 * ((density_list[0] ** 0.5)
+                                      * cp.conjugate(System.psi_val_list[0]) ** 2)
+
+        matrix[0:dim, 0:dim] = a + hermite_dipol_a_triu + hermite_lhy_a
+        matrix[0:dim, dim:] = -b - hermite_dipol_b_triu - hermite_lhy_b
+        matrix[dim:, 0:dim] = b + hermite_dipol_c_triu + hermite_lhy_c
+        matrix[dim:, dim:] = -a - hermite_dipol_d_triu - hermite_lhy_a
+
+    else:
+        matrix[0:dim, 0:dim] = a
+        matrix[0:dim, dim:] = -b
+        matrix[dim:, 0:dim] = b
+        matrix[dim:, dim:] = -a
 
     mat2d(matrix, "bog:")
     
@@ -376,22 +452,27 @@ if __name__ == "__main__":
     args = flags(sys.argv[1:])
 
     # home = "/bigwork/dscheier"
-    # experiment_suffix = "gpu_02_06_no_V_1comp"
+    # experiment_suffix = "gpu_02_16_dip_1comp"
+    # # experiment_suffix = "gpu_02_06_no_V_1comp"
     # args.dir_path = Path(f"{home}/results/begin_{experiment_suffix}/")
-    # args.dir_name = "movie040"
+    # args.dir_name = "movie001"
+    # # args.dir_name = "movie040"
+    # # args.dir_name = "movie042"
+    # # args.dir_name = "movie050"
     # args.filename_schroedinger = "schroedinger.pkl"
     # args.filename_steps = "step_"
     # args.steps_format = "%07d"
     # args.frame = None
-    # args.mode = "dask"
-    ## args.mode = "flat"
+    # # args.mode = "dask"
+    # args.mode = "flat"
+    # args.dipol = True
 
-    # n = 14
+    # n = 2
     # args.nx = n
     # args.ny = n
     # args.nz = n
     # args.recalculate = False
-    # args.print_num_eigenvalues = 30
+    # args.print_num_eigenvalues = 50
 
     # args.graphs_dirname = "graphs"
 
@@ -433,7 +514,6 @@ if __name__ == "__main__":
     print(f"mu: {System.mu_arr}")
     System.stack_shift = 0.0
 
-
     if path_result.exists() and not args.recalculate:
         try:
             with open(path_bogoliubov, "rb") as g:
@@ -459,7 +539,7 @@ if __name__ == "__main__":
         if args.mode == "dask":
             client = Client() 
         bogoliubov_matrix = get_bogoliuv_matrix(System, operator, args.nx, args.ny, args.nz,
-                                                mode=args.mode)
+                                                mode=args.mode, dipol=args.dipol)
         if cupy_used:
             bogoliubov_matrix = cp.asnumpy(bogoliubov_matrix)
 
