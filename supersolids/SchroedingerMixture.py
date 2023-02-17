@@ -1204,7 +1204,6 @@ class SchroedingerMixture(Schroedinger):
                     U_dd_list_np.append(U_dd.get())
                 U_dd_tensor_vec: np.ndarray = np.stack(U_dd_list_np, axis=0)
             try:
-                print(f"einsum for dipol_term_vec not worked in cupy. Try in np.")
                 dipol_term_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
                                                        self.a_dd_array,
                                                        U_dd_tensor_vec)
@@ -1230,7 +1229,10 @@ class SchroedingerMixture(Schroedinger):
         # contact_interaction_vec = self.arr_tensor_mult(self.a_s_array, density_tensor_vec)
         # dipol_term_vec = self.arr_tensor_mult(self.a_dd_array, U_dd_tensor_vec)
 
-        mu_lhy_list: List[cp.ndarray] = self.get_mu_lhy_list(density_list)
+        if self.lhy_factor == 0.0:
+            mu_lhy_list: List[cp.ndarray] = [0.0, 0.0]
+        else:
+            mu_lhy_list: List[cp.ndarray] = self.get_mu_lhy_list(density_list)
         
         return contact_interaction_vec, dipol_term_vec, mu_lhy_list
 
