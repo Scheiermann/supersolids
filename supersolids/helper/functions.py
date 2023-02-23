@@ -415,6 +415,15 @@ def get_g_qf(N: int, a_s_l_ho_ratio: float, epsilon_dd: float):
 
     return g_qf
 
+def get_g_qf_bog(N: int, a_s: float, a_dd: float):
+    epsilon_dd = a_dd / a_s
+    g_qf = (32.0 / (3.0 * np.sqrt(np.pi))
+            * 4.0 * np.pi * a_s ** (5.0 / 2.0)
+            * N ** (3.0 / 2.0)
+            * new_int(epsilon_dd))
+
+    return g_qf
+
 
 def get_l_ho(m: float = 164.0 * constants.u_in_kg,
              w_x: float = 2.0 * np.pi * 30.0):
