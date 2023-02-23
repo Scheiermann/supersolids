@@ -68,6 +68,7 @@ def flags(args_array):
                         help="Number of Hermite polynomials used for z axis.")
     parser.add_argument("-l_0", metavar="l_0", type=float, default=None,
                         help="Help constant for dimensionless formulation of equations.")
+    parser.add_argument("-label", type=str, default="", help="Label to name result dirnames.")
 
     args = parser.parse_args(args_array)
     print(f"args: {args}")
@@ -515,50 +516,50 @@ def check_sol(System, nx, ny, nz, bog_mat):
 if __name__ == "__main__":
     args = flags(sys.argv[1:])
 
-    home = "/bigwork/dscheier"
-    # experiment_suffix = "gpu_02_16_dip_1comp"
-    # experiment_suffix = "gpu_02_17_paper_1comp"
+    # home = "/bigwork/dscheier"
+    # # experiment_suffix = "gpu_02_16_dip_1comp"
+    # # experiment_suffix = "gpu_02_17_paper_1comp"
 
-    # experiment_suffix = "gpu_02_06_no_V_1comp"
-    # args.dir_name = "movie050"
+    # # experiment_suffix = "gpu_02_06_no_V_1comp"
+    # # args.dir_name = "movie050"
 
-    # experiment_suffix = "gpu_02_20_lhy_1comp"
-    # experiment_suffix = "gpu_02_22_lhy_1comp"
-    # experiment_suffix = "gpu_02_22_no_dipol_no_lhy_1comp"
+    # # experiment_suffix = "gpu_02_20_lhy_1comp"
+    # # experiment_suffix = "gpu_02_22_lhy_1comp"
+    # # experiment_suffix = "gpu_02_22_no_dipol_no_lhy_1comp"
 
-    # experiment_suffix = "gpu_02_22_no_dipol_no_lhy_1comp_w100"
-    # args.dir_name = "movie001"
+    # # experiment_suffix = "gpu_02_22_no_dipol_no_lhy_1comp_w100"
+    # # args.dir_name = "movie001"
 
-    experiment_suffix = "gpu_02_22_no_dipol_no_lhy_1comp_w_paper"
-    # args.dir_name = "movie001"
-    # args.dir_name = "movie010"
-    args.dir_name = "movie030"
+    # experiment_suffix = "gpu_02_22_no_dipol_no_lhy_1comp_w_paper"
+    # # args.dir_name = "movie001"
+    # # args.dir_name = "movie010"
+    # args.dir_name = "movie030"
 
-    args.dir_path = Path(f"{home}/results/begin_{experiment_suffix}/")
-    args.filename_schroedinger = "schroedinger.pkl"
-    args.filename_steps = "step_"
-    args.steps_format = "%07d"
-    args.frame = None
-    # args.mode = "dask"
-    args.mode = "flat"
-    # args.dipol = True
-    args.dipol = False
-    args.l_0 = None
-    args.ground_state = True
+    # args.dir_path = Path(f"{home}/results/begin_{experiment_suffix}/")
+    # args.filename_schroedinger = "schroedinger.pkl"
+    # args.filename_steps = "step_"
+    # args.steps_format = "%07d"
+    # args.frame = None
+    # # args.mode = "dask"
+    # args.mode = "flat"
+    # # args.dipol = True
+    # args.dipol = False
+    # args.l_0 = None
+    # args.ground_state = True
 
-    # n = 7
-    # args.nx = n
-    # args.ny = n
-    # args.nz = n
-    args.nx = 12
-    args.ny = 5
-    args.nz = 5
-    # args.recalculate = False
-    args.recalculate = True
-    args.print_num_eigenvalues = 100
+    # # n = 7
+    # # args.nx = n
+    # # args.ny = n
+    # # args.nz = n
+    # args.nx = 12
+    # args.ny = 5
+    # args.nz = 5
+    # # args.recalculate = False
+    # args.recalculate = True
+    # args.print_num_eigenvalues = 100
 
-    args.graphs_dirname = "graphs"
-    label = ""
+    # args.graphs_dirname = "graphs"
+    # args.label = ""
 
     ######## END OF USER INPUT #####################################################################
 
@@ -568,9 +569,9 @@ if __name__ == "__main__":
         dir_path = args.dir_path
     path_graphs = Path(dir_path, args.graphs_dirname)
     path_result = Path(path_graphs,
-                       f"BdG_{args.dir_name}_{label}{args.nx}_{args.ny}_{args.nz}_{args.mode}.npz")
+                       f"BdG_{args.dir_name}_{args.label}{args.nx}_{args.ny}_{args.nz}_{args.mode}.npz")
     path_bogoliubov = Path(path_graphs,
-                           f"Matrix_BdG_{args.dir_name}_{label}{args.nx}_{args.ny}_{args.nz}"
+                           f"Matrix_BdG_{args.dir_name}_{args.label}{args.nx}_{args.ny}_{args.nz}"
                            + f"_{args.mode}.npz")
 
     if not path_graphs.is_dir():
