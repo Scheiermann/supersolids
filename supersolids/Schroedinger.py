@@ -1005,7 +1005,7 @@ class Schroedinger:
                 # save psi_val after steps_per_npz steps of dt (to save disk space)
                 self.save_psi_val(input_path, filename_steps, steps_format, frame)
 
-                print(f"t={self.t:07.05f}, mu_rel={mu_rel}, "
+                print(f"t={self.t:07.05f}, mu={self.mu_arr}, mu_rel={mu_rel}, "
                       f"processed={(frame - frame_start) / self.max_timesteps:05.03f}%")
 
             mu_rel = np.abs((self.mu_arr - mu_old) / self.mu_arr)
