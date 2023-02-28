@@ -6,6 +6,7 @@ from pathlib import Path
 
 from matplotlib import pyplot as plt
 
+import dill
 import numpy as np
 import dask.array as da
 from dask.distributed import Client
@@ -24,6 +25,7 @@ cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
 
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
+from supersolids.SchroedingerMixtureNumpy import SchroedingerMixtureNumpy
 from supersolids.tools.get_System_at_npz import get_System_at_npz
 
 
@@ -143,8 +145,8 @@ def position_revert(x, y, z, xmax, ymax, zmax, nxmax, nymax, nzmax):
 def HO_3D(x, y, z, ind, ind_y_max, ind_z_max, ay=1, az=1):
     ax = 1
     ind_x, ind_y, ind_z = indices(ind, ind_y_max, ind_z_max)
-    # herm_3d = HO_1D(ind_x, x, ax) * HO_1D(ind_y, y, ay) * HO_1D(ind_z, z, az)
-    herm_3d = HO_1D(ind_x, x, ax) * HO_1D(ind_y, y, ax) * HO_1D(ind_z, z, ax)
+    herm_3d = HO_1D(ind_x, x, ax) * HO_1D(ind_y, y, ay) * HO_1D(ind_z, z, az)
+    # herm_3d = HO_1D(ind_x, x, ax) * HO_1D(ind_y, y, ax) * HO_1D(ind_z, z, ax)
     if cupy_used:
         herm_3d = cp.array(herm_3d)
 
@@ -404,6 +406,51 @@ def get_hermit_matrix_flat(index_dict, System, operator, nx, ny, nz, dipol=False
     return hermite_matrix, E_H0, hermite_dipol_abcd_list, hermite_lhy_abc_list
 
 
+def check_eGPE(System, g):
+    print(f"check_eGPE")
+    if cupy_used:
+        psi_0 = cp.array(System.psi_val_list[0])
+        H_kin_part = cp.array(System.H_kin_list[0]) * psi_0
+        V_part = cp.array(System.V_val) * psi_0
+    else:
+        psi_0 = System.psi_val_list[0]
+        H_kin_part = System.H_kin_list[0] * psi_0
+        V_part = System.V_val * psi_0
+    H_kin_test: np.ndarray = np.exp(-1.0 * (0.5 * System.k_squared) * System.dt)
+    # dV = System.volume_element(fourier_space=False)
+    # norm_psi_0_test = cp.sum(cp.abs(psi_0) ** 2) * dV
+    norm_psi_0 = System.sum_dV(System.get_density_list()[0], fourier_space=False)
+    print(f"norm_psi_0: {norm_psi_0}")
+    print(f"H_kin ok?: {cp.all(H_kin_test == cp.array(System.H_kin_list[0]))}")
+
+    g_part = g * System.N_list[0] * cp.abs(psi_0) ** 2 * psi_0
+    mu_part = System.mu_arr[0] * psi_0
+    
+    all_parts = H_kin_part + V_part + g_part - mu_part
+    mu_mesh = (H_kin_part + V_part + g_part) / psi_0
+    limit = 10**-4
+    all_0 = mat_check(all_parts, name="all_parts", limit=limit)
+    mat_check(mu_part, name="mu_part", limit=limit)
+    mat_check(g_part, name="g_part", limit=limit)
+    mat_check(V_part, name="V_part", limit=limit)
+    mat_check(H_kin_part, name="H_kin_part", limit=limit)
+    
+    print(f"all_parts[:, 15, 15]: {cp.real(all_0[:, 15, 15])}")
+    return all_parts
+
+def mat_check(arr, name, limit = 10 ** -5):
+    print(f"{name}:")
+    arr_limited = cp.where(cp.abs(arr) < limit, 0, cp.real(arr))
+    imag_min = cp.min(cp.imag(arr))
+    imag_max = cp.max(cp.imag(arr))
+
+    number_0 = cp.count_nonzero(arr_limited==0)
+    print(f"Min/Max imag: {imag_min} of {imag_max}")
+    print(f"Number of zeros: {number_0} of {arr.size}")
+    
+    return arr_limited
+
+
 def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask", dipol=False, l_0=None,
                         ground_state=True):
     # contact_interaction_vec, dipol_term_vec, _ = System.get_dipol_U_dd_mu_lhy()
@@ -412,6 +459,18 @@ def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask", dipol=False, 
     # dipol_term_vec = cp.array(dipol_term_vec)
     System.V_val = cp.array(System.V_val)
     System.k_squared = cp.array(System.k_squared)
+   
+    g = 4.0 * np.pi * System.a_s_array[0, 0]
+    # mu = functions.mu_3d(g * System.N_list[0])
+    mu = System.mu_arr[0]
+    # mu = System.mu_arr[0] - 8.32
+    # mu = float(g * np.max(operator))
+    # mu = 3.833 # no_dipol_no_lhy_w_paper
+    # print(f"mu by hand: {mu}, g: {g}")
+
+ 
+    should_0 = check_eGPE(System, g) 
+    print(f"should_0: {should_0}")
 
     # np cp conversion
     # for i, (contact_interaction, dipol_term, mu_lhy) in enumerate(zip(
@@ -442,17 +501,19 @@ def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask", dipol=False, 
     else:
         sys.exit("Mode not implemented. Choose between dask, cupy, flat.")
 
-    g = 4.0 * np.pi * System.a_s_array[0, 0]
-    # mu = functions.mu_3d(g * System.N_list[0])
-    mu = System.mu_arr[0]
-    # mu = float(g * np.max(operator))
-    # mu = 3.833 # no_dipol_no_lhy_w_paper
-    # print(f"mu by hand: {mu}, g: {g}")
-
     b = g * hermite_matrix
     a = E_H0 + 2.0 * b - cp.diag(dim * [mu])
     # a = np.diag(En(ind_vec, ny, nz) - mu) + 2.0 * b
 
+    psi_0 = cp.zeros(dim)
+    operator_0 = cp.real(System.psi_val_list[0])
+    index_dict = get_index_dict(nx, ny, nz)
+    for l in range(dim):
+        comb1 = index_dict[l]
+        psi_0[l] = hermite_transform(System, operator_0, comb1, comb1, sandwich=False)
+    fix_mu = cp.dot(psi_0.T, cp.dot(a - b, psi_0)) / cp.dot(psi_0.T, psi_0)
+    print(f"fix_mu: {fix_mu}")
+    
     matrix = cp.zeros((2*dim, 2*dim), dtype=cp.complex_)
 
     if dipol:
@@ -508,6 +569,8 @@ def check_sol(System, nx, ny, nz, bog_mat):
     # result_0 = np.where(np.abs(result) > 0.0001, result, 0)
     # mat2d(psi_0_2dim, "psi_0_2dim:")
     mat2d(result, "result:")
+    fix_mu = result[0] / psi_0[0]
+    print(f"fix_mu: {fix_mu}")
     
     return result
 
@@ -530,10 +593,18 @@ if __name__ == "__main__":
     # # experiment_suffix = "gpu_02_22_no_dipol_no_lhy_1comp_w100"
     # # args.dir_name = "movie001"
 
-    # experiment_suffix = "gpu_02_22_no_dipol_no_lhy_1comp_w_paper"
+    # # experiment_suffix = "gpu_02_22_no_dipol_no_lhy_1comp_w_paper"
     # # args.dir_name = "movie001"
     # # args.dir_name = "movie010"
-    # args.dir_name = "movie030"
+    # # args.dir_name = "movie030"
+
+    # # experiment_suffix = "gpu_02_23_no_dipol_no_lhy_1comp_w_paper"
+    # # args.dir_name = "movie004"
+
+    # experiment_suffix = "gpu_02_27_no_dipol_no_lhy_1comp_w_paper"
+    # args.dir_name = "movie017"
+    # # args.dir_name = "movie012"
+    # # args.dir_name = "movie016"
 
     # args.dir_path = Path(f"{home}/results/begin_{experiment_suffix}/")
     # args.filename_schroedinger = "schroedinger.pkl"
@@ -547,13 +618,13 @@ if __name__ == "__main__":
     # args.l_0 = None
     # args.ground_state = True
 
-    # # n = 7
-    # # args.nx = n
-    # # args.ny = n
-    # # args.nz = n
-    # args.nx = 12
-    # args.ny = 5
-    # args.nz = 5
+    # n = 2
+    # args.nx = n
+    # args.ny = n
+    # args.nz = n
+    # # args.nx = 18
+    # # args.ny = 11
+    # # args.nz = 11
     # # args.recalculate = False
     # args.recalculate = True
     # args.print_num_eigenvalues = 100
@@ -596,6 +667,14 @@ if __name__ == "__main__":
     print(f"{System}")
     print(f"mu: {System.mu_arr}")
     System.stack_shift = 0.0
+
+    if not cupy_used:
+        # convert to numpy
+        # System_np = System.copy_with_all_numpy()
+        System_np = SchroedingerMixtureNumpy(System)
+        numpy_path = Path(dir_path, args.dir_name, "schroedinger_numpy.pkl")
+        with open(numpy_path, "wb") as f:
+            dill.dump(obj=System_np, file=f)
 
     if args.l_0 is None:
         # x harmonic oscillator length
