@@ -14,6 +14,7 @@ from copy import deepcopy
 import functools
 import pickle
 import sys
+import traceback
 
 import dill
 import numpy as np
@@ -85,12 +86,14 @@ def get_A_density_total(density_list: List[cp.ndarray]) -> Tuple[cp.ndarray, cp.
         try:
             density_list[0].get() 
             density_total: cp.ndarray = cp.copy(density_list[0])
-        except:
+        except Exception as e:
+            traceback.print_tb(e.__traceback__)
             try:
                 for i, density in enumerate(density_list):
                     density_list[i] = cp.asarray(density)
                 density_total: cp.ndarray = cp.copy(density_list[0])
-            except:
+            except Exception as e:
+                traceback.print_tb(e.__traceback__)
                 density_total: np.ndarray = np.copy(density_list[0])
     else:
         density_total: np.ndarray = np.copy(density_list[0])
@@ -103,10 +106,12 @@ def get_A_density_total(density_list: List[cp.ndarray]) -> Tuple[cp.ndarray, cp.
     # remove nan, because of possible 0/0 
     try:
         density_A = cp.where(density_A != cp.nan, density_A, 0.0)
-    except:
+    except Exception as e:
+        traceback.print_tb(e.__traceback__)
         try:
             density_A = np.where(density_A != cp.nan, density_A, 0.0)
-        except:
+        except Exception as e:
+            traceback.print_tb(e.__traceback__)
             density_A = np.where(density_A != np.nan, density_A, 0.0)
 
 
@@ -576,7 +581,8 @@ class SchroedingerMixture(Schroedinger):
             if cupy_used:
                 try:
                     psi_val_list: np.ndarray = [psi_val.get() for psi_val in arr_list]
-                except Exception:
+                except Exception as e:
+                    traceback.print_tb(e.__traceback__)
                     # cupy is installed, but data was saved as numpy array
                     psi_val_list: np.ndarray = [psi_val for psi_val in arr_list]
             else:
@@ -610,6 +616,7 @@ class SchroedingerMixture(Schroedinger):
                     SystemSummary: SchroedingerMixtureSummary = dill.load(file=f)
                     SystemSummary.copy_to(self)
         except Exception as e:
+            traceback.print_tb(e.__traceback__)
             print(f"{system_summary_path} not found.\n {e}")
 
         return self
@@ -723,12 +730,14 @@ class SchroedingerMixture(Schroedinger):
             else:
                 try:
                     E_pot_ext_list.append(self.sum_dV(density * self.V_val, dV=dV))
-                except:
+                except Exception as e:
+                    traceback.print_tb(e.__traceback__)
                     E_pot_ext_list.append(self.sum_dV(density.get() * self.V_val, dV=dV))
 
         try:
             E_pot_arr = cp.array(E_pot_ext_list).get()
-        except:
+        except Exception as e:
+            traceback.print_tb(e.__traceback__)
             E_pot_arr = np.array(E_pot_ext_list)
         # add all components
         E_pot = np.sum(E_pot_arr)
@@ -831,10 +840,12 @@ class SchroedingerMixture(Schroedinger):
             else:
                 try:
                     density_N = N * self.get_density(psi_val, jit=jit)
-                except Exception:
+                except Exception as e:
+                    traceback.print_tb(e.__traceback__)
                     try:
                         density_N: np.ndarray = N * self.get_density(psi_val, jit=jit).get()
-                    except Exception:
+                    except Exception as e:
+                        traceback.print_tb(e.__traceback__)
                         density_N: np.ndarray = N * self.get_density(psi_val, jit=jit)
                 if cupy_used:
                     density_N: cp.ndarray = cp.asarray(density_N)
@@ -1144,15 +1155,15 @@ class SchroedingerMixture(Schroedinger):
             try:
                 U_dd_list.append(cp.fft.ifftn(cp.asarray(self.V_k_val) * cp.fft.fftn(density)))
             except Exception as e:
-                print({e})
+                traceback.print_tb(e.__traceback__)
                 try:
                     U_dd_list.append(np.fft.ifftn(self.V_k_val.get() * np.fft.fftn(density.get())))
                 except Exception as e:
-                    print({e})
+                    traceback.print_tb(e.__traceback__)
                     try:
                         U_dd_list.append(np.fft.ifftn(self.V_k_val * np.fft.fftn(density.get())))
                     except Exception as e:
-                        print({e})
+                        traceback.print_tb(e.__traceback__)
 
 
         return U_dd_list
@@ -1180,7 +1191,8 @@ class SchroedingerMixture(Schroedinger):
         try:
             # density_tensor_vec: cp.ndarray = cp.stack(density_list, axis=0)
             density_tensor_vec: cp.ndarray = cp.array(density_list)
-        except Exception:
+        except Exception as e:
+            traceback.print_tb(e.__traceback__)
             density_list_np = []
             for density in density_list:
                 density_list_np.append(density.get())
@@ -1198,7 +1210,8 @@ class SchroedingerMixture(Schroedinger):
             try:
                 # U_dd_tensor_vec: cp.ndarray = cp.stack(U_dd_list, axis=0)
                 U_dd_tensor_vec: cp.ndarray = cp.array(U_dd_list)
-            except Exception:
+            except Exception as e:
+                traceback.print_tb(e.__traceback__)
                 U_dd_list_np = []
                 for U_dd in U_dd_list:
                     U_dd_list_np.append(U_dd.get())
@@ -1207,8 +1220,9 @@ class SchroedingerMixture(Schroedinger):
                 dipol_term_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
                                                        self.a_dd_array,
                                                        U_dd_tensor_vec)
-            except Exception:
+            except Exception as e:
                 print(f"einsum for dipol_term_vec not worked in cupy. Try in np.")
+                traceback.print_tb(e.__traceback__)
                 dipol_term_vec: np.ndarray = np.einsum("...ij, j...->i...",
                                                        cp.asnumpy(self.a_dd_array),
                                                        cp.asnumpy(U_dd_tensor_vec)
@@ -1218,8 +1232,9 @@ class SchroedingerMixture(Schroedinger):
             contact_interaction_vec: cp.ndarray = cp.einsum("...ij, j...->i...",
                                                             self.a_s_array,
                                                             density_tensor_vec)
-        except Exception:
+        except Exception as e:
             print(f"einsum for contact_interaction_vec not worked in cupy. Try in np.")
+            traceback.print_tb(e.__traceback__)
             contact_interaction_vec: np.ndarray = np.einsum("...ij, j...->i...",
                                                             cp.asnumpy(self.a_s_array),
                                                             cp.asnumpy(density_tensor_vec),
