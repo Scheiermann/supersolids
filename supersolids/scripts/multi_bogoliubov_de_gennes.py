@@ -24,8 +24,9 @@ if __name__ == "__main__":
     recalculate = False
 
     graphs_dirname = "graphs"
+    label=""
 
-    print_num_eigenvalues = 20
+    print_num_eigenvalues = 100
 
     mem_in_MB = 1400
     xvfb_display = 990
@@ -84,7 +85,8 @@ echo {jobname}
 -nz={nz} \
 -recalculate={recalculate} \
 -print_num_eigenvalues={print_num_eigenvalues} \
--graphs_dirname={graphs_dirname} &
+-graphs_dirname={graphs_dirname} \
+-label={label} &
 # -frame={frame} \
 
 """
