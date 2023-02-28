@@ -1274,14 +1274,15 @@ class SchroedingerMixture(Schroedinger):
                                                                        mu_lhy,
                                                                        lhy_factor=self.lhy_factor,
                                                                        )
-                term_and_tilt = term + tilt_term
-                H_pot_propagator: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt, term_and_tilt, split_step)
+                term_and_tilt = term + tilt_term - self.mu_arr[i]
+                H_pot_propagator: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt,
+                                                                    term_and_tilt, split_step)
             else:
                 term: cp.ndarray = self.get_H_pot_exponent_terms(dipol_term,
                                                                  contact_interaction,
                                                                  mu_lhy,
                                                                  )
-                term_and_tilt = term + tilt_term
+                term_and_tilt = term + tilt_term - self.mu_arr[i]
                 H_pot_propagator: cp.ndarray = self.get_H_pot(term_and_tilt, split_step)
 
             if cupy_used:
