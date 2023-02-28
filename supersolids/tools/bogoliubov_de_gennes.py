@@ -267,7 +267,7 @@ def get_parity(comb1, comb2):
 
     return parity
 
-def get_hermit_matrix(index_dict, System, operator, dim):
+def get_hermite_matrix(index_dict, System, operator, dim):
     hermite_matrix = cp.zeros((dim, dim))
     E_H0 = cp.zeros((dim, dim))
     triu_0, triu_1 = np.triu_indices(dim)
@@ -287,7 +287,7 @@ def get_hermit_matrix(index_dict, System, operator, dim):
     return hermite_matrix, E_H0
 
 
-def get_hermit_matrix_dask(index_dict, System, operator, dim, fast = True):
+def get_hermite_matrix_dask(System, operator, dim, index_dict, fast = True):
     hermite_matrix = cp.zeros((dim, dim))
     E_H0 = cp.zeros((dim, dim))
     triu_0, triu_1 = np.triu_indices(dim)
@@ -326,11 +326,60 @@ def get_hermit_matrix_dask(index_dict, System, operator, dim, fast = True):
 
     return hermite_matrix, E_H0
 
-def get_hermit_matrix_flat(index_dict, System, operator, nx, ny, nz, dipol=False, ground_state=True):
-    dim = int(nx * ny * nz)
+def get_hermite_matrix_dipol(System, index_dict, ground_state=True):
+    hermite_dipol_abcd_list = []
+    with run_time(name=f"dipol all"):
+        matrix_entries = ["A", "B", "C", "D"]
+        for i, key in enumerate(matrix_entries):
+            hermite_dipol_abcd_list.append(cp.zeros((dim, dim)))
+        triu_0, triu_1 = np.triu_indices(dim)
+        with run_time(name=f"hermite_dipol"):
+            for i, entry in enumerate(matrix_entries):
+                with run_time(name=f"hermite_dipol {i}"):
+                    for l, m in zip(triu_0, triu_1):
+                        comb1 = index_dict[l]
+                        comb2 = index_dict[m]
+                        hermite_dipol_abcd_list[i][l, m] = get_hermite_dipol(
+                            System, comb1, comb2,
+                            ground_state=ground_state,
+                            entry=entry)
+                    print(f"{i}:\n{hermite_dipol_abcd_list[i]}")
+            hermite_dipol_abcd_list = map(functions.symmetric_mat, hermite_dipol_abcd_list)
+
+    return hermite_dipol_abcd_list
+
+def get_lhy_terms(System, ground_state=True):
+    lhy_entries = 3
+    lhy_abc_list = []
+    density_list = System.get_density_list(jit=False, cupy_used=cupy_used)
+
+    density_raveled = operator_ravel(density_list[0], pos_v, System.Res.y, System.Res.z)
+    psi_val_raveled = operator_ravel(System.psi_val_list[0], pos_v, System.Res.y, System.Res.z)
+    density_raveled_by_N = density_raveled / (System.N_list[0] ** 2)
+    psi_val_raveled_by_N = psi_val_raveled / System.N_list[0]
+
+    with run_time(name=f"lhy_abc_list"):
+        for i in range(lhy_entries):
+            lhy_abc_list.append(cp.zeros((dim, dim)))
+
+        lhy_abc_list[0] = g_qf * 2.5 * density_raveled_by_N ** 1.5
+        if ground_state:
+            print(f"ground_state: {ground_state}")
+            lhy_b = g_qf * 1.5 * (density_raveled_by_N ** 0.5) * psi_val_raveled_by_N ** 2
+            lhy_abc_list[1] = lhy_b
+            lhy_abc_list[2] = lhy_b
+        else:
+            lhy_abc_list[1] = g_qf * 1.5 * (density_raveled_by_N ** 0.5) * psi_val_raveled_by_N ** 2
+            lhy_abc_list[2] = g_qf * 1.5 * (density_raveled_by_N ** 0.5) * cp.conjugate(
+                psi_val_raveled_by_N) ** 2
+
+    return lhy_abc_list
+
+
+def get_hermite_matrix_flat(System, operator, dim):
     pos_max = System.Res.x * System.Res.y * System.Res.z
     pos_vec = np.arange(0, pos_max, 1)
-    ind_vec = np.arange(0, int(nx * ny * nz), 1)
+    ind_vec = np.arange(0, dim, 1)
     ind_v, pos_v = np.meshgrid(ind_vec, pos_vec, indexing='ij')
     dV = System.volume_element(fourier_space=False)
     x, y, z = position(System, pos_v) 
@@ -338,72 +387,26 @@ def get_hermit_matrix_flat(index_dict, System, operator, nx, ny, nz, dipol=False
     ax, ay, az = 1, np.sqrt(System.w_x / System.w_y), np.sqrt(System.w_x / System.w_z)
     E_H0 = cp.diag(En(ind_vec, ny, nz, ay=ay, az=az))
     bog_helper = HO_3D(x, y, z, ind_v, ny, nz, ay=ay, az=az)
-
-    if dipol:
-        bog_helper_swapped = cp.swapaxes(bog_helper, 0, 1)
+    bog_helper_swapped = cp.swapaxes(bog_helper, 0, 1)
 
     # bring operator in same order as x
     operator_raveled = operator_ravel(operator, pos_v, System.Res.y, System.Res.z)
-    with run_time(name=f"flat hermite_matrix {nx} {ny} {nz}"):
-        if dipol:
-            hermite_matrix = cp.dot(bog_helper * operator_raveled, bog_helper_swapped) * dV
-        else:
-            hermite_matrix = cp.dot(bog_helper * operator_raveled, cp.swapaxes(bog_helper, 0, 1)) * dV
+    with run_time(name=f"flat hermite_matrix dim {dim}"):
+        hermite_matrix = cp.dot(bog_helper * operator_raveled, bog_helper_swapped) * dV
 
-    hermite_dipol_abcd_list = []
-    hermite_lhy_abc_list = []
-    lhy_abc_list = []
-    if dipol:
-        with run_time(name=f"dipol all {nx} {ny} {nz}"):
-            matrix_entries = ["A", "B", "C", "D"]
-            lhy_entries = 3
-            for i, key in enumerate(matrix_entries):
-                hermite_dipol_abcd_list.append(cp.zeros((dim, dim)))
-            triu_0, triu_1 = np.triu_indices(dim)
-            with run_time(name=f"hermite_dipol {nx} {ny} {nz}"):
-                for i, entry in enumerate(matrix_entries):
-                    with run_time(name=f"hermite_dipol {i}"):
-                        for l, m in zip(triu_0, triu_1):
-                            comb1 = index_dict[l]
-                            comb2 = index_dict[m]
-                            hermite_dipol_abcd_list[i][l, m] = get_hermite_dipol(
-                                                                  System, comb1, comb2,
-                                                                  ground_state=ground_state,
-                                                                  entry=entry)
-                        print(f"{i}:\n{hermite_dipol_abcd_list[i]}")
-                hermite_dipol_abcd_list = map(functions.symmetric_mat, hermite_dipol_abcd_list)
+    if System.lhy_factor != 0:
+        g_qf = functions.get_g_qf_bog(N=System.N_list[0],
+                                      a_s=float(System.a_s_array[0, 0]),
+                                      a_dd=float(System.a_dd_array[0, 0]))
+        print(f"g_qf: {g_qf}")
+        lhy_abc_list = get_lhy_terms(System, ground_state=True)
 
-            g_qf = functions.get_g_qf_bog(N=System.N_list[0],
-                                          a_s=float(System.a_s_array[0, 0]),
-                                          a_dd=float(System.a_dd_array[0, 0]))
-            print(f"g_qf: {g_qf}")
+        with run_time(name=f"lhy all"):
+            for lhy_key in lhy_abc_list:
+                hermite_lhy_abc_list.append(cp.dot(bog_helper * lhy_key, bog_helper_swapped) * dV)
+            hermite_lhy_abc_list = list(g_qf * cp.array(hermite_lhy_abc_list))
 
-            density_list = System.get_density_list(jit=False, cupy_used=cupy_used)
-
-            density_raveled = operator_ravel(density_list[0], pos_v, System.Res.y, System.Res.z)
-            psi_val_raveled = operator_ravel(System.psi_val_list[0], pos_v, System.Res.y, System.Res.z)
-            density_raveled_by_N = density_raveled / (System.N_list[0] ** 2)
-            psi_val_raveled_by_N = psi_val_raveled / System.N_list[0]
-
-            with run_time(name=f"lhy_abc_list"):
-                for i in range(lhy_entries):
-                    lhy_abc_list.append(cp.zeros((dim, dim)))
-
-                lhy_abc_list[0] = g_qf * 2.5 * density_raveled_by_N ** 1.5
-                if ground_state:
-                    print(f"ground_state: {ground_state}")
-                    lhy_b = g_qf * 1.5 * (density_raveled_by_N ** 0.5) * psi_val_raveled_by_N ** 2
-                    lhy_abc_list[1] = lhy_b
-                    lhy_abc_list[2] = lhy_b
-                else:
-                    lhy_abc_list[1] = g_qf * 1.5 * (density_raveled_by_N ** 0.5) * psi_val_raveled_by_N ** 2
-                    lhy_abc_list[2] = g_qf * 1.5 * (density_raveled_by_N ** 0.5) * cp.conjugate(psi_val_raveled_by_N) ** 2
-
-            with run_time(name=f"lhy all {nx} {ny} {nz}"):
-                for lhy_key in lhy_abc_list:
-                    hermite_lhy_abc_list.append(cp.dot(bog_helper * lhy_key, bog_helper_swapped) * dV)
-
-    return hermite_matrix, E_H0, hermite_dipol_abcd_list, hermite_lhy_abc_list
+    return hermite_matrix, E_H0, hermite_lhy_abc_list
 
 
 def check_eGPE(System, g):
@@ -453,8 +456,9 @@ def mat_check(arr, name, limit = 10 ** -5):
 
 def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask", dipol=False, l_0=None,
                         ground_state=True):
-    # contact_interaction_vec, dipol_term_vec, _ = System.get_dipol_U_dd_mu_lhy()
+    # contact_interaction_vec, dipol_term_vec, mu_lhy_list = System.get_dipol_U_dd_mu_lhy()
 
+    # np cp conversion
     # contact_interaction_vec = cp.array(contact_interaction_vec)
     # dipol_term_vec = cp.array(dipol_term_vec)
     System.V_val = cp.array(System.V_val)
@@ -472,9 +476,9 @@ def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask", dipol=False, 
     should_0 = check_eGPE(System, g) 
     print(f"should_0: {should_0}")
 
-    # np cp conversion
+    # chem_pot = []
     # for i, (contact_interaction, dipol_term, mu_lhy) in enumerate(zip(
-    #         list(contact_interaction_vec), list(dipol_term_vec), mu_lhy_list)):
+    #         list(contact_interaction_vec), list(dipol_term_vec), mu_lhy_list), strict=True):
     #     term: np.ndarray = System.get_H_pot_exponent_terms(dipol_term,
     #                                                        contact_interaction,
     #                                                        mu_lhy
@@ -487,17 +491,16 @@ def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask", dipol=False, 
 
     if mode == "dask":
         with run_time(name=f"{mode} {nx} {ny} {nz}"):
-            hermite_matrix_triu, E_H0, bog_helper = get_hermit_matrix_dask(index_dict, System,
-                                                                           operator, dim, fast=True)
+            hermite_matrix_triu, E_H0 = get_hermite_matrix_dask(System, operator, dim, index_dict,
+                                                                fast=True)
         hermite_matrix = functions.symmetric_mat(hermite_matrix_triu)
     elif mode == "cupy":
         with run_time(name=f"{mode} {nx} {ny} {nz}"):
-            hermite_matrix_triu, E_H0, hermite_dipol, hermite_lhy = get_hermit_matrix(index_dict, System, operator, dim)
+            hermite_matrix_triu, E_H0 = get_hermite_matrix(System, operator, dim, index_dict)
         hermite_matrix = functions.symmetric_mat(hermite_matrix_triu)
     elif mode == "flat":
         with run_time(name=f"{mode} {nx} {ny} {nz}"):
-            hermite_matrix, E_H0, hermite_dipol_abcd_list, hermite_lhy_abc_list = get_hermit_matrix_flat(index_dict, System, operator, nx, ny, nz,
-                                                                                                         dipol=dipol, ground_state=ground_state)
+            hermite_matrix, E_H0, hermite_lhy_abc = get_hermite_matrix_flat(System, operator, dim)
     else:
         sys.exit("Mode not implemented. Choose between dask, cupy, flat.")
 
@@ -516,26 +519,39 @@ def get_bogoliuv_matrix(System, operator, nx, ny, nz, mode="dask", dipol=False, 
     
     matrix = cp.zeros((2*dim, 2*dim), dtype=cp.complex_)
 
+    extra_a = cp.zeros_like(a.shape)
+    extra_b = cp.zeros_like(b.shape)
+    extra_c = cp.zeros_like(a.shape)
+    extra_d = cp.zeros_like(b.shape)
+    if System.lhy_factor != 0:
+        hermite_lhy_a, hermite_lhy_b, hermite_lhy_c = hermite_lhy_abc
+        extra_a = extra_a + hermite_lhy_a
+        extra_b = extra_b - hermite_lhy_b
+        extra_c = extra_b + hermite_lhy_c
+        extra_d = extra_a - hermite_lhy_a
+
     if dipol:
-        hermite_dipol_a_triu, hermite_dipol_b_triu, hermite_dipol_c_triu, hermite_dipol_d_triu = hermite_dipol_abcd_list
-        hermite_lhy_a, hermite_lhy_b, hermite_lhy_c = hermite_lhy_abc_list
+        hermite_dipol_abcd_list = []
+        hermite_dipol_abcd_list = get_hermite_matrix_dipol(System, index_dict,
+                                                           ground_state=ground_state)
+        (hermite_dipol_a_triu, hermite_dipol_b_triu,
+         hermite_dipol_c_triu, hermite_dipol_d_triu) = hermite_dipol_abcd_list
 
-        matrix[0:dim, 0:dim] = a + hermite_dipol_a_triu + hermite_lhy_a
-        matrix[0:dim, dim:] = -b - hermite_dipol_b_triu - hermite_lhy_b
-        matrix[dim:, 0:dim] = b + hermite_dipol_c_triu + hermite_lhy_c
-        matrix[dim:, dim:] = -a - hermite_dipol_d_triu - hermite_lhy_a
+        extra_a = extra_a + hermite_dipol_a_triu
+        extra_b = extra_b - hermite_dipol_b_triu
+        extra_c = extra_b + hermite_dipol_c_triu
+        extra_d = extra_a - hermite_dipol_d_triu
 
-    else:
-        matrix[0:dim, 0:dim] = a
-        matrix[0:dim, dim:] = -b
-        matrix[dim:, 0:dim] = b
-        matrix[dim:, dim:] = -a
+    matrix[0:dim, 0:dim] = a + extra_a
+    matrix[0:dim, dim:] = -b + extra_b
+    matrix[dim:, 0:dim] = b + extra_c
+    matrix[dim:, dim:] = -a + extra_d
 
     mat2d(matrix, "bog:")
     
     return matrix
 
-    
+
 def hermite_laplace(System, i):
     k = 2
     factor = 2 ** k * (factorial(i) / np.math.factorial(i - k))
