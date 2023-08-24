@@ -8,8 +8,9 @@ import numpy as np
 if __name__ == "__main__":
     supersolids_version = "0.1.38rc1"
 
-    home = "/home/dscheiermann"
-    # home = "/bigwork/dscheier"
+    # home = "/home/dscheiermann"
+    home = "/bigwork/dscheier"
+    # home = "/mnt/disk2/dscheiermann"
     # experiment_suffix = "gpu_04_03"
     # experiment_suffix = "gpu_03_29_test1"
     # experiment_suffix = "gpu_04_18_bog"
@@ -33,8 +34,9 @@ if __name__ == "__main__":
     # experiment_suffix = "gpu_06_23_dys162"
     experiment_suffix = "gpu_06_23_dys162_box"
     # experiment_suffix = "gpu_06_28"
-    # dir_path = Path(f"{home}/results/begin_{experiment_suffix}/")
-    dir_path = Path(f"/mnt/disk2/dscheiermann/results/begin_{experiment_suffix}/")
+    dir_path = Path(f"{home}/results/begin_{experiment_suffix}/")
+
+    mem_in_GB = 4
 
     movie_string = "movie"
     counting_format = "%03d"
@@ -86,9 +88,9 @@ if __name__ == "__main__":
     ny = 64
     nz = 64
 
-    stepper_x = 2
-    stepper_y = 2
-    stepper_z = 2
+    stepper_x = 1
+    stepper_y = 1
+    stepper_z = 1
 
     graphs_dirname = "graphs"
     label=""
@@ -131,7 +133,24 @@ if __name__ == "__main__":
 
             jobname = f"{supersolids_version}_{mem_in_MB}M_{dir_name}_{nx}_{ny}_{nz}"
 
+            cluster_flags = f"""#==================================================
+#SBATCH --job-name {jobname}
+#SBATCH -D {dir_path}/log/
+#SBATCH --mail-user daniel.scheiermann@itp.uni-hannover.de
+#SBATCH --mail-type=END,FAIL
+#SBATCH -o output-%j.out
+#SBATCH -e error-%j.out
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH -t 2-00:00:00
+#SBATCH --mem={mem_in_GB}G
+##SBATCH -p gpu_cuda
+##SBATCH --exclude=alamak,algedi,baten,canopus,cressida,cursa,crux,dorado,gomeisa,kari,mintaka,nunki,oberon,rigel,telesto,tureis,weywot
+##SBATCH -w altair,atlas,berti,gemini,mirzam,niobe,pegasus,phad,pollux,rana,sargas,weywot
+"""
+
             heredoc = "\n".join(["#!/bin/bash",
+                                 cluster_flags,
                                 f"""
 Xvfb :{xvfb_display - j_counter} &
 export DISPLAY=:{xvfb_display - j_counter}
@@ -151,7 +170,9 @@ echo {jobname}
 ## to use local version
 # ${home}/miniconda/envs/solids/bin/python3.10 ${home}/supersolids/supersolids/tools/bogoliubov_de_gennes.py \
 ## to use installed package version
-{home}/miniconda/envs/solids/bin/python3.10 -m supersolids.tools.bogoliubov_de_gennes \
+# {home}/miniconda/envs/solids/bin/python3.10 -m supersolids.tools.bogoliubov_de_gennes \
+
+{home}/miniconda/envs/solids/bin/python3.10 {home}/supersolids/supersolids/tools/bogoliubov_de_gennes.py \
 -dir_path={dir_path} \
 -dir_name={dir_name} \
 -filename_schroedinger={filename_schroedinger} \
@@ -175,6 +196,7 @@ echo {jobname}
 -csr_cut_off_0={csr_cut_off_0} \
 --get_eigenvalues \
 --reduced_version \
+--gpu_off \
 # --cut_hermite_values \
 # --cut_hermite_orders \
 # --dask_dipol \
@@ -185,7 +207,9 @@ echo {jobname}
             ])
 
             print(heredoc)
-            with open(Path(dir_path, f"sbatch_bog_{dir_name}_{nx}_{ny}_{nz}_{mode}.sh"), "w") as f:
+            with open(Path(dir_path,
+                           f"sbatch_bog_{dir_name}_{nx}_{ny}_{nz}_{mode}_"
+                           + f"{stepper_x}_{stepper_y}_{stepper_z}.sh"), "w") as f:
                 f.write(f"{heredoc}\n")
 
             j_counter += 1

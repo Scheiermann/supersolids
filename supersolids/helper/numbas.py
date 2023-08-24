@@ -54,13 +54,13 @@ def get_H_pot_exponent_terms_jit(V_val: cp.ndarray,
 
 
 @njit('c16[:,:,:](c16, f8, c16[:,:,:], f8)')
-def get_H_pot_jit(U: cp.complex, dt: float, terms: cp.ndarray,
+def get_H_pot_jit(U: cp.complex_, dt: float, terms: cp.ndarray,
                   split_step: float = 0.5) -> cp.ndarray:
     return np.exp(U * (split_step * dt) * terms)
 
 
 @njit((c16, c16, types.Array(c16, 3, "C"), c16), cache=True)
-def get_H_pot_jit(U: cp.complex, dt: float, terms: cp.ndarray,
+def get_H_pot_jit(U: cp.complex_, dt: float, terms: cp.ndarray,
                   split_step: float = 0.5) -> cp.ndarray:
     return np.exp(U * (split_step * dt) * terms)
 

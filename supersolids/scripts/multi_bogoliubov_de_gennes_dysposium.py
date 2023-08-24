@@ -16,79 +16,32 @@ if __name__ == "__main__":
     # experiment_suffix = "gpu_04_26_add"
     # experiment_suffix = "gpu_04_27_add3"
     # experiment_suffix = "gpu_05_02"
-    # experiment_suffix = "gpu_05_06"
-    # experiment_suffix = "gpu_05_22"
-    # experiment_suffix = "gpu_05_22_dys"
-    # experiment_suffix = "gpu_05_23_dys"
-    # experiment_suffix = "gpu_05_24_dys"
-    # experiment_suffix = "gpu_05_24_dys_res"
-    # experiment_suffix = "gpu_05_24_dys_res_256"
-    # experiment_suffix = "gpu_05_06_res_128"
-    # experiment_suffix = "gpu_05_06_res_128_box_4"
-    # experiment_suffix = "gpu_05_06_res_256_box_4"
-    # experiment_suffix = "gpu_05_09_dt"
-    # experiment_suffix = "gpu_05_09_dt2"
-    # experiment_suffix = "gpu_06_09_dys"
-    # experiment_suffix = "gpu_06_20"
-    # experiment_suffix = "gpu_06_23_dys162"
-    experiment_suffix = "gpu_06_23_dys162_box"
-    # experiment_suffix = "gpu_06_28"
-    # dir_path = Path(f"{home}/results/begin_{experiment_suffix}/")
-    dir_path = Path(f"/mnt/disk2/dscheiermann/results/begin_{experiment_suffix}/")
+    # experiment_suffix = "gpu_05_03"
+    experiment_suffix = "gpu_05_03_test_dys"
+    dir_path = Path(f"{home}/results/begin_{experiment_suffix}/")
 
     movie_string = "movie"
     counting_format = "%03d"
-    # movie_start = 15
-    # movie_end = 15
-    # movie_start = 1
-    # movie_end = 1
-    # movie_start = 15
-    # movie_end = 15
-    movie_start = 1
-    movie_end = 13
-    # movie_start = 8
-    # movie_end = 8
+    movie_start = 5
+    movie_end = 5
     movie_number_list = np.arange(movie_start, movie_end + 1, 1)
-
-    arnoldi_num_eigs = 30
 
     filename_schroedinger = "schroedinger.pkl"
     filename_steps = "step_"
     steps_format = "%07d"
     frame = None
-    # mode = "flat"
-    # mode = "fft"
-    mode = "lin_op"
-    # mode = "linear"
-    # mode = "dask"
-    # mode = "smart"
+    mode = "flat"
 
-    csr_cut_off_0 = 0.1
+    nx_start = 12
+    nx_end = 31
+    nx_step = 4
 
-    # nx_start = 6
-    # nx_start = 6
-    nx_start = 128
-    # nx_start = 46
-    nx_end = 129
-    # nx_start = 32
-    # nx_end = 53
-    # nx_start = 32
-    # nx_end = 17
-    # nx_end = 33
-    # nx_start = 6
-    # nx_end = 15
-    # nx_step = 1
-    nx_step = 2
-    # nx_start = 16
-    # nx_end = 33
-    # nx_step = 4
-
-    ny = 64
-    nz = 64
-
-    stepper_x = 2
-    stepper_y = 2
-    stepper_z = 2
+    # ny = 16
+    # nz = 16
+    # ny = 14
+    # nz = 14
+    # ny = 8
+    # nz = 8
 
     graphs_dirname = "graphs"
     label=""
@@ -104,7 +57,7 @@ if __name__ == "__main__":
     # j_counter = skip - 1
     end = 0
     
-    gpu_index = 0
+    gpu_index = 1
 
     ######## END OF USER INPUT #####################################################################
 
@@ -112,13 +65,9 @@ if __name__ == "__main__":
     for movie_number in movie_number_list:
         dir_name = f"{movie_string}{counting_format % movie_number}"
         for nx in nx_array:
-            # nx = int(nx)
-            # ny = int(nx)
-            # nz = int(nx)
-
             nx = int(nx)
-            ny = int(ny)
-            nz = int(nz)
+            ny = int(nx)
+            nz = int(nx)
 
             movie_string = "movie"
             counting_format = "%03d"
@@ -160,32 +109,23 @@ echo {jobname}
 -nx={nx} \
 -ny={ny} \
 -nz={nz} \
--stepper_x={stepper_x} \
--stepper_y={stepper_y} \
--stepper_z={stepper_z} \
 -print_num_eigenvalues={print_num_eigenvalues} \
 -mode={mode} \
 -label={label} \
 -gpu_index={gpu_index} \
---dipol \
 --recalculate \
 --ground_state \
 --arnoldi \
--arnoldi_num_eigs={arnoldi_num_eigs} \
--csr_cut_off_0={csr_cut_off_0} \
---get_eigenvalues \
---reduced_version \
-# --cut_hermite_values \
-# --cut_hermite_orders \
-# --dask_dipol \
 # --pytorch \
+# --dipol \
 # -frame={frame} \
 -graphs_dirname={graphs_dirname} &
+
 """
             ])
 
             print(heredoc)
-            with open(Path(dir_path, f"sbatch_bog_{dir_name}_{nx}_{ny}_{nz}_{mode}.sh"), "w") as f:
+            with open(Path(dir_path, f"sbatch_bog_{dir_name}_{nx}_{ny}_{nz}.sh"), "w") as f:
                 f.write(f"{heredoc}\n")
 
             j_counter += 1

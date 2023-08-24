@@ -11,7 +11,7 @@ from supersolids.helper.dict2str import dic2str
 if __name__ == "__main__":
     slurm = True
     xvfb_display = 650
-    supersolids_version = "0.1.37rc7"
+    supersolids_version = "0.1.38rc1"
     dir_path = Path("/bigwork/dscheier/results/begin_ramp_test_11_11/")
 
     dir_path_log = Path(dir_path, "log")

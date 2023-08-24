@@ -12,6 +12,7 @@ Implements an Animation with matplotlib (for Systems in 1D or 2D).
 import sys
 from os import sep
 from typing import Tuple, List
+from pathlib import Path
 
 import numpy as np
 from matplotlib import animation, cm
@@ -19,7 +20,12 @@ from matplotlib import pyplot as plt
 
 from supersolids.Animation import Animation
 from supersolids.Schroedinger import Schroedinger
-from supersolids.helper import functions
+from supersolids.helper import functions, get_version
+
+__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables()
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
+                                                               gpu_off=__GPU_OFF_ENV__,
+                                                               gpu_index=__GPU_INDEX_ENV__)
 
 
 class MatplotlibAnimation(Animation.Animation):
@@ -32,7 +38,7 @@ class MatplotlibAnimation(Animation.Animation):
 
         """
         super().__init__(Res=Anim.Res,
-                         plot_psi_sol=Anim.plot_psi_sol_list,
+                         # plot_psi_sol=Anim.plot_psi_sol_list,
                          plot_V=Anim.plot_V,
                          alpha_psi_list=Anim.alpha_psi_list,
                          alpha_psi_sol_list=Anim.alpha_psi_sol_list,
@@ -272,15 +278,24 @@ class MatplotlibAnimation(Animation.Animation):
                     contour.remove()
 
             mu_old = System.mu_arr
-            System.time_step()
+            System.time_step(numba_used=numba_used, cupy_used=cupy_used)
             mu_rel = np.abs((System.mu_arr - mu_old) / System.mu_arr)
-            print(f"mu_rel: {mu_rel}")
-            if mu_rel < accuracy:
+            print(f"t={System.t:07.05f}, mu={System.mu_arr}, mu_rel={mu_rel}")
+
+            SystemSummary, summary_name = System.use_summary()
+
+            if np.all(mu_rel < accuracy):
                 print(f"accuracy reached: {mu_rel}")
                 self.anim.event_source.stop()
 
-        if frame_index % 10 == 0:
+        if frame_index % 100 == 0:
             print(f"Round {frame_index}")
+            try:
+                print(f"t={System.t:07.05f}, mu={System.mu_arr}, mu_rel={mu_rel:.08f}, "
+                    f"processed={(frame_index / (System.max_timesteps / System.dt)):05.03f}%")
+            except Exception as e:
+                mur_rel = np.inf
+            # System.save_psi_val(System.input_path, filename_steps, steps_format, frame_index)
 
         if System.dim == 1:
             self.psi_line.set_data(System.x, np.abs(System.psi_val) ** 2.0)
@@ -305,11 +320,22 @@ class MatplotlibAnimation(Animation.Animation):
                 # here we crop the calculated mesh to the viewable mesh,
                 # but the rest is still calculated to not change
                 # the boundary conditions. Essentially we just zoom.
-                psi_pos, psi_val = crop_pos_to_limits(self.ax,
-                                                      System.pos,
-                                                      System.psi_0,
-                                                      func_val=System.psi_val)
-                psi_prob = np.abs(psi_val) ** 2.0
+                if len(System.N_list) == 1:
+                    psi_pos, psi_val = crop_pos_to_limits(self.ax,
+                                                          System.pos,
+                                                          System.psi_0,
+                                                          func_val=System.psi_val)
+                    psi_prob = np.abs(psi_val) ** 2.0
+                else:
+                    psi_pos, psi_val = crop_pos_to_limits(self.ax,
+                                                          System.pos,
+                                                          System.psi_0_list[0],
+                                                          func_val=System.psi_val_list[0])
+                    psi_prob = np.abs(psi_val) ** 2.0
+
+                if cupy_used:
+                    psi_prob = psi_prob.get()
+
                 self.psi_line = self.ax.plot_surface(psi_pos[:, :, 0],
                                                      psi_pos[:, :, 1],
                                                      psi_prob,
@@ -317,7 +343,7 @@ class MatplotlibAnimation(Animation.Animation):
                                                      linewidth=5,
                                                      rstride=1,
                                                      cstride=1,
-                                                     alpha=self.alpha_psi_list
+                                                     alpha=self.alpha_psi_list[0]
                                                      )
 
                 cmap = cm.coolwarm
@@ -352,10 +378,14 @@ class MatplotlibAnimation(Animation.Animation):
                     color_bar_axes = self.fig.add_axes([0.85, 0.1, 0.03, 0.8])
                     self.fig.colorbar(self.psi_x_line, cax=color_bar_axes)
 
-        self.title.set_text(f"g = {System.g:.2}, dt = {System.dt:.6}, "
-                            f"max_timesteps = {System.max_timesteps:d}, "
-                            f"imag_time = {System.imag_time},\n"
-                            f"t = {System.t:02.05f}")
+        if len(System.N_list) == 1:
+            g = System.g
+        else:
+            g = 4.0 * np.pi * System.a_s_array[0, 0]
+        self.title.set_text(f"g = {g:.2},dt={System.dt:.6}, "
+                            f"max_timesteps={System.max_timesteps:d}, "
+                            f"imag_time={System.imag_time},\n"
+                            f"t={System.t:02.05f}")
 
         if System.dim == 1:
             return self.psi_line, self.V_line, self.psi_sol_line, self.title
@@ -402,8 +432,12 @@ class MatplotlibAnimation(Animation.Animation):
                                             cache_frame_data=False)
 
         # requires either mencoder or ffmpeg to be installed on your system
-        self.anim.save("results" + sep + self.filename,
-                       fps=15, dpi=300, extra_args=['-vcodec', 'libx264'])
+        anim_filename = Path(System.input_path, self.filename)
+        print(f"{str(anim_filename)}")
+        if not System.input_path.is_dir():
+            System.input_path.mkdir(parents=True)
+
+        self.anim.save(anim_filename, fps=15, dpi=300, extra_args=['-vcodec', 'libx264'])
 
 
 def plot_2d(resolution=32,

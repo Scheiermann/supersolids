@@ -141,6 +141,17 @@ def flags(args_array):
                         help="If flag is not used, interactive animation is "
                              "shown and saved as mp4, else Schroedinger is "
                              "saved as pkl and allows offscreen usage.")
+    parser.add_argument("-r_cut", type=float, default=None,
+                        help="Radial cut off of dipol-dipol interaction")
+    parser.add_argument("-r_cut_ratio", type=float, default=0.98,
+                        help="Radial cut off of dipol-dipol interaction as ratio in "
+                             "terms of maximal box length. "
+                             "Not used if r_cut provided or r_cut_unused flag used.")
+    parser.add_argument("--r_cut_unused", default=True, action="store_false",
+                        help="Use flag to turn off the radial cut-off of the "
+                             "dipol-dipol interaction, which is used to not get the "
+                             "long range interaction due to "
+                             "virtual images produced by the FFT.")
     parser.add_argument("--gpu_off", default=False, action="store_true",
                         help="Use flag to turn off gpu eventhouh it might be usable")
     parser.add_argument("-gpu_index", type=int, default=0,
@@ -194,15 +205,17 @@ if __name__ == "__main__":
     else:
         V_interaction_cut_x = list(map(float, args.V_interaction_cut_x))
 
-    if not args.V_interaction_cut_y:
-        V_interaction_cut_y = [cut_ratio * MyBox.y0, cut_ratio * MyBox.y1]
-    else:
-        V_interaction_cut_y = list(map(float, args.V_interaction_cut_y))
+    if MyBox.dim >= 2:
+        if not args.V_interaction_cut_y:
+            V_interaction_cut_y = [cut_ratio * MyBox.y0, cut_ratio * MyBox.y1]
+        else:
+            V_interaction_cut_y = list(map(float, args.V_interaction_cut_y))
 
-    if not args.V_interaction_cut_z:
-        V_interaction_cut_z = [cut_ratio * MyBox.z0, cut_ratio * MyBox.z1]
-    else:
-        V_interaction_cut_z = list(map(float, args.V_interaction_cut_z))
+    if MyBox.dim == 3:
+        if not args.V_interaction_cut_z:
+            V_interaction_cut_z = [cut_ratio * MyBox.z0, cut_ratio * MyBox.z1]
+        else:
+            V_interaction_cut_z = list(map(float, args.V_interaction_cut_z))
 
     try:
         dir_path = Path(args.dir_path).expanduser()
@@ -239,9 +252,17 @@ if __name__ == "__main__":
     V_3d = functools.partial(functions.v_harmonic_3d, alpha_y=alpha_y, alpha_z=alpha_z)
 
     # radial or no cut-off
+    if args.r_cut:
+        r_cut = args.r_cut
+    else:
+        if args.r_cut_unused:
+            # r_cut_ratio = 0.98
+            r_cut = args.r_cut_ratio * max(MyBox.lengths())
+        else:
+            r_cut = None
     V_3d_ddi = functools.partial(functions.dipol_dipol_interaction,
-                                 r_cut=0.98 * max(MyBox.lengths()),
-                                 use_cut_off=True,
+                                 r_cut=r_cut,
+                                 use_cut_off=args.r_cut_unused,
                                  )
 
     ## cylindrical cut-off
@@ -260,12 +281,17 @@ if __name__ == "__main__":
     # psi_0_1d = functools.partial(functions.psi_0_rect, x_min=-0.25, x_max=-0.25, a=2.0)
 
     if args.noise is None:
-        psi_0_noise_3d = None
+        psi_0_noise = None
     else:
-        psi_0_noise_3d = functions.noise_mesh(
+        if MyBox.dim == 2:
+            noise_shape = (Res.x, Res.y)
+        if MyBox.dim == 3:
+            noise_shape = (Res.x, Res.y, Res.z)
+
+        psi_0_noise = functions.noise_mesh(
             val_min=args.noise[0],
             val_max=args.noise[1],
-            shape=(Res.x, Res.y, Res.z)
+            shape=noise_shape,
             )
 
     if MyBox.dim == 3:
@@ -296,20 +322,28 @@ if __name__ == "__main__":
             mu_sol_list.append(functions.mu_1d)
         V_interaction = None
     elif Res.dim == 2:
+        a_s_factor = np.sqrt(8.0 * np.pi) * np.sqrt(alpha_z)
         x_lim = (MyBox.x0, MyBox.x1)
         y_lim = (MyBox.y0, MyBox.y1)
         V_trap = V_2d
         for i in range(0, len(m_list)):
             psi_0_list.append(functools.partial(functions.psi_gauss_2d_pdf,
-                mu=[args.mu["mu_x"], args.mu["mu_y"]],
-                var=cp.array([[args.a["a_x"], 0.0], [0.0, args.a["a_y"]]])
+                mu=np.array([args.mu["mu_x"], args.mu["mu_y"]]),
+                # mu=[args.mu["mu_x"], args.mu["mu_y"]],
+                # var=cp.array([[args.a["a_x"], 0.0], [0.0, args.a["a_y"]]])
+                var=np.array([[args.a["a_x"], 0.0], [0.0, args.a["a_y"]]])
                 )
             )
             psi_0_noise_list.append(None)
             psi_sol_list.append(functions.thomas_fermi_2d_pos)
             mu_sol_list.append(functions.mu_2d)
-        V_interaction = None
+        if args.V_interaction:
+            # TODO: implement interaction for 2d case
+            V_interaction = None
+        else:
+            V_interaction = None
     elif Res.dim == 3:
+        a_s_factor = 4.0 * np.pi
         x_lim = (MyBox.x0, MyBox.x1) # arbitrary as not used (mayavi vs matplotlib)
         y_lim = (MyBox.y0, MyBox.y1) # arbitrary as not used (mayavi vs matplotlib)
         V_trap = V_3d
@@ -321,7 +355,7 @@ if __name__ == "__main__":
                 x_0=args.mu["mu_x"], y_0=args.mu["mu_y"], z_0=args.mu["mu_z"],
                 k_0=0.0)
             )
-            psi_0_noise_list.append(psi_0_noise_3d)
+            psi_0_noise_list.append(psi_0_noise)
             psi_sol_list.append(psi_sol_3d)
             mu_sol_list.append(functions.mu_3d)
 
@@ -367,7 +401,8 @@ if __name__ == "__main__":
             psi_0_noise_list=psi_0_noise_list,
             psi_sol_list=psi_sol_list,
             mu_sol_list=mu_sol_list,
-            input_path=Path("~/Documents/itp/master/supersolids/supersolids/").expanduser(),
+            # input_path=Path("~/Documents/itp/master/supersolids/supersolids/").expanduser(),
+            input_path=Path(dir_path, args.dir_name_result),
             )
     else:
         SchroedingerInput: Schroedinger = Schroedinger(

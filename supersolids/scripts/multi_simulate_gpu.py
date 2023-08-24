@@ -13,17 +13,19 @@ from supersolids.helper.dict2str import dic2str
 
 
 if __name__ == "__main__":
-    supersolids_version = "0.1.37rc7"
+    supersolids_version = "0.1.38rc1"
     # dir_path = Path("/bigwork/dscheier/results/begin_gpu_big/")
     # dir_path = Path("/home/dscheiermann/results/begin_gpu_12_28/")
     # dir_path = Path("/home/dscheiermann/results/begin_gpu_12_28_to_102/")
-    dir_path = Path("/home/dscheiermann/results/begin_gpu_12_28_to_102_dip9/")
+    # dir_path = Path("/home/dscheiermann/results/begin_gpu_12_28_to_102_dip9/")
+    # dir_path = Path("/home/dscheiermann/results/begin_gpu_01_13_dip9/")
+    dir_path = Path("/home/dscheiermann/results/begin_gpu_01_20_dip9/")
 
     dir_path_log = Path(f"{dir_path}/log/")
     dir_path_log.mkdir(parents=True, exist_ok=True)
 
     mem_in_MB = 1400
-    xvfb_display = 490
+    xvfb_display = 680
     gpu_index=0
 
     mixture: bool = True
@@ -48,10 +50,9 @@ if __name__ == "__main__":
     delta_f_x_end = -0.4
     delta_f_x_step = 1.0
 
-    # a12_start = 62.5
-    # a12_end = 97.6
-    # a12_end = 62.6
-    # a12_step = 2.5
+    a12_start = 20.0
+    a12_end = 44.6
+    a12_step = 0.5
 
     if mixture:
         file_start = "step_"
@@ -66,7 +67,7 @@ if __name__ == "__main__":
     movie_string = "movie"
     counting_format = "%03d"
     movie_number = 1
-    files2last = 40
+    files2last = 60
     load_from_multi = True
     load_outer_loop = True
 
@@ -81,8 +82,8 @@ if __name__ == "__main__":
     func_path_list = []
     dir_path_func_list = []
     # a12_array = np.array([70.5, 71.0, 71.5, 72.0, 73.0, 73.5, 74.0, 74.5, 75.5, 76.0, 76.5, 77.0, 78.0, 78.5, 79.0, 79.5, 80.5, 81.0, 81.5, 82.0, 83.0, 83.5, 84.0, 84.5, 85.5, 86.0, 86.5, 87.0, 88.0, 88.5, 89.0, 89.5])
-    a12_array = np.array([90.5, 91.0, 91.5, 92.0, 93.0, 93.5, 94.0, 94.5, 95.5, 96.0, 96.5, 97.0, 98.0, 98.5, 99.0, 99.5, 100.0, 100.5, 101.0, 101.5, 102.0])
-    # a12_array = np.arange(a12_start, a12_end, a12_step)
+    # a12_array = np.array([90.5, 91.0, 91.5, 92.0, 93.0, 93.5, 94.0, 94.5, 95.5, 96.0, 96.5, 97.0, 98.0, 98.5, 99.0, 99.5, 100.0, 100.5, 101.0, 101.5, 102.0])
+    a12_array = np.arange(a12_start, a12_end, a12_step)
     for a12 in a12_array:
         for delta_f_x in np.arange(delta_f_x_start, delta_f_x_end, delta_f_x_step):
             skip_counter += 1

@@ -90,26 +90,24 @@ if __name__ == "__main__":
     # experiment_suffix = "gpu_12_28_to_102"
     # experiment_suffix = "gpu_12_28_to_102_dip9"
     # experiment_suffix = "gpu_01_13_dip9"
-    experiment_suffix = "gpu_01_20_dip9"
+    # experiment_suffix = "gpu_01_20_dip9"
     # experiment_suffix = "gpu_01_21_dip9"
-    path_anchor_input = Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/")
+    experiment_suffix = "gpu_2023_08_23"
+    # experiment_suffix = "gpu_2023_08_23_part2"
+    # path_anchor_input = Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/")
+    path_anchor_input = Path(f"/mnt/disk2/dscheiermann/results/begin_{experiment_suffix}/")
     path_anchor_output = Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/")
     # path_anchor_output = Path("/run/media/dsche/scr2/begin_gpu/")
     # path_anchor_output = Path("/run/media/dsche/scr2/begin_gpu_big/")
 
 
-    # take_last = 3
-    take_last = None
+    take_last = 11
+    # take_last = None
 
     movie_string = "movie"
     counting_format = "%03d"
-    # movie_start = 1
-    # movie_end = 50
-    movie_start = 61
-    # movie_end = 90
-    movie_end = 110
-    # movie_end = 40
-    # movie_end = 15
+    movie_start = 1
+    movie_end = 36
 
     mixture = True
 

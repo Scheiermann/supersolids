@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 
 import os
-from sys import version_info
+import sys
 from pkg_resources import get_distribution, parse_version
 
 def get_version(package="supersolids"):
-    if version_info >= (3, 8, 0):
+    if sys.version_info >= (3, 8, 0):
         from importlib.metadata import version
-        package_version = version(package)
-    elif version_info >= (3, 6, 0):
+        try:
+            package_version = version(package)
+        except Exception:
+            print(f"\n{package} is not installed!")
+            sys.exit(1)
+    elif sys.version_info >= (3, 6, 0):
         package_version = get_distribution(package).version
     else:
         package_version = "unknown"

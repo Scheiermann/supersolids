@@ -78,8 +78,11 @@ if __name__ == "__main__":
     # experiment_suffix = "gpu_12_28"
     # experiment_suffix = "gpu_12_28_to_102"
     # experiment_suffix = "gpu_12_28_to_102_dip9"
-    experiment_suffix = "gpu_01_13_dip9"
-    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # experiment_suffix = "gpu_01_13_dip9"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+
+    experiment_suffix = "gpu_03_15_no_dipol_no_lhy_1comp_w_paper"
+    path_anchor_input_list.append(Path(f"/home/dscheiermann/results/begin_"))
 
     mixture = True
     filename_schroedinger: str = "schroedinger.pkl"
@@ -90,8 +93,9 @@ if __name__ == "__main__":
     else:
         filename_steps = "step_"
 
-    # frame_start = None
-    frame_start = 350000
+    frame_start = None
+    # frame_start = 70000
+    # frame_start = 350000
     if frame_start is None:
         take_last = 4
     else:
@@ -106,9 +110,9 @@ if __name__ == "__main__":
     # movie_end_list = [52]
     # movie_start_list = [21]
     # movie_end_list = [35]
-    movie_start_list = [31]
+    movie_start_list = [9]
     # movie_end_list = [72]
-    movie_end_list = [55]
+    movie_end_list = [9]
 
     dt = 0.0002
 
@@ -142,18 +146,19 @@ if __name__ == "__main__":
     # property_args_list = [[], [], [], [], []]
     # property_args_frame_list = [False, False, False, False, False]
 
-    # func = "lambda x, y: (x, y)"
-    # func_mu = "lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))"
-    # file_suffix_list = ["", "", "", "mu_rel", "", "", "", "_fft"]
-    # inbuild_func_list = ["", "", "", "", "", "", "", "fft_plot"]
-    # func_list = ["", "", "", func_mu, "", "", "", ""]
-    # steps_per_npz_list = [100, 1000, 100, 100, 1000, 1000, 100, 100]
-    # subplots_list = [False, False, False, False, True, True, True, True]
-    # property_func_list = [False, True, False, False, True, True, False, False]
-    # list_of_arrays_list = [False, False, False, False, True, True, True, True]
-    # property_names_list = ["E", "get_E_explicit", "mu_arr", "mu_arr", "get_center_of_mass", "get_parity", "monopolar", "monopolar"]
-    # property_args_list = [[], [], [], [], [], [], [], []]
-    # property_args_frame_list = [False, False, False, False, False, False, False, False]
+    func = "lambda x, y: (x, y)"
+    func_mu = "lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))"
+    file_suffix_list = ["", "", "", "mu_rel", "", "", "", "_fft"]
+    inbuild_func_list = ["", "", "", "", "", "", "", "fft_plot"]
+    inbuild_func_args_list = [[], [], [], [], [], [], [], []]
+    func_list = ["", "", "", func_mu, "", "", "", ""]
+    steps_per_npz_list = [100, 1000, 100, 100, 1000, 1000, 100, 100]
+    subplots_list = [False, False, False, False, True, True, True, True]
+    property_func_list = [False, True, False, False, True, True, False, False]
+    list_of_arrays_list = [False, False, False, False, True, True, True, True]
+    property_names_list = ["E", "get_E_explicit", "mu_arr", "mu_arr", "get_center_of_mass", "get_parity", "monopolar", "monopolar"]
+    property_args_list = [[], [], [], [], [], [], [], []]
+    property_args_frame_list = [False, False, False, False, False, False, False, False]
 
     # func_mu = "lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))"
     # file_suffix_list = ["", "mu_rel", "", ""]
@@ -191,17 +196,17 @@ if __name__ == "__main__":
     # inbuild_func_args_list = [[1, 62, 1]]
     # property_args_frame_list = [False]
 
-    file_suffix_list = ["_contrast"]
-    inbuild_func_list = [""]
-    func_list = [""]
-    steps_per_npz_list = [1000]
-    subplots_list = [False]
-    property_func_list = [True]
-    list_of_arrays_list = [False]
-    property_names_list = ["get_contrast"]
-    property_args_list = [[5, 0.3]]
-    inbuild_func_args_list = [[]]
-    property_args_frame_list = [False]
+    # file_suffix_list = ["_contrast"]
+    # inbuild_func_list = [""]
+    # func_list = [""]
+    # steps_per_npz_list = [1000]
+    # subplots_list = [False]
+    # property_func_list = [True]
+    # list_of_arrays_list = [False]
+    # property_names_list = ["get_contrast"]
+    # property_args_list = [[5, 0.3]]
+    # inbuild_func_args_list = [[]]
+    # property_args_frame_list = [False]
 
 
     # steps_per_npz_list = [100]

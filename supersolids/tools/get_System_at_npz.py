@@ -11,9 +11,16 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import BoundaryNorm, ListedColormap
 from matplotlib.ticker import MaxNLocator
 
+from supersolids.helper import get_version
+from supersolids.helper.get_path import get_path
+
+__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables()
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
+                                                               gpu_off=__GPU_OFF_ENV__,
+                                                               gpu_index=__GPU_INDEX_ENV__)
+
 from supersolids.Schroedinger import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture
-from supersolids.helper.get_path import get_path
 from supersolids.tools.track_property import property_check, get_property
 
 
@@ -47,6 +54,7 @@ def get_System_at_npz(dir_path: Path = Path("~/supersolids/results").expanduser(
             # get the psi_val of Schroedinger at other timesteps (t!=0)
             with open(psi_val_path, "rb") as f:
                 System_loaded.psi_val = np.load(file=f)["psi_val"]
+        print(f"System loaded successfully from: {psi_val_path}")
 
     except zipfile.BadZipFile:
         print(f"Zipfile with frame {frame} can't be read. Maybe the simulation "

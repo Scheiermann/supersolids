@@ -515,6 +515,10 @@ class MayaviAnimation(Animation.Animation):
 
         path_schroedinger: Path = Path(input_path, filename_schroedinger)
         System = load_System(path_schroedinger, host=host)
+        # TODO
+        System.psi_sol_list[0] = functions.HO_3D(System.x_mesh, System.y_mesh, System.z_mesh,
+                                                 ind_x=0, ind_y=0, ind_z=0,
+                                                 ax=1, ay=1, az=1)
 
         (prob_plots, slice_x_plot, slice_y_plot, slice_z_plot,
          V_plot, psi_sol_plot) = self.prepare(System,
@@ -630,26 +634,28 @@ class MayaviAnimation(Animation.Animation):
                 traceback.print_exc()
                 break
 
-            try:
-                output_path, _, _, _ = get_path.get_path(self.dir_path_output)
-                cut_1d.cut_1d(System_list,
-                              slice_indices=[self.slice_indices[0],
-                                             self.slice_indices[1],
-                                             self.slice_indices[2]],
-                              psi_sol_3d_cut_x=None,
-                              psi_sol_3d_cut_y=None,
-                              psi_sol_3d_cut_z=None,
-                              # dir_path=self.dir_path,
-                              dir_path=output_path,
-                              y_lim=cut1d_y_lim,
-                              plot_val_list=cut1d_plot_val_list,
-                              frame=frame,
-                              steps_format=steps_format,
-                              mixture_slice_index_list=mixture_slice_index_list,
-                              filename_steps_list=filename_steps_list,
-                              )
-            except Exception as e:
-                print(f"cut1d did not work!\n{e}")
+            scale_mode_list = ["lin", "log"]
+            for scale_mode in scale_mode_list:
+                try:
+                    output_path, _, _, _ = get_path.get_path(self.dir_path_output)
+                    cut_1d.cut_1d(System_list,
+                                  slice_indices=[self.slice_indices[0],
+                                                 self.slice_indices[1],
+                                                 self.slice_indices[2]],
+                                  psi_sol_3d_cut_x=None,
+                                  psi_sol_3d_cut_y=None,
+                                  psi_sol_3d_cut_z=None,
+                                  # dir_path=self.dir_path,
+                                  dir_path=output_path,
+                                  y_lim=cut1d_y_lim,
+                                  plot_val_list=cut1d_plot_val_list,
+                                  frame=frame,
+                                  steps_format=steps_format,
+                                  mixture_slice_index_list=mixture_slice_index_list,
+                                  filename_steps_list=filename_steps_list,
+                                  )
+                except Exception as e:
+                    print(f"cut1d did not work!\n{e}")
 
             anim_name_special = "anextra"
             anim_name = "anim"

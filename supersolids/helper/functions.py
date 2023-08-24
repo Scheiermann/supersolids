@@ -40,13 +40,14 @@ def check_ResBox(Res: Resolution, MyBox: Box):
     return Res, MyBox
 
 
-def get_grid_helper(Res: Resolution, MyBox: Box, index: int):
+def get_grid_helper(Res: Resolution, MyBox: Box, index: int, with_0=True):
     try:
         x0, x1 = MyBox.get_bounds_by_index(index)
         res = Res.get_bounds_by_index(index)
         box_len = x1 - x0
         x: np.ndarray = np.linspace(x0, x1, res, endpoint=False)
-        dx: float = box_len / float(res - 1)
+        # dx: float = box_len / float(res - 1)
+        dx: float = x[1] - x[0]
         dkx: float = 2.0 * np.pi / box_len
         kx: np.ndarray = np.fft.fftfreq(res, d=1.0 / (dkx * res))
 
@@ -60,7 +61,7 @@ def get_grid_helper(Res: Resolution, MyBox: Box, index: int):
     return x, dx, kx, dkx
 
 
-def get_grid(Res: Resolution, MyBox: Box):
+def get_grid(Res: Resolution, MyBox: Box, with_0=True):
     x0, x1 = MyBox.get_bounds_by_index(0)
     res_x = Res.get_bounds_by_index(0)
     y0, y1 = MyBox.get_bounds_by_index(1)
@@ -69,10 +70,17 @@ def get_grid(Res: Resolution, MyBox: Box):
     res_z = Res.get_bounds_by_index(2)
 
     try:
-        x_mesh, y_mesh, z_mesh = np.mgrid[x0: x1: complex(0, res_x),
-                                          y0: y1: complex(0, res_y),
-                                          z0: z1: complex(0, res_z)
-                                          ]           
+        if with_0:
+            x = np.linspace(x0, x1, res_x, endpoint=False) 
+            y = np.linspace(y0, y1, res_y, endpoint=False) 
+            z = np.linspace(z0, z1, res_z, endpoint=False) 
+            x_mesh, y_mesh, z_mesh = np.meshgrid(x, y, z, indexing="ij")
+        else:
+            x_mesh, y_mesh, z_mesh = np.mgrid[x0: x1: complex(0, res_x),
+                                              y0: y1: complex(0, res_y),
+                                              z0: z1: complex(0, res_z)
+                                              ]           
+
     except KeyError:
         sys.exit(
             f"Keys x0, x1, y0, y1, z0, z1 of box needed, "
@@ -357,7 +365,7 @@ def w_dimensionsless(dimensionless_factor: float,
                      w_x: float = 2.0 * np.pi * 30.0,
                      w_y: float = 2.0 * np.pi * 30.0,
                      w_z: float = 2.0 * np.pi * 30.0,
-                     ) -> (float, float, float):
+                     ) -> Tuple[float, float, float]:
     w_x_dimensionless = w_x * dimensionless_factor
     w_y_dimensionless = w_y * dimensionless_factor
     w_z_dimensionless = w_z * dimensionless_factor
@@ -417,10 +425,8 @@ def get_g_qf(N: int, a_s_l_ho_ratio: float, epsilon_dd: float):
 
 def get_g_qf_bog(N: int, a_s: float, a_dd: float):
     epsilon_dd = a_dd / a_s
-    g_qf = (32.0 / (3.0 * np.sqrt(np.pi))
-            * 4.0 * np.pi * a_s ** (5.0 / 2.0)
-            * N ** (3.0 / 2.0)
-            * new_int(epsilon_dd))
+    print(f"epsilon_dd: {epsilon_dd}")
+    g_qf = get_g_qf(N, a_s, epsilon_dd)
 
     return g_qf
 

@@ -328,8 +328,18 @@ class SchroedingerMixture(Schroedinger):
                 else:
                     self.V_val: np.ndarray = self.V(self.pos)
 
+            if self.V_interaction is None:
+                # For no interaction the identity is needed with respect to 2D
+                # * 2D (array with 1.0 everywhere)
+                self.V_k_val: cp.ndarray = np.full(self.psi_val_list[0].shape, 1.0)
+            else:
+                if callable(self.V_interaction):
+                    self.V_k_val: np.ndarray = self.V_interaction(kx_mesh, ky_mesh, kz_mesh)
+                    if cupy_used:
+                        self.V_k_val: cp.ndarray = cp.asarray(self.V_k_val)
+
         elif self.dim == 3:
-            self.x_mesh, self.y_mesh, self.z_mesh = functions.get_grid(self.Res, self.Box)
+            self.x_mesh, self.y_mesh, self.z_mesh = functions.get_grid(self.Res, self.Box, with_0=True)
             # if cupy_used:
             #     x_mesh, y_mesh, z_mesh = cp.asarray(x_mesh), cp.asarray(y_mesh), cp.asarray(z_mesh)
             #     x_mesh, y_mesh, z_mesh = self.x_mesh.get(), self.y_mesh.get(), self.z_mesh.get()
@@ -391,7 +401,7 @@ class SchroedingerMixture(Schroedinger):
             if self.V_interaction is None:
                 # For no interaction the identity is needed with respect to 2D
                 # * 2D (array with 1.0 everywhere)
-                self.V_k_val: cp.ndarray = np.full(self.psi_val.shape, 1.0)
+                self.V_k_val: cp.ndarray = np.full(self.psi_val_list[0].shape, 1.0)
             else:
                 if callable(self.V_interaction):
                     self.V_k_val: np.ndarray = self.V_interaction(kx_mesh, ky_mesh, kz_mesh)
@@ -443,6 +453,9 @@ class SchroedingerMixture(Schroedinger):
         self.H_kin_list = []
         for m in self.m_list:
             self.H_kin_list.append(self.H_kin)
+        
+        d_ronen = self.a_dd_factor * self.a_dd_array[0, 0] * self.N_list[0]
+        print(f"d_ronen: {d_ronen}")
 
     def convert_all_to_numpy(self):
         self.a_s_array: np.ndarray = cp.asnumpy(self.a_s_array)
@@ -592,7 +605,8 @@ class SchroedingerMixture(Schroedinger):
     def use_summary(self, summary_name: Optional[str] = None) -> Tuple[SchroedingerMixtureSummary,
                                                                        Optional[str]]:
         Summary: SchroedingerMixtureSummary = SchroedingerMixtureSummary(self)
-        Summary.convert_all_to_numpy()
+        if cupy_used:
+            Summary.convert_all_to_numpy()
 
         return Summary, summary_name
 
@@ -764,7 +778,7 @@ class SchroedingerMixture(Schroedinger):
     def get_mu_explicit(self, psi_previous_list) -> None:
         mu_list = []
         for (psi_val, psi_previous) in zip(self.psi_val_list, psi_previous_list):
-            integrand = np.conjugate(psi_previous) * (psi_val - psi_previous)
+            integrand = np.conjugate(psi_previous) * (psi_previous - psi_val)
             mu_list.append((1 / self.dt) * self.sum_dV(integrand))
         
         return mu_list
@@ -1187,6 +1201,8 @@ class SchroedingerMixture(Schroedinger):
     def get_dipol_U_dd_mu_lhy(self):
         if cupy_used:
             jit = False
+        else:
+            jit = numba_used
         density_list: List[cp.ndarray] = self.get_density_list(jit=jit, cupy_used=cupy_used)
         try:
             # density_tensor_vec: cp.ndarray = cp.stack(density_list, axis=0)
@@ -1251,9 +1267,8 @@ class SchroedingerMixture(Schroedinger):
         
         return contact_interaction_vec, dipol_term_vec, mu_lhy_list
 
-
     def split_operator_pot(self, split_step: float = 0.5, jit: bool = True,
-                           cupy_used: bool = False,) -> Tuple[List[cp.ndarray], List[cp.ndarray]]:
+                           cupy_used: bool = False,) -> None:
         # update H_pot before use
         contact_interaction_vec, dipol_term_vec, mu_lhy_list = self.get_dipol_U_dd_mu_lhy()
         for i, (contact_interaction, dipol_term, mu_lhy) in enumerate(zip(
@@ -1274,16 +1289,29 @@ class SchroedingerMixture(Schroedinger):
                                                                        mu_lhy,
                                                                        lhy_factor=self.lhy_factor,
                                                                        )
-                term_and_tilt = term + tilt_term - self.mu_arr[i]
-                H_pot_propagator: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt,
-                                                                    term_and_tilt, split_step)
+                term_and_tilt = term + tilt_term
             else:
                 term: cp.ndarray = self.get_H_pot_exponent_terms(dipol_term,
                                                                  contact_interaction,
                                                                  mu_lhy,
                                                                  )
-                term_and_tilt = term + tilt_term - self.mu_arr[i]
-                H_pot_propagator: cp.ndarray = self.get_H_pot(term_and_tilt, split_step)
+                term_and_tilt = term + tilt_term
+
+            # use mu to get more precise results
+            # mu_buffer = (cp.conjugate(self.psi_val_list[i])
+            #             * (self.H_kin_list[i] + term_and_tilt)
+            #             * self.psi_val_list[i]
+            #             )
+            # mu_by_H = cp.real(self.sum_dV(mu_buffer / psi_norm_list[i]))
+            # self.mu_arr[i] = mu_by_H
+            # term_and_tilt_mu = term_and_tilt - self.mu_arr[i]
+            term_and_tilt_mu = term_and_tilt
+
+            if jit: 
+                H_pot_propagator: cp.ndarray = numbas.get_H_pot_jit(self.U, self.dt,
+                                                                    term_and_tilt_mu, split_step)
+            else:
+                H_pot_propagator: cp.ndarray = self.get_H_pot(term_and_tilt_mu, split_step)
 
             if cupy_used:
                 self.psi_val_list[i] = (cp.asarray(H_pot_propagator) * cp.asarray(self.psi_val_list[i]))
@@ -1337,5 +1365,45 @@ class SchroedingerMixture(Schroedinger):
         # but we play safe here (regardless of speedup)
         # if self.imag_time:
         psi_norm_list: List[float] = self.normalize_psi_val()
+
+        # for i, (H_kin, term_and_tilt, psi_norm) in enumerate(zip(self.H_kin_list, term_and_tilt_list,
+        #                                                          psi_norm_list, strict=True)):
+        #     mu_buffer = (cp.conjugate(self.psi_val_list[i]) * (H_kin + term_and_tilt)
+        #                  * self.psi_val_list[i])
+        #     mu_by_H = cp.real(self.sum_dV(mu_buffer / psi_norm))
+        #     self.mu_arr[i] = mu_by_H
+
         for i, psi_norm in enumerate(psi_norm_list):
             self.mu_arr[i] = -cp.log(psi_norm) / (2.0 * self.dt)
+        # print(f"mu_arr: {self.mu_arr}")
+
+        # print(f"check_eGPE")
+        # from scipy.ndimage import minimum_position, maximum_position
+        # if cupy_used:
+        #     psi_0 = cp.array(self.psi_val_list[0])
+        #     H_kin_part = cp.array(self.H_kin_list[0]) * psi_0
+        #     V_part = cp.array(self.V_val) * psi_0
+        # else:
+        #     psi_0 = System.psi_val_list[0]
+        #     H_kin_part = self.H_kin_list[0] * psi_0
+        #     V_part = self.V_val * psi_0
+        # g = 4.0 * np.pi * self.a_s_array[0, 0]
+        # g_part = g * self.N_list[0] * cp.abs(psi_0) ** 2 * psi_0
+        # mu_part = self.mu_arr[0] * psi_0
+        
+        # all_parts = H_kin_part + V_part + g_part - mu_part
+        # arr_real = np.real(cp.asnumpy(all_parts))
+        # mu_part_real = np.real(cp.asnumpy(mu_part))
+        # g_part_real = np.real(cp.asnumpy(g_part))
+        # V_part_real = np.real(cp.asnumpy(V_part))
+        # H_kin_part_real = np.real(cp.asnumpy(H_kin_part))
+        # real_min = np.min(arr_real)
+        # real_max = np.max(arr_real)
+        # max_pos = maximum_position(arr_real)
+
+        # print(f"max_pos Box: {self.x_mesh[max_pos]}, {self.y_mesh[max_pos]}, {self.z_mesh[max_pos]}")
+        # print(f"max(all_parts): {real_max}, max(V_part): {cp.max(cp.real(V_part))}, max(mu_part): {cp.max(cp.real(mu_part))}")
+        # print(f"H_kin_part_real[max_pos]: {H_kin_part_real[max_pos]}, V_part_real[max_pos]: {V_part_real[max_pos]}, mu_part_real[max_pos]: {mu_part_real[max_pos]}, g_part_real[max_pos]: {g_part_real[max_pos]}")
+        # print(f"Min/Max all_parts_real: {real_min} and {real_max} at {minimum_position(arr_real)} and {max_pos}")
+        # print(f"Min/Max H_kin_part_real: {cp.min(H_kin_part_real)} and {cp.max(H_kin_part_real)} at {minimum_position(H_kin_part_real)} and {maximum_position(H_kin_part_real)}")
+

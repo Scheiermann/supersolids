@@ -65,7 +65,14 @@ if __name__ == "__main__":
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     # experiment_suffix = "gpu_12_28_to_102_dip9"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
-    experiment_suffix = "gpu_01_13_dip9"
+    # experiment_suffix = "gpu_01_13_dip9"
+    # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    
+
+    # experiment_suffix = "gpu_03_15_no_dipol_no_lhy_1comp_w_paper"
+    # path_anchor_input_list.append(Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/"))
+
+    experiment_suffix = "gpu_2023_08_23"
     path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     
     # path_anchor_input_list.append(Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/"))
@@ -85,6 +92,9 @@ if __name__ == "__main__":
     # path_anchor_output_list = path_anchor_input_list
     # experiment_suffix = "ramp_luis"
     # path_anchor_output_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+    # path_anchor_output_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
+
+    # path_anchor_output_list.append(Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/"))
     path_anchor_output_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
     
     # mixture = False
@@ -107,9 +117,10 @@ if __name__ == "__main__":
 
     movie_string = "movie"
     counting_format = "%03d"
-    movie_start_list = [31]
-    movie_end_list = [55]
-    slice_indices = {"x": 127, "y": 31, "z": 31}
+    movie_start_list = [1]
+    movie_end_list = [1]
+    # slice_indices = {"x": 127, "y": 31, "z": 31}
+    slice_indices = {"x": 256, "y": 127, "z": 127}
     # slice_indices = {"x": 63, "y": 31, "z": 31}
     # slice_indices = {"x": 31, "y": 15, "z": 15}
 

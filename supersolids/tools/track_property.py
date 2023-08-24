@@ -22,7 +22,11 @@ from matplotlib import pyplot as plt
 from typing import Optional
 
 from supersolids.helper import get_version
-cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np)
+
+__GPU_OFF_ENV__, __GPU_INDEX_ENV__ = get_version.get_env_variables()
+cp, cupy_used, cuda_used, numba_used = get_version.check_cp_nb(np,
+                                                               gpu_off=__GPU_OFF_ENV__,
+                                                               gpu_index=__GPU_INDEX_ENV__)
 
 from supersolids import Schroedinger
 from supersolids.SchroedingerMixture import SchroedingerMixture

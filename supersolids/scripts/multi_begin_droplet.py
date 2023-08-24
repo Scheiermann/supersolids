@@ -12,7 +12,7 @@ if __name__ == "__main__":
     slurm = True
     mem_in_GB = 2
     xvfb_display = 890
-    supersolids_version = "0.1.37rc7"
+    supersolids_version = "0.1.38rc1"
     dir_path = Path("/bigwork/dscheier/results/begin_paper/")
 
     movie_string = "movie"
