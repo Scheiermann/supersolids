@@ -81,8 +81,14 @@ if __name__ == "__main__":
     # experiment_suffix = "gpu_01_13_dip9"
     # path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/"))
 
-    experiment_suffix = "gpu_03_15_no_dipol_no_lhy_1comp_w_paper"
-    path_anchor_input_list.append(Path(f"/home/dscheiermann/results/begin_"))
+    # experiment_suffix = "gpu_03_15_no_dipol_no_lhy_1comp_w_paper"
+    # path_anchor_input_list.append(Path(f"/home/dscheiermann/results/begin_{experiment_suffix}"))
+
+    # experiment_suffix = "gpu_2023_08_23_part2"
+    # experiment_suffix = "gpu_2023_08_23"
+    # experiment_suffix = "gpu_2023_09_04"
+    experiment_suffix = "gpu_2023_09_04_dip9"
+    path_anchor_input_list.append(Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}"))
 
     mixture = True
     filename_schroedinger: str = "schroedinger.pkl"
@@ -93,28 +99,39 @@ if __name__ == "__main__":
     else:
         filename_steps = "step_"
 
-    frame_start = None
+    # frame_start = None
+    # frame_start = 0
+    # frame_start = 100000
+    # frame_start = 110000
     # frame_start = 70000
-    # frame_start = 350000
+    # frame_start = 150000
+    frame_start = 350000
     if frame_start is None:
         take_last = 4
     else:
         take_last = None
         # frame_start = 0
         # frame_end = 1000
-        frame_end = None
+        # frame_end = None
+        frame_end = 700000
+        # frame_end = 600000
+        # frame_end = 500000
 
     # movie_start_list = [1]
-    # movie_end_list = [25]
-    # movie_start_list = [31]
-    # movie_end_list = [52]
-    # movie_start_list = [21]
-    # movie_end_list = [35]
-    movie_start_list = [9]
-    # movie_end_list = [72]
-    movie_end_list = [9]
+    # movie_end_list = [1]
+    # movie_start_list = [306]
+    # movie_end_list = [350]
+    # movie_start_list = [406]
+    # movie_end_list = [450]
+    # movie_start_list = [506]
+    # movie_end_list = [550]
+    movie_start_list = [601]
+    movie_end_list = [650]
 
     dt = 0.0002
+    # dt = 0.002
+    # dt = 0.0015
+    # dt = 0.02
 
     dir_name = "movie"
     counting_format = "%03d"
@@ -146,19 +163,69 @@ if __name__ == "__main__":
     # property_args_list = [[], [], [], [], []]
     # property_args_frame_list = [False, False, False, False, False]
 
+    # func = "lambda x, y: (x, y)"
+    # func_mu = "lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))"
+    # file_suffix_list = ["", "", "", "mu_rel", "", "", "", "_fft"]
+    # inbuild_func_list = ["", "", "", "", "", "", "", "fft_plot"]
+    # inbuild_func_args_list = [[], [], [], [], [], [], [], []]
+    # func_list = ["", "", "", func_mu, "", "", "", ""]
+    # # steps_per_npz_list = [100, 1000, 100, 100, 1000, 1000, 100, 100]
+    # # steps_per_npz_list = [1, 1, 1, 1, 1, 1, 1, 1]
+    # steps_per_npz_list = [1, 1, 1, 1, 1, 1, 1, 1]
+    # subplots_list = [False, False, False, False, True, True, True, True]
+    # property_func_list = [False, True, False, False, True, True, False, False]
+    # list_of_arrays_list = [False, False, False, False, True, True, True, True]
+    # property_names_list = ["E", "get_E_explicit", "mu_arr", "mu_arr", "get_center_of_mass", "get_parity", "monopolar", "monopolar"]
+    # property_args_list = [[], [], [], [], [], [], [], []]
+    # property_args_frame_list = [False, False, False, False, False, False, False, False]
+
     func = "lambda x, y: (x, y)"
-    func_mu = "lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))"
-    file_suffix_list = ["", "", "", "mu_rel", "", "", "", "_fft"]
-    inbuild_func_list = ["", "", "", "", "", "", "", "fft_plot"]
-    inbuild_func_args_list = [[], [], [], [], [], [], [], []]
-    func_list = ["", "", "", func_mu, "", "", "", ""]
-    steps_per_npz_list = [100, 1000, 100, 100, 1000, 1000, 100, 100]
-    subplots_list = [False, False, False, False, True, True, True, True]
-    property_func_list = [False, True, False, False, True, True, False, False]
-    list_of_arrays_list = [False, False, False, False, True, True, True, True]
-    property_names_list = ["E", "get_E_explicit", "mu_arr", "mu_arr", "get_center_of_mass", "get_parity", "monopolar", "monopolar"]
-    property_args_list = [[], [], [], [], [], [], [], []]
-    property_args_frame_list = [False, False, False, False, False, False, False, False]
+    file_suffix_list = ["", "_fft"]
+    inbuild_func_list = ["", "fft_plot"]
+    # inbuild_func_args_list = [[], [1, 1000]]
+    # inbuild_func_args_list = [[], [1, 200]]
+    # inbuild_func_args_list = [[], [1, 60]]
+    inbuild_func_args_list = [[], [1, 80]]
+    func_list = ["", ""]
+    steps_per_npz_list = [100, 100]
+    subplots_list = [True, True]
+    property_func_list = [False, False]
+    list_of_arrays_list = [True, True]
+    property_names_list = ["monopolar", "monopolar"]
+    property_args_list = [[], []]
+    property_args_frame_list = [False, False]
+
+    # func = "lambda x, y: (x, y)"
+    # file_suffix_list = ["_fft"]
+    # inbuild_func_list = ["fft_plot"]
+    # inbuild_func_args_list = [[1, 80]]
+    # func_list = [""]
+    # steps_per_npz_list = [100]
+    # subplots_list = [True]
+    # property_func_list = [False]
+    # list_of_arrays_list = [True]
+    # property_names_list = ["monopolar"]
+    # property_args_list = [[]]
+    # property_args_frame_list = [False]
+
+
+    # box = [80, 176, 28, 36, 28, 36]
+    # # box = [88, 168, 30, 34, 30, 34]
+    # # box = [0, 256, 0, 64, 0, 64]
+    # func = "lambda x, y: (x, y)"
+    # file_suffix_list = [""]
+    # inbuild_func_list = [""]
+    # inbuild_func_args_list = [[]]
+    # func_list = [""]
+    # steps_per_npz_list = [10000]
+    # subplots_list = [False]
+    # property_func_list = [True]
+    # list_of_arrays_list = [False]
+    # property_names_list = ["get_contrast_old"]
+    # property_args_list = [[2, *box]]
+    # property_args_frame_list = [False]
+
+
 
     # func_mu = "lambda x, y: (x[1:], np.abs(np.diff(y)) / np.abs(y[1:]))"
     # file_suffix_list = ["", "mu_rel", "", ""]
@@ -277,7 +344,8 @@ if __name__ == "__main__":
                                      # "pol_", steps_format]
                                      # filename_steps + "pol_", steps_format]
                 # property_args = [0.00725, number_of_peaks[i]]
-                command = ["python", "-m", "supersolids.tools.track_property"]
+                # command = ["python", "-m", "supersolids.tools.track_property"]
+                command = ["python", "/bigwork/dscheier/supersolids/supersolids/tools/track_property.py"]
                 flags = [f"-dt={dt}",
                          f"-dir_path={path_anchor_input}",
                          f"-dir_name={dir_name}{counting_format % movie_number}",

@@ -11,7 +11,8 @@ def get_version(package="supersolids"):
             package_version = version(package)
         except Exception:
             print(f"\n{package} is not installed!")
-            sys.exit(1)
+            package_version = "unknown"
+            # sys.exit(1)
     elif sys.version_info >= (3, 6, 0):
         package_version = get_distribution(package).version
     else:
@@ -27,11 +28,11 @@ def check_numba_used():
     if numba_version:
         numpy_version = get_version("numpy")
         # numba needs numpy version under or equal 1.21
-        if parse_version(numpy_version) < parse_version("1.24"):
+        if parse_version(numpy_version) < parse_version("1.25"):
             numba_used = True
             print("numba is usable!")
         else:
-            print("WARNING: numba NOT used, as it needs numpy version under or equal 1.24!")
+            print("WARNING: numba NOT used, as it needs numpy version under or equal 1.25!")
             numba_used = False
     else:
         print("WARNING: numba NOT used, as it is not installed!")

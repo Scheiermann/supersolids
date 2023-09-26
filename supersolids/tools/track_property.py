@@ -264,7 +264,7 @@ def plot_property(args, func=functions.identity):
         property_all = property_all.ravel()
         x_range, y_range = func(t, property_all, *args.inbuild_func_args)
 
-        plt.plot(x_range, y_range, "x-")
+        plt.plot(x_range, y_range, ".-")
         plt.xlabel(rf"t with dt={args.dt}")
         plt.ylabel(f"{args.property_name}")
         plt.grid()
@@ -281,12 +281,12 @@ def plot_property(args, func=functions.identity):
                     for j in range(0, number_of_components):
                         labels.append(f"component {j} axis {i}")
                         x_range, y_range = func(t, property_all[j, i, :], *args.inbuild_func_args)
-                        ax.plot(x_range, y_range, "x-", label=labels[-1])
+                        ax.plot(x_range, y_range, ".-", label=labels[-1])
 
                 else:
                     labels.append(str(i))
                     x_range, y_range = func(t, property_all.T[i], *args.inbuild_func_args)
-                    ax.plot(x_range, y_range, "x-", label=labels[i])
+                    ax.plot(x_range, y_range, ".-", label=labels[i])
                 ax.grid()
                 ax.legend()
             plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
@@ -300,7 +300,7 @@ def plot_property(args, func=functions.identity):
             for i in range(0, dim):
                 labels.append(str(i))
                 x_range, y_range = func(t, property_all.T[i], *args.inbuild_func_args)
-                plt.plot(x_range, y_range, "x-", label=labels[i])
+                plt.plot(x_range, y_range, ".-", label=labels[i])
 
             plt.setp(plt.gca().get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
             plt.xlabel(rf"t with dt={args.dt}")

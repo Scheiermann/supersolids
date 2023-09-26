@@ -515,10 +515,10 @@ class MayaviAnimation(Animation.Animation):
 
         path_schroedinger: Path = Path(input_path, filename_schroedinger)
         System = load_System(path_schroedinger, host=host)
-        # TODO
-        System.psi_sol_list[0] = functions.HO_3D(System.x_mesh, System.y_mesh, System.z_mesh,
-                                                 ind_x=0, ind_y=0, ind_z=0,
-                                                 ax=1, ay=1, az=1)
+        ## TODO:
+        # System.psi_sol_list[0] = functions.HO_3D(System.x_mesh, System.y_mesh, System.z_mesh,
+        #                                          ind_x=0, ind_y=0, ind_z=0,
+        #                                          ax=1, ay=1, az=1)
 
         (prob_plots, slice_x_plot, slice_y_plot, slice_z_plot,
          V_plot, psi_sol_plot) = self.prepare(System,

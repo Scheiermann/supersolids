@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from pathlib import Path
+import traceback
 from typing import List
 
 from moviepy.editor import VideoFileClip, clips_array
@@ -11,11 +12,16 @@ from PIL import Image
 def paste_together(path_in_list: List[Path], path_out: Path, nrow: int, ncol: int, ratio=None):
     fs = []
     for i, path_in in enumerate(path_in_list):
+        size = get_first_im_size(path_in_list, ratio)
         if path_in is None:
-            size = get_first_im_size(path_in_list, ratio)
             im = Image.new("RGB", size)
         else:
-            im = Image.open(path_in, 'r')
+            try:
+                im = Image.open(path_in, 'r')
+            except Exception as e:
+                im = Image.new("RGB", size)
+                traceback.print_tb(e.__traceback__)
+
             if ratio:
                 size = (int(ratio * size) for size in im.size)
                 im = im.resize(size, Image.ANTIALIAS)

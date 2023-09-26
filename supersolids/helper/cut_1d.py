@@ -12,6 +12,7 @@ time-dependent Schrodinger equation.
 """
 import functools
 from pathlib import Path
+import traceback
 from typing import Callable, List, Tuple, Optional
 
 import numpy as np
@@ -219,9 +220,12 @@ def read_cuts_paths(dir_paths: List[Path]):
     cuts = []
     probs = []
     for dir_path in dir_paths:
-        with open(dir_path, "rb") as f:
-            cuts.append(np.load(file=f)["cut"])
-            probs.append(np.load(file=f)["prob"])
+        try:
+            with open(dir_path, "rb") as f:
+                cuts.append(np.load(file=f)["cut"])
+                probs.append(np.load(file=f)["prob"])
+        except Exception as e:
+            traceback.print_tb(e.__traceback__)
 
     return cuts, probs
 
