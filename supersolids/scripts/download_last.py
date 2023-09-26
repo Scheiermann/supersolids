@@ -92,31 +92,93 @@ if __name__ == "__main__":
     # experiment_suffix = "gpu_01_13_dip9"
     # experiment_suffix = "gpu_01_20_dip9"
     # experiment_suffix = "gpu_01_21_dip9"
-    experiment_suffix = "gpu_2023_08_23"
+    # experiment_suffix = "gpu_2023_08_23"
     # experiment_suffix = "gpu_2023_08_23_part2"
+    # experiment_suffix = "gpu_2023_09_04"
+    # experiment_suffix = "gpu_2023_09_04_dip9"
+    # experiment_suffix = "gpu_2023_09_25_stacked"
+    experiment_suffix = "gpu_2023_09_26_stacked"
     # path_anchor_input = Path(f"/home/dscheiermann/results/begin_{experiment_suffix}/")
-    path_anchor_input = Path(f"/mnt/disk2/dscheiermann/results/begin_{experiment_suffix}/")
+    path_anchor_input = Path(f"/mnt/disk1/dscheiermann/results/begin_{experiment_suffix}/")
+    # path_anchor_input = Path(f"/mnt/disk2/dscheiermann/results/begin_{experiment_suffix}/")
     path_anchor_output = Path(f"/bigwork/dscheier/results/begin_{experiment_suffix}/")
     # path_anchor_output = Path("/run/media/dsche/scr2/begin_gpu/")
     # path_anchor_output = Path("/run/media/dsche/scr2/begin_gpu_big/")
 
 
-    take_last = 11
-    # take_last = None
+    # take_last = 9
+    # take_last = 9
+    take_last = None
 
     movie_string = "movie"
     counting_format = "%03d"
-    movie_start = 1
-    movie_end = 36
+    # movie_start = 151
+    # movie_end = 186
+    # movie_start = 201
+    # movie_end = 216
+    # movie_start = 231
+    # movie_end = 246
+    # movie_start = 271
+    # movie_end = 286
+
+    # movie_start = 401
+    # movie_end = 416
+    # movie_start = 401
+    # movie_end = 401
+    # movie_start = 421
+    # movie_end = 421
+    # movie_start = 441
+    # movie_end = 441
+    # movie_start = 501
+    # movie_end = 548
+
+    # movie_start = 111
+    # movie_end = 141
+
+    # movie_start = 306
+    # movie_end = 350
+    # movie_start = 406
+    # movie_end = 450
+
+    # movie_start = 1
+    # movie_end = 4
+    movie_start = 11
+    movie_end = 17
+    # movie_start = 1
+    # movie_end = 7
+    # movie_start = 21
+    # movie_end = 27
+
+    # movie_start = 506
+    # movie_end = 550
+
+    # movie_start = 601
+    # movie_end = 650
+
+    # movie_start = 211
+    # movie_end = 241
+
+    # movie_start = 1
+    # movie_end = 15
+    # movie_start = 21
+    # movie_end = 35
+
+    # movie_start = 1
+    # movie_end = 72
 
     mixture = True
 
+    steps_property = 100
+
+    if take_last is None:
+        take_last_list = [None, None, None, None]
+    else:
+        take_last_list = [take_last, take_last, take_last, (take_last - 1) * steps_property]
+
     if mixture:
-        take_last_list = [take_last, take_last, take_last, (take_last - 1) * 100]
         filename_steps_list = ["script_", "schroedinger_",
                                "step_", "SchroedingerMixtureSummary_"]
     else:
-        take_last_list = [take_last, take_last, take_last, (take_last - 1) * 100]
         filename_steps_list = ["script_", "schroedinger_",
                                "step_", "SchroedingerSummary_"]
     steps_format_list = ["%04d", "%04d", "%07d", "%07d"]
@@ -124,7 +186,7 @@ if __name__ == "__main__":
     filename_number_regex_list = ['*', '*', '*', '*']
     # filename_number_regex = '*0000'
 
-    filename_singles = ["schroedinger.pkl", "script.txt"]
+    filename_singles = ["schroedinger.pkl", "script.txt", "distort.txt"]
     download_steps = True
 
     for i in range(movie_start, movie_end + 1):
